@@ -1,5 +1,21 @@
 # Progress Log
 
+## 2026-07-17 (adversarial bug-hunt run, post-task-3)
+
+**Done:** Fetched all branches, checked out `claude/dev`, ran `npm test` in both `sample-app/` (29/29 green) and `reviewer/` (46/46 green), then hunted adversarially for bugs/weak tests/security holes on the two commits since the last hunt (`97a4882` errorHandling fix, `ad9b7de` task 3 config+loader) — `sample-app/` was untouched since the prior hunt and showed nothing new on re-inspection.
+
+- **Real bug found and fixed — `missingTests` rule aggregated "has a test" across the whole diff instead of per source file:** `reviewer/src/rules/missingTests.js` computed `testFiles.length > 0` once for the entire diff and used that single boolean to suppress *every* source file's missing-tests finding. Reproduced directly: a diff changing `src/utils/round.js` (no test) and `src/utils/slugify.js` alongside `tests/slugify.test.js` (its own test) produced **zero** issues — `round.js`'s missing coverage was silently hidden because *some* test file happened to be present elsewhere in the same diff. This is the exact same class of bug already codified in CLAUDE.md's error-handling-rule guideline below (one compliant instance silencing findings for an unrelated non-compliant instance) but at cross-file scope instead of within-file scope, and it shipped in task 2 (2026-07-17 "task 2: reviewer core") undetected because none of the pre-existing tests put more than one source file in a single diff.
+  - Fix: `check()` now matches each source file against changed test files by basename convention (`round.js` <-> `round.test.js`) instead of a diff-wide flag; a source file is only suppressed if *its own* matching test changed, not merely *some* test file anywhere in the diff.
+  - Added a fixture (`missing-tests-mixed-files.diff`) and 1 regression test reproducing the false negative. Suite is now 47/47 green in `reviewer/`.
+- **Reviewed, left as-is:** `security.js`, `performance.js`, `style.js` all iterate and emit issues per-line/per-file already (no file-wide aggregate booleans) — checked each against the same false-negative shape (multiple lines/files, mixed compliant/non-compliant) and found no analogous bug. `diffParser.js`'s `/dev/null` labeling for deleted files (flagged in the prior hunt entry) remains cosmetic-only and unchanged — still no observed failure. `loadRuleConfig.js`'s YAML malformed-file handling (throws on any non-ENOENT error) and `buildRules.js`'s severity filtering were re-checked and are correct; `js-yaml@4`'s `load()` uses the safe schema by default, so no arbitrary-code-execution risk from a malicious `review-rules.yaml`.
+
+**Decisions:**
+- Matched source-to-test files by basename (stripping `.js`/`.test.js`) rather than requiring an exact directory mirror (e.g. `src/foo.js` <-> `tests/foo.test.js` specifically), since the existing fixtures and `missing-tests` rule already tolerate test files living directly under `tests/` regardless of the source file's subdirectory depth — an exact-path convention would have been a stricter rule than the one already in place and risked new false positives without an observed failure motivating it.
+- Did not extend the same per-file matching to a "does the test actually cover the changed lines" check (already an open question from task 2) — out of scope for this bug fix; the fix only closes the cross-file aggregation false negative, not the coarser diff-local-vs-coverage-aware heuristic question.
+
+**Open questions for Vijay:**
+- Now that `missing-tests` matches by basename convention, should non-conventionally-named test files (e.g. a single `tests/controllers.test.js` covering multiple controller source files) be supported via config, or is 1:1 basename matching the intended contract going forward?
+
 ## 2026-07-17 (task 3: review-rules.yaml + loader)
 
 **Done:** Task 3 — added `review-rules.yaml` (repo root) with MERN defaults, and a loader in `reviewer/src/config/`:

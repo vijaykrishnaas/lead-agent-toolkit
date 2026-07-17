@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-17 (adversarial bug-hunt run, post-task-3)
+**Change:** Broadened the existing CLAUDE.md guideline on diff-scanning static-analysis rules (below the hard invariants) to explicitly cover cross-file aggregation, not just within-a-single-file aggregation. Also updated its required test coverage to include a "2+ source files in one diff, mixed compliant/non-compliant" case, not only a "2+ occurrences in one file" case.
+
+**Evidence:** PROGRESS.md, 2026-07-17 "adversarial bug-hunt run, post-task-3" entry — `reviewer/src/rules/missingTests.js` computed `testFiles.length > 0` once for the entire diff and reused that single boolean for every source file, so a test file changed for one source file silenced the missing-tests finding for a completely different, untested source file in the same diff. This is the same underlying bug class as the `errorHandling.js` file-wide-aggregation bug the existing CLAUDE.md guideline was written to prevent (2026-07-17 "reviewer adversarial-hunt run" entry) — except at cross-file scope rather than within-file scope. The guideline's original wording ("never aggregate a single boolean across a whole file diff") didn't explicitly rule out cross-file aggregation, so it didn't prevent this second occurrence of the same class of false negative from shipping in task 2/3. Fixed in the same run (basename-based per-source-file test matching in `missingTests.js`, 1 new fixture, 1 new regression test, suite 47/47 green) — this changelog entry codifies the broadened scope so a third occurrence (e.g. aggregating across multiple hunks, or across multiple rule invocations) is caught by the same guideline going forward.
+
 ## 2026-07-17
 **Change:** Added a guideline to CLAUDE.md (below the hard invariants) requiring async Express route handlers to be wrapped in error handling (routed to a catch-all error middleware) and requiring every handler's test suite to include at least one rejected-promise test case, not only resolved-happy-path mocks.
 

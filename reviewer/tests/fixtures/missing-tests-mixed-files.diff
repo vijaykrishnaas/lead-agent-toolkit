@@ -1,0 +1,26 @@
+diff --git a/src/utils/round.js b/src/utils/round.js
+index e69de29..4b825dc 100644
+--- a/src/utils/round.js
++++ b/src/utils/round.js
+@@ -1,2 +1,4 @@
+ function round(value, digits) {
++  const factor = 10 ** digits;
++  return Math.round(value * factor) / factor;
+ }
+diff --git a/src/utils/slugify.js b/src/utils/slugify.js
+index e69de29..4b825dc 100644
+--- a/src/utils/slugify.js
++++ b/src/utils/slugify.js
+@@ -1,2 +1,4 @@
+ function slugify(title) {
++  return title.trim().toLowerCase().replace(/\s+/g, '-');
+ }
+diff --git a/tests/slugify.test.js b/tests/slugify.test.js
+index e69de29..4b825dc 100644
+--- a/tests/slugify.test.js
++++ b/tests/slugify.test.js
+@@ -1,2 +1,4 @@
+ const { slugify } = require('../src/utils/slugify');
++test('slugify converts a title to a slug', () => {
++  expect(slugify('Hello World')).toBe('hello-world');
++});

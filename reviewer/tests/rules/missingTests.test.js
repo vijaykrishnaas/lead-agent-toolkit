@@ -70,4 +70,16 @@ describe('missing-tests rule', () => {
     const files = parseDiff(loadFixture('missing-tests.diff'));
     expect(missingTestsRule.check(files, { sourceDirs: [] })).toEqual(missingTestsRule.check(files));
   });
+
+  it('flags an untested source file even when a different source file in the same diff has a matching test', () => {
+    const files = parseDiff(loadFixture('missing-tests-mixed-files.diff'));
+    const issues = missingTestsRule.check(files);
+
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({
+      file: 'src/utils/round.js',
+      severity: 'medium',
+    });
+    expect(issues.some((issue) => issue.file === 'src/utils/slugify.js')).toBe(false);
+  });
 });

@@ -70,4 +70,18 @@ describe('Users', () => {
     const res = await request(app).delete('/api/users/u2').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
     expect(res.status).toBe(403);
   });
+
+  test('GET /:id returns 400 for a malformed id instead of hanging', async () => {
+    const castErr = new Error('Cast to ObjectId failed');
+    castErr.name = 'CastError';
+    User.findById.mockRejectedValue(castErr);
+    const res = await request(app).get('/api/users/not-a-valid-id').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
+    expect(res.status).toBe(400);
+  });
+
+  test('GET /me returns 500 instead of hanging when the database call fails', async () => {
+    User.findById.mockRejectedValue(new Error('connection lost'));
+    const res = await request(app).get('/api/users/me').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
+    expect(res.status).toBe(500);
+  });
 });

@@ -8,7 +8,7 @@ function auth(req, res, next) {
   }
   try {
     const secret = process.env.JWT_SECRET || 'dev-secret';
-    const payload = jwt.verify(token, secret);
+    const payload = jwt.verify(token, secret, { algorithms: ['HS256'] });
     req.user = { id: payload.id, email: payload.email };
     return next();
   } catch (err) {

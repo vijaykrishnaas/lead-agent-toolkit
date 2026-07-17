@@ -79,4 +79,18 @@ describe('Tasks', () => {
     const res = await request(app).delete('/api/tasks/missing').set('Authorization', auth);
     expect(res.status).toBe(404);
   });
+
+  test('GET /:id returns 400 for a malformed id instead of hanging', async () => {
+    const castErr = new Error('Cast to ObjectId failed');
+    castErr.name = 'CastError';
+    Task.findOne.mockRejectedValue(castErr);
+    const res = await request(app).get('/api/tasks/not-a-valid-id').set('Authorization', auth);
+    expect(res.status).toBe(400);
+  });
+
+  test('POST / returns 500 instead of hanging when the database call fails', async () => {
+    Task.create.mockRejectedValue(new Error('connection lost'));
+    const res = await request(app).post('/api/tasks').set('Authorization', auth).send({ title: 'X' });
+    expect(res.status).toBe(500);
+  });
 });

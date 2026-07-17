@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 function signToken(user) {
   const secret = process.env.JWT_SECRET || 'dev-secret';
-  return jwt.sign({ id: user._id, email: user.email }, secret, { expiresIn: '1d' });
+  return jwt.sign({ id: user._id, email: user.email }, secret, { expiresIn: '1d', algorithm: 'HS256' });
 }
 
 async function register(req, res) {

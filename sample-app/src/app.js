@@ -15,6 +15,17 @@ function createApp() {
 
   app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    if (err.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid id' });
+    }
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ error: err.message });
+    }
+    return res.status(500).json({ error: 'Internal server error' });
+  });
+
   return app;
 }
 

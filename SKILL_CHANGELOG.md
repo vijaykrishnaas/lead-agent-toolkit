@@ -1,0 +1,6 @@
+# Skill Changelog
+
+## 2026-07-17
+**Change:** Added a guideline to CLAUDE.md (below the hard invariants) requiring async Express route handlers to be wrapped in error handling (routed to a catch-all error middleware) and requiring every handler's test suite to include at least one rejected-promise test case, not only resolved-happy-path mocks.
+
+**Evidence:** PROGRESS.md, 2026-07-17 "adversarial bug-hunt run" entry — `usersController.js` and `tasksController.js` had zero error handling around their async Mongoose calls, and `app.js` had no catch-all error middleware. A rejected promise (e.g. a real Mongoose `CastError` from an invalid ObjectId in the URL, or a transient DB failure) hung the HTTP request indefinitely instead of returning an error response — a DoS-shaped bug. It shipped to `claude/dev` undetected because all 25 existing tests only ever mocked resolved values; none exercised a rejection path. The bug itself was fixed in the same run (new `src/middleware/asyncHandler.js`, wired into both route files, plus a catch-all error middleware in `app.js`, plus 4 new regression tests), but the underlying cause — test suites that only cover the happy path — is a repo-wide risk worth codifying so it isn't reintroduced by later tasks (e.g. task 2's reviewer core).

@@ -1,0 +1,25 @@
+diff --git a/src/utils/slugify.js b/src/utils/slugify.js
+index e69de29..4b825dc 100644
+--- a/src/utils/slugify.js
++++ b/src/utils/slugify.js
+@@ -1,2 +1,8 @@
+ function slugify(title) {
++  try {
++    return title.trim().toLowerCase().replace(/\s+/g, '-');
++  } catch (err) {
++    return '';
++  }
+ }
++module.exports = { slugify };
+diff --git a/tests/slugify.test.js b/tests/slugify.test.js
+index e69de29..4b825dc 100644
+--- a/tests/slugify.test.js
++++ b/tests/slugify.test.js
+@@ -1,2 +1,6 @@
+ const { slugify } = require('../src/utils/slugify');
++test('slugify converts a title to a slug', () => {
++  expect(slugify('Hello World')).toBe('hello-world');
++});
++test('slugify handles non-string input without throwing', () => {
++  expect(slugify(null)).toBe('');
++});

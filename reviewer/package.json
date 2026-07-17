@@ -1,0 +1,12 @@
+{
+  "name": "reviewer",
+  "version": "1.0.0",
+  "description": "Diff -> structured review JSON: risk assessment and categorized issues (security, missing-tests, error-handling, performance, style)",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

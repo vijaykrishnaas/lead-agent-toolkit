@@ -1,0 +1,12 @@
+diff --git a/src/services/notifyService.js b/src/services/notifyService.js
+index e69de29..4b825dc 100644
+--- a/src/services/notifyService.js
++++ b/src/services/notifyService.js
+@@ -1,2 +1,6 @@
+ const mailer = require('../lib/mailer');
++async function notifyAll(users) {
++  users.forEach(async (user) => {
++    await mailer.send(user.email);
++  });
++}
+ module.exports = { notifyAll: () => {} };

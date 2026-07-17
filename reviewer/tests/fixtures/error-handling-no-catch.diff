@@ -1,0 +1,11 @@
+diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js
+index e69de29..4b825dc 100644
+--- a/src/controllers/widgetsController.js
++++ b/src/controllers/widgetsController.js
+@@ -1,2 +1,6 @@
+ const Widget = require('../models/Widget');
++exports.getWidget = async (req, res) => {
++  const widget = await Widget.findById(req.params.id);
++  res.json(widget);
++};
+ module.exports = exports;

@@ -36,3 +36,21 @@
 **Open questions for Vijay:**
 - Should `GET /api/users/:id` be locked down to self-only, or is cross-user lookup of name/email intentional public-profile behavior? Left unchanged pending your call.
 - Given this run found a systemic gap (tests only ever mock happy-path resolves, never rejections), should task 2's reviewer core treat "no rejected-promise test per async handler" as a first-class `missing-tests` finding category?
+
+## 2026-07-17 (task 2: reviewer core)
+
+**Done:** Task 2 — built `reviewer/`, a self-contained package implementing diff -> structured review JSON:
+- `src/diffParser.js`: parses unified-diff text (as produced by `git diff`) into `{ file, hunks: [{ header, lines: [{ type: 'add'|'del'|'context', content, newLine, oldLine }] }] }`, tracking old/new line numbers per hunk header.
+- `src/rules/{security,errorHandling,missingTests,performance,style}.js`: one rule module per required category, each exporting `{ category, check(files) }`. Heuristics implemented: hardcoded-credential patterns and `eval(` (security); async route handlers with no `try`/`asyncHandler` wrapper and `.then()` without `.catch()` (error-handling); source files changed with no corresponding test file changed in the same diff (missing-tests); `await` inside `.forEach()` and the `JSON.parse(JSON.stringify(...))` deep-clone anti-pattern (performance); `var` declarations and stray `console.log` (style).
+- `src/reviewer.js`: `reviewDiff(diffText, rules = defaultRules)` runs all rules over the parsed diff and returns `{ risk, issues: [{ file, line, category, severity, message, fix }] }`. `risk` is `'none'|'low'|'medium'|'high'`, taken as the max issue severity present (or `'none'` if no issues).
+- 6 diff fixtures under `tests/fixtures/` (one per category plus a `clean.diff` with no findings), 29 Jest tests across `tests/diffParser.test.js`, `tests/reviewer.test.js`, and one test file per rule — all green (`npm test` inside `reviewer/`).
+
+**Decisions:**
+- Resolved the open question above (own top-level package vs. root workspace) by following the same precedent as `sample-app/`: `reviewer/` is a self-contained package with its own `package.json`/`node_modules`, so each package's `npm test` stays independent and green per hard invariant #1. Revisit if a later task (e.g. task 4's CLI) needs to import across packages.
+- Rules are intentionally hardcoded regex/heuristic checks for now, not yet driven by config — task 3 (`review-rules.yaml` + loader) is the next backlog item and is expected to supply/override the rule set that `reviewDiff` accepts as its second argument, which is why that parameter already exists and is exercised by a "custom rule set" test.
+- `missing-tests` is diff-local (no test file present anywhere in the same diff), not a full-repo check for an existing test file — matches the scope of "diff -> structured review JSON" without needing repo/filesystem access from the reviewer core.
+- Both root-level packages (`sample-app/`, `reviewer/`) currently need separate `npm install && npm test` runs; there is still no root `package.json`. Flagging again below since task 4 (CLI) may need to invoke the reviewer as a library from a different entry point.
+
+**Open questions for Vijay:**
+- Should `reviewer/` and `sample-app/` be unified under an npm workspaces root once there are 3+ packages, or is the current fully-independent-packages layout fine to keep through the rest of the backlog?
+- The `missing-tests` rule only checks whether *any* test file changed alongside a source file in the diff, not whether it actually covers the changed lines. Is that heuristic sufficient for the reviewer's purposes, or should a later task try to map test files to the source files they cover (e.g. by naming convention)?

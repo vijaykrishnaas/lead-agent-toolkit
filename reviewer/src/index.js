@@ -1,1 +1,5 @@
-module.exports = { ...require('./reviewer'), ...require('./config/loadRules') };
+module.exports = {
+  ...require('./reviewer'),
+  ...require('./config/loadRules'),
+  ...require('./format/markdownReport'),
+};

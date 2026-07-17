@@ -3,7 +3,7 @@
 1. [DONE] Scaffold sample-app/: minimal Express+Mongo REST API (users, auth, tasks CRUD), Jest, plain JS. `npm test` green.
 2. [DONE] Reviewer core: diff -> structured review JSON (risk, issues[]: file/line/category/fix). Categories: security, missing-tests, error-handling, performance, style. Fixture-based unit tests.
 3. [DONE] review-rules.yaml config with MERN defaults; loader + tests.
-4. CLI: `npm run review -- <base>..<head>` -> markdown report. Verify against sample-app history.
+4. [DONE] CLI: `npm run review -- <base>..<head>` -> markdown report. Verify against sample-app history.
 5. GitHub integration: post review as PR comment (token via env, mocked in tests).
 6. Standup module: last 24h commits/PRs -> per-author standup markdown.
 7. Doc-drift module: Express routes vs openapi.yaml -> mismatch report.

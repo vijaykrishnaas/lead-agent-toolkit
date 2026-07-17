@@ -55,6 +55,38 @@ describe('error-handling rule', () => {
     expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
   });
 
+  it('flags the second handler when only the first of two handlers in a file has a try/catch', () => {
+    // Regression: the rule used to decide hasTry/hasAsyncWrapper once for
+    // the whole file diff, so a try/catch on one handler silenced the
+    // check for every other handler added in the same file.
+    const files = parseDiff(loadFixture('error-handling-mixed-handlers.diff'));
+    const issues = errorHandlingRule.check(files);
+
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('deleteWidget');
+  });
+
+  it('flags an uncaught .then() chain even when an earlier chain in the same file has a .catch()', () => {
+    const diff = [
+      'diff --git a/src/jobs/cleanup.js b/src/jobs/cleanup.js',
+      '--- a/src/jobs/cleanup.js',
+      '+++ b/src/jobs/cleanup.js',
+      '@@ -1,1 +1,5 @@',
+      ' function cleanup() {',
+      '+  db.remove().then((r) => r.count).catch((e) => log(e));',
+      '+}',
+      '+function purge() {',
+      '+  return db.purge().then((r) => r.count);',
+      '+}',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const thenIssues = issues.filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
+    expect(thenIssues).toHaveLength(1);
+    expect(thenIssues[0].line).toBe(5);
+  });
+
   it('flags a .then() chain with no matching .catch()', () => {
     const diff = [
       'diff --git a/src/jobs/cleanup.js b/src/jobs/cleanup.js',

@@ -1,0 +1,17 @@
+rules:
+  security:
+    enabled: false
+
+  error-handling:
+    enabled: true
+    minSeverity: high
+
+  missing-tests:
+    enabled: true
+    options:
+      sourceDirs:
+        - app/src
+
+  style:
+    enabled: true
+    minSeverity: bogus

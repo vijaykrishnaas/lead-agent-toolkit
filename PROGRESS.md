@@ -1,5 +1,25 @@
 # Progress Log
 
+## 2026-07-17 (task 3: review-rules.yaml + loader)
+
+**Done:** Task 3 — added `review-rules.yaml` (repo root) with MERN defaults, and a loader in `reviewer/src/config/`:
+- `review-rules.yaml`: per-category config (`security`, `error-handling`, `missing-tests`, `performance`, `style`) with `enabled`, `minSeverity`, and rule-specific `options`. `missing-tests.options.sourceDirs` defaults to `[src, lib, client/src, server/src, sample-app/src, reviewer/src]` — this directly closes the gap flagged as an open question in the 2026-07-17 "reviewer adversarial-hunt run" entry below (the old hardcoded `^(src|lib)/` pattern never matched nested packages like `sample-app/src/...`).
+- `reviewer/src/config/loadRuleConfig.js`: reads + normalizes the YAML (`js-yaml` added as a dependency). Missing file -> empty config (all rules run with defaults, matching `reviewDiff`'s no-config behavior); malformed file (any non-ENOENT read error) still throws; invalid `minSeverity` values fall back to `'low'`.
+- `reviewer/src/config/buildRules.js`: applies a normalized config over a base rule set — drops disabled categories, filters issues below `minSeverity`, forwards `options` as each rule's second `check(files, options)` argument.
+- `reviewer/src/config/loadRules.js`: composes the two into `loadRules(configPath?, baseRules?)`, returning a rules array usable directly by `reviewDiff`. Re-exported from `reviewer/src/index.js` alongside the existing `reviewDiff`/`parseDiff`/`defaultRules`.
+- `reviewer/src/rules/missingTests.js`: extended `check(files, options)` to accept `options.sourceDirs` (falls back to the original `['src', 'lib']` default when omitted or empty), so the rule itself stays config-driven instead of the loader needing to monkey-patch it.
+- 15 new tests: `tests/config/{loadRuleConfig,buildRules,loadRules}.test.js` plus 4 new cases in `tests/rules/missingTests.test.js` (default-pattern-unchanged, widened-via-options, empty-options-falls-back, one new fixture `tests/fixtures/config/custom-rules.yaml`). One `loadRules` integration test asserts the actual repo-root `review-rules.yaml` reproduces the pre-task-3 default `reviewDiff` output byte-for-byte on the existing `security-hardcoded-secret.diff` fixture, guarding against the new config accidentally changing behavior for categories that weren't the point of this task. Suite is now 46/46 green in `reviewer/`; `sample-app/` still 29/29 green (untouched).
+
+**Decisions:**
+- Placed `review-rules.yaml` at the repo root (not inside `reviewer/`), matching how CLAUDE.md lists it alongside other root-level, agent-tunable files ("You MAY improve: ... TASKS.md ordering, review-rules.yaml") rather than as reviewer-package-internal config.
+- Kept per-category config to `enabled` + `minSeverity` + free-form `options`, instead of letting config override individual issue severities — the existing rules emit multiple severities per category (e.g. `error-handling` emits both `high` for a missing try/catch and `medium` for an uncaught `.then()`), so a single per-category severity override would have silently collapsed that distinction. `minSeverity` filtering preserves it while still letting a MERN-tuned config quiet noisy categories.
+- Only `missing-tests` gained a real config-consumed option (`sourceDirs`) in this pass — no other rule has an analogous config-shaped need yet (e.g. `security`'s secret-pattern regex isn't backlog-scoped for this task), so no speculative `options` support was added to `security`/`performance`/`style`/`error-handling`.
+- Chose `js-yaml@^4` (CommonJS, no ESM-only surprises) over hand-rolling a YAML subset parser; network access to the npm registry was confirmed working before adding the dependency.
+
+**Open questions for Vijay:**
+- Should task 4's CLI accept a `--config <path>` flag wired to `loadRules(path)`, or always resolve `review-rules.yaml` from the repo root regardless of where the CLI is invoked from?
+- Is `minSeverity`-based filtering the right lever for a MERN-tuned config, or would you rather see per-issue-type (not just per-category) severity overrides once more rules exist — e.g. distinguishing the two `error-handling` sub-checks (missing try/catch vs. uncaught `.then()`) in config?
+
 ## 2026-07-17
 
 **Done:** Task 1 — scaffolded `sample-app/`, a minimal Express + Mongoose REST API in plain JS (Node 20):

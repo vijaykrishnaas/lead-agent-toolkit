@@ -1,0 +1,39 @@
+# review-rules.yaml
+#
+# Configuration for reviewer/ (diff -> structured review JSON). Loaded via
+# reviewer/src/config/loadRules.js. Controls, per rule category: whether the
+# rule runs at all (enabled), the minimum issue severity to report
+# (minSeverity), and rule-specific options.
+#
+# Defaults below target a MERN-stack layout (Mongo/Express/React/Node) with
+# one or more Express packages living under <package>/src, plus the common
+# client/src + server/src split some MERN repos use.
+
+rules:
+  security:
+    enabled: true
+    minSeverity: low
+
+  error-handling:
+    enabled: true
+    minSeverity: low
+
+  missing-tests:
+    enabled: true
+    minSeverity: low
+    options:
+      sourceDirs:
+        - src
+        - lib
+        - client/src
+        - server/src
+        - sample-app/src
+        - reviewer/src
+
+  performance:
+    enabled: true
+    minSeverity: low
+
+  style:
+    enabled: true
+    minSeverity: low

@@ -1,1 +1,1 @@
-module.exports = require('./reviewer');
+module.exports = { ...require('./reviewer'), ...require('./config/loadRules') };

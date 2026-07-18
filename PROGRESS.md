@@ -1,5 +1,23 @@
 # Progress Log
 
+## 2026-07-18 (task 5: GitHub integration — post review as PR comment)
+
+**Done:** Task 5 — added `reviewer/src/github/postReviewComment.js`:
+- `postReviewComment({ token, owner, repo, prNumber, body }, deps)` — POSTs `body` (the markdown report from task 4) to `POST /repos/{owner}/{repo}/issues/{prNumber}/comments` on the GitHub REST API, with a `Bearer` auth header. `deps.request` defaults to the global `fetch` (Node 20+, no new dependency needed) but is fully injectable so tests never make a real network call. Throws a clear error (without calling `request`) when `token`, `owner`/`repo`, or `prNumber` is missing, and throws with the response status + body text on a non-2xx GitHub response.
+- `tokenFromEnv(env = process.env)` — reads `GITHUB_TOKEN` from the environment (injectable `env` for tests), matching the task's "token via env" requirement without hardcoding secrets anywhere in the module.
+- Re-exported both from `reviewer/src/index.js` alongside the other public API (`reviewDiff`, `loadRules`, `formatMarkdownReport`).
+- 7 new tests in `tests/github/postReviewComment.test.js` (happy path asserts the exact URL/method/headers/body; missing-token, missing-owner/repo, and missing-prNumber cases all assert `request` is never called; a non-ok response case asserts the thrown error includes status + body text; two `tokenFromEnv` cases). Suite is now 69/69 green in `reviewer/`; `sample-app/` still 29/29 green (untouched).
+
+**Decisions:**
+- Did not wire this into `reviewer/src/cli.js`. `runCli` is currently fully synchronous (returns a plain exit code, and all 15 existing CLI tests assert on that synchronous return value); posting to GitHub is inherently async, so wiring it in would mean either making `runCli` return a `Promise` everywhere (touching every existing CLI test and the `require.main` entrypoint) or bolting on a parallel async code path — both are bigger, riskier changes than what task 5 actually asks for, and nothing in the task description or backlog says the CLI itself needs a `--post-pr` flag. Kept `postReviewComment` as a standalone, directly-importable module instead, matching how `reviewer/src/index.js` already re-exports each task's public API piece by piece. Backlog task 9 (`.claude/skills/review-pr/SKILL.md`, "runs the reviewer on a PR and posts results") is the natural place to compose the CLI's diff/report generation with this module's PR-commenting — revisit CLI wiring there only if that task's shape actually needs it.
+- Used the global `fetch` (stable in Node 20+, confirmed available in this environment) instead of adding an HTTP client dependency (e.g. `node-fetch`, `axios`) or hand-rolling an `https` request — no observed need for anything beyond a single injectable POST call, and it keeps `reviewer/`'s dependency list unchanged (`js-yaml` is still the only runtime dependency).
+- Auth header is `Bearer <token>` (current GitHub REST API guidance) rather than the older `token <token>` scheme — both are accepted by GitHub today, but `Bearer` is the documented current form and there's no existing convention in this repo to match instead.
+- Kept validation minimal and specific (three distinct missing-field error messages) rather than a generic schema validator — matches this repo's existing style in `cli.js`'s `parseArgs` (hand-written checks with specific error messages) over introducing a validation library for three required fields.
+
+**Open questions for Vijay:**
+- Should posting fail loudly (current behavior: reject/throw) or should there be a "dry run" / `--no-post` type escape hatch once this is wired into a CI-triggered flow (task 9's skill), so a reviewer run can still produce a report even if the GitHub API call fails or `GITHUB_TOKEN` isn't set in that environment?
+- Is one comment per review run the intended behavior, or should a later task look for an existing bot comment on the PR and update it in place (avoiding a growing thread of comments on every push)? No existing behavior to preserve either way since this is the first GitHub-API-writing code in the repo — flagging before task 9 builds on top of it.
+
 ## 2026-07-17 (task 4: CLI)
 
 **Done:** Task 4 — added `reviewer/src/cli.js`, a `npm run review -- <base>..<head>` CLI that shells out to `git diff <range>`, runs it through `loadRules()` (the repo-root `review-rules.yaml`) and `reviewDiff`, and renders the result as a markdown report:

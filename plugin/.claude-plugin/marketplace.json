@@ -1,0 +1,14 @@
+{
+  "name": "lead-agent-toolkit-plugins",
+  "description": "Local marketplace for the lead-agent-toolkit plugin (PR review + standup skills).",
+  "owner": {
+    "name": "Vijay Krishna"
+  },
+  "plugins": [
+    {
+      "name": "lead-agent-toolkit",
+      "source": "./",
+      "description": "PR review and standup-digest skills backed by this repo's reviewer/ diff-scanning CLI toolkit."
+    }
+  ]
+}

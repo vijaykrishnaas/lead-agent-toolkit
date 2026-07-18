@@ -106,6 +106,35 @@ Findings can also be posted directly to a PR via `github/postReviewComment.js` (
 npm run doc-drift -- --app <path/to/app.js> --openapi <path/to/openapi.yaml> [--out report.md]
 ```
 
+## Claude Code plugin
+
+The `review-pr` and `standup` skills are also packaged as an installable Claude
+Code plugin at `plugin/` — install it once and invoke the skills as
+`/lead-agent-toolkit:review-pr` and `/lead-agent-toolkit:standup` from any
+project, instead of relying on this repo's standalone `.claude/skills/`
+(`plugin/skills/*` are exact copies of `.claude/skills/*`; both need to stay
+in sync, which `reviewer/tests/plugin.test.js` checks).
+
+**Test it for a single session**, from the repo root:
+
+```bash
+claude --plugin-dir ./plugin
+```
+
+**Install it persistently** (survives across sessions/projects), from the
+repo root:
+
+```bash
+claude
+> /plugin marketplace add ./plugin
+> /plugin install lead-agent-toolkit@lead-agent-toolkit-plugins
+```
+
+Either way, the skills' underlying scripts (`reviewer/src/reviewPrCli.js`,
+`reviewer/src/standupCli.js`) are invoked with `node`, so run them from a
+shell that's `cd`'d into (or pass `--repo` pointing at) a checkout of this
+repo — the plugin doesn't bundle its own copy of `reviewer/`.
+
 ## Project conventions
 
 - Plain JavaScript, Node 20, Jest — no TypeScript, no AST parser (rules use scoped regex/heuristics over diff text, consistent with the rest of the codebase).

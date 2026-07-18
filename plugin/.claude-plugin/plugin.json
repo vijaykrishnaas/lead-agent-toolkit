@@ -1,0 +1,12 @@
+{
+  "name": "lead-agent-toolkit",
+  "displayName": "Lead Agent Toolkit",
+  "description": "PR review and standup-digest skills backed by this repo's reviewer/ diff-scanning CLI toolkit.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Vijay Krishna"
+  },
+  "homepage": "https://github.com/vijaykrishnaas/lead-agent-toolkit",
+  "repository": "https://github.com/vijaykrishnaas/lead-agent-toolkit",
+  "keywords": ["code-review", "pull-request", "standup", "github", "diff"]
+}

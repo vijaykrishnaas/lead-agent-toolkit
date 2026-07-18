@@ -55,6 +55,36 @@ describe('collectExpressRoutes', () => {
     ]);
   });
 
+  it('follows a router file that itself mounts a nested sub-router, instead of dropping the sub-router\'s routes', () => {
+    // Regression: only the app entry file was ever scanned for mounts, so a
+    // router file mounting its own nested sub-router (e.g. tasks.routes.js
+    // mounting comments.routes.js under '/:id/comments') had the entire
+    // sub-router's routes silently missing from the collected set.
+    const nestedTasksRouterSource = `
+      const commentsRoutes = require('./comments.routes');
+      router.get('/', list);
+      router.use('/:id/comments', commentsRoutes);
+    `;
+    const commentsRouterSource = `
+      router.get('/', listComments);
+      router.post('/', createComment);
+    `;
+    const readFile = jest.fn((filePath) => {
+      if (filePath === appEntryPath) return `const tasksRoutes = require('./routes/tasks.routes');\napp.use('/api/tasks', tasksRoutes);`;
+      if (filePath === path.resolve('/repo/src', './routes/tasks.routes.js')) return nestedTasksRouterSource;
+      if (filePath === path.resolve('/repo/src/routes', './comments.routes.js')) return commentsRouterSource;
+      throw new Error(`unexpected read: ${filePath}`);
+    });
+
+    const routes = collectExpressRoutes({ appEntryPath }, { readFile });
+
+    expect(routes).toEqual([
+      { method: 'GET', path: '/api/tasks' },
+      { method: 'GET', path: '/api/tasks/:id/comments' },
+      { method: 'POST', path: '/api/tasks/:id/comments' },
+    ]);
+  });
+
   it('resolves a requirePath that already ends in .js without appending a second .js', () => {
     const readFile = jest.fn((filePath) => {
       if (filePath === appEntryPath) {

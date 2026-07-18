@@ -1,6 +1,11 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 
-const FOREACH_START = /\.forEach\(\s*(async\s+)?\([^)]*\)\s*=>\s*{/;
+// The param-list group is matched lazily (not `[^)]*`) so a nested paren in
+// a default value or destructuring default (e.g. `({ id = genId() }) => {`)
+// doesn't stop the match at that inner `)` -- the lazy quantifier keeps
+// expanding until it finds a `)` immediately followed by `=> {`, which is
+// necessarily the callback's own closing paren.
+const FOREACH_START = /\.forEach\(\s*(async\s+)?\(.*?\)\s*=>\s*{/;
 const AWAIT_PATTERN = /\bawait\b/;
 const DEEP_CLONE_ANTIPATTERN = /JSON\.parse\(\s*JSON\.stringify\(/;
 

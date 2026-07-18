@@ -1,8 +1,12 @@
 // Normalizes a route path for comparison across Express and OpenAPI param
 // syntax (':id' -> '{id}') and trailing slashes, so the same real route
-// written either way compares equal.
+// written either way compares equal. Express param regex constraints (e.g.
+// ':id(\d+)') have no OpenAPI equivalent, so the constraint is dropped along
+// with the conversion -- otherwise ':id(\d+)' -> '{id}(\d+)' never matches
+// its documented '{id}' counterpart, and the same real, fully-documented
+// route is reported as drift on both sides.
 function normalizeRoutePath(routePath) {
-  const withBraceParams = routePath.replace(/:([A-Za-z_$][\w$]*)/g, '{$1}');
+  const withBraceParams = routePath.replace(/:([A-Za-z_$][\w$]*)(\([^)]*\))?/g, '{$1}');
   if (withBraceParams === '/') return withBraceParams;
   return withBraceParams.replace(/\/$/, '');
 }

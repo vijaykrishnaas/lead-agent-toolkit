@@ -29,15 +29,38 @@ function collectThenStatement(addedLines, startIdx) {
   return blockLines.join('\n');
 }
 
+// Collects the lines belonging to the handler block starting at
+// addedLines[startIdx], bounded by that handler's own brace depth (from its
+// first `{` back down to 0) rather than "up to the next handler's start
+// line" — the latter sweeps in any unrelated code sitting between two
+// handlers (e.g. a helper function with its own unrelated try/catch), which
+// would otherwise satisfy TRY_BLOCK/ASYNC_WRAPPER for a handler that has no
+// error handling of its own.
+function collectHandlerBlock(addedLines, startIdx) {
+  let depth = 0;
+  let sawOpen = false;
+  const blockLines = [];
+  for (let i = startIdx; i < addedLines.length; i += 1) {
+    const content = addedLines[i].content;
+    blockLines.push(content);
+    for (const ch of content) {
+      if (ch === '{') { depth += 1; sawOpen = true; } else if (ch === '}') depth -= 1;
+    }
+    if (sawOpen && depth <= 0) break;
+  }
+  return blockLines.join('\n');
+}
+
 function check(files) {
   const issues = [];
   for (const file of files) {
     const addedLines = collectAddedLines(file);
 
-    // Handlers are analyzed per-block (from one handler signature up to the
-    // next), not file-wide: a try/catch or asyncHandler wrapper on one
-    // handler must not silence the check for a sibling handler in the same
-    // file diff.
+    // Handlers are analyzed per-block (each handler's own brace-bounded
+    // body), not file-wide and not "up to the next handler": a try/catch or
+    // asyncHandler wrapper on one handler — or on unrelated code sitting
+    // between two handlers — must not silence the check for a sibling
+    // handler in the same file diff.
     const handlerIndexes = [];
     addedLines.forEach((line, idx) => {
       if (ASYNC_HANDLER_SIGNATURE.test(line.content) && HANDLER_PARAMS.test(line.content)) {
@@ -45,12 +68,8 @@ function check(files) {
       }
     });
 
-    handlerIndexes.forEach((idx, i) => {
-      const blockEnd = i + 1 < handlerIndexes.length ? handlerIndexes[i + 1] : addedLines.length;
-      const block = addedLines
-        .slice(idx, blockEnd)
-        .map((line) => line.content)
-        .join('\n');
+    handlerIndexes.forEach((idx) => {
+      const block = collectHandlerBlock(addedLines, idx);
       if (!TRY_BLOCK.test(block) && !ASYNC_WRAPPER.test(block)) {
         const line = addedLines[idx];
         issues.push({

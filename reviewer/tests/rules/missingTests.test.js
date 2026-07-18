@@ -71,6 +71,23 @@ describe('missing-tests rule', () => {
     expect(missingTestsRule.check(files, { sourceDirs: [] })).toEqual(missingTestsRule.check(files));
   });
 
+  it('flags a source file even when a different source file with the same basename (in a different directory) has a matching test', () => {
+    // Regression: matching was basename-only, so `src/utils/round.js` and
+    // `src/other/round.js` in the same diff were treated as interchangeable
+    // by a single `tests/round.test.js` -- even though that test file only
+    // actually imports `src/utils/round`, leaving `src/other/round.js`
+    // completely untested and unflagged.
+    const files = parseDiff(loadFixture('missing-tests-basename-collision.diff'));
+    const issues = missingTestsRule.check(files);
+
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({
+      file: 'src/other/round.js',
+      severity: 'medium',
+    });
+    expect(issues.some((issue) => issue.file === 'src/utils/round.js')).toBe(false);
+  });
+
   it('flags an untested source file even when a different source file in the same diff has a matching test', () => {
     const files = parseDiff(loadFixture('missing-tests-mixed-files.diff'));
     const issues = missingTestsRule.check(files);

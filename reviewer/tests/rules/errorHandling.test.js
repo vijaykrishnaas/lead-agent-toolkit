@@ -67,6 +67,41 @@ describe('error-handling rule', () => {
     expect(handlerIssues[0].message).toContain('deleteWidget');
   });
 
+  it('flags both handlers when unrelated code with its own try/catch sits between them', () => {
+    // Regression: handler blocks used to be bounded by "up to the next
+    // handler's start line," which swept unrelated intervening code (e.g. a
+    // helper function with its own try/catch) into the first handler's
+    // window, satisfying TRY_BLOCK for a handler that has no error handling
+    // of its own.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,16 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => {',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+      '+function unrelatedHelper() {',
+      '+  try {',
+      '+    doSomething();',
+      '+  } catch (e) {',
+      '+    log(e);',
+      '+  }',
+      '+}',
+      '+exports.deleteWidget = async (req, res) => {',
+      '+  await Widget.findByIdAndDelete(req.params.id);',
+      '+  res.status(204).send();',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(2);
+    expect(handlerIssues.some((i) => i.message.includes('getWidget'))).toBe(true);
+    expect(handlerIssues.some((i) => i.message.includes('deleteWidget'))).toBe(true);
+  });
+
   it('flags an uncaught .then() chain even when an earlier chain in the same file has a .catch()', () => {
     const diff = [
       'diff --git a/src/jobs/cleanup.js b/src/jobs/cleanup.js',

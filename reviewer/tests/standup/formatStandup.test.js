@@ -69,6 +69,56 @@ describe('formatStandupReport', () => {
     expect(report.indexOf('PR two')).toBeLessThan(report.indexOf('PR five'));
   });
 
+  it('neutralizes markdown-structural characters and embedded newlines in commit messages and PR titles', () => {
+    // Commit messages and PR titles are attacker-influenceable (any
+    // contributor controls their own). A malicious title/message must not be
+    // able to forge a markdown link, break out of its list item via an
+    // embedded newline to inject a fake heading/metadata line, or otherwise
+    // alter the report's structure.
+    const groups = makeGroups([
+      [
+        'Mallory',
+        {
+          commits: [
+            {
+              hash: 'deadbeefff',
+              author: 'Mallory',
+              date: '2026-07-18T08:00:00Z',
+              message: 'Fix login `](javascript:alert(1))` and add | pipe | chars',
+            },
+          ],
+          pullRequests: [
+            {
+              number: 99,
+              author: 'Mallory',
+              title: '[Click here](javascript:alert(document.cookie))\n## Fake Section\n**Since:** 1970-01-01',
+              state: 'open',
+            },
+          ],
+        },
+      ],
+    ]);
+
+    const report = formatStandupReport(groups);
+
+    // No unescaped "](" survives anywhere, so no live markdown link, and no
+    // forged heading/metadata line (the embedded newlines that would have
+    // started new lines were collapsed to spaces).
+    expect(report).not.toMatch(/[^\\]\]\(/);
+    expect(report).not.toMatch(/^## Fake Section$/m);
+    expect(report).not.toMatch(/^\*\*Since:\*\* 1970-01-01$/m);
+    // The whole PR entry stays on a single line, with structural characters
+    // backslash-escaped to inert literal text.
+    const prLineIndex = report.indexOf('- #99');
+    const prLineEnd = report.indexOf('\n', prLineIndex);
+    const prLine = report.slice(prLineIndex, prLineEnd);
+    expect(prLine).toBe(
+      '- #99 \\[Click here\\]\\(javascript:alert\\(document.cookie\\)\\) '
+      + '## Fake Section \\*\\*Since:\\*\\* 1970-01-01 (open)',
+    );
+    expect(report).toContain('- `deadbee` Fix login \\`\\]\\(javascript:alert\\(1\\)\\)\\` and add | pipe | chars');
+  });
+
   it('sorts commits chronologically by actual instant, not by lexicographic date string, across mixed timezone offsets', () => {
     // git's %aI preserves each commit's own author-timezone offset, so a
     // naive string sort can put a later commit first when the offset pushes
@@ -81,8 +131,8 @@ describe('formatStandupReport', () => {
         'Dave',
         {
           commits: [
-            { hash: 'cccccccccc', author: 'Dave', date: '2026-07-18T23:30:00-07:00', message: 'Later (non-UTC offset)' },
-            { hash: 'dddddddddd', author: 'Dave', date: '2026-07-19T01:00:00+00:00', message: 'Earlier (UTC offset)' },
+            { hash: 'cccccccccc', author: 'Dave', date: '2026-07-18T23:30:00-07:00', message: 'Later non-UTC offset' },
+            { hash: 'dddddddddd', author: 'Dave', date: '2026-07-19T01:00:00+00:00', message: 'Earlier UTC offset' },
           ],
           pullRequests: [],
         },
@@ -91,6 +141,6 @@ describe('formatStandupReport', () => {
 
     const report = formatStandupReport(groups);
 
-    expect(report.indexOf('Earlier (UTC offset)')).toBeLessThan(report.indexOf('Later (non-UTC offset)'));
+    expect(report.indexOf('Earlier UTC offset')).toBeLessThan(report.indexOf('Later non-UTC offset'));
   });
 });

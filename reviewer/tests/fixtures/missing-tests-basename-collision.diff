@@ -1,0 +1,27 @@
+diff --git a/src/utils/round.js b/src/utils/round.js
+index e69de29..4b825dc 100644
+--- a/src/utils/round.js
++++ b/src/utils/round.js
+@@ -1,2 +1,4 @@
+ function round(value, digits) {
++  const factor = 10 ** digits;
++  return Math.round(value * factor) / factor;
+ }
+diff --git a/src/other/round.js b/src/other/round.js
+index e69de29..4b825dc 100644
+--- a/src/other/round.js
++++ b/src/other/round.js
+@@ -1,2 +1,4 @@
+ function round(value, mode) {
++  if (mode === 'up') return Math.ceil(value);
++  return Math.floor(value);
+ }
+diff --git a/tests/round.test.js b/tests/round.test.js
+index e69de29..4b825dc 100644
+--- a/tests/round.test.js
++++ b/tests/round.test.js
+@@ -1,2 +1,4 @@
+ const { round } = require('../src/utils/round');
++test('rounds', () => {
++  expect(round(1.005, 2)).toBeCloseTo(1.01);
++});

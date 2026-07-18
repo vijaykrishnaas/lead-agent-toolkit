@@ -64,6 +64,40 @@ describe('parseRouterSource', () => {
       { method: 'GET', path: '/widgets' },
     ]);
   });
+  it('extracts routes defined via router.route(path).<verb>() chaining', () => {
+    // Regression: METHOD_CALL_PATTERN requires the verb call to be
+    // immediately preceded by "router." or "app.", so a chained call like
+    // router.route('/widgets').get(fn).post(fn) never matched at all — the
+    // token before ".get(" is ")" from ".route(...)", not "router" — and
+    // the whole route silently vanished from the extracted route list.
+    const source = `
+      router.route('/widgets').get(listWidgets).post(createWidget);
+      router.route('/widgets/:id')
+        .get(getWidget)
+        .put(updateWidget)
+        .delete(deleteWidget);
+    `;
+
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/widgets' },
+      { method: 'POST', path: '/widgets' },
+      { method: 'GET', path: '/widgets/:id' },
+      { method: 'PUT', path: '/widgets/:id' },
+      { method: 'DELETE', path: '/widgets/:id' },
+    ]);
+  });
+
+  it('does not let one .route() chain\'s verbs bleed into the next .route() chain in the same file', () => {
+    const source = `
+      router.route('/a').get(getA);
+      router.route('/b').post(createB);
+    `;
+
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/b' },
+    ]);
+  });
 });
 
 describe('parseAppEntrySource', () => {

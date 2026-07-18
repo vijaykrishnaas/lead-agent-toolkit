@@ -17,6 +17,14 @@ describe('normalizeRoutePath', () => {
   it('leaves an already-{param}-style path unchanged', () => {
     expect(normalizeRoutePath('/api/users/{id}')).toBe('/api/users/{id}');
   });
+
+  it('drops an Express param regex constraint so a fully-documented route does not read as drift', () => {
+    // Regression: ':id(\d+)' only had the ':name' prefix converted, leaving
+    // the constraint suffix ("(\d+)") in place -- so ':id(\d+)' normalized
+    // to '{id}(\d+)' instead of '{id}', which never matches the spec's
+    // plain '{id}' entry for the same real route.
+    expect(normalizeRoutePath('/users/:id(\\d+)')).toBe('/users/{id}');
+  });
 });
 
 describe('compareRoutes', () => {
@@ -61,6 +69,13 @@ describe('compareRoutes', () => {
 
     const result = compareRoutes(codeRoutes, specRoutes);
     expect(result.missingFromSpec).toEqual([{ method: 'POST', path: '/api/tasks' }]);
+  });
+
+  it('does not report drift for a route documented in the spec whose Express definition has a param regex constraint', () => {
+    const codeRoutes = [{ method: 'GET', path: '/users/:id(\\d+)' }];
+    const specRoutes = [{ method: 'GET', path: '/users/{id}' }];
+
+    expect(compareRoutes(codeRoutes, specRoutes)).toEqual({ missingFromSpec: [], missingFromCode: [] });
   });
 
   it('sorts results by method then path for stable output', () => {

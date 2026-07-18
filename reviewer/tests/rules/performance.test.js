@@ -59,6 +59,26 @@ describe('performance rule', () => {
     expect(issues).toEqual([]);
   });
 
+  it('flags await inside a .forEach() whose callback has a destructuring default containing a nested call', () => {
+    // Regression: FOREACH_START used `[^)]*` for the param list, which can't
+    // contain a nested `)` -- a default/destructuring param like
+    // `({ id = genId() })` broke the match entirely, so the whole block
+    // (including a genuine await) was never even inspected.
+    const diff = [
+      'diff --git a/src/services/batch.js b/src/services/batch.js',
+      '--- a/src/services/batch.js',
+      '+++ b/src/services/batch.js',
+      '@@ -1,1 +1,4 @@',
+      '+items.forEach(({ id = genId() }) => {',
+      '+  await save(id);',
+      '+});',
+    ].join('\n');
+
+    const issues = performanceRule.check(parseDiff(diff));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].line).toBe(1);
+  });
+
   it('does not let a clean forEach silence — or misattribute the line of — a later bad forEach in the same file', () => {
     const diff = [
       'diff --git a/src/services/batch.js b/src/services/batch.js',

@@ -8,7 +8,7 @@
     {
       "name": "lead-agent-toolkit",
       "source": "./",
-      "description": "PR review and standup-digest skills backed by this repo's reviewer/ diff-scanning CLI toolkit."
+      "description": "PR review, standup-digest, and doc-drift skills backed by this repo's reviewer/ diff-scanning CLI toolkit."
     }
   ]
 }

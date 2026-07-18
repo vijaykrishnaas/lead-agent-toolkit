@@ -50,7 +50,15 @@ describe('marketplace.json', () => {
 });
 
 describe('plugin skills', () => {
-  const skillNames = ['review-pr', 'standup'];
+  const skillNames = fs
+    .readdirSync(STANDALONE_SKILLS_ROOT, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+
+  it('found at least one standalone skill to check parity against', () => {
+    expect(skillNames.length).toBeGreaterThan(0);
+  });
 
   it.each(skillNames)('%s/SKILL.md exists under the plugin skills/ directory', (name) => {
     const skillPath = path.join(PLUGIN_ROOT, 'skills', name, 'SKILL.md');

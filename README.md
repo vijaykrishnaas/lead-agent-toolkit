@@ -108,12 +108,14 @@ npm run doc-drift -- --app <path/to/app.js> --openapi <path/to/openapi.yaml> [--
 
 ## Claude Code plugin
 
-The `review-pr` and `standup` skills are also packaged as an installable Claude
-Code plugin at `plugin/` — install it once and invoke the skills as
-`/lead-agent-toolkit:review-pr` and `/lead-agent-toolkit:standup` from any
-project, instead of relying on this repo's standalone `.claude/skills/`
-(`plugin/skills/*` are exact copies of `.claude/skills/*`; both need to stay
-in sync, which `reviewer/tests/plugin.test.js` checks).
+The `review-pr`, `standup`, and `doc-drift` skills are also packaged as an
+installable Claude Code plugin at `plugin/` — install it once and invoke the
+skills as `/lead-agent-toolkit:review-pr`, `/lead-agent-toolkit:standup`, and
+`/lead-agent-toolkit:doc-drift` from any project, instead of relying on this
+repo's standalone `.claude/skills/` (`plugin/skills/*` are exact copies of
+`.claude/skills/*`; both need to stay in sync, which
+`reviewer/tests/plugin.test.js` checks against every directory under
+`.claude/skills/`, not a hardcoded list).
 
 **Test it for a single session**, from the repo root:
 

@@ -52,6 +52,17 @@ describe('postReviewComment', () => {
 
     await expect(postReviewComment(baseArgs, { request })).rejects.toThrow(/404.*Not Found/s);
   });
+
+  it('URL-encodes owner/repo/prNumber so a stray "/" cannot redirect the request to a different API path', async () => {
+    const request = jest.fn().mockResolvedValue(makeResponse({ json: { id: 1 } }));
+
+    await postReviewComment({ ...baseArgs, owner: 'attacker/other-owner', repo: 'other-repo' }, { request });
+
+    expect(request).toHaveBeenCalledWith(
+      `${GITHUB_API_URL}/repos/attacker%2Fother-owner/other-repo/issues/42/comments`,
+      expect.anything(),
+    );
+  });
 });
 
 describe('tokenFromEnv', () => {

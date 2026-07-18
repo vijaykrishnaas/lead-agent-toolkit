@@ -41,6 +41,7 @@ function parseReviewPrArgs(argv) {
   if (!args.owner) throw new Error('Missing required --owner <owner>.');
   if (!args.ghRepo) throw new Error('Missing required --gh-repo <name>.');
   if (!args.pr) throw new Error('Missing required --pr <number>.');
+  if (!/^\d+$/.test(args.pr)) throw new Error(`Invalid --pr "${args.pr}" — expected a plain number.`);
   if (!args.range) throw new Error('Missing <base>..<head> range.');
   if (!RANGE_PATTERN.test(args.range)) {
     throw new Error(`Invalid range "${args.range}" — expected <base>..<head>.`);

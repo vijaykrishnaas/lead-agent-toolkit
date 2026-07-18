@@ -22,7 +22,8 @@ async function postReviewComment({ token, owner, repo, prNumber, body }, deps = 
     throw new Error('Missing prNumber — the PR number to comment on.');
   }
 
-  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/issues/${prNumber}/comments`;
+  const url = `${GITHUB_API_URL}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
+    + `/issues/${encodeURIComponent(prNumber)}/comments`;
   const response = await request(url, {
     method: 'POST',
     headers: {

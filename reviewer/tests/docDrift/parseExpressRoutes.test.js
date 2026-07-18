@@ -100,4 +100,19 @@ describe('parseAppEntrySource', () => {
       { prefix: '/b', requirePath: './b' },
     ]);
   });
+
+  it('still resolves a mount when one or more middleware args sit between the prefix and the router', () => {
+    const source = `
+      const authMiddleware = require('./middleware/auth');
+      const tasksRoutes = require('./routes/tasks.routes');
+      const usersRoutes = require('./routes/users.routes');
+      app.use('/api/tasks', authMiddleware, tasksRoutes);
+      app.use('/api/users', authMiddleware, someValidator, usersRoutes);
+    `;
+    const { mounts } = parseAppEntrySource(source);
+    expect(mounts).toEqual([
+      { prefix: '/api/tasks', requirePath: './routes/tasks.routes' },
+      { prefix: '/api/users', requirePath: './routes/users.routes' },
+    ]);
+  });
 });

@@ -60,6 +60,11 @@ describe('parseReviewPrArgs', () => {
     expect(() => parseReviewPrArgs(['--owner', 'o', '--gh-repo', 'r', '--pr', '1', 'abc123'])).toThrow(/Invalid range/);
   });
 
+  it('throws when --pr is not a plain number (e.g. a path-injection attempt)', () => {
+    expect(() => parseReviewPrArgs(['--owner', 'o', '--gh-repo', 'r', '--pr', '1/../other-repo', 'a..b']))
+      .toThrow(/Invalid --pr/);
+  });
+
   it('throws on an unrecognized flag', () => {
     expect(() => parseReviewPrArgs([...BASE_ARGV, '--bogus'])).toThrow(/Unrecognized argument/);
   });

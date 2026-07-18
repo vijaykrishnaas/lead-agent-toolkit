@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-18 (adversarial bug-hunt run, post-task-6)
+**Change:** Added a guideline to CLAUDE.md (below the hard invariants) requiring timezone-offset-preserving timestamp strings (e.g. git's `%aI`) to be parsed to `Date`/epoch and compared numerically, never sorted via plain string comparison, and requiring a mixed-offset test case for any such sort.
+
+**Evidence:** PROGRESS.md, 2026-07-18 "adversarial bug-hunt run, post-task-6" entry — `reviewer/src/standup/formatStandup.js` sorted each author's commits with `a.date.localeCompare(b.date)` on the `%aI` author-date string, which preserves the commit's original author-timezone offset rather than normalizing to UTC. Confirmed a real misordering: a commit dated `2026-07-18T23:30:00-07:00` (`2026-07-19T06:30:00Z` — later in real time) sorted *before* one dated `2026-07-19T01:00:00+00:00` (`2026-07-19T01:00:00Z` — earlier), purely because `'07-18' < '07-19'` as text. This is a new bug class — not the file/cross-file aggregation class the two existing rule-related guidelines cover, and not the unguarded-pipeline-stage class the CLI guideline covers — so it's captured as its own entry. All four pre-existing sort tests used `Z`-only or matching-offset fixtures, which happen to sort correctly as text, so the bug shipped undetected; a first attempt at a regression test also passed against the buggy code for the same reason (offsets that didn't straddle a day boundary), which is why the guideline explicitly calls out that same-offset/coincidental-pass risk. Fixed in the same run (`new Date(a.date) - new Date(b.date)` in `formatStandup.js`, 1 new regression test using offsets that straddle a UTC day boundary, verified to fail against the pre-fix code and pass against the fix; suite 95/95 green in `reviewer/`, 29/29 in `sample-app/`).
+
 ## 2026-07-18 (adversarial bug-hunt run, post-task-5)
 **Change:** Added a guideline to CLAUDE.md (below the hard invariants) requiring a script's testable entry point (e.g. `runCli`) to wrap every pipeline stage in try/catch, not only the stages already anticipated to fail, and requiring an unexpected-throw test case for every stage.
 

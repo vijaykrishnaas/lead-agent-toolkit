@@ -28,7 +28,7 @@ function formatStandupReport(groups, meta = {}) {
 
     if (commits.length > 0) {
       lines.push('**Commits:**');
-      for (const commit of [...commits].sort((a, b) => a.date.localeCompare(b.date))) {
+      for (const commit of [...commits].sort((a, b) => new Date(a.date) - new Date(b.date))) {
         lines.push(formatCommitLine(commit));
       }
       lines.push('');

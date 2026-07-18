@@ -7,7 +7,8 @@
     "test": "jest",
     "review": "node src/cli.js",
     "review-pr": "node src/reviewPrCli.js",
-    "doc-drift": "node src/docDriftCli.js"
+    "doc-drift": "node src/docDriftCli.js",
+    "standup": "node src/standupCli.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"

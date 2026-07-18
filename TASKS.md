@@ -9,7 +9,7 @@
 7. [DONE] Doc-drift module: Express routes vs openapi.yaml -> mismatch report.
 8. [DONE] README + mermaid architecture diagram.
 9. [DONE] Skill: .claude/skills/review-pr/SKILL.md — runs the reviewer on a PR and posts results. Follow Claude Code skill-authoring best practices (check official docs in-run).
-10. Skill: .claude/skills/standup/SKILL.md — generates standup digest.
+10. [DONE] Skill: .claude/skills/standup/SKILL.md — generates standup digest.
 11. Package skills as an installable Claude Code plugin (manifest per current plugin docs) so Vijay can install locally: `plugin/` dir + install instructions in README.
 12. Skill: .claude/skills/doc-drift/SKILL.md.
 13. Self-audit: read all PROGRESS.md entries, write RETRO.md — what failed, what to improve, propose 3 new backlog tasks.

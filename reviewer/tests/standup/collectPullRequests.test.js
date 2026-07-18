@@ -102,4 +102,15 @@ describe('collectPullRequests', () => {
 
     await expect(collectPullRequests({ owner: 'o', repo: 'r', since }, { request })).rejects.toThrow(/404.*Not Found/s);
   });
+
+  it('URL-encodes owner/repo so a stray "/" cannot redirect the request to a different API path', async () => {
+    const request = jest.fn().mockResolvedValue(makeResponse({ json: [] }));
+
+    await collectPullRequests({ owner: 'attacker/other-owner', repo: 'r', since }, { request });
+
+    expect(request).toHaveBeenCalledWith(
+      `${GITHUB_API_URL}/repos/attacker%2Fother-owner/r/pulls?state=all&sort=updated&direction=desc&per_page=50`,
+      expect.anything(),
+    );
+  });
 });

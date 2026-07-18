@@ -21,7 +21,7 @@ async function collectPullRequests({ owner, repo, since } = {}, deps = {}) {
   const headers = { Accept: 'application/vnd.github+json', 'User-Agent': 'lead-agent-toolkit-reviewer' };
   if (deps.token) headers.Authorization = `Bearer ${deps.token}`;
 
-  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/pulls?state=all&sort=updated&direction=desc&per_page=50`;
+  const url = `${GITHUB_API_URL}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/pulls?state=all&sort=updated&direction=desc&per_page=50`;
   const response = await request(url, { headers });
 
   if (!response.ok) {

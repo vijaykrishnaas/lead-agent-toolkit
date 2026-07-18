@@ -11,6 +11,10 @@ reviewer's rule set (`review-rules.yaml`), formats a markdown report, and
 posts that report as a comment on the given GitHub PR — all via one script,
 `reviewer/src/reviewPrCli.js` (`npm run review-pr` from `reviewer/`).
 
+Re-running this skill against a PR it already commented on updates that
+prior comment in place rather than posting a new one each time, so
+reviewing the same PR repeatedly doesn't grow a long comment thread.
+
 ## Before running
 
 1. Confirm the four required values: `owner`, `gh-repo` (the GitHub repo

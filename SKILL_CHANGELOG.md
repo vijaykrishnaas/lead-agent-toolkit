@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-18 (task 16: update-in-place PR comment posting)
+**Change:** `reviewer/src/github/postReviewComment.js` now searches the PR's existing comments for one it posted previously (identified by a hidden `BOT_COMMENT_MARKER` prefix) and `PATCH`es it in place instead of always `POST`ing a new comment. Updated `.claude/skills/review-pr/SKILL.md` and its byte-identical `plugin/skills/review-pr/SKILL.md` copy to document this behavior change.
+
+**Evidence:** TASKS.md item 16, proposed in RETRO.md's 2026-07-18 self-audit, citing PROGRESS.md's task-5 entry (which first raised "should this update an existing comment instead of always posting a new one?" as an open question) and task-9's entry (which restated it, unresolved, when the `review-pr` skill — explicitly designed for repeat invocation against the same PR — shipped). This is TASKS.md backlog work, not a discretionary self-improvement, but logged here per hard invariant 3, which names "skills" as one of the three self-modification categories requiring a changelog entry regardless of discretion — same precedent as the task-9/task-11/task-14 entries below. Without this fix, reviewing the same PR more than once (the skill's own stated normal use case) grows an ever-longer comment thread instead of keeping one up-to-date review comment. Suite is 226/226 green in `reviewer/` (221 pre-existing + 5 net-new regression tests covering the search/PATCH/POST-fallback/pagination/marker-position behavior), 29/29 in `sample-app/` (unaffected).
+
 ## 2026-07-18 (adversarial bug-hunt run, post-task-14)
 **Change:** Added a new guideline to CLAUDE.md (below the hard invariants) requiring a rule's exemption/allowlist condition to be checked against the same specific value its positive check already matched, never against the whole line/block the positive check happened to be scanning — and requiring, before trusting such an exemption, a check of what the specific case it claims to protect would do if the exemption were deleted outright.
 

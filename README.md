@@ -1,1 +1,113 @@
 # lead-agent-toolkit
+
+Two self-contained Node 20 / plain-JavaScript packages:
+
+- **`sample-app/`** — a minimal Express + Mongoose REST API (auth, users, tasks CRUD) that exists as a realistic MERN-style target for `reviewer/` to analyze and demo against.
+- **`reviewer/`** — a diff-scanning code review toolkit: turns a git diff into a structured, categorized review (security, error-handling, missing-tests, performance, style), plus a standup-digest generator and an Express-routes-vs-OpenAPI-spec doc-drift checker.
+
+Each package has its own `package.json`/`node_modules` and its own `npm test` — there is no root package or workspace yet (see `PROGRESS.md` for the open question on unifying them).
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph sampleapp["sample-app/ (demo target)"]
+        routes["routes/*.routes.js"] --> controllers["controllers/*Controller.js"]
+        controllers --> asyncHandler["middleware/asyncHandler.js"]
+        controllers --> models["models/User.js, Task.js"]
+        auth["middleware/auth.js"] --> routes
+        app["app.js"] --> routes
+        app --> errorMiddleware["catch-all error middleware"]
+        server["server.js"] --> app
+        server --> db["config/db.js (MongoDB)"]
+    end
+
+    subgraph reviewer["reviewer/"]
+        git[("git diff / repo")] --> diffParser["diffParser.js"]
+        diffParser --> rulesEngine["reviewer.js: reviewDiff()"]
+
+        subgraph rules["rules/*"]
+            security["security.js"]
+            errorHandling["errorHandling.js"]
+            missingTests["missingTests.js"]
+            performance["performance.js"]
+            style["style.js"]
+        end
+        rulesEngine --> rules
+
+        yamlConfig[("review-rules.yaml")] --> configLoader["config/loadRules.js"]
+        configLoader --> rulesEngine
+
+        rulesEngine --> markdownReport["format/markdownReport.js"]
+        markdownReport --> cli["cli.js: npm run review"]
+        markdownReport --> postComment["github/postReviewComment.js"]
+        postComment --> githubApi[("GitHub REST API")]
+
+        commits[("git log")] --> collectCommits["standup/collectCommits.js"]
+        prs[("GitHub PRs API")] --> collectPRs["standup/collectPullRequests.js"]
+        collectCommits --> groupByAuthor["standup/groupByAuthor.js"]
+        collectPRs --> groupByAuthor
+        groupByAuthor --> formatStandup["standup/formatStandup.js"]
+
+        appEntry[("Express app entry + routers")] --> parseRoutes["docDrift/parseExpressRoutes.js"]
+        openapi[("openapi.yaml")] --> parseOpenApi["docDrift/parseOpenApi.js"]
+        parseRoutes --> compareRoutes["docDrift/compareRoutes.js"]
+        parseOpenApi --> compareRoutes
+        compareRoutes --> formatDocDrift["docDrift/formatDocDrift.js"]
+        formatDocDrift --> docDriftCli["docDriftCli.js: npm run doc-drift"]
+    end
+
+    routes -.diffed / scanned.-> git
+    app -.routes.-> appEntry
+```
+
+## `sample-app/`
+
+Minimal Express + Mongoose REST API, plain JS.
+
+- **Auth:** `POST /api/auth/register`, `POST /api/auth/login` — bcrypt password hashing, JWT (HS256, pinned algorithm).
+- **Users:** `GET /api/users/me`, `GET /api/users/:id`, `PUT /api/users/:id`, `DELETE /api/users/:id` (JWT-protected, self-only for write/delete).
+- **Tasks:** full CRUD under `/api/tasks`, scoped to the authenticated owner.
+- `GET /health`, JSON 404 fallback, and a catch-all error middleware (every async handler is wrapped via `middleware/asyncHandler.js` so rejected promises can't hang a request).
+- `openapi.yaml` at the package root documents all routes; kept in sync with the code and checked by `reviewer/`'s doc-drift module.
+
+```bash
+cd sample-app
+npm install
+npm test    # 29 Jest + Supertest tests, models mocked (no live MongoDB needed)
+npm start   # requires a real MONGO_URI
+```
+
+## `reviewer/`
+
+### Code review: diff → structured findings
+
+`reviewDiff(diffText, rules)` parses a unified diff and runs it through pluggable rule modules (`security`, `error-handling`, `missing-tests`, `performance`, `style`), each scoped to the individual block/occurrence being checked (not aggregated file-wide — see `CLAUDE.md`). Rules and their severities are configurable via the repo-root `review-rules.yaml`.
+
+```bash
+cd reviewer
+npm install
+npm test                                # 138 Jest tests
+npm run review -- <base>..<head>        # markdown report to stdout
+npm run review -- <base>..<head> --out report.md
+```
+
+Findings can also be posted directly to a PR via `github/postReviewComment.js` (`GITHUB_TOKEN` from the environment).
+
+### Standup digest
+
+`standup/generateStandup({ repo, owner, ghRepo, since }, deps)` collects the last N hours of commits (`git log`) and pull requests (GitHub REST API), groups them by author, and renders a per-author markdown digest. Importable as a library today; not yet wired to a CLI (see backlog task 10).
+
+### Doc-drift: routes vs. OpenAPI spec
+
+`docDrift/generateDocDrift` parses an Express app's routes (entry file + mounted routers) and an OpenAPI YAML doc, then diffs the two route lists.
+
+```bash
+npm run doc-drift -- --app <path/to/app.js> --openapi <path/to/openapi.yaml> [--out report.md]
+```
+
+## Project conventions
+
+- Plain JavaScript, Node 20, Jest — no TypeScript, no AST parser (rules use scoped regex/heuristics over diff text, consistent with the rest of the codebase).
+- All I/O (`git`, `fetch`, filesystem) is dependency-injected into orchestration functions (`runCli`, `generateStandup`, `postReviewComment`, ...) so tests never shell out or hit the network.
+- Full history of decisions, bugs found/fixed, and open questions lives in `PROGRESS.md`; self-modification history (CLAUDE.md guideline changes) lives in `SKILL_CHANGELOG.md`; the backlog lives in `TASKS.md`.

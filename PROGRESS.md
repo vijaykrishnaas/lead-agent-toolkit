@@ -1,5 +1,21 @@
 # Progress Log
 
+## 2026-07-18 (task 8: README + mermaid architecture diagram)
+
+**Done:** Fetched all branches, checked out `claude/dev` (already existed upstream, up to date with `origin/claude/dev`), ran `npm install && npm test` in both `reviewer/` (138/138 green) and `sample-app/` (29/29 green) to confirm a clean baseline, then did task 8 (topmost non-DONE backlog item): `README.md` was a single-line stub (`# lead-agent-toolkit`), so wrote a real one.
+
+- Rewrote `README.md`: a top-level summary of the two packages (`sample-app/`, `reviewer/`), a mermaid `flowchart TB` architecture diagram (two subgraphs — `sample-app/`'s routes -> controllers -> models/asyncHandler/error-middleware chain, and `reviewer/`'s four pipelines: diff -> rules -> markdown report -> CLI/PR-comment, git log + GitHub PRs -> standup digest, and Express routes + openapi.yaml -> doc-drift report — plus a config-file input edge for `review-rules.yaml`), per-package quickstart command blocks (`npm install && npm test`, `npm run review`, `npm run doc-drift`) matching the actual `package.json` scripts, and a "project conventions" section (plain JS/no AST parser, dependency-injected I/O, where history/decisions/backlog live) pulled from the recurring patterns already documented across `PROGRESS.md`/`SKILL_CHANGELOG.md`/`CLAUDE.md`.
+- Diagram content (node/file names, script commands, route lists) was checked directly against the real source tree (`find reviewer/src sample-app/src -type f`) and both `package.json` files' `scripts` blocks, not written from memory, so it should track actual module boundaries rather than drift from them immediately.
+- No source code changed — re-ran `npm test` in both packages after the edit to confirm the hard invariant still holds: 138/138 in `reviewer/`, 29/29 in `sample-app/` (unchanged, as expected for a docs-only change).
+
+**Decisions:**
+- Did not add a second, narrower "how the review pipeline works" diagram or per-package README files — one root README with one architecture diagram covering both packages matches the task's literal scope ("README + mermaid architecture diagram", singular) and the repo's current two-package size; revisit if a third package/tool is added.
+- Left the standup module's "not yet wired to a CLI" status and the doc-drift/review CLIs' actual flag names as documented facts (matching backlog task 10's still-open status and the real `cli.js`/`docDriftCli.js` argument parsing) rather than aspirationally documenting an interface that doesn't exist yet.
+- No CLAUDE.md/skill/backlog-reorder changes this run — a docs-only task surfaced no bug, gap, or false negative to cite, so per the hard invariant's "cite an observed failure" bar, no self-modification was made.
+
+**Open questions for Vijay:**
+- Backlog tasks 9 and 10 (the `review-pr` and `standup` skills) will add new invocable entry points once built — should the README get a follow-up pass at that point to document the skills themselves (install/usage), or is `plugin/` + task 11's README install instructions (per its own wording) the intended home for that content instead of this top-level README?
+
 ## 2026-07-18 (adversarial bug-hunt run, post-task-7)
 
 **Done:** Fetched all branches, checked out `claude/dev` (up to date with `origin/claude/dev`), ran `npm install && npm test` in `reviewer/` (136/136 green) and `sample-app/` (29/29 green) to confirm a clean baseline, then hunted adversarially for bugs/weak tests/security holes. Reviewed the doc-drift module (task 7, freshest, not-yet-hunted code) line by line and sanity-checked it live against the real `sample-app/src/app.js` + `openapi.yaml` (both a true "no drift" run and a deliberately-mismatched run correctly caught the injected drift) — found no bug there. Shifted focus to re-auditing older rule modules against the existing CLAUDE.md file-wide-aggregation guideline, since that guideline has already had to be broadened twice for recurrences.

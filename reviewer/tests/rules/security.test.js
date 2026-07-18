@@ -34,6 +34,25 @@ describe('security rule', () => {
     expect(issues).toHaveLength(0);
   });
 
+  it('still flags a hardcoded secret when process.env is mentioned elsewhere on the same line', () => {
+    // A trailing process.env reference (a fallback expression, or even just
+    // a comment) must not silence a real hardcoded literal earlier on the
+    // same line -- the exemption only makes sense when process.env IS the
+    // assigned value, not merely present somewhere in the line.
+    const diff = [
+      'diff --git a/src/config/thirdParty.js b/src/config/thirdParty.js',
+      '--- a/src/config/thirdParty.js',
+      '+++ b/src/config/thirdParty.js',
+      '@@ -1,1 +1,2 @@',
+      ' const axios = require("axios");',
+      '+const password = "hunter2"; // fallback for process.env.PASSWORD',
+    ].join('\n');
+
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].message).toMatch(/hardcoded credential/i);
+  });
+
   it('flags eval() usage', () => {
     const diff = [
       'diff --git a/src/utils/parse.js b/src/utils/parse.js',

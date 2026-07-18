@@ -1,6 +1,6 @@
 {
   "name": "lead-agent-toolkit-plugins",
-  "description": "Local marketplace for the lead-agent-toolkit plugin (PR review + standup skills).",
+  "description": "Local marketplace for the lead-agent-toolkit plugin (PR review, standup, and doc-drift skills).",
   "owner": {
     "name": "Vijay Krishna"
   },

@@ -87,7 +87,7 @@ npm start   # requires a real MONGO_URI
 ```bash
 cd reviewer
 npm install
-npm test                                # 138 Jest tests
+npm test
 npm run review -- <base>..<head>        # markdown report to stdout
 npm run review -- <base>..<head> --out report.md
 ```
@@ -96,7 +96,11 @@ Findings can also be posted directly to a PR via `github/postReviewComment.js` (
 
 ### Standup digest
 
-`standup/generateStandup({ repo, owner, ghRepo, since }, deps)` collects the last N hours of commits (`git log`) and pull requests (GitHub REST API), groups them by author, and renders a per-author markdown digest. Importable as a library today; not yet wired to a CLI (see backlog task 10).
+`standup/generateStandup({ repo, owner, ghRepo, since }, deps)` collects the last N hours of commits (`git log`) and pull requests (GitHub REST API), groups them by author, and renders a per-author markdown digest.
+
+```bash
+npm run standup -- [--owner <owner> --gh-repo <name>] [--since <iso-date>] [--out report.md]
+```
 
 ### Doc-drift: routes vs. OpenAPI spec
 

@@ -46,6 +46,24 @@ describe('parseRouterSource', () => {
     const source = `router.get("/:id", getById);`;
     expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/:id' }]);
   });
+
+  it('recognizes router.options(...) and router.head(...), not only the five original verbs', () => {
+    // Regression: HTTP_METHODS here used to omit 'options'/'head' while
+    // parseOpenApi.js's own list included them, so a real, implemented
+    // OPTIONS/HEAD route silently vanished from the code-side route list
+    // and compareRoutes() reported it as missing from code even though it
+    // was fully implemented.
+    const source = `
+      router.options('/widgets', corsHandler);
+      router.head('/widgets', headHandler);
+      router.get('/widgets', listHandler);
+    `;
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'OPTIONS', path: '/widgets' },
+      { method: 'HEAD', path: '/widgets' },
+      { method: 'GET', path: '/widgets' },
+    ]);
+  });
 });
 
 describe('parseAppEntrySource', () => {

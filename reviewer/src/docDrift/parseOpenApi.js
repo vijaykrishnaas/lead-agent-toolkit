@@ -1,6 +1,5 @@
 const yaml = require('js-yaml');
-
-const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'];
+const { HTTP_METHODS } = require('./httpMethods');
 
 // Extracts { method, path } route entries from an OpenAPI YAML document's
 // `paths` map. Non-HTTP-verb keys under a path (parameters, summary,

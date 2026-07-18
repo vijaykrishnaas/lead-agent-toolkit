@@ -100,4 +100,48 @@ describe('error-handling rule', () => {
     const issues = errorHandlingRule.check(parseDiff(diff));
     expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(true);
   });
+
+  it('does not flag a caught chain whose .catch() falls outside a fixed small line window (multi-line-formatted chain)', () => {
+    // Regression: the .then()/.catch() check used to slice a fixed 3-line
+    // window after each .then(), so a legitimately-caught chain spread
+    // across more than 3 lines (e.g. one .then() per line) had its real
+    // .catch() fall outside the window and got flagged as uncaught.
+    const diff = [
+      'diff --git a/src/jobs/cleanup.js b/src/jobs/cleanup.js',
+      '--- a/src/jobs/cleanup.js',
+      '+++ b/src/jobs/cleanup.js',
+      '@@ -1,1 +1,7 @@',
+      ' function cleanup() {',
+      '+  return promise',
+      '+    .then(a)',
+      '+    .then(b)',
+      '+    .then(c)',
+      '+    .catch(handleErr);',
+      '+}',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+  });
+
+  it('flags an uncaught .then() even when an unrelated adjacent statement has its own .catch() one line later', () => {
+    // Regression: the same fixed 3-line window could pull an unrelated,
+    // independent statement's .catch() into the window, silencing a
+    // genuinely uncaught chain right next to it.
+    const diff = [
+      'diff --git a/src/jobs/cleanup.js b/src/jobs/cleanup.js',
+      '--- a/src/jobs/cleanup.js',
+      '+++ b/src/jobs/cleanup.js',
+      '@@ -1,1 +1,4 @@',
+      ' function cleanup() {',
+      '+  jobA.then(doA);',
+      '+  jobB.then(doB).catch(handleB);',
+      '+}',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const thenIssues = issues.filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
+    expect(thenIssues).toHaveLength(1);
+    expect(thenIssues[0].line).toBe(2);
+  });
 });

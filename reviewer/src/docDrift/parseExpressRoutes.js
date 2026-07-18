@@ -1,4 +1,4 @@
-const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
+const { HTTP_METHODS } = require('./httpMethods');
 const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${HTTP_METHODS.join('|')})\\(\\s*(['"])(.*?)\\2`, 'g');
 const MOUNT_PATTERN = /\bapp\.use\(\s*(['"])(.*?)\1\s*,\s*(?:[A-Za-z_$][\w$]*\s*,\s*)*([A-Za-z_$][\w$]*)\s*\)/g;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;

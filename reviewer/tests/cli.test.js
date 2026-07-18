@@ -38,6 +38,10 @@ describe('parseArgs', () => {
   it('throws on an unrecognized flag', () => {
     expect(() => parseArgs(['a..b', '--bogus'])).toThrow(/Unrecognized argument/);
   });
+
+  it('throws when --out is the last token, instead of silently falling back to stdout', () => {
+    expect(() => parseArgs(['a..b', '--out'])).toThrow(/Missing value for --out/);
+  });
 });
 
 describe('runCli', () => {

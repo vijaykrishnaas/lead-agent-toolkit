@@ -5,24 +5,26 @@ const { tokenFromEnv } = require('./github/postReviewComment');
 const USAGE = 'Usage: standup [--owner <owner>] [--gh-repo <name>] [--repo <path>] '
   + '[--since <iso-date>] [--token <token>] [--out <file>]';
 
+// Flags that take a following value. A flag given as the last token in argv
+// (or immediately followed by another flag) must fail loudly rather than
+// silently taking `undefined` as its value — see the CLAUDE.md guideline on
+// value-taking CLI flags for why (an unnoticed missing value for --owner
+// previously produced a commits-only report with no error at all).
+const VALUE_FLAGS = {
+  '--owner': 'owner', '--gh-repo': 'ghRepo', '--repo': 'repo', '--since': 'since', '--token': 'token', '--out': 'out',
+};
+
 function parseStandupArgs(argv) {
   const args = {
     owner: null, ghRepo: null, repo: process.cwd(), since: null, token: null, out: null,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--owner') {
-      args.owner = argv[++i];
-    } else if (arg === '--gh-repo') {
-      args.ghRepo = argv[++i];
-    } else if (arg === '--repo') {
-      args.repo = argv[++i];
-    } else if (arg === '--since') {
-      args.since = argv[++i];
-    } else if (arg === '--token') {
-      args.token = argv[++i];
-    } else if (arg === '--out') {
-      args.out = argv[++i];
+    const key = VALUE_FLAGS[arg];
+    if (key) {
+      const value = argv[++i];
+      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
+      args[key] = value;
     } else {
       throw new Error(`Unrecognized argument: ${arg}`);
     }

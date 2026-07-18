@@ -29,6 +29,10 @@ describe('parseDocDriftArgs', () => {
   it('throws on an unrecognized flag', () => {
     expect(() => parseDocDriftArgs(['--app', 'a.js', '--openapi', 'o.yaml', '--bogus'])).toThrow(/Unrecognized argument/);
   });
+
+  it('throws when --out is the last token, instead of silently falling back to stdout', () => {
+    expect(() => parseDocDriftArgs(['--app', 'a.js', '--openapi', 'o.yaml', '--out'])).toThrow(/Missing value for --out/);
+  });
 });
 
 describe('runDocDriftCli', () => {

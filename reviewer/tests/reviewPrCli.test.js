@@ -68,6 +68,10 @@ describe('parseReviewPrArgs', () => {
   it('throws on an unrecognized flag', () => {
     expect(() => parseReviewPrArgs([...BASE_ARGV, '--bogus'])).toThrow(/Unrecognized argument/);
   });
+
+  it('throws when --token is the last token, instead of silently omitting it', () => {
+    expect(() => parseReviewPrArgs([...BASE_ARGV, '--token'])).toThrow(/Missing value for --token/);
+  });
 });
 
 describe('runReviewPrCli', () => {

@@ -44,6 +44,14 @@ describe('parseStandupArgs', () => {
   it('throws on an unrecognized flag', () => {
     expect(() => parseStandupArgs(['--bogus'])).toThrow(/Unrecognized argument/);
   });
+
+  it('throws when --owner is the last token, instead of silently omitting it', () => {
+    expect(() => parseStandupArgs(['--repo', '.', '--owner'])).toThrow(/Missing value for --owner/);
+  });
+
+  it('throws when --out is the last token, instead of silently falling back to stdout', () => {
+    expect(() => parseStandupArgs(['--owner', 'o', '--gh-repo', 'r', '--out'])).toThrow(/Missing value for --out/);
+  });
 });
 
 describe('runStandupCli', () => {

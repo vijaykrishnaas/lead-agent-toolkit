@@ -9,6 +9,13 @@ const USAGE = 'Usage: review-pr -- --owner <owner> --gh-repo <name> --pr <number
   + '[--repo <path>] [--config <path>] [--token <token>] [--out <file>] [--no-post]';
 const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
 
+// Flags that take a following value. A flag given as the last token in argv
+// must fail loudly rather than silently taking `undefined` as its value —
+// see the CLAUDE.md guideline on value-taking CLI flags.
+const VALUE_FLAGS = {
+  '--owner': 'owner', '--gh-repo': 'ghRepo', '--pr': 'pr', '--repo': 'repo', '--config': 'config', '--token': 'token', '--out': 'out',
+};
+
 function parseReviewPrArgs(argv) {
   const args = {
     owner: null, ghRepo: null, pr: null, range: null,
@@ -16,20 +23,11 @@ function parseReviewPrArgs(argv) {
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--owner') {
-      args.owner = argv[++i];
-    } else if (arg === '--gh-repo') {
-      args.ghRepo = argv[++i];
-    } else if (arg === '--pr') {
-      args.pr = argv[++i];
-    } else if (arg === '--repo') {
-      args.repo = argv[++i];
-    } else if (arg === '--config') {
-      args.config = argv[++i];
-    } else if (arg === '--token') {
-      args.token = argv[++i];
-    } else if (arg === '--out') {
-      args.out = argv[++i];
+    const key = VALUE_FLAGS[arg];
+    if (key) {
+      const value = argv[++i];
+      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
+      args[key] = value;
     } else if (arg === '--no-post') {
       args.noPost = true;
     } else if (!args.range && !arg.startsWith('--')) {

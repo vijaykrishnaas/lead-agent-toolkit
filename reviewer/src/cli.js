@@ -7,16 +7,20 @@ const { formatMarkdownReport } = require('./format/markdownReport');
 const USAGE = 'Usage: review -- <base>..<head> [--repo <path>] [--config <path>] [--out <file>]';
 const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
 
+// Flags that take a following value. A flag given as the last token in argv
+// must fail loudly rather than silently taking `undefined` as its value —
+// see the CLAUDE.md guideline on value-taking CLI flags.
+const VALUE_FLAGS = { '--repo': 'repo', '--config': 'config', '--out': 'out' };
+
 function parseArgs(argv) {
   const args = { range: null, repo: process.cwd(), config: undefined, out: null };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--repo') {
-      args.repo = argv[++i];
-    } else if (arg === '--config') {
-      args.config = argv[++i];
-    } else if (arg === '--out') {
-      args.out = argv[++i];
+    const key = VALUE_FLAGS[arg];
+    if (key) {
+      const value = argv[++i];
+      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
+      args[key] = value;
     } else if (!args.range && !arg.startsWith('--')) {
       args.range = arg;
     } else {

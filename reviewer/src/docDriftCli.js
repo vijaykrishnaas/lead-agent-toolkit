@@ -3,16 +3,20 @@ const { generateDocDrift } = require('./docDrift/generateDocDrift');
 
 const USAGE = 'Usage: doc-drift --app <path-to-express-entry> --openapi <path-to-openapi.yaml> [--out <file>]';
 
+// Flags that take a following value. A flag given as the last token in argv
+// must fail loudly rather than silently taking `undefined` as its value —
+// see the CLAUDE.md guideline on value-taking CLI flags.
+const VALUE_FLAGS = { '--app': 'app', '--openapi': 'openapi', '--out': 'out' };
+
 function parseDocDriftArgs(argv) {
   const args = { app: null, openapi: null, out: null };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--app') {
-      args.app = argv[++i];
-    } else if (arg === '--openapi') {
-      args.openapi = argv[++i];
-    } else if (arg === '--out') {
-      args.out = argv[++i];
+    const key = VALUE_FLAGS[arg];
+    if (key) {
+      const value = argv[++i];
+      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
+      args[key] = value;
     } else {
       throw new Error(`Unrecognized argument: ${arg}`);
     }

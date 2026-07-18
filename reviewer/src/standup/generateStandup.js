@@ -18,7 +18,7 @@ async function generateStandup(options = {}, deps = {}) {
   const collectCommitsFn = deps.collectCommits || collectCommits;
   const collectPullRequestsFn = deps.collectPullRequests || collectPullRequests;
 
-  const commits = collectCommitsFn({ repo, since }, deps);
+  const commits = await collectCommitsFn({ repo, since }, deps);
   const pullRequests = owner && ghRepo ? await collectPullRequestsFn({ owner, repo: ghRepo, since }, deps) : [];
 
   const groups = groupByAuthor({ commits, pullRequests });

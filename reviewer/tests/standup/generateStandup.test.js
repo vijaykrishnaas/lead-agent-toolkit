@@ -49,4 +49,18 @@ describe('generateStandup', () => {
     expect(since).toEqual(new Date('2026-07-17T00:00:00.000Z'));
     expect(report).toContain('**Since:** 2026-07-17T00:00:00.000Z');
   });
+
+  it('awaits an async collectCommits mock instead of treating it as already-resolved', async () => {
+    const collectCommits = jest.fn(async () => [
+      { hash: 'abc1234567', author: 'Alice', date: '2026-07-18T09:00:00Z', message: 'Fix bug' },
+    ]);
+
+    const report = await generateStandup(
+      { repo: '/repo', since: new Date('2026-07-17T00:00:00.000Z') },
+      { collectCommits },
+    );
+
+    expect(report).toContain('## Alice');
+    expect(report).toContain('Fix bug');
+  });
 });

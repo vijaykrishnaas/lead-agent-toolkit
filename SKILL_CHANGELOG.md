@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-18 (adversarial bug-hunt run, post-task-8)
+**Change:** Added a guideline to CLAUDE.md (below the hard invariants) requiring every dependency-injected collaborator of the same shape/role in a multi-collaborator function to be `await`ed consistently — never awaiting some and not others just because today's default implementation for the un-awaited one happens to be synchronous — and requiring an async-mock test case for any such "presumably sync" collaborator.
+
+**Evidence:** PROGRESS.md, 2026-07-18 "adversarial bug-hunt run, post-task-8" entry — `reviewer/src/standup/generateStandup.js` awaited `collectPullRequestsFn(...)` (line 22) but called `collectCommitsFn(...)` without `await` (line 21), even though both are injected via the same `deps` object and `collectCommits`'s real (non-test) implementation is exported from the same module family as the awaited `collectPullRequests`. Reproduced directly: injecting an async `collectCommits` mock (a natural thing to do, since its sibling collaborator is already async) left `commits` as an unresolved Promise, which crashed `groupByAuthor`'s `for (const commit of commits)` with "commits is not iterable". This is a new bug class — not file-wide aggregation, not an unguarded CLI stage, not a string-vs-numeric timestamp sort — so it's captured as its own entry. Fixed in the same run (added the missing `await`, 1 new regression test in `tests/standup/generateStandup.test.js` using an async `collectCommits` mock, verified to fail against the pre-fix code and pass against the fix; suite 139/139 green in `reviewer/`, 29/29 in `sample-app/`).
+
 ## 2026-07-18 (adversarial bug-hunt run, post-task-7)
 **Change:** Broadened the existing CLAUDE.md file-wide-aggregation guideline (below the hard invariants) to explicitly cover a second shape of the same violation: a single regex tested against a joined/combined multi-line string of all added lines, not just a `hasX` boolean computed once and reused. Also added an explicit audit instruction to check for `join('\n')`/combined-string regex tests specifically when reviewing a rule for this bug class.
 

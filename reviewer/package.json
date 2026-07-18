@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "review": "node src/cli.js",
+    "review-pr": "node src/reviewPrCli.js",
     "doc-drift": "node src/docDriftCli.js"
   },
   "devDependencies": {

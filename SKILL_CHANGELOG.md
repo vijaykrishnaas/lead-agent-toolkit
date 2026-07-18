@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-18 (task 9: review-pr skill)
+**Change:** Added `.claude/skills/review-pr/SKILL.md` (61 lines, under the 150-line cap) and its underlying script `reviewer/src/reviewPrCli.js`, which composes the existing `git diff` → `loadRules` → `reviewDiff` → `formatMarkdownReport` pipeline (from `reviewer/src/cli.js`) with `postReviewComment` (from task 5) to review a PR's `base..head` range and post the report as a PR comment, with a `--no-post` dry-run escape hatch and an explicit `--token` override alongside `GITHUB_TOKEN` env sourcing.
+
+**Evidence/justification:** This is not a discretionary self-improvement subject to the "cite an observed failure" bar in the paragraph below the hard invariants — it is TASKS.md backlog task 9 itself, the explicit next planned deliverable, done in full per this run's instructions. Logged here anyway because hard invariant 3 names "skills" as one of the three self-modification categories requiring a changelog entry, and this is the first file ever created under `.claude/skills/`. Frontmatter and structure (YAML `description`/`name`/`argument-hint`, supporting-file references, concise task-content body) follow the official Claude Code skills docs (`code.claude.com/docs/en/skills`), fetched and read in this run rather than assumed from memory. See PROGRESS.md's 2026-07-18 "task 9" entry for the design decisions (flag naming, dry-run behavior, token sourcing) and the full test/verification record.
+
 ## 2026-07-18 (adversarial bug-hunt run, post-task-8)
 **Change:** Added a guideline to CLAUDE.md (below the hard invariants) requiring every dependency-injected collaborator of the same shape/role in a multi-collaborator function to be `await`ed consistently — never awaiting some and not others just because today's default implementation for the un-awaited one happens to be synchronous — and requiring an async-mock test case for any such "presumably sync" collaborator.
 

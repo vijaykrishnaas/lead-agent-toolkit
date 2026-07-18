@@ -39,4 +39,43 @@ describe('performance rule', () => {
     const files = parseDiff(loadFixture('clean.diff'));
     expect(performanceRule.check(files)).toEqual([]);
   });
+
+  it('does not flag a clean forEach just because an unrelated await appears later in the same file', () => {
+    const diff = [
+      'diff --git a/src/services/batch.js b/src/services/batch.js',
+      '--- a/src/services/batch.js',
+      '+++ b/src/services/batch.js',
+      '@@ -1,1 +1,8 @@',
+      '+items.forEach((item) => {',
+      '+  doSomething(item);',
+      '+});',
+      '+',
+      '+setTimeout(async () => {',
+      '+  await doOther();',
+      '+});',
+    ].join('\n');
+
+    const issues = performanceRule.check(parseDiff(diff));
+    expect(issues).toEqual([]);
+  });
+
+  it('does not let a clean forEach silence — or misattribute the line of — a later bad forEach in the same file', () => {
+    const diff = [
+      'diff --git a/src/services/batch.js b/src/services/batch.js',
+      '--- a/src/services/batch.js',
+      '+++ b/src/services/batch.js',
+      '@@ -1,1 +1,7 @@',
+      '+items.forEach((item) => {',
+      '+  doSomething(item);',
+      '+});',
+      '+',
+      '+users.forEach(async (user) => {',
+      '+  await mailer.send(user.email);',
+      '+});',
+    ].join('\n');
+
+    const issues = performanceRule.check(parseDiff(diff));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].line).toBe(5);
+  });
 });

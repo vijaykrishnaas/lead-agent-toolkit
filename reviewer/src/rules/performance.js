@@ -1,24 +1,54 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 
-const AWAIT_IN_FOREACH = /\.forEach\(\s*(async\s+)?\([^)]*\)\s*=>\s*{[\s\S]*?await[\s\S]*?}\s*\)/;
+const FOREACH_START = /\.forEach\(\s*(async\s+)?\([^)]*\)\s*=>\s*{/;
+const AWAIT_PATTERN = /\bawait\b/;
 const DEEP_CLONE_ANTIPATTERN = /JSON\.parse\(\s*JSON\.stringify\(/;
+
+// Collects the lines belonging to a single .forEach(...) callback body
+// (from its opening "{" up to the matching "}", tracked by brace depth) so
+// that an await inside one forEach — or unrelated code after it — can't be
+// mistaken for content of a different, unrelated block.
+function collectForEachBlock(addedLines, startIdx) {
+  let depth = 0;
+  let opened = false;
+  const blockLines = [];
+  for (let i = startIdx; i < addedLines.length; i += 1) {
+    const content = addedLines[i].content;
+    blockLines.push(content);
+    for (const ch of content) {
+      if (ch === '{') {
+        depth += 1;
+        opened = true;
+      } else if (ch === '}') {
+        depth -= 1;
+      }
+    }
+    if (opened && depth <= 0) break;
+  }
+  return blockLines.join('\n');
+}
 
 function check(files) {
   const issues = [];
   for (const file of files) {
     const addedLines = collectAddedLines(file);
-    const combinedAdded = addedLines.map((line) => line.content).join('\n');
 
-    if (AWAIT_IN_FOREACH.test(combinedAdded)) {
-      const forEachLine = addedLines.find((line) => /\.forEach\(/.test(line.content));
-      issues.push({
-        file: file.file,
-        line: forEachLine.newLine,
-        severity: 'medium',
-        message: 'await used inside a .forEach() callback; the awaits run concurrently and unordered, not sequentially.',
-        fix: 'Use a for...of loop (for sequential awaits) or Promise.all(items.map(...)) (for concurrent awaits) instead of .forEach().',
-      });
-    }
+    // Scoped per .forEach() call: an await inside one forEach block — or
+    // anywhere else in the file diff — must not be attributed to, or
+    // silence the check for, a different forEach block in the same file.
+    addedLines.forEach((line, idx) => {
+      if (!FOREACH_START.test(line.content)) return;
+      const block = collectForEachBlock(addedLines, idx);
+      if (AWAIT_PATTERN.test(block)) {
+        issues.push({
+          file: file.file,
+          line: line.newLine,
+          severity: 'medium',
+          message: 'await used inside a .forEach() callback; the awaits run concurrently and unordered, not sequentially.',
+          fix: 'Use a for...of loop (for sequential awaits) or Promise.all(items.map(...)) (for concurrent awaits) instead of .forEach().',
+        });
+      }
+    });
 
     for (const line of addedLines) {
       if (DEEP_CLONE_ANTIPATTERN.test(line.content)) {

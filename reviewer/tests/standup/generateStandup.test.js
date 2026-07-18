@@ -25,7 +25,12 @@ describe('generateStandup', () => {
     const report = await generateStandup({ repo: '/repo', since: new Date() }, { collectCommits, collectPullRequests });
 
     expect(collectPullRequests).not.toHaveBeenCalled();
-    expect(report).toContain('No commits or pull requests in the last 24h.');
+    // generateStandup always resolves `since` to a concrete Date (defaulting
+    // to 24h ago when not given) and passes its ISO string through as
+    // meta.since, so the report names the actual window queried rather than
+    // a hardcoded "last 24h" — see formatStandup.js.
+    expect(report).toContain('No commits or pull requests since ');
+    expect(report).not.toContain('last 24h');
   });
 
   it('defaults since to the last 24 hours when not given', async () => {

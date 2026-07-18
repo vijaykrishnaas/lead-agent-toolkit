@@ -32,9 +32,18 @@ describe('formatStandupReport', () => {
     expect(report).toContain('_No activity._');
   });
 
-  it('reports no activity at all when the group map is empty', () => {
+  it('reports no activity at all when the group map is empty and no since is given', () => {
     const report = formatStandupReport(new Map());
     expect(report).toContain('No commits or pull requests in the last 24h.');
+  });
+
+  it('reflects a custom since window in the no-activity message instead of hardcoding "last 24h"', () => {
+    // A custom --since can be far from 24h ago; the empty-state message must
+    // not claim a 24h window it didn't actually query.
+    const report = formatStandupReport(new Map(), { since: '2020-01-01T00:00:00.000Z' });
+    expect(report).toContain('**Since:** 2020-01-01T00:00:00.000Z');
+    expect(report).toContain('No commits or pull requests since 2020-01-01T00:00:00.000Z.');
+    expect(report).not.toContain('last 24h');
   });
 
   it('sorts commits chronologically and pull requests by number within an author', () => {

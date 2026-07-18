@@ -14,7 +14,15 @@ function formatStandupReport(groups, meta = {}) {
   if (meta.since) lines.push(`**Since:** ${meta.since}`, '');
 
   if (groups.size === 0) {
-    lines.push('No commits or pull requests in the last 24h.');
+    // meta.since reflects the actual queried window (it can be an arbitrary
+    // date via the CLI's --since flag, not always "24h ago"), so the no-
+    // activity message must not hardcode "last 24h" when a custom since is
+    // given — that reads as self-contradictory next to the "**Since:**" line
+    // above it (e.g. "**Since:** 2020-01-01 ... in the last 24h.").
+    const noActivityMessage = meta.since
+      ? `No commits or pull requests since ${meta.since}.`
+      : 'No commits or pull requests in the last 24h.';
+    lines.push(noActivityMessage);
     return lines.join('\n') + '\n';
   }
 

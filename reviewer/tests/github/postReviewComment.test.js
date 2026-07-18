@@ -32,7 +32,7 @@ describe('postReviewComment', () => {
         body: JSON.stringify({ body: `${BOT_COMMENT_MARKER}\n# Code Review Report` }),
       }),
     );
-    expect(result).toEqual({ id: 1, html_url: 'https://github.com/.../comments/1' });
+    expect(result).toEqual({ id: 1, html_url: 'https://github.com/.../comments/1', updated: false });
   });
 
   it('throws without calling request when the token is missing', async () => {
@@ -102,7 +102,7 @@ describe('postReviewComment', () => {
         body: JSON.stringify({ body: `${BOT_COMMENT_MARKER}\n# Code Review Report` }),
       }),
     );
-    expect(result).toEqual({ id: 101 });
+    expect(result).toEqual({ id: 101, updated: true });
   });
 
   it('updates the most recent bot comment when more than one exists on the PR', async () => {

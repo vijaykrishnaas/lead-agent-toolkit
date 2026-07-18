@@ -54,8 +54,10 @@ a clear one-line message on stderr — never a raw crash.
 
 Report the risk level and issue count back to the user, and confirm whether
 the comment was actually posted (the CLI prints
-`Posted review comment to <owner>/<gh-repo>#<pr-number>.` on success) or
-just previewed (`--no-post` / no token available).
+`Posted review comment to <owner>/<gh-repo>#<pr-number>.` when a new comment
+was created, or `Updated existing review comment on <owner>/<gh-repo>#<pr-number>.`
+when a prior bot comment was updated in place instead) or just previewed
+(`--no-post` / no token available).
 
 ## Reference
 

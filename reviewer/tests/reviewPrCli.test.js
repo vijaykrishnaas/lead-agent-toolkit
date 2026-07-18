@@ -106,6 +106,16 @@ describe('runReviewPrCli', () => {
     expect(deps.stdout.text).toContain('Posted review comment to vijaykrishnaas/lead-agent-toolkit#42.');
   });
 
+  it('prints an "updated" message instead of "posted" when postReviewComment updated an existing bot comment', async () => {
+    const deps = basePassingDeps({ postReviewComment: jest.fn().mockResolvedValue({ id: 101, updated: true }) });
+
+    const exitCode = await runReviewPrCli(BASE_ARGV, deps);
+
+    expect(exitCode).toBe(0);
+    expect(deps.stdout.text).toContain('Updated existing review comment on vijaykrishnaas/lead-agent-toolkit#42.');
+    expect(deps.stdout.text).not.toContain('Posted review comment');
+  });
+
   it('prefers an explicit --token flag over GITHUB_TOKEN from env', async () => {
     const deps = basePassingDeps();
 

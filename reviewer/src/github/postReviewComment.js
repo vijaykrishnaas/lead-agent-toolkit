@@ -100,7 +100,12 @@ async function postReviewComment({ token, owner, repo, prNumber, body }, deps = 
     throw new Error(`GitHub API request failed (${response.status}): ${text}`);
   }
 
-  return response.json();
+  const comment = await response.json();
+  // `updated` tells callers (e.g. the CLI's success message) whether this
+  // call PATCHed a prior bot comment or POSTed a brand-new one — without it,
+  // a caller can only ever say "posted", which is wrong once task 16's
+  // update-in-place behavior actually updates something.
+  return { ...comment, updated: Boolean(existing) };
 }
 
 module.exports = { postReviewComment, tokenFromEnv, GITHUB_API_URL, BOT_COMMENT_MARKER };

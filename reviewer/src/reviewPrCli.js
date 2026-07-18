@@ -113,14 +113,15 @@ async function runReviewPrCli(argv, deps = {}) {
 
   try {
     const token = args.token || tokenFromEnvFn(env);
-    await postReviewCommentFn({
+    const result = await postReviewCommentFn({
       token,
       owner: args.owner,
       repo: args.ghRepo,
       prNumber: args.pr,
       body: report,
     }, deps);
-    stdout.write(`Posted review comment to ${args.owner}/${args.ghRepo}#${args.pr}.\n`);
+    const action = result && result.updated ? 'Updated existing review comment on' : 'Posted review comment to';
+    stdout.write(`${action} ${args.owner}/${args.ghRepo}#${args.pr}.\n`);
   } catch (err) {
     stderr.write(`Failed to post PR comment: ${err.message}\n`);
     return 1;

@@ -12,4 +12,7 @@
 10. [DONE] Skill: .claude/skills/standup/SKILL.md — generates standup digest.
 11. [DONE] Package skills as an installable Claude Code plugin (manifest per current plugin docs) so Vijay can install locally: `plugin/` dir + install instructions in README.
 12. [DONE] Skill: .claude/skills/doc-drift/SKILL.md.
-13. Self-audit: read all PROGRESS.md entries, write RETRO.md — what failed, what to improve, propose 3 new backlog tasks.
+13. [DONE] Self-audit: read all PROGRESS.md entries, write RETRO.md — what failed, what to improve, propose 3 new backlog tasks.
+14. Package `doc-drift` into `plugin/` for parity with `review-pr`/`standup`; generalize `plugin.test.js`'s copy-drift guard to enumerate `.claude/skills/*` instead of a hardcoded list. (Proposed in RETRO.md, 2026-07-18 self-audit.)
+15. Extract a shared `collectBoundedBlock`-style helper into `reviewer/src/utils/` and refactor `errorHandling.js`/`performance.js` to use it for per-occurrence block-boundary scoping. (Proposed in RETRO.md, 2026-07-18 self-audit — see SKILL_CHANGELOG.md for the four recurrences of this bug class this closes off structurally.)
+16. Make `review-pr`'s PR-comment posting update an existing bot comment in place instead of always creating a new one. (Proposed in RETRO.md, 2026-07-18 self-audit — resolves the open question first raised in the task-5 PROGRESS.md entry and restated in task-9's.)

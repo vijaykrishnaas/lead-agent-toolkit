@@ -3,4 +3,5 @@ module.exports = {
   ...require('./config/loadRules'),
   ...require('./format/markdownReport'),
   ...require('./github/postReviewComment'),
+  ...require('./standup'),
 };

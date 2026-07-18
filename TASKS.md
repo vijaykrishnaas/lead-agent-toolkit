@@ -5,7 +5,7 @@
 3. [DONE] review-rules.yaml config with MERN defaults; loader + tests.
 4. [DONE] CLI: `npm run review -- <base>..<head>` -> markdown report. Verify against sample-app history.
 5. [DONE] GitHub integration: post review as PR comment (token via env, mocked in tests).
-6. Standup module: last 24h commits/PRs -> per-author standup markdown.
+6. [DONE] Standup module: last 24h commits/PRs -> per-author standup markdown.
 7. Doc-drift module: Express routes vs openapi.yaml -> mismatch report.
 8. README + mermaid architecture diagram.
 9. Skill: .claude/skills/review-pr/SKILL.md — runs the reviewer on a PR and posts results. Follow Claude Code skill-authoring best practices (check official docs in-run).

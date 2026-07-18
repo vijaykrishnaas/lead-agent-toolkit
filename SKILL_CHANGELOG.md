@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-18 (adversarial bug-hunt run, post-task-5)
+**Change:** Added a guideline to CLAUDE.md (below the hard invariants) requiring a script's testable entry point (e.g. `runCli`) to wrap every pipeline stage in try/catch, not only the stages already anticipated to fail, and requiring an unexpected-throw test case for every stage.
+
+**Evidence:** PROGRESS.md, 2026-07-18 "adversarial bug-hunt run, post-task-5" entry — `reviewer/src/cli.js`'s `runCli` guarded `parseArgs`, `execGit`, and `loadRulesFn` with try/catch (each returning exit code 1 with a clear stderr message on failure), but left `reviewDiffFn`, `formatReport`, and `writeFile` completely unguarded. An exception from any of those three — reproduced directly by making `writeFile` throw (e.g. `--out` pointing at a nonexistent directory) — propagated as an uncaught exception and crashed the process with a raw stack trace instead of the controlled exit-code-1 behavior every other failure path in the same function already had. This is a new bug class (inconsistent error-handling coverage across a single function's pipeline stages), distinct from the two aggregation-scope guidelines already in CLAUDE.md, so it's captured as its own entry. Fixed in the same run (both stages now wrapped in try/catch, 2 new regression tests in `tests/cli.test.js`, suite 71/71 green) — this changelog entry codifies the guideline so future CLI/script entry points in this repo don't ship with partial error-handling coverage.
+
 ## 2026-07-17 (adversarial bug-hunt run, post-task-3)
 **Change:** Broadened the existing CLAUDE.md guideline on diff-scanning static-analysis rules (below the hard invariants) to explicitly cover cross-file aggregation, not just within-a-single-file aggregation. Also updated its required test coverage to include a "2+ source files in one diff, mixed compliant/non-compliant" case, not only a "2+ occurrences in one file" case.
 

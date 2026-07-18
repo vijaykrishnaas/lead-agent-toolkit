@@ -115,6 +115,39 @@ describe('runCli', () => {
     expect(stderr.text).toContain('Failed to load review-rules config');
   });
 
+  it('returns exit code 1 and writes to stderr when writing the report fails (e.g. bad --out path), instead of crashing', () => {
+    const stderr = makeStream();
+    const execGit = () => loadFixture('clean.diff');
+    const writeFile = () => {
+      throw new Error('ENOENT: no such file or directory');
+    };
+
+    const exitCode = runCli(['base..head', '--out', '/no/such/dir/report.md'], {
+      execGit,
+      writeFile,
+      stdout: makeStream(),
+      stderr,
+    });
+
+    expect(exitCode).toBe(1);
+    expect(stderr.text).toContain('Failed to write report output');
+    expect(stderr.text).toContain('ENOENT');
+  });
+
+  it('returns exit code 1 and writes to stderr when reviewing the diff throws, instead of crashing', () => {
+    const stderr = makeStream();
+    const execGit = () => loadFixture('clean.diff');
+    const reviewDiff = () => {
+      throw new Error('unexpected rule failure');
+    };
+
+    const exitCode = runCli(['base..head'], { execGit, reviewDiff, stdout: makeStream(), stderr });
+
+    expect(exitCode).toBe(1);
+    expect(stderr.text).toContain('Review failed');
+    expect(stderr.text).toContain('unexpected rule failure');
+  });
+
   it('passes --config through to loadRules', () => {
     const loadRules = jest.fn(() => []);
     const execGit = () => loadFixture('clean.diff');

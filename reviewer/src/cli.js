@@ -66,13 +66,24 @@ function runCli(argv, deps = {}) {
     return 1;
   }
 
-  const result = reviewDiffFn(diffText, rules);
-  const report = formatReport(result, { range: args.range });
+  let report;
+  try {
+    const result = reviewDiffFn(diffText, rules);
+    report = formatReport(result, { range: args.range });
+  } catch (err) {
+    stderr.write(`Review failed: ${err.message}\n`);
+    return 1;
+  }
 
-  if (args.out) {
-    writeFile(args.out, report);
-  } else {
-    stdout.write(report);
+  try {
+    if (args.out) {
+      writeFile(args.out, report);
+    } else {
+      stdout.write(report);
+    }
+  } catch (err) {
+    stderr.write(`Failed to write report output: ${err.message}\n`);
+    return 1;
   }
 
   return 0;

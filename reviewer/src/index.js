@@ -4,4 +4,5 @@ module.exports = {
   ...require('./format/markdownReport'),
   ...require('./github/postReviewComment'),
   ...require('./standup'),
+  ...require('./docDrift'),
 };

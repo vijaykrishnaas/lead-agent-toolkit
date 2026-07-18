@@ -1,5 +1,31 @@
 # Progress Log
 
+## 2026-07-18 (task 7: doc-drift module)
+
+**Done:** Fetched all branches, checked out `claude/dev` (up to date with `origin/claude/dev`), ran `npm install && npm test` in `reviewer/` (95/95 green) and `sample-app/` (29/29 green) to confirm a clean baseline, then did task 7 (topmost non-DONE backlog item): the doc-drift module comparing Express routes against `openapi.yaml`.
+
+- Added `reviewer/src/docDrift/`:
+  - `parseExpressRoutes.js`: regex-based extraction of `{ method, path }` from a single router file's source (`parseRouterSource`) and of both direct `app.<verb>(...)` routes and `app.use(prefix, router)` mounts — resolved back to their `require(...)`'d file — from an app entry file's source (`parseAppEntrySource`). Follows the same "parse source text with scoped regex, not a full JS/AST parser" style already used throughout `reviewer/src/rules/*`.
+  - `collectExpressRoutes.js`: walks an app entry file plus every router file it mounts (fs reads injectable via `deps.readFile`, matching the `collectCommits`/`execGit` DI pattern) and returns the full flat list of routes actually implemented in code, with mount prefixes correctly joined to router-local paths (`joinPath`).
+  - `parseOpenApi.js`: parses an OpenAPI YAML doc's `paths` map (via the `js-yaml` dependency already present in `reviewer/package.json` for `review-rules.yaml`) into the same `{ method, path }` shape, ignoring non-HTTP-verb keys (`parameters`, `summary`, `description`, ...) under each path.
+  - `compareRoutes.js`: normalizes Express `:param` vs OpenAPI `{param}` syntax and trailing slashes, then diffs the two route lists into `{ missingFromSpec, missingFromCode }`. Each route is compared independently (no whole-list boolean aggregation), per the existing cross-file/file-wide aggregation guideline in `CLAUDE.md` — verified with a test asserting one matching route does not silence a mismatch on a different route in the same comparison.
+  - `formatDocDrift.js` / `generateDocDrift.js`: markdown rendering and DI'd orchestration, mirroring `formatMarkdownReport`/`generateStandup`.
+  - `reviewer/src/docDriftCli.js`: new CLI (`npm run doc-drift -- --app <path> --openapi <path> [--out <file>]`), added as an `npm` script. Every pipeline stage (`parseDocDriftArgs`, `generateDocDrift`, `writeFile`) is individually wrapped in try/catch with its own regression test for an unexpected throw, per the existing CLAUDE.md guideline on `runCli`-style entry points (`reviewer/src/cli.js` was the precedent that guideline was written from).
+  - `reviewer/src/docDrift/index.js` barrel, wired into `reviewer/src/index.js`.
+- Added `sample-app/openapi.yaml`, a spec matching sample-app's 12 real routes (`/health`, `/api/auth/register`, `/api/auth/login`, `/api/users/me`, `/api/users/:id` GET/PUT/DELETE, `/api/tasks` POST/GET, `/api/tasks/:id` GET/PUT/DELETE) exactly, so the module has a real, non-trivial target to run against (matching the "verify against sample-app" pattern from task 4's CLI).
+- 41 new Jest tests across 7 new test files in `reviewer/tests/docDrift/` and `reviewer/tests/docDriftCli.test.js`. Suite is now 136/136 green in `reviewer/`; `sample-app/` unchanged at 29/29.
+- Ran the new CLI directly against the real `sample-app/src/app.js` + the new `sample-app/openapi.yaml`: reported "No drift detected." Then, as a sanity check that the tool isn't a no-op, ran it again against a copy of the spec with the `DELETE /api/tasks/{id}` entry deliberately removed — it correctly reported `DELETE /api/tasks/:id` as missing from the spec, confirming real drift detection before trusting the "in sync" result above. The scratch copy was deleted after the check; nothing under `sample-app/` or `reviewer/` was left modified by this verification step.
+
+**Decisions:**
+- Route parsing works on source text via regex (same style as `reviewer/src/rules/*` and `diffParser.js`), not a real JS parser/AST or by requiring and executing the app — no observed failure justified the added complexity/dependency of a JS parser, and this keeps the module consistent with the rest of the repo's heuristic style.
+- `collectExpressRoutes` only follows one level of `app.use(prefix, router)` mounts (matching sample-app's actual structure — three flat-mounted routers, no nested sub-routers). Not generalized to arbitrarily nested routers since nothing in this repo exercises that shape yet; flagging below in case a later task needs it.
+- A mount whose router variable has no matching `require(...)` in the same source is silently skipped rather than treated as an error, since it's ambiguous (could be an inline/dynamically-built router) and no real file in this repo hits that case — `sample-app/src/app.js`'s three mounts all resolve cleanly.
+- Kept `sample-app/openapi.yaml` accurate (zero drift) as the checked-in source of truth, and verified drift detection separately against a throwaway `/tmp` copy, rather than leaving a permanent, deliberately-wrong fixture in `sample-app/` — the repo's actual OpenAPI doc should reflect reality, not encode a bug for demo purposes.
+
+**Open questions for Vijay:**
+- Should `collectExpressRoutes` be generalized to handle nested router mounts (a router itself mounting a sub-router via `router.use('/x', subRouter)`) before task 12 (the `doc-drift` skill) wraps this in a Claude Code skill, or is the current flat-mount support sufficient given sample-app's actual shape?
+- `openapi.yaml` was added at `sample-app/` root, alongside the existing `.env.example`/`package.json`. Is that the right home for it, or would you prefer it under `sample-app/docs/` (or similar) as the project grows?
+
 ## 2026-07-18 (adversarial bug-hunt run, post-task-6)
 
 **Done:** Fetched all branches, checked out `claude/dev` (already existed upstream, up to date with `origin/claude/dev`), ran `npm install && npm test` in both `sample-app/` (29/29 green) and `reviewer/` (94/94 green, the pre-existing baseline) to confirm a clean starting point, then hunted adversarially on the one commit since the last hunt — task 6, the standup module (`reviewer/src/standup/*`), which had not yet been through an adversarial pass.

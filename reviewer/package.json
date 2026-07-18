@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "review": "node src/cli.js"
+    "review": "node src/cli.js",
+    "doc-drift": "node src/docDriftCli.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"

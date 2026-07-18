@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  title: sample-app API
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      responses:
+        '201':
+          description: Created
+  /api/auth/login:
+    post:
+      summary: Log in and receive a JWT
+      responses:
+        '200':
+          description: OK
+  /api/users/me:
+    get:
+      summary: Get the current authenticated user
+      responses:
+        '200':
+          description: OK
+  /api/users/{id}:
+    get:
+      summary: Get a user by id
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update a user by id
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete a user by id
+      responses:
+        '204':
+          description: No Content
+  /api/tasks:
+    post:
+      summary: Create a task
+      responses:
+        '201':
+          description: Created
+    get:
+      summary: List tasks
+      responses:
+        '200':
+          description: OK
+  /api/tasks/{id}:
+    get:
+      summary: Get a task by id
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update a task by id
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete a task by id
+      responses:
+        '204':
+          description: No Content

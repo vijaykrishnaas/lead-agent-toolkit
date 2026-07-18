@@ -1,4 +1,5 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
+const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 
 const ASYNC_HANDLER_SIGNATURE = /async\s*(\(|function)/;
 const HANDLER_PARAMS = /req\s*,\s*res/;
@@ -11,7 +12,9 @@ const CATCH_CALL = /\.catch\s*\(/;
 // addedLines[startIdx], from that line up through the line where the
 // statement actually ends: parens balanced (depth <= 0) AND either the
 // line ends with a `;`, or the following line isn't a `.`-prefixed chain
-// continuation (so an unrelated next statement is never pulled in).
+// continuation (so an unrelated next statement is never pulled in). This is
+// a statement-boundary walk, not a brace-delimited block, so it can't reuse
+// collectBoundedBlock (which stops strictly at open/close-char balance).
 function collectThenStatement(addedLines, startIdx) {
   let depth = 0;
   const blockLines = [];
@@ -25,28 +28,6 @@ function collectThenStatement(addedLines, startIdx) {
       else if (ch === ')') depth -= 1;
     }
     if (depth <= 0 && /;\s*$/.test(content.trimEnd())) break;
-  }
-  return blockLines.join('\n');
-}
-
-// Collects the lines belonging to the handler block starting at
-// addedLines[startIdx], bounded by that handler's own brace depth (from its
-// first `{` back down to 0) rather than "up to the next handler's start
-// line" — the latter sweeps in any unrelated code sitting between two
-// handlers (e.g. a helper function with its own unrelated try/catch), which
-// would otherwise satisfy TRY_BLOCK/ASYNC_WRAPPER for a handler that has no
-// error handling of its own.
-function collectHandlerBlock(addedLines, startIdx) {
-  let depth = 0;
-  let sawOpen = false;
-  const blockLines = [];
-  for (let i = startIdx; i < addedLines.length; i += 1) {
-    const content = addedLines[i].content;
-    blockLines.push(content);
-    for (const ch of content) {
-      if (ch === '{') { depth += 1; sawOpen = true; } else if (ch === '}') depth -= 1;
-    }
-    if (sawOpen && depth <= 0) break;
   }
   return blockLines.join('\n');
 }
@@ -69,7 +50,7 @@ function check(files) {
     });
 
     handlerIndexes.forEach((idx) => {
-      const block = collectHandlerBlock(addedLines, idx);
+      const block = collectBoundedBlock(addedLines, idx);
       if (!TRY_BLOCK.test(block) && !ASYNC_WRAPPER.test(block)) {
         const line = addedLines[idx];
         issues.push({

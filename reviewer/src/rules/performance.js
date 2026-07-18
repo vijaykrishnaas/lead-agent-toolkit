@@ -1,4 +1,5 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
+const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 
 // The param-list group is matched lazily (not `[^)]*`) so a nested paren in
 // a default value or destructuring default (e.g. `({ id = genId() }) => {`)
@@ -8,30 +9,6 @@ const { collectAddedLines } = require('../utils/collectAddedLines');
 const FOREACH_START = /\.forEach\(\s*(async\s+)?\(.*?\)\s*=>\s*{/;
 const AWAIT_PATTERN = /\bawait\b/;
 const DEEP_CLONE_ANTIPATTERN = /JSON\.parse\(\s*JSON\.stringify\(/;
-
-// Collects the lines belonging to a single .forEach(...) callback body
-// (from its opening "{" up to the matching "}", tracked by brace depth) so
-// that an await inside one forEach — or unrelated code after it — can't be
-// mistaken for content of a different, unrelated block.
-function collectForEachBlock(addedLines, startIdx) {
-  let depth = 0;
-  let opened = false;
-  const blockLines = [];
-  for (let i = startIdx; i < addedLines.length; i += 1) {
-    const content = addedLines[i].content;
-    blockLines.push(content);
-    for (const ch of content) {
-      if (ch === '{') {
-        depth += 1;
-        opened = true;
-      } else if (ch === '}') {
-        depth -= 1;
-      }
-    }
-    if (opened && depth <= 0) break;
-  }
-  return blockLines.join('\n');
-}
 
 function check(files) {
   const issues = [];
@@ -43,7 +20,7 @@ function check(files) {
     // silence the check for, a different forEach block in the same file.
     addedLines.forEach((line, idx) => {
       if (!FOREACH_START.test(line.content)) return;
-      const block = collectForEachBlock(addedLines, idx);
+      const block = collectBoundedBlock(addedLines, idx);
       if (AWAIT_PATTERN.test(block)) {
         issues.push({
           file: file.file,

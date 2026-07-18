@@ -1,5 +1,22 @@
 # Progress Log
 
+## 2026-07-18 (task 15: shared collectBoundedBlock helper)
+
+**Done:** Task 15 — the topmost non-DONE, non-BLOCKED backlog item. Fetched all branches, checked out `claude/dev` (up to date with `origin/claude/dev`), ran `npm install && npm test` in `reviewer/` (215/215 green) and `sample-app/` (29/29 green) to confirm a clean baseline, then did the refactor RETRO.md's self-audit (task 13) and TASKS.md task 15 named as the structural fix for the four-times-recurring "aggregate instead of scoping to one occurrence" bug class:
+
+- Compared `errorHandling.js`'s `collectHandlerBlock` and `performance.js`'s `collectForEachBlock` line-by-line — they were byte-for-byte the same algorithm (brace-depth tracking from a start index's first `{` down to the matching `}`), just duplicated with different local variable names (`sawOpen` vs `opened`). Extracted that exact algorithm into `reviewer/src/utils/collectBoundedBlock.js` (`collectBoundedBlock(addedLines, startIdx)`), and repointed both rule files at the shared helper, deleting the two duplicate local functions.
+- Left `errorHandling.js`'s `collectThenStatement` (the `.then()`/`.catch()` statement-boundary walk) as its own function, not folded into `collectBoundedBlock` — it tracks paren depth, not brace depth, and its stop condition is genuinely different (checks *before* consuming a line whether the line still looks like a `.`-chain continuation, plus a semicolon-terminated-statement check that brace-matching has no equivalent of). Forcing it into the same abstraction would have meant bolting statement-boundary special cases onto a helper whose only other two callers need plain brace matching — read as a worse refactor than leaving two purpose-fit functions, so didn't do it without an observed failure motivating that extra complexity.
+- Added `reviewer/tests/utils/collectBoundedBlock.test.js` (6 new tests) exercising the helper directly and in isolation: single-line block, multi-line block, nested-brace depth tracking, the exact "unrelated content with its own braces sitting between two occurrences" shape that motivated this task (two occurrences correctly bounded, unrelated middle content excluded from both), reading to end-of-input when no closing brace ever appears, and reading to end-of-input when the start line has no opening brace at all (documented as the existing, unchanged edge-case behavior inherited from both original duplicated functions — not a new gap this task introduced).
+- No behavior change intended or observed: all 9 pre-existing `errorHandling.test.js` cases and all 6 pre-existing `performance.test.js` cases (including every regression test for the four historical recurrences of this bug class) still pass unmodified against the refactored code.
+
+**Test run:** `reviewer/` — 221/221 green (215 pre-existing + 6 new in `collectBoundedBlock.test.js`, 30 suites). `sample-app/` — 29/29 green, unchanged by this task.
+
+**Decisions:**
+- Did not parameterize `collectBoundedBlock` with configurable open/close characters (e.g. to also serve paren-depth callers) — neither of its two current callers needs that, and CLAUDE.md's "no speculative rewrites" instruction applies to production code the same as to skills/CLAUDE.md itself; adding unused flexibility now would just be a bypass surface with no caller exercising it. Revisit if and when a third caller actually needs a different delimiter.
+- This closes RETRO.md's task-15 evidence (five documented recurrences of this bug class, four of them explicitly named in the CLAUDE.md guideline's evidence trail) by construction: any future diff-scanning rule that needs brace-delimited per-occurrence scoping now gets a correctly-implemented helper to import, rather than reinventing (and potentially re-breaking) the same brace-tracking logic a third time.
+
+**Open questions for Vijay:** None new this run — task 16 (update-in-place PR commenting) is next per TASKS.md ordering and is unrelated to this refactor.
+
 ## 2026-07-18 (adversarial bug-hunt run, post-task-14)
 
 **Done:** Fetched all branches, checked out `claude/dev` (up to date with `origin/claude/dev`, HEAD at the task-14 commit), ran `npm install && npm test` in `reviewer/` (214/214 green) and `sample-app/` (29/29 green) to confirm a clean baseline, then hunted adversarially for bugs, weak tests, and security holes across both packages (read every `reviewer/src/*` module and every `sample-app/src/*` controller/middleware personally, plus `README.md` and the `plugin/` manifests).

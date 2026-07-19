@@ -118,4 +118,60 @@ describe('Auth', () => {
     expect(res.status).toBe(400);
     expect(User.findOne).not.toHaveBeenCalled();
   });
+
+  describe('production JWT_SECRET hardening', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalSecret = process.env.JWT_SECRET;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalNodeEnv;
+      if (originalSecret === undefined) {
+        delete process.env.JWT_SECRET;
+      } else {
+        process.env.JWT_SECRET = originalSecret;
+      }
+    });
+
+    test('register fails instead of signing a token with a default/placeholder secret in production', async () => {
+      process.env.NODE_ENV = 'production';
+      delete process.env.JWT_SECRET;
+      User.findOne.mockResolvedValue(null);
+      User.create.mockResolvedValue({ _id: 'user1', name: 'Alice', email: 'alice@example.com', password: 'hashed' });
+
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ name: 'Alice', email: 'alice@example.com', password: 'secret123' });
+
+      expect(res.status).toBe(500);
+      expect(res.body.token).toBeUndefined();
+    });
+
+    test('login fails instead of signing a token with the .env.example placeholder secret in production', async () => {
+      process.env.NODE_ENV = 'production';
+      process.env.JWT_SECRET = 'change-me';
+      const hashed = await bcrypt.hash('secret123', 10);
+      User.findOne.mockResolvedValue({ _id: 'user1', name: 'Alice', email: 'alice@example.com', password: hashed });
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'alice@example.com', password: 'secret123' });
+
+      expect(res.status).toBe(500);
+      expect(res.body.token).toBeUndefined();
+    });
+
+    test('login still succeeds in production with a real JWT_SECRET set', async () => {
+      process.env.NODE_ENV = 'production';
+      process.env.JWT_SECRET = 'a-real-production-secret';
+      const hashed = await bcrypt.hash('secret123', 10);
+      User.findOne.mockResolvedValue({ _id: 'user1', name: 'Alice', email: 'alice@example.com', password: hashed });
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'alice@example.com', password: 'secret123' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.token).toBeDefined();
+    });
+  });
 });

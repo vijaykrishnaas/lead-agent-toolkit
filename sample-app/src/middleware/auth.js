@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { resolveJwtSecret } = require('../config/jwtSecret');
 
 function auth(req, res, next) {
   const header = req.header('Authorization') || '';
@@ -6,8 +7,10 @@ function auth(req, res, next) {
   if (!token) {
     return res.status(401).json({ error: 'Missing or invalid Authorization header' });
   }
+  // Resolved outside the try/catch: a misconfigured secret is a server
+  // error (500 via the app's error middleware), not an invalid-token 401.
+  const secret = resolveJwtSecret();
   try {
-    const secret = process.env.JWT_SECRET || 'dev-secret';
     const payload = jwt.verify(token, secret, { algorithms: ['HS256'] });
     req.user = { id: payload.id, email: payload.email };
     return next();

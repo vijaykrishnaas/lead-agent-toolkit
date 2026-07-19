@@ -84,4 +84,35 @@ describe('Users', () => {
     const res = await request(app).get('/api/users/me').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
     expect(res.status).toBe(500);
   });
+
+  describe('production JWT_SECRET hardening', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalSecret = process.env.JWT_SECRET;
+    const validToken = token('u1', 'bob@example.com');
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalNodeEnv;
+      if (originalSecret === undefined) {
+        delete process.env.JWT_SECRET;
+      } else {
+        process.env.JWT_SECRET = originalSecret;
+      }
+    });
+
+    test('rejects a request with 500 (not 401) when JWT_SECRET is unset in production', async () => {
+      process.env.NODE_ENV = 'production';
+      delete process.env.JWT_SECRET;
+      const res = await request(app).get('/api/users/me').set('Authorization', `Bearer ${validToken}`);
+      expect(res.status).toBe(500);
+      expect(User.findById).not.toHaveBeenCalled();
+    });
+
+    test('rejects a request with 500 (not 401) when JWT_SECRET is still the .env.example placeholder in production', async () => {
+      process.env.NODE_ENV = 'production';
+      process.env.JWT_SECRET = 'change-me';
+      const res = await request(app).get('/api/users/me').set('Authorization', `Bearer ${validToken}`);
+      expect(res.status).toBe(500);
+      expect(User.findById).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -1,9 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { resolveJwtSecret } = require('../config/jwtSecret');
 
 function signToken(user) {
-  const secret = process.env.JWT_SECRET || 'dev-secret';
+  const secret = resolveJwtSecret();
   return jwt.sign({ id: user._id, email: user.email }, secret, { expiresIn: '1d', algorithm: 'HS256' });
 }
 

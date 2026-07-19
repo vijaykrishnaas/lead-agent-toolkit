@@ -1,4 +1,6 @@
-const { postReviewComment, tokenFromEnv, GITHUB_API_URL, BOT_COMMENT_MARKER } = require('../../src/github/postReviewComment');
+const {
+  postReviewComment, tokenFromEnv, GITHUB_API_URL, BOT_COMMENT_PREFIX, computeBotCommentMarker,
+} = require('../../src/github/postReviewComment');
 
 function makeResponse({ ok = true, status = 201, json = {}, text = '' } = {}) {
   return { ok, status, json: async () => json, text: async () => text };
@@ -13,6 +15,7 @@ function noExistingComments() {
 
 describe('postReviewComment', () => {
   const baseArgs = { token: 'gh-token', owner: 'vijaykrishnaas', repo: 'lead-agent-toolkit', prNumber: 42, body: '# Code Review Report' };
+  const marker = computeBotCommentMarker(baseArgs.token, baseArgs.owner, baseArgs.repo, baseArgs.prNumber);
 
   it('POSTs a marker-prefixed body to the PR comments endpoint with an auth header when no prior bot comment exists', async () => {
     const request = jest.fn()
@@ -29,7 +32,7 @@ describe('postReviewComment', () => {
           Authorization: 'Bearer gh-token',
           Accept: 'application/vnd.github+json',
         }),
-        body: JSON.stringify({ body: `${BOT_COMMENT_MARKER}\n# Code Review Report` }),
+        body: JSON.stringify({ body: `${marker}\n# Code Review Report` }),
       }),
     );
     expect(result).toEqual({ id: 1, html_url: 'https://github.com/.../comments/1', updated: false });
@@ -88,7 +91,7 @@ describe('postReviewComment', () => {
       .mockResolvedValueOnce(makeResponse({
         json: [
           { id: 100, body: 'a human comment, no marker' },
-          { id: 101, body: `${BOT_COMMENT_MARKER}\nstale report` },
+          { id: 101, body: `${marker}\nstale report` },
         ],
       }))
       .mockResolvedValueOnce(makeResponse({ json: { id: 101 } }));
@@ -99,7 +102,7 @@ describe('postReviewComment', () => {
       `${GITHUB_API_URL}/repos/vijaykrishnaas/lead-agent-toolkit/issues/comments/101`,
       expect.objectContaining({
         method: 'PATCH',
-        body: JSON.stringify({ body: `${BOT_COMMENT_MARKER}\n# Code Review Report` }),
+        body: JSON.stringify({ body: `${marker}\n# Code Review Report` }),
       }),
     );
     expect(result).toEqual({ id: 101, updated: true });
@@ -109,8 +112,8 @@ describe('postReviewComment', () => {
     const request = jest.fn()
       .mockResolvedValueOnce(makeResponse({
         json: [
-          { id: 10, body: `${BOT_COMMENT_MARKER}\nfirst run` },
-          { id: 20, body: `${BOT_COMMENT_MARKER}\nsecond run` },
+          { id: 10, body: `${marker}\nfirst run` },
+          { id: 20, body: `${marker}\nsecond run` },
         ],
       }))
       .mockResolvedValueOnce(makeResponse({ json: { id: 20 } }));
@@ -127,7 +130,7 @@ describe('postReviewComment', () => {
     const fullPage = Array.from({ length: 100 }, (_, i) => ({ id: i, body: `human comment ${i}` }));
     const request = jest.fn()
       .mockResolvedValueOnce(makeResponse({ json: fullPage }))
-      .mockResolvedValueOnce(makeResponse({ json: [{ id: 999, body: `${BOT_COMMENT_MARKER}\nold report` }] }))
+      .mockResolvedValueOnce(makeResponse({ json: [{ id: 999, body: `${marker}\nold report` }] }))
       .mockResolvedValueOnce(makeResponse({ json: { id: 999 } }));
 
     await postReviewComment(baseArgs, { request });
@@ -141,7 +144,7 @@ describe('postReviewComment', () => {
 
   it('does not treat a comment that merely contains the marker mid-body (not at the start) as a prior bot comment', async () => {
     const request = jest.fn()
-      .mockResolvedValueOnce(makeResponse({ json: [{ id: 5, body: `quoting the bot: ${BOT_COMMENT_MARKER}` }] }))
+      .mockResolvedValueOnce(makeResponse({ json: [{ id: 5, body: `quoting the bot: ${marker}` }] }))
       .mockResolvedValueOnce(makeResponse({ json: { id: 6 } }));
 
     await postReviewComment(baseArgs, { request });
@@ -150,6 +153,44 @@ describe('postReviewComment', () => {
       `${GITHUB_API_URL}/repos/vijaykrishnaas/lead-agent-toolkit/issues/42/comments`,
       expect.objectContaining({ method: 'POST' }),
     );
+  });
+
+  it('does not treat a spoofed comment using a fixed public prefix (no valid HMAC suffix) as a prior bot comment', async () => {
+    const request = jest.fn()
+      .mockResolvedValueOnce(makeResponse({
+        json: [{ id: 7, body: `${BOT_COMMENT_PREFIX} -->\nfake report from a non-owning commenter` }],
+      }))
+      .mockResolvedValueOnce(makeResponse({ json: { id: 8 } }));
+
+    await postReviewComment(baseArgs, { request });
+
+    expect(request).toHaveBeenLastCalledWith(
+      `${GITHUB_API_URL}/repos/vijaykrishnaas/lead-agent-toolkit/issues/42/comments`,
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+});
+
+describe('computeBotCommentMarker', () => {
+  it('is deterministic for the same token/owner/repo/prNumber', () => {
+    expect(computeBotCommentMarker('gh-token', 'o', 'r', 42)).toBe(computeBotCommentMarker('gh-token', 'o', 'r', 42));
+  });
+
+  it('differs when the token differs, so it cannot be guessed without the real credential', () => {
+    expect(computeBotCommentMarker('gh-token', 'o', 'r', 42))
+      .not.toBe(computeBotCommentMarker('a-different-token', 'o', 'r', 42));
+  });
+
+  it('differs across PRs/repos so a marker cannot be replayed from one PR onto another', () => {
+    const base = computeBotCommentMarker('gh-token', 'o', 'r', 42);
+    expect(computeBotCommentMarker('gh-token', 'o', 'r', 43)).not.toBe(base);
+    expect(computeBotCommentMarker('gh-token', 'o', 'other-repo', 42)).not.toBe(base);
+  });
+
+  it('starts with the public prefix but is not equal to it alone', () => {
+    const marker = computeBotCommentMarker('gh-token', 'o', 'r', 42);
+    expect(marker.startsWith(BOT_COMMENT_PREFIX)).toBe(true);
+    expect(marker).not.toBe(`${BOT_COMMENT_PREFIX} -->`);
   });
 });
 

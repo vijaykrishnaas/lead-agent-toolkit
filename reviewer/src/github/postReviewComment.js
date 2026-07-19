@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const GITHUB_API_URL = 'https://api.github.com';
 
 // Hidden marker prepended to every comment this tool posts, so a repeat run
@@ -5,7 +7,28 @@ const GITHUB_API_URL = 'https://api.github.com';
 // invocation) can find and update its own prior comment instead of always
 // creating a new one — see TASKS.md task 16 / RETRO.md for the observed
 // growing-comment-thread problem this closes.
-const BOT_COMMENT_MARKER = '<!-- lead-agent-toolkit:review-pr -->';
+//
+// The suffix is an HMAC of `owner/repo#prNumber` keyed by the caller's own
+// GitHub token, not a fixed public string — a fixed marker lets any non-owning
+// commenter on the PR post their own comment starting with the same text and
+// have `findExistingBotComment` PATCH it instead of the real bot comment,
+// permanently orphaning the genuine one. Deriving the suffix from the token
+// makes it unpredictable to anyone without that credential, needs no extra
+// API call (unlike checking the comment author against `GET /user`, which
+// also breaks the default `GITHUB_TOKEN` in GitHub Actions), and works
+// identically for `GITHUB_TOKEN` and PAT credentials alike. A token rotation
+// between runs just misses the old comment and posts a new one — the same
+// graceful "no prior comment found" fallback already used today.
+// (TASKS.md task 19 / RETRO.md 2026-07-19 self-audit round 3.)
+const BOT_COMMENT_PREFIX = '<!-- lead-agent-toolkit:review-pr';
+
+function computeBotCommentMarker(token, owner, repo, prNumber) {
+  const suffix = crypto.createHmac('sha256', token)
+    .update(`${owner}/${repo}#${prNumber}`)
+    .digest('hex')
+    .slice(0, 16);
+  return `${BOT_COMMENT_PREFIX}:${suffix} -->`;
+}
 
 const COMMENTS_PER_PAGE = 100;
 // Safety cap on pages searched for a prior bot comment, so a PR with a
@@ -26,11 +49,12 @@ function authHeaders(token) {
   };
 }
 
-// Finds this tool's own prior comment on the PR (identified by
-// BOT_COMMENT_MARKER), if any. Issue comments are returned oldest-first by
-// GitHub, so pages are walked forward and the last (most recent) match wins.
-// Returns null if no prior bot comment is found.
+// Finds this tool's own prior comment on the PR (identified by this PR's
+// computed bot-comment marker), if any. Issue comments are returned
+// oldest-first by GitHub, so pages are walked forward and the last (most
+// recent) match wins. Returns null if no prior bot comment is found.
 async function findExistingBotComment({ token, owner, repo, prNumber }, request) {
+  const marker = computeBotCommentMarker(token, owner, repo, prNumber);
   let found = null;
   for (let page = 1; page <= MAX_COMMENT_SEARCH_PAGES; page += 1) {
     const url = `${GITHUB_API_URL}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
@@ -49,7 +73,7 @@ async function findExistingBotComment({ token, owner, repo, prNumber }, request)
     if (comments.length === 0) break;
 
     for (const comment of comments) {
-      if (typeof comment.body === 'string' && comment.body.startsWith(BOT_COMMENT_MARKER)) {
+      if (typeof comment.body === 'string' && comment.body.startsWith(marker)) {
         found = comment;
       }
     }
@@ -61,9 +85,9 @@ async function findExistingBotComment({ token, owner, repo, prNumber }, request)
 
 // Posts `body` (markdown) as an issue comment on the given PR, or updates
 // this tool's own prior comment on that PR in place if one already exists
-// (identified by BOT_COMMENT_MARKER), instead of always creating a new one.
-// `deps.request` defaults to the global fetch (Node 20+) but is injectable
-// so tests never hit the real GitHub API.
+// (identified by this PR's computed bot-comment marker), instead of always
+// creating a new one. `deps.request` defaults to the global fetch (Node 20+)
+// but is injectable so tests never hit the real GitHub API.
 async function postReviewComment({ token, owner, repo, prNumber, body }, deps = {}) {
   const request = deps.request || fetch;
 
@@ -77,7 +101,7 @@ async function postReviewComment({ token, owner, repo, prNumber, body }, deps = 
     throw new Error('Missing prNumber — the PR number to comment on.');
   }
 
-  const markedBody = `${BOT_COMMENT_MARKER}\n${body}`;
+  const markedBody = `${computeBotCommentMarker(token, owner, repo, prNumber)}\n${body}`;
   const existing = await findExistingBotComment({ token, owner, repo, prNumber }, request);
 
   const url = existing
@@ -108,4 +132,6 @@ async function postReviewComment({ token, owner, repo, prNumber, body }, deps = 
   return { ...comment, updated: Boolean(existing) };
 }
 
-module.exports = { postReviewComment, tokenFromEnv, GITHUB_API_URL, BOT_COMMENT_MARKER };
+module.exports = {
+  postReviewComment, tokenFromEnv, GITHUB_API_URL, BOT_COMMENT_PREFIX, computeBotCommentMarker,
+};

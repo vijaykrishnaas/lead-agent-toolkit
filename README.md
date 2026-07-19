@@ -74,7 +74,7 @@ Minimal Express + Mongoose REST API, plain JS.
 ```bash
 cd sample-app
 npm install
-npm test    # 29 Jest + Supertest tests, models mocked (no live MongoDB needed)
+npm test    # Jest + Supertest tests, models mocked (no live MongoDB needed)
 npm start   # requires a real MONGO_URI
 ```
 

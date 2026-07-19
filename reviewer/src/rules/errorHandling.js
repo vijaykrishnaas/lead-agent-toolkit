@@ -53,6 +53,42 @@ function collectStatement(addedLines, startIdx) {
   return blockLines.join('\n');
 }
 
+// Decides whether the handler starting at addedLines[startIdx] is brace-
+// bodied (its arrow/function body opens a '{' *somewhere*, not necessarily
+// on its own signature line — e.g. `async (req, res) =>` on one line, `{` on
+// the next, a legal and real formatting style) or genuinely brace-less/
+// concise-bodied (no '{' anywhere in the statement). Checking only the
+// signature's own starting line for '{' (the prior version of this check)
+// misclassifies the former as brace-less, which then runs collectStatement
+// instead of collectBoundedBlock -- and collectStatement's own break
+// condition ("depth back to 0 and this line isn't a `.`-continuation") fires
+// the instant it sees the bare '{' line, well before ever reaching a
+// try/catch inside that block, misflagging a genuinely try/catch-wrapped
+// handler as missing error handling. This walks the same statement boundary
+// collectStatement uses, but checks each line for '{' before applying that
+// boundary check, so a brace on any line before the statement would
+// otherwise end is still detected as brace-bodied. collectBoundedBlock
+// itself already scans forward from startIdx looking for the first '{'
+// (see its own loop), so once this returns true it's safe to hand off to it
+// even when the brace isn't on startIdx's own line.
+function handlerHasBraceBody(addedLines, startIdx) {
+  let depth = 0;
+  let quoteState = null;
+  for (let i = startIdx; i < addedLines.length; i += 1) {
+    const content = addedLines[i].content;
+    const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
+    quoteState = nextQuoteState;
+    if (masked.includes('{')) return true;
+    if (i > startIdx && depth <= 0 && !masked.trim().startsWith('.')) return false;
+    for (const ch of masked) {
+      if (ch === '(') depth += 1;
+      else if (ch === ')') depth -= 1;
+    }
+    if (depth <= 0 && /;\s*$/.test(masked.trimEnd())) return false;
+  }
+  return false;
+}
+
 function check(files) {
   const issues = [];
   for (const file of files) {
@@ -71,20 +107,24 @@ function check(files) {
     });
 
     handlerIndexes.forEach((idx) => {
-      // collectBoundedBlock is only safe to use once the handler's own
-      // starting line actually opens a brace: for an occurrence whose
-      // starting line never opens one at all (a concise/expression-bodied
-      // arrow handler, e.g. `async (req, res) => res.json(x);` — no `{`
-      // anywhere), collectBoundedBlock's documented fallback for that case
-      // is "read to the end of input" (see its own test of the same name),
-      // which sweeps every unrelated statement/handler after this one into
-      // the window and can satisfy TRY_BLOCK/ASYNC_WRAPPER off content that
-      // has nothing to do with this handler. A brace-less handler can never
-      // contain a `try { ... }` of its own regardless (that requires
-      // braces), so it only needs its own statement's lines checked for an
-      // ASYNC_WRAPPER match — collectStatement bounds that correctly.
-      const { masked: firstLineMasked } = maskStringLiterals(addedLines[idx].content);
-      const block = firstLineMasked.includes('{')
+      // collectBoundedBlock is only safe to use once the handler is known to
+      // actually open a brace *somewhere* in its statement: for an
+      // occurrence with no '{' anywhere at all (a concise/expression-bodied
+      // arrow handler, e.g. `async (req, res) => res.json(x);`),
+      // collectBoundedBlock's documented fallback for that case is "read to
+      // the end of input" (see its own test of the same name), which sweeps
+      // every unrelated statement/handler after this one into the window and
+      // can satisfy TRY_BLOCK/ASYNC_WRAPPER off content that has nothing to
+      // do with this handler. A brace-less handler can never contain a
+      // `try { ... }` of its own regardless (that requires braces), so it
+      // only needs its own statement's lines checked for an ASYNC_WRAPPER
+      // match — collectStatement bounds that correctly. handlerHasBraceBody
+      // checks the whole statement, not just startIdx's own line, so a
+      // block-bodied handler whose '{' lands on a later line (e.g.
+      // `async (req, res) =>` then `{` on the next line — legal, real
+      // formatting) is still correctly routed to collectBoundedBlock instead
+      // of being misclassified as brace-less.
+      const block = handlerHasBraceBody(addedLines, idx)
         ? collectBoundedBlock(addedLines, idx)
         : collectStatement(addedLines, idx);
       if (!TRY_BLOCK.test(block) && !ASYNC_WRAPPER.test(block)) {

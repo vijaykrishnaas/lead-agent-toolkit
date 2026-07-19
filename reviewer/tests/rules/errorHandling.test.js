@@ -248,6 +248,59 @@ describe('error-handling rule', () => {
     expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
   });
 
+  it('does not flag a try/catch-wrapped handler whose opening brace is on the line after the signature', () => {
+    // Regression: the prior fix for brace-less/concise-body handlers decided
+    // block-bodied-vs-brace-less by checking only the handler's own
+    // signature line for '{'. A block-bodied arrow handler can legally put
+    // its '{' on the next line instead (`async (req, res) =>` then `{` on
+    // its own line), which that check misclassified as brace-less --
+    // routing it to collectStatement, whose break condition fires the
+    // instant it sees the bare '{' line (not a `.`-continuation, depth
+    // already back to 0), well before ever reaching the try/catch inside
+    // the block. A fully try/catch-wrapped handler was misflagged as
+    // missing error handling as a result.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,8 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) =>',
+      '+{',
+      '+  try {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  } catch (err) {',
+      '+    res.status(500).json({ error: "failed" });',
+      '+  }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
+  it('flags a handler with no try/catch whose opening brace is on the line after the signature', () => {
+    // Companion case to the regression above: confirms the fix doesn't
+    // overcorrect into never flagging a next-line-brace handler at all --
+    // one with genuinely no error handling still gets caught.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,4 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) =>',
+      '+{',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
+
   it('flags an async handler with no try/catch even when the block contains a string literal with a stray "{"', () => {
     // Regression: collectBoundedBlock counted every '{' / '}' character
     // including ones inside string literals, so a stray '{' in a handler's

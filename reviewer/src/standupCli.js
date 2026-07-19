@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { generateStandup } = require('./standup/generateStandup');
 const { tokenFromEnv } = require('./github/postReviewComment');
+const { consumeFlagValue } = require('./utils/consumeFlagValue');
 
 const USAGE = 'Usage: standup [--owner <owner>] [--gh-repo <name>] [--repo <path>] '
   + '[--since <iso-date>] [--token <token>] [--out <file>]';
@@ -22,9 +23,7 @@ function parseStandupArgs(argv) {
     const arg = argv[i];
     const key = VALUE_FLAGS[arg];
     if (key) {
-      const value = argv[++i];
-      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
-      args[key] = value;
+      args[key] = consumeFlagValue(argv, ++i, arg);
     } else {
       throw new Error(`Unrecognized argument: ${arg}`);
     }

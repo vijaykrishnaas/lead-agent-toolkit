@@ -33,6 +33,10 @@ describe('parseDocDriftArgs', () => {
   it('throws when --out is the last token, instead of silently falling back to stdout', () => {
     expect(() => parseDocDriftArgs(['--app', 'a.js', '--openapi', 'o.yaml', '--out'])).toThrow(/Missing value for --out/);
   });
+
+  it('throws when --app is immediately followed by another flag, instead of silently taking it as the value', () => {
+    expect(() => parseDocDriftArgs(['--app', '--openapi', 'o.yaml'])).toThrow(/Missing value for --app/);
+  });
 });
 
 describe('runDocDriftCli', () => {

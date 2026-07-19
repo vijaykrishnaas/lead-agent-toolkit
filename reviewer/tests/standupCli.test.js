@@ -52,6 +52,16 @@ describe('parseStandupArgs', () => {
   it('throws when --out is the last token, instead of silently falling back to stdout', () => {
     expect(() => parseStandupArgs(['--owner', 'o', '--gh-repo', 'r', '--out'])).toThrow(/Missing value for --out/);
   });
+
+  it('throws when --owner is immediately followed by another flag, instead of silently omitting it', () => {
+    // Regression: the header comment on VALUE_FLAGS already claimed this
+    // case ("or immediately followed by another flag") was handled, but the
+    // parser only ever checked for `undefined` (the last-token case) —
+    // `--owner --gh-repo r` silently took '--gh-repo' as --owner's own
+    // value and dropped --gh-repo's real value, producing a mismatched
+    // owner/repo pairing with no error.
+    expect(() => parseStandupArgs(['--owner', '--gh-repo', 'r'])).toThrow(/Missing value for --owner/);
+  });
 });
 
 describe('runStandupCli', () => {

@@ -72,6 +72,10 @@ describe('parseReviewPrArgs', () => {
   it('throws when --token is the last token, instead of silently omitting it', () => {
     expect(() => parseReviewPrArgs([...BASE_ARGV, '--token'])).toThrow(/Missing value for --token/);
   });
+
+  it('throws when --token is immediately followed by another flag, instead of silently taking it as the value', () => {
+    expect(() => parseReviewPrArgs([...BASE_ARGV, '--token', '--no-post'])).toThrow(/Missing value for --token/);
+  });
 });
 
 describe('runReviewPrCli', () => {

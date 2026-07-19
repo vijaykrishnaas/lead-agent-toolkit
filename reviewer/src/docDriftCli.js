@@ -1,11 +1,13 @@
 const fs = require('fs');
 const { generateDocDrift } = require('./docDrift/generateDocDrift');
+const { consumeFlagValue } = require('./utils/consumeFlagValue');
 
 const USAGE = 'Usage: doc-drift --app <path-to-express-entry> --openapi <path-to-openapi.yaml> [--out <file>]';
 
-// Flags that take a following value. A flag given as the last token in argv
-// must fail loudly rather than silently taking `undefined` as its value —
-// see the CLAUDE.md guideline on value-taking CLI flags.
+// Flags that take a following value. A flag given as the last token in argv,
+// or immediately followed by another flag, must fail loudly rather than
+// silently taking a wrong value — see the CLAUDE.md guideline on
+// value-taking CLI flags.
 const VALUE_FLAGS = { '--app': 'app', '--openapi': 'openapi', '--out': 'out' };
 
 function parseDocDriftArgs(argv) {
@@ -14,9 +16,7 @@ function parseDocDriftArgs(argv) {
     const arg = argv[i];
     const key = VALUE_FLAGS[arg];
     if (key) {
-      const value = argv[++i];
-      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
-      args[key] = value;
+      args[key] = consumeFlagValue(argv, ++i, arg);
     } else {
       throw new Error(`Unrecognized argument: ${arg}`);
     }

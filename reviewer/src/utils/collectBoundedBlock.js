@@ -1,3 +1,5 @@
+const { maskStringLiterals } = require('./maskStringLiterals');
+
 // Collects the lines belonging to a single brace-delimited block starting at
 // addedLines[startIdx], from that line's first opening brace up through the
 // line containing its matching closing brace (tracked by brace depth), so an
@@ -11,14 +13,22 @@
 // compliant one. See CLAUDE.md's per-occurrence-scoping guideline for the
 // bug class this closes off structurally, shared by errorHandling.js's
 // handler-block check and performance.js's forEach-block check.
+// Braces inside string/template literals (e.g. a log message containing a
+// literal "{") are masked out via maskStringLiterals first, so they can't be
+// mistaken for real block structure — see CLAUDE.md's string-literal-aware
+// depth-counting guideline for the false-positive/false-negative pairs this
+// closes off.
 function collectBoundedBlock(addedLines, startIdx) {
   let depth = 0;
   let opened = false;
+  let quoteState = null;
   const blockLines = [];
   for (let i = startIdx; i < addedLines.length; i += 1) {
     const content = addedLines[i].content;
     blockLines.push(content);
-    for (const ch of content) {
+    const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
+    quoteState = nextQuoteState;
+    for (const ch of masked) {
       if (ch === '{') {
         depth += 1;
         opened = true;

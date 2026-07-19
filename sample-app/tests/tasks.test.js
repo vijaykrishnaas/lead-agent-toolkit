@@ -45,11 +45,16 @@ describe('Tasks', () => {
     expect(Task.find).toHaveBeenCalledWith({ owner: 'u1' });
   });
 
-  test('gets a task by id', async () => {
+  test('gets a task by id, scoped to the owner', async () => {
+    // Asserting the query's owner filter, not just the response body, so a
+    // future change that accidentally drops owner-scoping here (an IDOR
+    // letting any authenticated user read another user's task by id) would
+    // fail this test even though the mocked response body looks identical.
     Task.findOne.mockResolvedValue({ _id: 't1', title: 'A' });
     const res = await request(app).get('/api/tasks/t1').set('Authorization', auth);
     expect(res.status).toBe(200);
     expect(res.body.title).toBe('A');
+    expect(Task.findOne).toHaveBeenCalledWith({ _id: 't1', owner: 'u1' });
   });
 
   test('404s for a missing task', async () => {
@@ -58,7 +63,10 @@ describe('Tasks', () => {
     expect(res.status).toBe(404);
   });
 
-  test('updates a task', async () => {
+  test('updates a task, scoped to the owner', async () => {
+    // Same IDOR-shaped regression guard as the getById test above: assert
+    // the update was filtered by owner, not just that the response body
+    // reflects the mocked resolved value.
     Task.findOneAndUpdate.mockResolvedValue({ _id: 't1', title: 'A2', completed: true });
     const res = await request(app)
       .put('/api/tasks/t1')
@@ -66,12 +74,19 @@ describe('Tasks', () => {
       .send({ title: 'A2', completed: true });
     expect(res.status).toBe(200);
     expect(res.body.completed).toBe(true);
+    expect(Task.findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: 't1', owner: 'u1' },
+      expect.anything(),
+      expect.anything(),
+    );
   });
 
-  test('deletes a task', async () => {
+  test('deletes a task, scoped to the owner', async () => {
+    // Same IDOR-shaped regression guard as the getById/update tests above.
     Task.findOneAndDelete.mockResolvedValue({ _id: 't1' });
     const res = await request(app).delete('/api/tasks/t1').set('Authorization', auth);
     expect(res.status).toBe(204);
+    expect(Task.findOneAndDelete).toHaveBeenCalledWith({ _id: 't1', owner: 'u1' });
   });
 
   test('404s deleting a missing task', async () => {

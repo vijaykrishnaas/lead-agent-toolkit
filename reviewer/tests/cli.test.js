@@ -42,6 +42,13 @@ describe('parseArgs', () => {
   it('throws when --out is the last token, instead of silently falling back to stdout', () => {
     expect(() => parseArgs(['a..b', '--out'])).toThrow(/Missing value for --out/);
   });
+
+  it('throws when --out is immediately followed by another flag, instead of silently taking it as the value', () => {
+    // Regression: only the "last token in argv" shape was validated;
+    // `--out --repo <path>` silently took '--repo' as --out's own value and
+    // dropped --repo's real value entirely, with no error.
+    expect(() => parseArgs(['a..b', '--out', '--repo', '/tmp/repo'])).toThrow(/Missing value for --out/);
+  });
 });
 
 describe('runCli', () => {

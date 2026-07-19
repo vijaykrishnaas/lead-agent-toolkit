@@ -4,14 +4,16 @@ const { reviewDiff } = require('./reviewer');
 const { loadRules, DEFAULT_CONFIG_PATH } = require('./config/loadRules');
 const { formatMarkdownReport } = require('./format/markdownReport');
 const { postReviewComment, tokenFromEnv } = require('./github/postReviewComment');
+const { consumeFlagValue } = require('./utils/consumeFlagValue');
 
 const USAGE = 'Usage: review-pr -- --owner <owner> --gh-repo <name> --pr <number> <base>..<head> '
   + '[--repo <path>] [--config <path>] [--token <token>] [--out <file>] [--no-post]';
 const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
 
-// Flags that take a following value. A flag given as the last token in argv
-// must fail loudly rather than silently taking `undefined` as its value —
-// see the CLAUDE.md guideline on value-taking CLI flags.
+// Flags that take a following value. A flag given as the last token in argv,
+// or immediately followed by another flag, must fail loudly rather than
+// silently taking a wrong value — see the CLAUDE.md guideline on
+// value-taking CLI flags.
 const VALUE_FLAGS = {
   '--owner': 'owner', '--gh-repo': 'ghRepo', '--pr': 'pr', '--repo': 'repo', '--config': 'config', '--token': 'token', '--out': 'out',
 };
@@ -25,9 +27,7 @@ function parseReviewPrArgs(argv) {
     const arg = argv[i];
     const key = VALUE_FLAGS[arg];
     if (key) {
-      const value = argv[++i];
-      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
-      args[key] = value;
+      args[key] = consumeFlagValue(argv, ++i, arg);
     } else if (arg === '--no-post') {
       args.noPost = true;
     } else if (!args.range && !arg.startsWith('--')) {

@@ -77,4 +77,37 @@ describe('collectBoundedBlock', () => {
     const addedLines = linesFrom(['const x = 1;', 'const y = 2;']);
     expect(collectBoundedBlock(addedLines, 0)).toBe(['const x = 1;', 'const y = 2;'].join('\n'));
   });
+
+  it('does not let a brace character inside a string literal over-extend the block', () => {
+    const addedLines = linesFrom([
+      'exports.getWidget = async (req, res) => {',
+      '  res.json({ note: "unexpected {" });',
+      '};',
+      'function unrelatedHelper() {',
+      '  try { doSomething(); } catch (e) { log(e); }',
+      '}',
+    ]);
+
+    const block = collectBoundedBlock(addedLines, 0);
+    expect(block).toBe([
+      'exports.getWidget = async (req, res) => {',
+      '  res.json({ note: "unexpected {" });',
+      '};',
+    ].join('\n'));
+    expect(block).not.toContain('try');
+    expect(block).not.toContain('unrelatedHelper');
+  });
+
+  it('does not let a brace character inside a string literal truncate the block early', () => {
+    const addedLines = linesFrom([
+      'exports.getWidget = async (req, res) => {',
+      '  console.log("weird } char");',
+      '  try { doX(); } catch (err) { log(err); }',
+      '};',
+    ]);
+
+    const block = collectBoundedBlock(addedLines, 0);
+    expect(block).toContain('try { doX(); } catch (err) { log(err); }');
+    expect(block).toContain('};');
+  });
 });

@@ -179,4 +179,55 @@ describe('error-handling rule', () => {
     expect(thenIssues).toHaveLength(1);
     expect(thenIssues[0].line).toBe(2);
   });
+
+  it('does not flag a caught chain whose callback body contains a closing paren inside a string literal', () => {
+    // Regression: collectThenStatement counted every '(' / ')' character
+    // including ones inside string literals, so a callback body logging a
+    // message containing a literal ")" prematurely closed the paren-depth
+    // count and truncated the scan before the chain's real .catch().
+    const diff = [
+      'diff --git a/src/jobs/cleanup.js b/src/jobs/cleanup.js',
+      '--- a/src/jobs/cleanup.js',
+      '+++ b/src/jobs/cleanup.js',
+      '@@ -1,1 +1,5 @@',
+      ' function cleanup() {',
+      '+  promise.then((result) => {',
+      '+    console.log("looks like this: )");',
+      '+    return result;',
+      '+  }).catch((err) => log(err));',
+      '+}',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+  });
+
+  it('flags an async handler with no try/catch even when the block contains a string literal with a stray "{"', () => {
+    // Regression: collectBoundedBlock counted every '{' / '}' character
+    // including ones inside string literals, so a stray '{' in a handler's
+    // own body over-extended its window into unrelated following code and
+    // silenced a genuine finding for the handler itself.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,7 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => {',
+      '+  res.json({ note: "unexpected {" });',
+      '+};',
+      '+function unrelatedHelper() {',
+      '+  try {',
+      '+    doSomething();',
+      '+  } catch (e) {',
+      '+    log(e);',
+      '+  }',
+      '+}',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
 });

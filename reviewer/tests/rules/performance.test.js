@@ -98,4 +98,25 @@ describe('performance rule', () => {
     expect(issues).toHaveLength(1);
     expect(issues[0].line).toBe(5);
   });
+
+  it('flags await inside a .forEach() whose callback body contains a closing brace inside a string literal', () => {
+    // Regression: collectBoundedBlock (shared with errorHandling.js) counted
+    // every '{' / '}' character including ones inside string literals, so a
+    // stray '}' in a log message before the real await over-extended the
+    // window's brace-depth count and hid the genuine await-in-forEach.
+    const diff = [
+      'diff --git a/src/services/batch.js b/src/services/batch.js',
+      '--- a/src/services/batch.js',
+      '+++ b/src/services/batch.js',
+      '@@ -1,1 +1,4 @@',
+      '+items.forEach(async (item) => {',
+      '+  log("unexpected } here");',
+      '+  await save(item);',
+      '+});',
+    ].join('\n');
+
+    const issues = performanceRule.check(parseDiff(diff));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].line).toBe(1);
+  });
 });

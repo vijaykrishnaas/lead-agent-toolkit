@@ -3,13 +3,15 @@ const { execFileSync } = require('child_process');
 const { reviewDiff } = require('./reviewer');
 const { loadRules, DEFAULT_CONFIG_PATH } = require('./config/loadRules');
 const { formatMarkdownReport } = require('./format/markdownReport');
+const { consumeFlagValue } = require('./utils/consumeFlagValue');
 
 const USAGE = 'Usage: review -- <base>..<head> [--repo <path>] [--config <path>] [--out <file>]';
 const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
 
-// Flags that take a following value. A flag given as the last token in argv
-// must fail loudly rather than silently taking `undefined` as its value —
-// see the CLAUDE.md guideline on value-taking CLI flags.
+// Flags that take a following value. A flag given as the last token in argv,
+// or immediately followed by another flag, must fail loudly rather than
+// silently taking a wrong value — see the CLAUDE.md guideline on
+// value-taking CLI flags.
 const VALUE_FLAGS = { '--repo': 'repo', '--config': 'config', '--out': 'out' };
 
 function parseArgs(argv) {
@@ -18,9 +20,7 @@ function parseArgs(argv) {
     const arg = argv[i];
     const key = VALUE_FLAGS[arg];
     if (key) {
-      const value = argv[++i];
-      if (value === undefined) throw new Error(`Missing value for ${arg}.`);
-      args[key] = value;
+      args[key] = consumeFlagValue(argv, ++i, arg);
     } else if (!args.range && !arg.startsWith('--')) {
       args.range = arg;
     } else {

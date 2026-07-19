@@ -7,10 +7,19 @@ function signToken(user) {
   return jwt.sign({ id: user._id, email: user.email }, secret, { expiresIn: '1d', algorithm: 'HS256' });
 }
 
+// req.body fields are attacker-controlled and only guaranteed to be JSON
+// values, not strings — a wrong-typed field (e.g. `{"email": {"$ne": null}}`)
+// is truthy and would otherwise reach `.toLowerCase()`/bcrypt/User.create
+// and throw, which the generic catch below turns into a misleading 500
+// instead of a 400.
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.length > 0;
+}
+
 async function register(req, res) {
   try {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    if (!isNonEmptyString(name) || !isNonEmptyString(email) || !isNonEmptyString(password)) {
       return res.status(400).json({ error: 'name, email and password are required' });
     }
     const existing = await User.findOne({ email: email.toLowerCase() });
@@ -22,6 +31,9 @@ async function register(req, res) {
     const token = signToken(user);
     return res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'Email already registered' });
+    }
     return res.status(500).json({ error: 'Registration failed' });
   }
 }
@@ -29,7 +41,7 @@ async function register(req, res) {
 async function login(req, res) {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (!isNonEmptyString(email) || !isNonEmptyString(password)) {
       return res.status(400).json({ error: 'email and password are required' });
     }
     const user = await User.findOne({ email: email.toLowerCase() });

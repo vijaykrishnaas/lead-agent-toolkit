@@ -1,5 +1,6 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
+const { maskStringLiterals } = require('../utils/maskStringLiterals');
 
 const ASYNC_HANDLER_SIGNATURE = /async\s*(\(|function)/;
 const HANDLER_PARAMS = /req\s*,\s*res/;
@@ -15,19 +16,27 @@ const CATCH_CALL = /\.catch\s*\(/;
 // continuation (so an unrelated next statement is never pulled in). This is
 // a statement-boundary walk, not a brace-delimited block, so it can't reuse
 // collectBoundedBlock (which stops strictly at open/close-char balance).
+// Parens inside string/template literals (e.g. a callback body logging a
+// message containing a literal ")") are masked out via maskStringLiterals
+// first, so they can't be mistaken for the statement's real paren
+// structure — same bug class and fix as collectBoundedBlock's, see
+// CLAUDE.md's string-literal-aware depth-counting guideline.
 function collectThenStatement(addedLines, startIdx) {
   let depth = 0;
+  let quoteState = null;
   const blockLines = [];
   for (let i = startIdx; i < addedLines.length; i += 1) {
     const content = addedLines[i].content;
-    if (i > startIdx && depth <= 0 && !content.trim().startsWith('.')) break;
+    const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
+    quoteState = nextQuoteState;
+    if (i > startIdx && depth <= 0 && !masked.trim().startsWith('.')) break;
 
     blockLines.push(content);
-    for (const ch of content) {
+    for (const ch of masked) {
       if (ch === '(') depth += 1;
       else if (ch === ')') depth -= 1;
     }
-    if (depth <= 0 && /;\s*$/.test(content.trimEnd())) break;
+    if (depth <= 0 && /;\s*$/.test(masked.trimEnd())) break;
   }
   return blockLines.join('\n');
 }

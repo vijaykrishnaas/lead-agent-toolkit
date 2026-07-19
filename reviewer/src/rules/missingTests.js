@@ -28,6 +28,9 @@ function baseName(filePath) {
 // a reference. Looks at every line in the test file's hunks (both added and
 // unchanged context), since the require/import statement is often
 // pre-existing context rather than a line newly added by this diff.
+// Matched as a whole path segment, not a raw substring — "utils/round" is a
+// substring of "utils/roundRobin", so a require of a completely different,
+// unrelated module would otherwise satisfy the check for "round" too.
 function testFileReferencesSource(testFile, sourceFile) {
   const segments = sourceFile.file.replace(/\.js$/, '').split('/');
   const qualified = segments.slice(-2).join('/'); // e.g. "utils/round"
@@ -36,7 +39,8 @@ function testFileReferencesSource(testFile, sourceFile) {
     .filter((line) => line.type === 'add' || line.type === 'context')
     .map((line) => line.content)
     .join('\n');
-  return content.includes(qualified);
+  const boundaryPattern = new RegExp(`(^|[^\\w])${escapeRegExp(qualified)}($|[^\\w])`);
+  return boundaryPattern.test(content);
 }
 
 // Matches a source file to a changed test file by basename convention (e.g.

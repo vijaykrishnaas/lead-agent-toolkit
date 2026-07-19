@@ -1,3 +1,4 @@
+const { maskStringLiterals } = require('../utils/maskStringLiterals');
 const { HTTP_METHODS } = require('./httpMethods');
 const VERB_ALTERNATION = HTTP_METHODS.join('|');
 const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*(['"])(.*?)\\2`, 'g');
@@ -13,7 +14,40 @@ const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\
 // METHOD_CALL_PATTERN can't see them because the verb call isn't preceded
 // by "router."/"app." directly, only by the ").route(...)" chain.
 const ROUTE_CALL_PATTERN = /\.route\(\s*(['"])(.*?)\1\s*\)/g;
-const CHAINED_VERB_PATTERN = new RegExp(`\\.(${VERB_ALTERNATION})\\(`, 'g');
+const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION})\\(`);
+
+// Walks forward from `chainStart` (right after a .route(path) call)
+// collecting only .<verb>(...) calls that are *directly* chained — i.e.
+// nothing but whitespace between one call's closing ")" and the next ".".
+// Each call's own argument list is skipped by paren-depth (using `masked`,
+// a string-literal-safe version of `source` from maskStringLiterals, so a
+// stray "(" or ")" inside a string/template literal in a handler body can't
+// desync the depth count), not by jumping to the *next* .route() call's
+// index — that boundary is unsafe whenever unrelated code (e.g. a separate
+// router.<verb>(...) statement) sits between two .route() chains, since it
+// would sweep that unrelated statement's own verb call into this chain. See
+// CLAUDE.md's per-occurrence-scoping guideline, which names this exact
+// "next occurrence's start" shape as unsafe for the same reason.
+function collectChainedVerbs(source, masked, chainStart) {
+  const verbs = [];
+  let pos = chainStart;
+  while (pos < source.length) {
+    const wsLen = /^\s*/.exec(source.slice(pos))[0].length;
+    const afterWs = pos + wsLen;
+    const verbMatch = CHAINED_VERB_START_PATTERN.exec(source.slice(afterWs));
+    if (!verbMatch) break;
+    verbs.push(verbMatch[1].toUpperCase());
+    let depth = 1;
+    let i = afterWs + verbMatch[0].length;
+    while (i < source.length && depth > 0) {
+      if (masked[i] === '(') depth += 1;
+      else if (masked[i] === ')') depth -= 1;
+      i += 1;
+    }
+    pos = i;
+  }
+  return verbs;
+}
 
 // Extracts { method, path } route entries from a single Express router file's
 // source text (e.g. tasks.routes.js). Only router.<verb>(path, ...) calls
@@ -26,21 +60,18 @@ function parseRouterSource(source) {
     routes.push({ method: match[1].toUpperCase(), path: match[3] });
   }
 
-  // For each .route(path) call, its chained verbs are whatever
-  // .<verb>(...) calls appear between it and the *next* .route(...) call
-  // (or end of source) — that span is exactly the chain hanging off this
-  // one .route(...), and stopping at the next .route(...) keeps two
-  // separate route() chains in the same file from bleeding into each other.
-  const routeCalls = [...source.matchAll(ROUTE_CALL_PATTERN)];
-  routeCalls.forEach((routeMatch, i) => {
+  // For each .route(path) call, its chained verbs are only the .<verb>(...)
+  // calls directly chained onto it (see collectChainedVerbs) — not "whatever
+  // appears before the next .route() call," which would misattribute an
+  // unrelated router.<verb>(...) statement sitting between two chains.
+  const { masked } = maskStringLiterals(source);
+  for (const routeMatch of source.matchAll(ROUTE_CALL_PATTERN)) {
     const path = routeMatch[2];
     const chainStart = routeMatch.index + routeMatch[0].length;
-    const chainEnd = i + 1 < routeCalls.length ? routeCalls[i + 1].index : source.length;
-    const chainSource = source.slice(chainStart, chainEnd);
-    for (const verbMatch of chainSource.matchAll(CHAINED_VERB_PATTERN)) {
-      routes.push({ method: verbMatch[1].toUpperCase(), path });
+    for (const method of collectChainedVerbs(source, masked, chainStart)) {
+      routes.push({ method, path });
     }
-  });
+  }
 
   return routes;
 }

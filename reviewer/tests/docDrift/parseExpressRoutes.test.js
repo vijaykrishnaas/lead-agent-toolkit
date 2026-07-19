@@ -98,6 +98,35 @@ describe('parseRouterSource', () => {
       { method: 'POST', path: '/b' },
     ]);
   });
+
+  it('does not sweep an unrelated router.<verb>() statement sitting between two .route() chains into the first chain', () => {
+    // Regression: the chain boundary used to be "up to the next .route()
+    // call's index," so an unrelated router.get('/b', ...) statement sitting
+    // between two .route() chains got scanned as if it were part of the
+    // first chain, duplicating GET /a (once from METHOD_CALL_PATTERN's own
+    // direct match on router.get, once again from the mis-bounded chain
+    // scan) instead of leaving the first chain as just its own single verb.
+    const source = `
+      router.route('/a')
+        .get(getA);
+
+      router.get('/b', getB);
+
+      router.route('/c')
+        .get(getC);
+    `;
+
+    const routes = parseRouterSource(source);
+    expect(routes.filter((r) => r.method === 'GET' && r.path === '/a')).toHaveLength(1);
+    expect(routes).toEqual(
+      expect.arrayContaining([
+        { method: 'GET', path: '/b' },
+        { method: 'GET', path: '/a' },
+        { method: 'GET', path: '/c' },
+      ]),
+    );
+    expect(routes).toHaveLength(3);
+  });
 });
 
 describe('parseAppEntrySource', () => {

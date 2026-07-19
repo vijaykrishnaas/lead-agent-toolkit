@@ -99,4 +99,37 @@ describe('missing-tests rule', () => {
     });
     expect(issues.some((issue) => issue.file === 'src/utils/slugify.js')).toBe(false);
   });
+
+  it('does not let a same-basename sibling\'s require of an unrelated, longer-named module satisfy the disambiguation check', () => {
+    // Regression: testFileReferencesSource matched "utils/round" as a raw
+    // substring, so a test file requiring a completely different module,
+    // '../src/utils/roundRobin', silently satisfied the check for
+    // src/utils/round.js purely because "utils/round" is a substring of
+    // "utils/roundRobin" -- leaving that sibling untested and unflagged
+    // even though the test file never actually references it.
+    const diff = [
+      'diff --git a/src/utils/round.js b/src/utils/round.js',
+      '--- a/src/utils/round.js',
+      '+++ b/src/utils/round.js',
+      '@@ -1,1 +1,2 @@',
+      ' function round(value, digits) {}',
+      '+exports.round = round;',
+      'diff --git a/src/other/round.js b/src/other/round.js',
+      '--- a/src/other/round.js',
+      '+++ b/src/other/round.js',
+      '@@ -1,1 +1,2 @@',
+      ' function round(value, mode) {}',
+      '+exports.round = round;',
+      'diff --git a/tests/round.test.js b/tests/round.test.js',
+      '--- a/tests/round.test.js',
+      '+++ b/tests/round.test.js',
+      '@@ -1,1 +1,2 @@',
+      " const { roundRobin } = require('../src/utils/roundRobin');",
+      "+test('rounds', () => { expect(roundRobin()).toBe(1); });",
+    ].join('\n');
+
+    const issues = missingTestsRule.check(parseDiff(diff));
+
+    expect(issues.map((issue) => issue.file).sort()).toEqual(['src/other/round.js', 'src/utils/round.js']);
+  });
 });

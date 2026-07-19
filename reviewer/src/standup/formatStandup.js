@@ -1,17 +1,4 @@
-// Commit messages and PR titles are attacker-influenceable (any contributor
-// controls their own commit message / PR title), so free-text values must be
-// neutralized before interpolation into markdown: embedded newlines are
-// collapsed (otherwise a multi-line message can forge extra report lines —
-// e.g. a fake "## Section" heading or "**Since:**" line — inside what should
-// render as a single list item), and markdown-structural characters
-// (backtick, *, _, [, ], (, )) are backslash-escaped — including the parens,
-// so no unescaped "](" substring survives — so a title like
-// "[x](javascript:...)" renders as inert text instead of a live link.
-function sanitizeMarkdownText(text) {
-  return String(text)
-    .replace(/\r\n|\r|\n/g, ' ')
-    .replace(/[`*_[\]()]/g, '\\$&');
-}
+const { sanitizeMarkdownText } = require('../utils/sanitizeMarkdownText');
 
 function formatCommitLine(commit) {
   return `- \`${commit.hash.slice(0, 7)}\` ${sanitizeMarkdownText(commit.message)}`;

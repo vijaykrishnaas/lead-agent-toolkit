@@ -1,7 +1,13 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 
 const SECRET_PATTERN = /(password|secret|apikey|api_key|token)\s*[:=]\s*['"`][^'"`]{3,}['"`]/i;
-const EVAL_PATTERN = /\beval\s*\(/;
+// \beval\s*\( catches the direct call form (`eval(x)`). It does not catch
+// bracket-property access (`global['eval'](x)`, `window["eval"](x)`), a
+// trivial one-line evasion with identical runtime semantics: `eval` there is
+// followed by `]`, not `(`, so the word-boundary form never matches. The
+// second alternative catches that shape directly (quoted "eval" inside
+// brackets, immediately invoked).
+const EVAL_PATTERN = /\beval\s*\(|\[\s*(['"])eval\1\s*\]\s*\(/;
 
 // No process.env exemption here: SECRET_PATTERN only matches when the
 // operator is immediately followed by a quoted literal, which a genuine

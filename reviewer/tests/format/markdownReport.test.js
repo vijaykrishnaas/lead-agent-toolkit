@@ -49,4 +49,40 @@ describe('formatMarkdownReport', () => {
     const report = formatMarkdownReport({ risk: 'none', issues: [] });
     expect(report).not.toContain('**Range:**');
   });
+
+  // This report is posted live to GitHub PR comments (reviewPrCli.js ->
+  // postReviewComment), and issue.message/issue.fix routinely embed
+  // diff-controlled content (e.g. security.js quoting the offending added
+  // line verbatim) that any non-owning PR contributor controls. A crafted
+  // added line containing a fake markdown link must not render as a live,
+  // clickable link in the posted comment.
+  it('neutralizes a forged markdown link embedded in a rule message so it cannot render as clickable', () => {
+    const result = {
+      risk: 'high',
+      issues: [
+        {
+          file: 'src/a.js',
+          line: 1,
+          category: 'security',
+          severity: 'high',
+          message: 'Possible hardcoded credential: "apikey = \'x\'; [Approve without review](https://evil.example/steal)"',
+          fix: 'Load secrets from environment variables.',
+        },
+      ],
+    };
+    const report = formatMarkdownReport(result);
+    expect(report).not.toContain('](https://evil.example/steal)');
+    expect(report).toContain('\\[Approve without review\\]\\(https://evil.example/steal\\)');
+  });
+
+  it('sanitizes an attacker-influenceable file path so it cannot break out of the bold span', () => {
+    const result = {
+      risk: 'low',
+      issues: [
+        { file: '**injected**.js', line: 1, category: 'style', severity: 'low', message: 'msg', fix: 'fix' },
+      ],
+    };
+    const report = formatMarkdownReport(result);
+    expect(report).toContain('\\*\\*injected\\*\\*.js');
+  });
 });

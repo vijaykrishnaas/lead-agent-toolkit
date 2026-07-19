@@ -59,6 +59,29 @@ describe('Auth', () => {
     expect(res.body.error).toMatch(/already registered/i);
   });
 
+  test('register rejects a password over the 72-byte bcrypt truncation limit', async () => {
+    // Regression: bcrypt silently truncates its input at 72 bytes, so two
+    // different over-length passwords sharing the same first 72 bytes would
+    // otherwise hash identically and both authenticate. Rejecting at
+    // registration keeps "the password the user set" and "the password
+    // that actually authenticates" the same thing.
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Alice', email: 'alice@example.com', password: 'a'.repeat(73) });
+    expect(res.status).toBe(400);
+    expect(User.create).not.toHaveBeenCalled();
+  });
+
+  test('register accepts a password exactly at the 72-byte limit', async () => {
+    User.findOne.mockResolvedValue(null);
+    User.create.mockResolvedValue({ _id: 'user1', name: 'Alice', email: 'alice@example.com', password: 'hashed' });
+
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Alice', email: 'alice@example.com', password: 'a'.repeat(72) });
+    expect(res.status).toBe(201);
+  });
+
   test('register rejects a non-string email instead of crashing into a 500', async () => {
     // Regression: `!email` only rejects falsy values, so a wrong-typed but
     // truthy email (e.g. an object from a malformed/adversarial request
@@ -101,6 +124,26 @@ describe('Auth', () => {
       .post('/api/auth/login')
       .send({ email: 'nope@example.com', password: 'x' });
     expect(res.status).toBe(401);
+  });
+
+  test('login runs a bcrypt comparison even for an unknown email, to avoid a timing side-channel', async () => {
+    // Regression: an unknown-email login used to 401 immediately, before
+    // any bcrypt.compare call, while a known-email/wrong-password login
+    // waited on a real bcrypt.compare — that latency gap lets a remote
+    // attacker enumerate registered emails purely by timing. Asserting the
+    // spy was called (regardless of the mocked implementation's own speed)
+    // catches a regression back to the early-return shape without making
+    // the test itself timing-sensitive/flaky.
+    const compareSpy = jest.spyOn(bcrypt, 'compare');
+    User.findOne.mockResolvedValue(null);
+
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'nope@example.com', password: 'x' });
+
+    expect(res.status).toBe(401);
+    expect(compareSpy).toHaveBeenCalledTimes(1);
+    compareSpy.mockRestore();
   });
 
   test('login rejects a non-string email instead of crashing into a 500', async () => {

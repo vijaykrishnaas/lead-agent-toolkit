@@ -1,3 +1,5 @@
+const { sanitizeMarkdownText } = require('../utils/sanitizeMarkdownText');
+
 const SEVERITY_ORDER = { high: 0, medium: 1, low: 2 };
 
 function severityBadge(severity) {
@@ -40,8 +42,21 @@ function formatMarkdownReport(result, meta = {}) {
   for (const [category, categoryIssues] of [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
     lines.push(`## ${category} (${categoryIssues.length})`, '');
     for (const issue of categoryIssues) {
-      lines.push(`- **${issue.file}:${issue.line}** [${severityBadge(issue.severity)}] — ${issue.message}`);
-      lines.push(`  - Fix: ${issue.fix}`);
+      // issue.message/issue.fix routinely embed diff-controlled content
+      // (e.g. security.js quoting the offending added line verbatim), and
+      // issue.file is a diff-supplied path — all attacker-influenceable by
+      // any non-owning contributor to the PR being reviewed. This report is
+      // posted live to GitHub PR comments (see reviewPrCli.js ->
+      // postReviewComment), so unsanitized content here is a markdown/link
+      // injection risk, not just a rendering quirk — same threat model as
+      // formatStandup.js's sanitizeMarkdownText, just on the higher-impact
+      // surface (a report that gets posted, not only printed/written to a
+      // file).
+      const file = sanitizeMarkdownText(issue.file);
+      const message = sanitizeMarkdownText(issue.message);
+      const fix = sanitizeMarkdownText(issue.fix);
+      lines.push(`- **${file}:${issue.line}** [${severityBadge(issue.severity)}] — ${message}`);
+      lines.push(`  - Fix: ${fix}`);
     }
     lines.push('');
   }

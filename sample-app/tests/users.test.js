@@ -52,6 +52,27 @@ describe('Users', () => {
     expect(res.body.name).toBe('Bobby');
   });
 
+  test('PUT /:id only ever writes the name/email fields, even when the request body sends more', async () => {
+    // Regression guard: the response-only assertions above would still pass
+    // if a future edit widened the $set payload to `{ ...req.body }` and
+    // reopened mass assignment (e.g. an attacker-supplied `password` or
+    // future `role`/`isAdmin` field), since findByIdAndUpdate is mocked and
+    // its return value doesn't depend on what it was actually called with.
+    // Asserting the call args is the same pattern tasksController's own
+    // update tests already use as a deliberate regression guard.
+    User.findByIdAndUpdate.mockResolvedValue({ _id: 'u1', name: 'Bobby', email: 'bob@example.com' });
+    await request(app)
+      .put('/api/users/u1')
+      .set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`)
+      .send({ name: 'Bobby', password: 'attacker-controlled', role: 'admin' });
+
+    expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+      'u1',
+      { $set: { name: 'Bobby' } },
+      { new: true, runValidators: true },
+    );
+  });
+
   test('PUT /:id returns 409 (not 500) when the new email collides with another user', async () => {
     const dupErr = new Error('E11000 duplicate key error');
     dupErr.code = 11000;

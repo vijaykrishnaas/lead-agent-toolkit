@@ -144,6 +144,11 @@ describe('Auth', () => {
 
       expect(res.status).toBe(500);
       expect(res.body.token).toBeUndefined();
+      // Regression: register used to call User.create before signing the
+      // token, so a misconfigured production secret still persisted a new
+      // account while reporting failure to the client — orphaning it,
+      // since re-registering the same email would then return 409 forever.
+      expect(User.create).not.toHaveBeenCalled();
     });
 
     test('login fails instead of signing a token with the .env.example placeholder secret in production', async () => {

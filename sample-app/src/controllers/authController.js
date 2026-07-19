@@ -23,6 +23,11 @@ async function register(req, res) {
     if (!isNonEmptyString(name) || !isNonEmptyString(email) || !isNonEmptyString(password)) {
       return res.status(400).json({ error: 'name, email and password are required' });
     }
+    // Fail fast on a misconfigured production secret before any DB write —
+    // otherwise User.create below persists an account that register can
+    // never hand a token back for, and re-registering it just returns 409
+    // forever until the secret is fixed.
+    resolveJwtSecret();
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
       return res.status(409).json({ error: 'Email already registered' });

@@ -25,4 +25,21 @@ describe('sanitizeMarkdownText', () => {
   it('coerces non-string input to a string', () => {
     expect(sanitizeMarkdownText(42)).toBe('42');
   });
+
+  it('escapes backslash itself, so a pre-escaped structural character in the input cannot flip parity and become live', () => {
+    // Input already contains a backslash-escaped asterisk (e.g. quoted
+    // verbatim from a diff-added line's own comment/string content, which
+    // can legitimately contain "\*"). Escaping only the `*` here (not the
+    // pre-existing `\`) would produce "\\*" — two backslashes, which pair
+    // off and render as one literal `\`, leaving `*` bare/live again.
+    const input = 'note: \\*ALERT\\* click here';
+    const result = sanitizeMarkdownText(input);
+    // Every backslash run immediately preceding a structural character must
+    // stay odd-length so it fully neutralizes that character: the original
+    // single backslash plus one more inserted for escaping `*` itself.
+    expect(result).toBe('note: \\\\\\*ALERT\\\\\\* click here');
+    // No run of an even number of backslashes sits directly before an
+    // unescaped structural character (which is what would leave it live).
+    expect(result).not.toMatch(/(?:^|[^\\])(?:\\\\)+[*_[\]()`]/);
+  });
 });

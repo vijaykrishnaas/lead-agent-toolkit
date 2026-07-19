@@ -5,18 +5,33 @@
 // before interpolation: embedded newlines are collapsed (otherwise a
 // multi-line value can forge extra report lines — e.g. a fake "## Section"
 // heading — inside what should render as a single list item), and
-// markdown-structural characters (backtick, *, _, [, ], (, )) are
+// markdown-structural characters (backslash, backtick, *, _, [, ], (, )) are
 // backslash-escaped — including the parens, so no unescaped "](" substring
 // survives — so a value like "[x](javascript:...)" or a hardcoded-credential
 // finding that happens to quote a crafted `[Approve without review](https://
 // evil.example)` link renders as inert text instead of a live, clickable
-// link. Shared by both the standup report and the review report — the
-// review report posts live to GitHub PR comments via postReviewComment, so
-// it is the higher-impact of the two surfaces.
+// link. Backslash itself must be in the escaped set, not just the six
+// markdown characters: a value can arrive already containing backslashes
+// (e.g. a diff-added line's own string/comment content, quoted verbatim into
+// `issue.message`), and CommonMark backslash-escapes are parsed by scanning
+// left-to-right and greedily pairing each backslash with the very next
+// character. Escaping only the six structural characters (not backslash)
+// changes the parity of any backslash run that already precedes one of them
+// in the input — e.g. input containing the literal 2 characters `\*` gets a
+// backslash prepended to the `*`, producing `\\*` (backslash, backslash,
+// asterisk); the two backslashes pair off and render as one literal `\`,
+// leaving the asterisk bare and structurally live again, exactly the "renders
+// as inert text" guarantee this function exists to provide. Escaping the
+// backslash character too keeps the total backslash run before any
+// structural character odd (so it always pairs with, and neutralizes, that
+// character) regardless of how many backslashes preceded it in the input.
+// Shared by both the standup report and the review report — the review
+// report posts live to GitHub PR comments via postReviewComment, so it is
+// the higher-impact of the two surfaces.
 function sanitizeMarkdownText(text) {
   return String(text)
     .replace(/\r\n|\r|\n/g, ' ')
-    .replace(/[`*_[\]()]/g, '\\$&');
+    .replace(/[\\`*_[\]()]/g, '\\$&');
 }
 
 module.exports = { sanitizeMarkdownText };

@@ -1,4 +1,4 @@
-const { maskStringLiterals } = require('../../src/utils/maskStringLiterals');
+const { maskStringLiterals, maskComments } = require('../../src/utils/maskStringLiterals');
 
 describe('maskStringLiterals', () => {
   it('masks a double-quoted string, preserving length and non-string characters', () => {
@@ -92,5 +92,45 @@ describe('maskStringLiterals', () => {
     const { masked } = maskStringLiterals(content);
     expect(masked).toBe('const url =                          ;');
     expect(masked.length).toBe(content.length);
+  });
+});
+
+describe('maskComments', () => {
+  it('masks a // line comment but leaves string content and code untouched', () => {
+    const content = 'router.get("/health", h); // router.delete("/:id", r);';
+    const { masked, quoteState } = maskComments(content);
+    expect(masked).toBe('router.get("/health", h);                             ');
+    expect(masked.length).toBe(content.length);
+    expect(quoteState).toBeNull();
+  });
+
+  it('masks a /* */ block comment but leaves string content untouched', () => {
+    const content = 'fn(/* router.post("/x", h); */ a, b);';
+    const { masked } = maskComments(content);
+    expect(masked).toBe('fn(                            a, b);');
+    expect(masked.length).toBe(content.length);
+  });
+
+  it('does not treat a // or /* inside a string literal as a comment', () => {
+    const content = 'const url = "http://example.com/* not a comment */";';
+    const { masked } = maskComments(content);
+    expect(masked).toBe(content);
+  });
+
+  it('does not mask a // that appears inside a string, even when a real comment follows', () => {
+    const content = 'router.get("http://x", h); // trailing comment';
+    const { masked } = maskComments(content);
+    expect(masked.startsWith('router.get("http://x", h); ')).toBe(true);
+    expect(masked).not.toContain('trailing');
+    expect(masked.length).toBe(content.length);
+  });
+
+  it('threads block-comment state across lines for a multi-line /* */ comment', () => {
+    const first = maskComments('router.get("/a", h); /* start', null);
+    expect(first.quoteState).toBe('/*');
+    const second = maskComments('  still commented */ router.post("/b", h);', first.quoteState);
+    expect(second.masked).toBe('                     router.post("/b", h);');
+    expect(second.masked.length).toBe('  still commented */ router.post("/b", h);'.length);
+    expect(second.quoteState).toBeNull();
   });
 });

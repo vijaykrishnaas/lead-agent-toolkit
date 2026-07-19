@@ -99,6 +99,40 @@ describe('parseRouterSource', () => {
     ]);
   });
 
+  it('does not treat a commented-out router.<verb>() call as a real route', () => {
+    // Regression: METHOD_CALL_PATTERN matched raw source text, so a
+    // commented-out route (e.g. dead code left behind after removing an
+    // endpoint) was reported as a live, implemented route — silencing a
+    // genuine doc-drift finding if the route is still documented in
+    // openapi.yaml but was actually removed from code.
+    const source = `
+      // router.delete('/:id', asyncHandler(remove));
+      router.get('/', asyncHandler(list));
+    `;
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/' }]);
+  });
+
+  it('does not treat a commented-out .route(path).<verb>() chain as real routes', () => {
+    const source = `
+      // router.route('/widgets').get(listWidgets).delete(removeWidget);
+      router.route('/widgets').post(createWidget);
+    `;
+    expect(parseRouterSource(source)).toEqual([{ method: 'POST', path: '/widgets' }]);
+  });
+
+  it('does not treat a commented-out chained verb between two real chained verbs as a real route', () => {
+    const source = `
+      router.route('/a')
+        .get(getA)
+        // .delete(deleteA)
+        .put(putA);
+    `;
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'PUT', path: '/a' },
+    ]);
+  });
+
   it('does not sweep an unrelated router.<verb>() statement sitting between two .route() chains into the first chain', () => {
     // Regression: the chain boundary used to be "up to the next .route()
     // call's index," so an unrelated router.get('/b', ...) statement sitting
@@ -180,6 +214,29 @@ describe('parseAppEntrySource', () => {
       { prefix: '/a', requirePath: './a' },
       { prefix: '/b', requirePath: './b' },
     ]);
+  });
+
+  it('does not treat a commented-out app.use(...) mount as a real one', () => {
+    // Regression: MOUNT_PATTERN/REQUIRE_PATTERN matched raw source text, so
+    // a commented-out mount (e.g. a disabled/removed route module) was
+    // reported as a live mount, and a real require() line that happens to
+    // sit only inside a comment was likewise resolved as if it existed.
+    const source = `
+      const secretRoutes = require('./routes/secret.routes');
+      // app.use('/api/secret', secretRoutes);
+      app.use('/api/tasks', secretRoutes);
+    `;
+    const { mounts } = parseAppEntrySource(source);
+    expect(mounts).toEqual([{ prefix: '/api/tasks', requirePath: './routes/secret.routes' }]);
+  });
+
+  it('does not resolve a mount whose require(...) only appears inside a comment', () => {
+    const source = `
+      // const secretRoutes = require('./routes/secret.routes');
+      app.use('/api/secret', secretRoutes);
+    `;
+    const { mounts } = parseAppEntrySource(source);
+    expect(mounts).toEqual([]);
   });
 
   it('still resolves a mount when one or more middleware args sit between the prefix and the router', () => {

@@ -94,4 +94,72 @@ function maskStringLiterals(content, quoteState = null) {
   return { masked, quoteState: state };
 }
 
-module.exports = { maskStringLiterals };
+// Like maskStringLiterals, but masks only `//` and `/* */` comments to
+// same-length spaces -- string/template literal contents (including their
+// quote characters) are copied through unchanged. Quote state is still
+// tracked internally (so a `//`/`/*` sequence *inside* a string isn't
+// mistaken for the start of a comment), it's just not used to blank
+// anything. For callers that need to keep matching a regex against real
+// source text (e.g. extracting a quoted path argument via a capture group)
+// while still refusing to match inside a comment -- a plain
+// maskStringLiterals() call would blank the string content those callers
+// need to capture, along with the comment they want ignored.
+function maskComments(content, quoteState = null) {
+  let masked = '';
+  let state = quoteState;
+  let i = 0;
+  while (i < content.length) {
+    if (state === '/*') {
+      if (content[i] === '*' && content[i + 1] === '/') {
+        masked += '  ';
+        i += 2;
+        state = null;
+      } else {
+        masked += ' ';
+        i += 1;
+      }
+      continue;
+    }
+    const ch = content[i];
+    if (state) {
+      if (ch === '\\') {
+        if (i + 1 >= content.length) {
+          masked += ch;
+          i += 1;
+          continue;
+        }
+        masked += ch + content[i + 1];
+        i += 2;
+        continue;
+      }
+      if (ch === state) state = null;
+      masked += ch;
+      i += 1;
+      continue;
+    }
+    if (ch === '/' && content[i + 1] === '/') {
+      let end = content.indexOf('\n', i);
+      if (end === -1) end = content.length;
+      masked += ' '.repeat(end - i);
+      i = end;
+      continue;
+    }
+    if (ch === '/' && content[i + 1] === '*') {
+      masked += '  ';
+      i += 2;
+      state = '/*';
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      state = ch;
+      masked += ch;
+      i += 1;
+      continue;
+    }
+    masked += ch;
+    i += 1;
+  }
+  return { masked, quoteState: state };
+}
+
+module.exports = { maskStringLiterals, maskComments };

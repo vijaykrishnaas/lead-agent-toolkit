@@ -1,4 +1,4 @@
-const { maskStringLiterals } = require('../utils/maskStringLiterals');
+const { maskStringLiterals, maskComments } = require('../utils/maskStringLiterals');
 const { HTTP_METHODS } = require('./httpMethods');
 const VERB_ALTERNATION = HTTP_METHODS.join('|');
 const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*(['"])(.*?)\\2`, 'g');
@@ -18,28 +18,33 @@ const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION})\\(`);
 
 // Walks forward from `chainStart` (right after a .route(path) call)
 // collecting only .<verb>(...) calls that are *directly* chained — i.e.
-// nothing but whitespace between one call's closing ")" and the next ".".
+// nothing but whitespace (or a masked-out comment, which reads as
+// whitespace to \s*) between one call's closing ")" and the next ".".
 // Each call's own argument list is skipped by paren-depth (using `masked`,
-// a string-literal-safe version of `source` from maskStringLiterals, so a
-// stray "(" or ")" inside a string/template literal in a handler body can't
-// desync the depth count), not by jumping to the *next* .route() call's
-// index — that boundary is unsafe whenever unrelated code (e.g. a separate
-// router.<verb>(...) statement) sits between two .route() chains, since it
-// would sweep that unrelated statement's own verb call into this chain. See
-// CLAUDE.md's per-occurrence-scoping guideline, which names this exact
-// "next occurrence's start" shape as unsafe for the same reason.
-function collectChainedVerbs(source, masked, chainStart) {
+// a string-and-comment-safe version of `source` from maskStringLiterals, so
+// a stray "(" or ")" inside a string/template literal or a comment in a
+// handler body can't desync the depth count), not by jumping to the *next*
+// .route() call's index — that boundary is unsafe whenever unrelated code
+// (e.g. a separate router.<verb>(...) statement) sits between two .route()
+// chains, since it would sweep that unrelated statement's own verb call
+// into this chain. See CLAUDE.md's per-occurrence-scoping guideline, which
+// names this exact "next occurrence's start" shape as unsafe for the same
+// reason. `commentMasked` (comments blanked, string content left intact —
+// unlike `masked`, which blanks both) is used for the verb-name match
+// itself, so a commented-out `.post(createA)` between two real chained
+// calls isn't picked up as if it were live code.
+function collectChainedVerbs(commentMasked, masked, chainStart) {
   const verbs = [];
   let pos = chainStart;
-  while (pos < source.length) {
-    const wsLen = /^\s*/.exec(source.slice(pos))[0].length;
+  while (pos < commentMasked.length) {
+    const wsLen = /^\s*/.exec(commentMasked.slice(pos))[0].length;
     const afterWs = pos + wsLen;
-    const verbMatch = CHAINED_VERB_START_PATTERN.exec(source.slice(afterWs));
+    const verbMatch = CHAINED_VERB_START_PATTERN.exec(commentMasked.slice(afterWs));
     if (!verbMatch) break;
     verbs.push(verbMatch[1].toUpperCase());
     let depth = 1;
     let i = afterWs + verbMatch[0].length;
-    while (i < source.length && depth > 0) {
+    while (i < masked.length && depth > 0) {
       if (masked[i] === '(') depth += 1;
       else if (masked[i] === ')') depth -= 1;
       i += 1;
@@ -54,9 +59,22 @@ function collectChainedVerbs(source, masked, chainStart) {
 // and router.route(path).<verb>(...) chains count as routes — router.use
 // (middleware) and similar are ignored because neither pattern matches
 // anything but a recognized HTTP verb.
+//
+// All top-level route-detection regexes (METHOD_CALL_PATTERN here,
+// MOUNT_PATTERN/REQUIRE_PATTERN in parseAppEntrySource) are matched against
+// `commentMasked`, not raw `source` — a commented-out call like
+// `// router.delete('/:id', remove);` is not real, live code, but a raw
+// regex match can't tell the difference, and would report a dead route as
+// implemented (silencing a genuine doc-drift finding for a route that's
+// documented in openapi.yaml but was actually removed/disabled in code).
+// `commentMasked` blanks only comments, leaving string content (the quoted
+// path itself) intact, unlike `maskStringLiterals`'s own `masked`, which
+// would blank the path text too and break the capture groups these regexes
+// rely on.
 function parseRouterSource(source) {
+  const { masked: commentMasked } = maskComments(source);
   const routes = [];
-  for (const match of source.matchAll(METHOD_CALL_PATTERN)) {
+  for (const match of commentMasked.matchAll(METHOD_CALL_PATTERN)) {
     routes.push({ method: match[1].toUpperCase(), path: match[3] });
   }
 
@@ -65,10 +83,10 @@ function parseRouterSource(source) {
   // appears before the next .route() call," which would misattribute an
   // unrelated router.<verb>(...) statement sitting between two chains.
   const { masked } = maskStringLiterals(source);
-  for (const routeMatch of source.matchAll(ROUTE_CALL_PATTERN)) {
+  for (const routeMatch of commentMasked.matchAll(ROUTE_CALL_PATTERN)) {
     const path = routeMatch[2];
     const chainStart = routeMatch.index + routeMatch[0].length;
-    for (const method of collectChainedVerbs(source, masked, chainStart)) {
+    for (const method of collectChainedVerbs(commentMasked, masked, chainStart)) {
       routes.push({ method, path });
     }
   }
@@ -90,14 +108,15 @@ function parseRouterSource(source) {
 // here too, not just plain router.<verb>(path) calls.
 function parseAppEntrySource(source) {
   const directRoutes = parseRouterSource(source);
+  const { masked: commentMasked } = maskComments(source);
 
   const requiresByVarName = new Map();
-  for (const match of source.matchAll(REQUIRE_PATTERN)) {
+  for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
     requiresByVarName.set(match[1], match[3]);
   }
 
   const mounts = [];
-  for (const match of source.matchAll(MOUNT_PATTERN)) {
+  for (const match of commentMasked.matchAll(MOUNT_PATTERN)) {
     const [, , prefix, varName] = match;
     const requirePath = requiresByVarName.get(varName);
     if (requirePath) mounts.push({ prefix, requirePath });

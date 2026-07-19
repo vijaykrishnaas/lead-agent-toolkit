@@ -1,17 +1,43 @@
-// Replaces the contents of single/double-quoted and template-literal strings
-// in `content` with spaces (same length, so column positions and non-string
+// Replaces the contents of single/double-quoted and template-literal
+// strings, `//` line comments, and `/* */` block comments in `content` with
+// spaces (same length, so column positions and non-string/non-comment
 // characters are preserved), so a caller counting structural characters
 // (braces, parens) doesn't mistake a brace/paren that only exists inside a
-// string literal for real code structure. Escaped quote characters (`\"`,
-// `\\`, etc.) don't end the string early. `quoteState` (one of `"`, `'`,
-// `` ` ``, or null) threads across calls so a template literal spanning
-// multiple lines doesn't fool the scanner into ending the string early on
-// the first line or never closing it on a later one.
+// string literal *or a comment* for real code structure. Escaped quote
+// characters (`\"`, `\\`, etc.) don't end the string early. `quoteState`
+// (one of `"`, `'`, `` ` ``, `/*` -- meaning "inside an unterminated block
+// comment" -- or null) threads across calls so a template literal or block
+// comment spanning multiple lines doesn't fool the scanner into ending it
+// early on the first line or never closing it on a later one. A `//` line
+// comment never needs to thread state across calls -- it always ends at the
+// next newline (or the end of `content` if there is none) -- but callers
+// that pass a whole multi-line file as a single `content` string (e.g.
+// docDrift/parseExpressRoutes.js) still need it bounded to that next
+// newline rather than masked to the end of the entire string. (Evidence:
+// PROGRESS.md -- errorHandling.js's collectBoundedBlock/handlerHasBraceBody
+// treated a `{`/`}` pair inside a same-line trailing comment on a handler's
+// signature line, e.g. `async (req, res) => // returns {id, name}`, as the
+// handler's real opening/closing brace, terminating the block scan after
+// just the signature line and missing the handler's actual try/catch body
+// entirely -- a false positive against fully compliant code. Comments were
+// the one non-code-structure text category maskStringLiterals didn't
+// already neutralize, despite doing exactly this for string literals.)
 function maskStringLiterals(content, quoteState = null) {
   let masked = '';
   let state = quoteState;
   let i = 0;
   while (i < content.length) {
+    if (state === '/*') {
+      if (content[i] === '*' && content[i + 1] === '/') {
+        masked += '  ';
+        i += 2;
+        state = null;
+      } else {
+        masked += ' ';
+        i += 1;
+      }
+      continue;
+    }
     const ch = content[i];
     if (state) {
       if (ch === '\\') {
@@ -41,6 +67,19 @@ function maskStringLiterals(content, quoteState = null) {
       if (ch === state) state = null;
       masked += ' ';
       i += 1;
+      continue;
+    }
+    if (ch === '/' && content[i + 1] === '/') {
+      let end = content.indexOf('\n', i);
+      if (end === -1) end = content.length;
+      masked += ' '.repeat(end - i);
+      i = end;
+      continue;
+    }
+    if (ch === '/' && content[i + 1] === '*') {
+      masked += '  ';
+      i += 2;
+      state = '/*';
       continue;
     }
     if (ch === '"' || ch === "'" || ch === '`') {

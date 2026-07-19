@@ -47,4 +47,50 @@ describe('maskStringLiterals', () => {
     const { masked } = maskStringLiterals('if (x) { return { a: 1 }; }');
     expect(masked).toBe('if (x) { return { a: 1 }; }');
   });
+
+  it('masks a trailing // line comment, including any braces/parens it contains', () => {
+    // Regression: a same-line trailing comment documenting a shape (e.g.
+    // "returns {id, name}") was previously left unmasked, so a caller
+    // counting braces (collectBoundedBlock) mistook the comment's own
+    // balanced '{'/'}' for real code structure.
+    const content = 'async (req, res) => // returns {id, name}';
+    const { masked, quoteState } = maskStringLiterals(content);
+    expect(masked).toBe('async (req, res) =>                      ');
+    expect(masked.length).toBe(content.length);
+    expect(quoteState).toBeNull();
+  });
+
+  it('bounds a // comment to the current line when content spans multiple lines', () => {
+    // Some callers (docDrift/parseExpressRoutes.js) pass a whole multi-line
+    // file as a single `content` string in one call, not threaded line by
+    // line. A // comment must only mask up to its own line's newline, not
+    // swallow the rest of the file.
+    const content = 'const a = 1; // note {x}\nconst b = { y: 2 };';
+    const { masked } = maskStringLiterals(content);
+    expect(masked).toBe('const a = 1;            \nconst b = { y: 2 };');
+    expect(masked.length).toBe(content.length);
+  });
+
+  it('masks a single-line /* */ block comment', () => {
+    const content = 'fn(/* {opts} */ a, b);';
+    const { masked, quoteState } = maskStringLiterals(content);
+    expect(masked).toBe('fn(             a, b);');
+    expect(masked.length).toBe(content.length);
+    expect(quoteState).toBeNull();
+  });
+
+  it('threads block-comment state across lines for a multi-line /* */ comment', () => {
+    const first = maskStringLiterals('async (req, res) => /* returns {', null);
+    expect(first.quoteState).toBe('/*');
+    const second = maskStringLiterals('  id, name } */ { try {} catch (e) {} }', first.quoteState);
+    expect(second.masked).toBe('                { try {} catch (e) {} }');
+    expect(second.quoteState).toBeNull();
+  });
+
+  it('does not treat a // inside a string literal as a comment', () => {
+    const content = 'const url = "http://example.com/{id}";';
+    const { masked } = maskStringLiterals(content);
+    expect(masked).toBe('const url =                          ;');
+    expect(masked.length).toBe(content.length);
+  });
 });

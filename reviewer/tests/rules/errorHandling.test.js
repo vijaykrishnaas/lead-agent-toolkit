@@ -301,6 +301,61 @@ describe('error-handling rule', () => {
     expect(handlerIssues[0].message).toContain('getWidget');
   });
 
+  it('does not flag a try/catch-wrapped handler whose signature line has a trailing comment containing braces', () => {
+    // Regression: maskStringLiterals masked string-literal content but not
+    // comments, so a same-line trailing comment on the handler's signature
+    // documenting a return shape (e.g. "// returns {id, name}") had its own
+    // balanced '{'/'}' counted as real code structure by collectBoundedBlock.
+    // Once that comment's braces balanced back to zero at the end of the
+    // signature line, collectBoundedBlock (opened && depth <= 0) stopped
+    // right there, never reaching the handler's real body -- including its
+    // try/catch -- on the following lines. A fully try/catch-wrapped handler
+    // was misflagged as missing error handling as a result. Confirmed via
+    // git stash to fail against the pre-fix maskStringLiterals and pass
+    // against the fix.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,9 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => // returns {id, name}',
+      '+{',
+      '+  try {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  } catch (err) {',
+      '+    res.status(500).json({ error: "failed" });',
+      '+  }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
+  it('flags an async handler with no try/catch even when the signature line has a trailing comment containing braces', () => {
+    // Companion case to the regression above: confirms the comment-masking
+    // fix doesn't overcorrect into never flagging a comment-on-signature
+    // handler at all -- one with genuinely no error handling still gets
+    // caught.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,5 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => // returns {id, name}',
+      '+{',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
+
   it('flags an async handler with no try/catch even when the block contains a string literal with a stray "{"', () => {
     // Regression: collectBoundedBlock counted every '{' / '}' character
     // including ones inside string literals, so a stray '{' in a handler's

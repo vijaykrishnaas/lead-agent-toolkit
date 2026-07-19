@@ -86,6 +86,26 @@ function collectStatement(addedLines, startIdx) {
 // outer wrapper call that's still open at that point -- `asyncHandler(` or
 // a route-registration call like `router.get('/x', ` -- is never mistaken
 // for still being inside the handler's own parameter list.
+//
+// This depth-gated character scan runs on *every* line from startIdx
+// onward, not just the signature's own starting line: an earlier version of
+// this fix only depth-gated the startIdx line and fell back to an
+// unconditional "first '{' present on this line" for every later line, on
+// the reasoning that "there's no parameter list left to still be inside of"
+// past the signature line. That reasoning breaks when the parameter list's
+// own default value spans multiple lines and contains its own nested braces
+// -- e.g. `async (req, res, opts = {` / `  nested: {` / `    a: 1` / `  }` /
+// `}) => {` -- because the still-open outer paren (from the signature's own
+// unclosed `(`) carries across every one of those lines, but the
+// unconditional per-line check accepted the *nested* object's own `{` (on
+// the `nested: {` line) as if it were the handler's real body brace, purely
+// because it was the first `{` character encountered after the signature
+// line, with no regard for whether the parameter list's paren was still
+// open. Scanning character-by-character with running paren depth on every
+// line (not just the first) closes this off structurally: a `{` occurring
+// anywhere is only ever accepted once the same running `depth` the
+// signature-line scan already used is back down to <= 0, no matter which
+// line it's on.
 function findHandlerBraceStart(addedLines, startIdx) {
   const signatureMatch = ASYNC_HANDLER_SIGNATURE.exec(addedLines[startIdx].content);
   const startColumn = signatureMatch ? signatureMatch.index : 0;
@@ -96,27 +116,13 @@ function findHandlerBraceStart(addedLines, startIdx) {
     const { masked, quoteState: nextQuoteState } = maskStringLiterals(rawContent, quoteState);
     quoteState = nextQuoteState;
 
-    if (i === startIdx) {
-      // On the signature's own line, scan character-by-character so a '{'
-      // is only accepted once depth (counted from this line's own start,
-      // i.e. from the signature match) is back down to <= 0 -- skipping one
-      // that's fully self-contained inside the still-open parameter list.
-      for (let c = 0; c < masked.length; c += 1) {
-        const ch = masked[c];
-        if (ch === '(') depth += 1;
-        else if (ch === ')') depth -= 1;
-        else if (ch === '{' && depth <= 0) {
-          return { lineIndex: i, column: startColumn + c };
-        }
+    for (let c = 0; c < masked.length; c += 1) {
+      const ch = masked[c];
+      if (ch === '(') depth += 1;
+      else if (ch === ')') depth -= 1;
+      else if (ch === '{' && depth <= 0) {
+        return { lineIndex: i, column: (i === startIdx ? startColumn : 0) + c };
       }
-    } else if (masked.includes('{')) {
-      // Once the scan has moved past the signature line without yet
-      // resolving (see the continuation/semicolon checks below, evaluated
-      // every iteration including this one), the statement is still open --
-      // so the first '{' found here is safely the real body brace. No
-      // depth-gating is needed for this case: unlike the signature line,
-      // there's no parameter list left to still be inside of.
-      return { lineIndex: i, column: masked.indexOf('{') };
     }
 
     const trimmed = masked.trim();
@@ -125,12 +131,6 @@ function findHandlerBraceStart(addedLines, startIdx) {
     // brace (e.g. `async (req, res) =>` / `// fetch and return` / `{`) must
     // not be mistaken for the statement having ended brace-less.
     if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.')) return null;
-    if (i > startIdx) {
-      for (const ch of masked) {
-        if (ch === '(') depth += 1;
-        else if (ch === ')') depth -= 1;
-      }
-    }
     if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) return null;
   }
   return null;

@@ -405,6 +405,72 @@ describe('error-handling rule', () => {
     expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
   });
 
+  it('does not flag a try/catch-wrapped handler whose default-parameter value is a multi-line object literal with its own nested braces', () => {
+    // Regression: findHandlerBraceStart's depth-gated char scan (the fix
+    // above for the same-line default-param case) only ran that gating on
+    // the signature's own starting line -- every later line fell back to an
+    // unconditional "first '{' present on this line", on the assumption that
+    // "there's no parameter list left to still be inside of" past the
+    // signature line. That assumption breaks when the default value itself
+    // spans multiple lines and contains its own nested object literal: the
+    // outer parameter-list paren (opened on the signature line) is still
+    // unclosed on every one of those lines, but the unconditional per-line
+    // check accepted the *nested* object's own '{' (on the `nested: {` line)
+    // as if it were the handler's real body brace -- purely because it was
+    // the first '{' character encountered, with no regard for whether the
+    // parameter list's paren was still open. This truncated the collected
+    // block to just the nested object literal's own lines, missing the real
+    // try/catch entirely, and misflagged a fully compliant handler as
+    // missing error handling. Confirmed via git stash to fail against the
+    // pre-fix code and pass against the fix.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,11 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res, opts = {',
+      '+  nested: {',
+      '+    a: 1',
+      '+  }',
+      '+}) => {',
+      '+  try {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  } catch (err) {',
+      '+    res.status(500).json({ error: "failed" });',
+      '+  }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
+  it('flags a handler with no try/catch whose default-parameter value is a multi-line object literal with its own nested braces', () => {
+    // Companion case to the regression above: confirms the fix doesn't
+    // overcorrect into never flagging this shape -- one with genuinely no
+    // error handling still gets caught.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,8 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res, opts = {',
+      '+  nested: {',
+      '+    a: 1',
+      '+  }',
+      '+}) => {',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
+
   it('does not flag a try/catch-wrapped handler whose signature line has a trailing comment containing braces', () => {
     // Regression: maskStringLiterals masked string-literal content but not
     // comments, so a same-line trailing comment on the handler's signature

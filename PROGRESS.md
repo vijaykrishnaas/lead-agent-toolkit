@@ -986,3 +986,41 @@ Read `3f1c5b5`'s own diff line-by-line first (the fix for the comment-line-break
 - Same as always-open: `GET /api/users/:id` cross-user lookup — still unresolved, not re-litigated this run.
 - `docDrift/parseExpressRoutes.js`'s top-level route-detection regexes matching raw source text (not comment-masked text), first flagged in "self-scheduled routine run 3" — still unresolved, not re-litigated this run (out of scope for this run's own single fix).
 - Seventh consecutive run substituting an adversarial hunt for an empty backlog. The standing question from prior runs (whether to formalize this into an explicit CLAUDE.md rule, or replace it with different behavior) remains unresolved — restating it once more rather than deciding it unilaterally.
+
+## 2026-07-19 (self-scheduled routine run 5)
+
+**Done:** Fetched all branches, checked out `claude/dev` (`52dbf85`, "self-scheduled routine run 4"). All 19 `TASKS.md` items remain `[DONE]`, no non-DONE/non-BLOCKED item to work top-down — eighth consecutive run in this standing situation. Followed the precedent established by runs 5-7 and the four prior self-scheduled routine runs (hunt the newest not-yet-independently-reviewed diff). Baseline `npm test` green in both packages before starting (`reviewer/` 298/298, `sample-app/` 48/48; both needed `npm install` first, no `node_modules` present at run start).
+
+Read `52dbf85`'s own diff line-by-line — its new `findHandlerBraceStart` (the ninth-recurrence-fixing eighth-recurrence fix, replacing `handlerHasBraceBody`) paren-depth-gates a `{` found on the signature's own starting line via a dedicated character-by-character scan, but every subsequent line falls back to a separate branch, `else if (masked.includes('{'))`, that accepts the first `{` character found with no depth-gating at all — justified by an inline comment reasoning "there's no parameter list left to still be inside of" once past the signature line. That reasoning only holds if the parameter list is confined to a single line, which the code never actually verifies. Constructed a repro: a multi-line default-parameter value with its own nested object literal —
+
+```
+exports.getWidget = async (req, res, opts = {
+  nested: {
+    a: 1
+  }
+}) => {
+  try {
+    res.json(await Widget.findById(req.params.id));
+  } catch (err) {
+    res.status(500).json({ error: "failed" });
+  }
+};
+```
+
+— produced a false-positive "Async route handler added without a try/catch" finding against fully compliant code. Traced the mechanism: the outer signature paren (opened by `async (`) is still unclosed on every line through `}) => {`, but the `nested: {` line's own `{` satisfied the ungated `masked.includes('{')` check first, so `findHandlerBraceStart` returned that line as the "real" body-brace location. `check()` then sliced `addedLines` starting there and handed it to `collectBoundedBlock`, which correctly brace-bounded *that* object literal (closing 2 lines later at the matching `}`) and reassembled just those 3 lines as "the block" — never reaching the real try/catch 2 lines further down. Confirmed via `git stash` that this predates nothing prior: it's introduced by `52dbf85` itself, the same commit that fixed the eighth recurrence — the old, cruder `handlerHasBraceBody`/`collectBoundedBlock` pairing this commit replaced happened to produce the right answer on this exact input by coincidence (its unconditional "sweep from the signature line to wherever cumulative brace-depth returns to 0" swept in the *entire* handler, default-param braces and all, and the real try/catch text was still present somewhere inside that oversized sweep, so the keyword regex still matched) — verified directly by running the repro against `3f1c5b5`'s (the parent commit's) `errorHandling.js`, which returned `[]` (no issues) for the identical input.
+
+- **Bug found and fixed — `findHandlerBraceStart`'s depth-gated `{`-acceptance was wired up only for the signature's own starting line; every later line used an ungated first-match check, so a multi-line default-parameter value with its own nested object literal had its inner brace mistaken for the handler's real body brace.** Fixed by unifying the two branches into a single character-by-character scan that runs identically on every line from the signature onward: `depth` (paren depth, counted from the signature's own match position) is tracked continuously across all lines, and a `{` is accepted only at the exact character position where `depth <= 0`, regardless of which line it's on. This removes the special-cased `i === startIdx` branch entirely — the same gating logic now covers every line uniformly. 2 new regression tests in `errorHandling.test.js`: the nested-multi-line-default-param false positive fixed (confirmed via `git stash` to fail against `52dbf85`'s pre-fix code and pass against the fix), and a companion confirming the identical shape with genuinely no try/catch is still correctly flagged (no overcorrection).
+
+**Test run:** `reviewer/` 300/300 green (298 baseline + 2 net-new in `errorHandling.test.js`). `sample-app/` 48/48 green, unaffected by this run.
+
+**Decisions:**
+- Continued the established precedent (runs 5-7, four prior self-scheduled routine runs) of hunting the newest not-yet-independently-reviewed commit — and this time found the bug directly in that commit's own new code, rather than needing to trace into a shared dependency the way the two immediately preceding runs did.
+- Made exactly one CLAUDE.md change this run (broadened the per-occurrence-scoping/boundary-derivation guideline for a ninth time), logged in `SKILL_CHANGELOG.md` with this entry's evidence, per hard invariant 3.
+- Did not attempt to further generalize `findHandlerBraceStart`/`collectStatement`/`collectBoundedBlock` into a single shared depth-gated-scan helper (there is now real duplication between `findHandlerBraceStart`'s char-by-char loop and `collectStatement`'s per-line loop) — no observed failure demonstrates the duplication itself causes a bug, and a speculative refactor isn't justified by this run's own "cite an observed failure" bar; flagging as a possible future cleanup rather than doing it now.
+- Left all 19 backlog tasks `[DONE]`, `TASKS.md` unchanged, per hard invariant 2 and this run's explicit "never mark backlog tasks DONE" instruction.
+
+**Open questions for Vijay:**
+- Same as always-open: `GET /api/users/:id` cross-user lookup — still unresolved, not re-litigated this run.
+- `docDrift/parseExpressRoutes.js`'s top-level route-detection regexes matching raw source text (not comment-masked text), first flagged in "self-scheduled routine run 3" — still unresolved, not re-litigated this run.
+- Possible future cleanup (not a bug): `findHandlerBraceStart` and `collectStatement` now both implement their own version of "walk lines, track paren depth, mask string literals/comments first" — worth consolidating into one shared helper if a future run finds this duplication itself causing a divergence bug, per this repo's own precedent for `collectBoundedBlock`'s extraction (task 15).
+- Eighth consecutive run substituting an adversarial hunt for an empty backlog (runs 5, 6, 7, and five self-scheduled routine runs since). This is now a well-established pattern with the standing question raised repeatedly (runs 6, 7, and three of the self-scheduled routine runs) and never answered: should "hunt the newest diff when the backlog is empty" be codified as an explicit `CLAUDE.md` rule, or replaced with different behavior? Restating once more rather than deciding it unilaterally, but flagging that this is now eight runs deep with no response — worth a decision one way or the other.

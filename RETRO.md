@@ -146,3 +146,172 @@ report window, and no run has yet built a sink where standup output reaches a
 rendered/trusted surface where escaping would matter. Flagging here instead
 of adding as tasks 17/18 so they aren't spuriously reordered ahead of the
 three above without a concrete trigger.
+
+# Retro round 2 — self-audit of tasks 13–16 (2026-07-19)
+
+Source: every PROGRESS.md entry since round 1 (task 13's own entry, the
+post-task-13 adversarial-hunt entry, task 14, the post-task-14 hunt, task 15,
+task 16, and the post-task-16 hunt — all 2026-07-18) and every
+SKILL_CHANGELOG.md entry added since round 1, read in full. Tasks 14–16 (the
+three round-1 proposals) are all `[DONE]`, and TASKS.md has no other
+non-DONE/non-BLOCKED item, so this run does what the post-task-16 PROGRESS.md
+entry's own open question anticipated ("should the next run do another
+RETRO.md-style self-audit?") rather than leaving the backlog empty.
+
+## What failed since round 1
+
+**1. Round 1's item 1 (the four-times-recurring aggregation-scope bug class)
+is now closed structurally, as intended.** Task 15 extracted
+`collectBoundedBlock` and repointed `errorHandling.js`/`performance.js` at it
+with zero behavior change (all pre-existing regression tests, including every
+historical recurrence, still pass unmodified). No new instance of this exact
+shape shipped in tasks 14–16 or either hunt since. Round 1's prescription
+("prefer a structural fix over a fifth guideline broadening") worked.
+
+**2. The same over-broad-scope failure mode reappeared once more, but in a
+mirror-image shape round 1 didn't anticipate: an *exemption* check scoped too
+broadly, not a *positive* check.** The post-task-14 hunt found
+`security.js`'s `process.env` exemption matched anywhere on the line instead
+of against the specific matched value, letting `const password = "hunter2";
+// fallback for process.env.PASSWORD` slip through uncaught. This is a fifth
+member of the same underlying "reasoning over too broad a scope" family the
+CLAUDE.md guideline already tracks, codified as its own new guideline
+paragraph the same run. Only one instance observed so far (unlike the
+four-times-recurring positive-check shape before task 15's fix), so per this
+repo's own "cite an observed failure" bar there isn't yet evidence to justify
+a dedicated structural helper the way `collectBoundedBlock` was for the
+positive-check shape — noted here so a second occurrence is recognized
+quickly rather than treated as new.
+
+**3. Round 1's item 3 (weak-test gaps letting real bugs ship) recurred once
+more, in the same "test mocks only one canned return shape" shape newly
+introduced by task 16 itself.** The post-task-16 hunt found
+`reviewPrCli.js`'s "Posted review comment to ..." message stayed hardcoded
+even after task 16 added real create-vs-update behavior, because
+`postReviewComment`'s return value never surfaced which action it took and
+`reviewPrCli.test.js` mocked it with one fixed shape (`{ id: 1 }`) in every
+test. This is a new sub-shape (message-describes-which-action, not
+message-describes-a-dynamic-value like round 1's `since`-window bug) but the
+same underlying pattern: a test suite exercising only the common/expected
+shape of a collaborator's output misses the specific combination that
+breaks. Codified as its own CLAUDE.md guideline the same run. Two
+now-distinct instances of "narrow-mock hides a real gap" across rounds 1 and
+2 — worth watching for a third before considering anything more structural
+than the guideline (e.g. a lint rule flagging single-shape mocks), since a
+generic fix here is much harder to state precisely than
+`collectBoundedBlock` was.
+
+**4. Round 1's item 4 (genuinely-flagged gaps sitting open for many runs
+because nothing ever "fails" in an offline repo) recurred for a specific,
+now-three-times-raised item: `sample-app`'s `JWT_SECRET || 'dev-secret'`
+fallback.** Raised in the post-task-14 hunt entry, restated in the task-16
+entry ("open questions carried forward"), and restated again in the
+post-task-16 entry — three separate PROGRESS.md entries, no resolution,
+still present in both `authController.js` and `middleware/auth.js` as of
+this run (confirmed directly by re-grepping). This is exactly the
+"known, scoped, cheap follow-up nobody has decided against" shape round 1's
+own "what to improve" section prescribed routing into TASKS.md rather than
+re-logging indefinitely — so this round finally does that instead of
+restating it as an open question a fourth time.
+
+**5. Round 1's item 5 (plugin packaging silently drifting out of sync with
+the skill set) is closed, and closed generically rather than just for the
+one instance.** Task 14 packaged `doc-drift` into `plugin/` and rewrote
+`plugin.test.js`'s guard to enumerate `.claude/skills/*` at test-run time
+instead of a hardcoded two-skill list, so a future fourth skill can't repeat
+this exact gap. Confirmed by inspection this run: `plugin/skills/` now
+contains all three (`doc-drift`, `review-pr`, `standup`), and
+`marketplace.json`'s description mentions all three.
+
+**6. A new pattern this round: real doc/prose drift inside this repo's own
+README and plugin manifests was found three separate times in a single hunt
+(post-task-14), and every one of them was found by manual inspection, not by
+any automated check — despite this repo's entire `doc-drift` module existing
+specifically to catch code-vs-docs drift for its *users*.** The three
+instances (README's reviewer quickstart hardcoding a stale Jest test count
+that was guaranteed to keep drifting; README's standup section describing a
+feature as "not yet wired to a CLI" four commits after it shipped;
+`marketplace.json`'s top-level description omitting `doc-drift` after task
+14 added the other two descriptions but missed this one) were all fixed the
+same run they were found, so there's no live bug today — but nothing added
+since prevents a fourth instance from shipping and sitting undetected for a
+full run cycle again, the same "found only by inspection, not test" gap
+round 1's item 3 flagged for narrower cases.
+
+## What to improve
+
+- Continue preferring a structural fix (like `collectBoundedBlock`) over a
+  guideline once a bug-class shape recurs a *second* time, not waiting for a
+  fourth recurrence the way the original aggregation class did before task
+  15 — apply this to the exemption-scope shape (item 2) and the
+  narrow-mock-testing shape (item 3) above if either recurs once more.
+- When a "no observed failure" open question gets restated for a *third*
+  distinct PROGRESS.md entry with no new information (item 4), stop
+  re-logging it as an open question and promote it to TASKS.md the way this
+  round does for the `JWT_SECRET` fallback — round 1 named this
+  improvement but this round is the first to actually apply it.
+- Doc/prose drift inside this repo's own README and plugin manifests (item
+  6) has now cost one full hunt run's worth of manual-inspection effort to
+  catch three instances; a proposed task below closes this the same way
+  `skillsFrontmatter.test.js` (post-task-12) closed the analogous "no test
+  scans every `SKILL.md`" gap — enumerate the generic, checkable claims
+  (skill names, package test counts) automatically instead of trusting prose
+  to stay accurate by hand.
+
+## Proposed new backlog tasks
+
+**17. Harden `sample-app`'s `JWT_SECRET || 'dev-secret'` fallback for
+production use** — e.g. throw at startup (or on first token
+sign/verify) when `NODE_ENV === 'production'` and `JWT_SECRET` is unset or
+still equals the `.env.example` placeholder, in both `authController.js` and
+`middleware/auth.js`. Evidence: raised as an open question in the
+post-task-14 PROGRESS.md entry, restated in the task-16 entry, and restated
+again in the post-task-16 entry — three separate, unresolved mentions with no
+new information added between them, which is precisely the "known, scoped,
+cheap follow-up" pattern this retro's own item 4 (and round 1's item 4)
+flags as something that belongs in TASKS.md rather than being re-logged as
+an open question indefinitely. `.env.example` already documents
+`JWT_SECRET=change-me` as something operators are expected to set, so a
+startup-time check enforcing that in production is a small, well-scoped
+change with an obvious correct behavior (unlike, e.g., the still-deferred
+template-literal-route-path question, which has no agreed-on correct
+behavior yet).
+
+**18. Add automated regression coverage against doc/prose drift inside this
+repo's own README.md and `plugin/.claude-plugin/*.json` manifests** — e.g. a
+test asserting `plugin/.claude-plugin/marketplace.json` and `plugin.json`'s
+descriptions mention every skill directory actually present under
+`plugin/skills/` (mirroring how `plugin.test.js`'s byte-identical-copy check
+and `skillsFrontmatter.test.js` already enumerate `.claude/skills/*`
+generically instead of a hardcoded list), and/or a check that README.md
+doesn't hardcode a specific Jest test count that's guaranteed to go stale.
+Evidence: the post-task-14 hunt found three separate instances of exactly
+this drift shape in one run — a hardcoded, already-stale test count in
+README, prose describing a shipped feature as not-yet-built, and
+`marketplace.json`'s description missing a skill task 14 had just added
+elsewhere — all found by manual inspection only, none caught by any test.
+This repo's own product is a doc-drift detector; closing this gap for its
+own docs is the same "fix the class, not the instance" approach task 14
+already applied to plugin skill-copy parity.
+
+## Not proposed as tasks (explicitly deferred, no strong evidence yet)
+
+- **`findExistingBotComment`'s comment-authorship trust boundary**
+  (task 16's marker-prefix matching has no author-identity check, so any PR
+  commenter could in principle author a marker-prefixed comment). Raised
+  once, in the post-task-16 hunt entry, with a reasoned decision already
+  attached (the only available fix breaks the common `GITHUB_TOKEN`
+  GitHub-Actions credential shape, and the exploitable impact is
+  self-limited to griefing the spoofer's own comment). One mention, not a
+  repeated pattern — leaving as an open question rather than promoting it.
+- **Template-literal Express route paths in `docDrift`** (confirmed-but-
+  unfixed in the post-task-13 hunt entry, no design decision made on the
+  correct failure mode). Only one mention since round 1, and — unlike the
+  `JWT_SECRET` item above — has no agreed-on correct behavior yet, so
+  promoting it now would mean deciding a design question inside a backlog
+  task description rather than the task doing well-scoped implementation
+  work.
+- **`collectPullRequests`' pagination cap and standup markdown-escaping**,
+  carried forward again from round 1's own deferred list — still no run has
+  observed either triggering condition (a >1000-PR window post-task-13's own
+  pagination fix, or a real rendered sink for standup output).

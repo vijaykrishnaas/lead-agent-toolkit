@@ -448,3 +448,118 @@ one.
   carried forward again — still no run has observed either triggering
   condition (a >1000-PR window post-task-13's own pagination fix, or a real
   rendered sink for standup output).
+
+# Retro round 4 — self-audit of task 19 (2026-07-19)
+
+Source: every PROGRESS.md entry since round 3 (the post-round-3 adversarial
+hunt with 3 fixes, task 19 itself, and the post-task-19 hunt) and every
+SKILL_CHANGELOG.md entry added since round 3, read in full. Task 19 (round
+3's one proposal) is `[DONE]`, and TASKS.md has no other non-DONE/non-BLOCKED
+item, so this run does what round 3's own precedent establishes (self-audit
+when the backlog empties) rather than leaving the backlog empty.
+
+## What failed since round 3
+
+**1. Round 2's item 2 pattern — a fix landing in one module without a check
+for the identical shape in a sibling module — recurred once more, in the
+post-round-3 hunt.** `usersController.js`'s `update()` returned 500 instead
+of 409 on an email-collision duplicate-key error, the exact bug class
+already fixed in `authController.js`'s `register` in an earlier hunt, but
+never checked against this second, structurally identical write into the
+same unique-indexed field. Round 1's item 2 named this exact gap
+("security/correctness fixes did not get propagated to sibling modules with
+the same shape") and it recurred here in a new pair of files — still no
+structural fix proposed (e.g. a shared duplicate-key-to-409 helper), since
+this is only the second known instance of *this specific* sibling-miss (the
+first being `postReviewComment.js`/`collectPullRequests.js`'s
+unencoded-URL gap from round-1-era hunts) and the two instances are in
+unrelated domains (HTTP-URL-encoding vs. Mongo error-code handling), so
+there's no single shared abstraction that would prevent both.
+
+**2. The per-occurrence-scoping guideline's stated scope gap (identified in
+the post-round-3 hunt itself) is still open, one mention only.** That hunt's
+own fix to `parseExpressRoutes.js`'s `.route()`-chain boundary was the exact
+"next occurrence's own start is not a safe boundary" shape the guideline's
+prose already names `.route()` calls as its own example of — but the
+guideline's literal stated scope is "diff-scanning static-analysis rules,"
+and `parseExpressRoutes.js` is a source-file parser, not a diff-scanning
+rule, so an audit strictly following the guideline's own wording wouldn't
+have caught it. That hunt explicitly raised broadening the scope as an open
+question and explicitly declined to act on it the same run (one-improvement
+budget spent on the unrelated `missingTests.js` substring-matching
+broadening instead). Re-confirmed this run: still exactly one mention, no
+second recurrence since — per round 2/3's own "wait for a second
+recurrence, or a repeated-mention pattern, before treating a documented
+gap as structural" precedent for guideline-text edits (not just code), not
+yet promotable. Flagging again below so a second recurrence is recognized
+quickly.
+
+**3. Task 19's own security fix shipped with a bug that defeated the exact
+threat model it was written to close — caught by the very next adversarial
+hunt, one run later, not before merge.** The post-task-19 hunt found that
+`findExistingBotComment`'s last-match-wins search survived task 19's
+HMAC-marker change unchanged, and since the marker is posted as plain text
+in every comment the tool writes, a copy-the-marker attack (no token
+knowledge needed) defeats the HMAC entirely — reproduced directly, and
+exactly the "permanently orphan the real comment" failure task 19 was
+written to prevent. This is a new, specific instance of round 1's item 4
+pattern in mirror image: not a fix that never got attempted, but a fix
+that was attempted, reasoned about carefully (task 19's own PROGRESS.md
+entry has a full "why this closes the gap" explanation), and still missed
+a load-bearing assumption (that an HMAC-derived value stays secret after
+being posted in the clear) until an adversarial pass specifically looked
+for it. The task-19 entry's own design reasoning never asked "what does an
+attacker who can only *read* the PR, not compute the HMAC, still get to
+copy?" — worth naming explicitly as a checklist question for any future
+security-shaped fix in this repo: after implementing, ask what the fix's
+*output* leaks to the same attacker class the fix is defending against,
+not only whether the fix's *derivation* is hard to reproduce. This is
+already captured procedurally by "hunt immediately after every task,"
+which is exactly what caught it here in one run rather than sitting
+unnoticed — the discipline worked as intended, so no new process change is
+proposed, only this explicit framing for next time a security fix ships.
+
+**4. Both new open questions from the post-task-19 hunt are single
+mentions with no observed trigger, matching round 3's own bar for
+"documented but deferred," not "promote."** (a) First-match-wins could, in
+an unobserved two-genuine-comments race, keep updating the older of two
+legitimate comments and orphan the newer one — no such race has been
+observed, and update-in-place (task 16) already narrows the window. (b)
+Whether to re-verify the marker at read time in addition to write time —
+a design question with no correctness gap identified, not a bug.
+
+## What to improve
+
+- No change to the improvement list from rounds 1–3 — this round's findings
+  are recurrences of already-named patterns (items 1 and 2 above) or a
+  single well-handled instance of an already-working discipline (item 3),
+  not evidence of a new gap in how this repo does self-audits.
+
+## Proposed new backlog tasks
+
+None. Re-checked every open item carried forward from rounds 1–3
+(template-literal Express route paths in `docDrift`, `collectPullRequests`
+pagination cap, standup markdown-escaping) and every new item raised since
+round 3 (items 2 and 4 above) — none has either a repeated-mention history
+or an agreed-on concrete design the way `JWT_SECRET` hardening (3 mentions)
+and the bot-comment HMAC marker (3 mentions, then a scoped fix) did before
+being promoted in rounds 2 and 3. Per this repo's own "cite an observed
+failure or gap — no speculative rewrites" bar (CLAUDE.md, above), adding a
+task now for any of these would mean inventing scope rather than
+responding to accumulated evidence. Leaving TASKS.md unchanged — all 19
+items remain `[DONE]`, per hard invariant 2 (never delete backlog history).
+
+## Not proposed as tasks (explicitly deferred, still no strong evidence)
+
+- **Per-occurrence-scoping guideline's stated scope** (item 2 above) — one
+  mention (post-round-3 hunt), explicitly deferred that same run. Watching
+  for a second recurrence (another regex/pattern-based source parser
+  shipping the same "next occurrence's start" boundary bug) before treating
+  the guideline-text gap as worth closing on its own.
+- **`findExistingBotComment` first-match-wins vs. a genuine-comment race**
+  (item 4a above) — one mention, no observed trigger, and update-in-place
+  already narrows the window it would need to exploit.
+- **Template-literal Express route paths in `docDrift`** and
+  **`collectPullRequests`' pagination cap / standup markdown-escaping**,
+  carried forward again from rounds 1–3 — still no run has observed either
+  triggering condition.

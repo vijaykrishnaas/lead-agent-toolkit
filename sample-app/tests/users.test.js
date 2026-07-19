@@ -52,6 +52,18 @@ describe('Users', () => {
     expect(res.body.name).toBe('Bobby');
   });
 
+  test('PUT /:id returns 409 (not 500) when the new email collides with another user', async () => {
+    const dupErr = new Error('E11000 duplicate key error');
+    dupErr.code = 11000;
+    User.findByIdAndUpdate.mockRejectedValue(dupErr);
+    const res = await request(app)
+      .put('/api/users/u1')
+      .set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`)
+      .send({ email: 'taken@example.com' });
+    expect(res.status).toBe(409);
+    expect(res.body.error).toMatch(/already in use/i);
+  });
+
   test('PUT /:id forbids editing another user', async () => {
     const res = await request(app)
       .put('/api/users/u2')

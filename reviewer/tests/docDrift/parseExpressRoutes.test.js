@@ -133,6 +133,27 @@ describe('parseRouterSource', () => {
     ]);
   });
 
+  it('still resolves the chain when a comment sits before the first chained verb', () => {
+    // Closes the open question raised in run 7's PROGRESS.md entry: a
+    // comment directly after .route(path), before any real chained verb,
+    // was flagged as worth a follow-up check rather than assumed safe by
+    // parity with the "comment between two real verbs" case above.
+    // Reproduced and confirmed already correct (commentMasked reads a
+    // comment-only line as whitespace to the leading \s* in
+    // collectChainedVerbs' verb-match, same as the between-verbs case) --
+    // this test only adds the missing regression coverage.
+    const source = `
+      router.route('/a')
+        // leading comment before the first chained verb
+        .get(getA)
+        .put(putA);
+    `;
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'PUT', path: '/a' },
+    ]);
+  });
+
   it('does not sweep an unrelated router.<verb>() statement sitting between two .route() chains into the first chain', () => {
     // Regression: the chain boundary used to be "up to the next .route()
     // call's index," so an unrelated router.get('/b', ...) statement sitting

@@ -35,4 +35,39 @@ describe('style rule', () => {
     const files = parseDiff(loadFixture('clean.diff'));
     expect(styleRule.check(files)).toEqual([]);
   });
+
+  it('does not flag a string literal that merely mentions "console.log(" as leftover debug code', () => {
+    // Regression: CONSOLE_LOG matched raw line content, so a log/error
+    // message string quoted verbatim into an added line (no actual
+    // console.log call executing) was reported as leftover debug code.
+    const diff = [
+      'diff --git a/src/help.js b/src/help.js',
+      '--- a/src/help.js',
+      '+++ b/src/help.js',
+      '@@ -1,1 +1,2 @@',
+      ' const x = 1;',
+      '+const msg = "call console.log(x) to debug";',
+    ].join('\n');
+
+    expect(styleRule.check(parseDiff(diff))).toEqual([]);
+  });
+
+  it('does not flag a commented-out console.log call as leftover debug code', () => {
+    // Companion to the string-literal case above: a `//`-commented-out call
+    // doesn't execute, so it isn't "left in source" as real debug code
+    // either -- consistent with this repo's established masking-before-
+    // detection discipline (see CLAUDE.md's "detect whether a code
+    // construct exists at all" guideline), which treats a comment the same
+    // as a string for this purpose: neither is live code.
+    const diff = [
+      'diff --git a/src/help.js b/src/help.js',
+      '--- a/src/help.js',
+      '+++ b/src/help.js',
+      '@@ -1,1 +1,2 @@',
+      ' const x = 1;',
+      '+  // console.log(debugVal);',
+    ].join('\n');
+
+    expect(styleRule.check(parseDiff(diff))).toEqual([]);
+  });
 });

@@ -51,11 +51,27 @@ function authHeaders(token) {
 
 // Finds this tool's own prior comment on the PR (identified by this PR's
 // computed bot-comment marker), if any. Issue comments are returned
-// oldest-first by GitHub, so pages are walked forward and the last (most
-// recent) match wins. Returns null if no prior bot comment is found.
+// oldest-first by GitHub, so pages are walked forward and the FIRST (oldest)
+// match wins — not the most recent one.
+//
+// This matters because the marker, despite being HMAC-derived from the
+// caller's token, is posted in plain text as the prefix of every comment
+// this tool writes — it is not actually secret once posted, only unguessable
+// *before* a first legitimate comment exists. A non-owning PR commenter can
+// simply read a genuine bot comment's body, copy its marker verbatim, and
+// post a new comment starting with that same marker. Under a
+// last-match-wins search, that later, spoofed comment would be preferred
+// over the genuine one, so all future runs would PATCH the attacker's
+// comment forever, permanently orphaning the real one — the exact failure
+// mode task 19 set out to prevent, which the original last-match-wins
+// implementation did not actually close. Because the attacker can only copy
+// a marker that has already been posted, the genuine comment is always the
+// earliest marker-prefixed comment in the thread, so committing to the
+// first match (and never overwriting it with a later one) closes the gap:
+// a spoofed copy posted after the genuine comment is simply ignored.
+// Returns null if no prior bot comment is found.
 async function findExistingBotComment({ token, owner, repo, prNumber }, request) {
   const marker = computeBotCommentMarker(token, owner, repo, prNumber);
-  let found = null;
   for (let page = 1; page <= MAX_COMMENT_SEARCH_PAGES; page += 1) {
     const url = `${GITHUB_API_URL}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
       + `/issues/${encodeURIComponent(prNumber)}/comments?per_page=${COMMENTS_PER_PAGE}&page=${page}`;
@@ -72,15 +88,14 @@ async function findExistingBotComment({ token, owner, repo, prNumber }, request)
     const comments = await response.json();
     if (comments.length === 0) break;
 
-    for (const comment of comments) {
-      if (typeof comment.body === 'string' && comment.body.startsWith(marker)) {
-        found = comment;
-      }
-    }
+    const match = comments.find(
+      (comment) => typeof comment.body === 'string' && comment.body.startsWith(marker),
+    );
+    if (match) return match;
 
     if (comments.length < COMMENTS_PER_PAGE) break;
   }
-  return found;
+  return null;
 }
 
 // Posts `body` (markdown) as an issue comment on the given PR, or updates

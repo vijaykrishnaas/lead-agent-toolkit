@@ -108,7 +108,7 @@ describe('postReviewComment', () => {
     expect(result).toEqual({ id: 101, updated: true });
   });
 
-  it('updates the most recent bot comment when more than one exists on the PR', async () => {
+  it('updates the earliest (first-posted) bot comment when more than one exists on the PR, not the most recent', async () => {
     const request = jest.fn()
       .mockResolvedValueOnce(makeResponse({
         json: [
@@ -116,14 +116,42 @@ describe('postReviewComment', () => {
           { id: 20, body: `${marker}\nsecond run` },
         ],
       }))
-      .mockResolvedValueOnce(makeResponse({ json: { id: 20 } }));
+      .mockResolvedValueOnce(makeResponse({ json: { id: 10 } }));
 
     await postReviewComment(baseArgs, { request });
 
     expect(request).toHaveBeenLastCalledWith(
-      `${GITHUB_API_URL}/repos/vijaykrishnaas/lead-agent-toolkit/issues/comments/20`,
+      `${GITHUB_API_URL}/repos/vijaykrishnaas/lead-agent-toolkit/issues/comments/10`,
       expect.anything(),
     );
+  });
+
+  it('SECURITY: does not let a later comment that merely copies a genuine comment\'s marker text hijack future updates', async () => {
+    // The HMAC marker is posted as plain text in every comment this tool
+    // writes, so it isn't secret once posted — anyone who can read the PR's
+    // comments (the same access a spoofer already needs to post one) can
+    // copy a genuine marker verbatim onto a new comment, with no knowledge
+    // of the token that produced it. If the search preferred the most
+    // recent match, this copy would permanently hijack all future updates,
+    // orphaning the real comment — the exact failure task 19 exists to
+    // prevent. The genuine comment must always be the earliest match, since
+    // a copy can only be posted after the original it copies from exists.
+    const request = jest.fn()
+      .mockResolvedValueOnce(makeResponse({
+        json: [
+          { id: 101, body: `${marker}\ngenuine report` },
+          { id: 102, body: `${marker}\nspoofed comment copying the real marker text verbatim` },
+        ],
+      }))
+      .mockResolvedValueOnce(makeResponse({ json: { id: 101 } }));
+
+    const result = await postReviewComment(baseArgs, { request });
+
+    expect(request).toHaveBeenLastCalledWith(
+      `${GITHUB_API_URL}/repos/vijaykrishnaas/lead-agent-toolkit/issues/comments/101`,
+      expect.anything(),
+    );
+    expect(result).toEqual({ id: 101, updated: true });
   });
 
   it('pages through the full comment history (not just the first page) to find a prior bot comment', async () => {

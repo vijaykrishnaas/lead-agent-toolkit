@@ -115,6 +115,35 @@ function findHandlerBraceStart(addedLines, startIdx) {
     const rawContent = i === startIdx ? addedLines[i].content.slice(startColumn) : addedLines[i].content;
     const { masked, quoteState: nextQuoteState } = maskStringLiterals(rawContent, quoteState);
     quoteState = nextQuoteState;
+    const trimmed = masked.trim();
+
+    // Checked *before* scanning this line's own characters, using depth as
+    // carried over from the end of the previous line: a brace-less handler
+    // that ends via ASI (no trailing ';', e.g. `async (req, res) =>
+    // res.json(x)` with no semicolon) has already implicitly ended once
+    // depth returns to <= 0 on a prior line with no brace found. Scanning
+    // this line's characters for '{' *before* this check (the prior
+    // ordering) would search a following, unrelated line/statement for a
+    // brace and could return a completely different handler's own body
+    // brace as if it belonged to this one — see CLAUDE.md's per-occurrence
+    // boundary-derivation guideline; this is the same class of bug as
+    // collectStatement's own "check-before-scan" ordering exists to
+    // prevent, applied here to brace *acceptance* instead of block
+    // *collection*.
+    //
+    // A line whose trimmed content itself starts with '{' is exempted from
+    // this bail-out: that's exactly the shape of a legitimate real body
+    // brace sitting alone on its own line (e.g. after a comment between the
+    // signature and the brace), and must fall through to the character
+    // scan below so it can be recognized and accepted. An unrelated
+    // following statement (a different handler's own signature, e.g.
+    // `exports.putWidget = async (req, res) => {`) never starts with '{'
+    // itself, so this exemption doesn't reopen the ASI bug above — that
+    // scan is still stopped by this same check on its own non-'{'-starting
+    // first line.
+    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.') && !trimmed.startsWith('{')) {
+      return null;
+    }
 
     for (let c = 0; c < masked.length; c += 1) {
       const ch = masked[c];
@@ -125,12 +154,6 @@ function findHandlerBraceStart(addedLines, startIdx) {
       }
     }
 
-    const trimmed = masked.trim();
-    // Same "blank/comment-only line doesn't end the statement" reasoning as
-    // collectStatement — a comment between the signature and its opening
-    // brace (e.g. `async (req, res) =>` / `// fetch and return` / `{`) must
-    // not be mistaken for the statement having ended brace-less.
-    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.')) return null;
     if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) return null;
   }
   return null;

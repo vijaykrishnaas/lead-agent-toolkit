@@ -234,6 +234,48 @@ describe('error-handling rule', () => {
     expect(handlerIssues[0].message).toContain('getWidget');
   });
 
+  it('flags a brace-less handler ending via ASI (no trailing semicolon) that is immediately followed by another handler, instead of crediting it with the following handler\'s own try/catch', () => {
+    // Regression: findHandlerBraceStart scanned each line's own characters
+    // for the real body '{' *before* checking whether the statement had
+    // already implicitly ended on a prior line (depth back to <= 0, no
+    // brace found there). A brace-less/concise-body handler that relies on
+    // ASI instead of a trailing ';' (e.g. `async (req, res) =>
+    // res.json(x)`, no semicolon -- a real style, "Standard JS"/`semi:
+    // false` formatting) never hit the same-line semicolon check, so the
+    // scan carried on into the *next* line -- which, if it happened to be a
+    // different handler's own signature ending in '{', was accepted as if
+    // it were the first (brace-less) handler's real body brace. That swept
+    // the second handler's own try/catch into the first handler's checked
+    // block, silencing a genuine missing-error-handling finding for the
+    // first handler entirely. Reproduced directly: a diff adding a
+    // brace-less `getWidget` (no semicolon, no error handling) immediately
+    // followed by a block-bodied `putWidget` (try/catch-wrapped) produced
+    // zero issues instead of one. Confirmed via `git stash` that this
+    // predates this run's own starting commit. Fixed by moving the
+    // "did the statement already end" check ahead of the per-line character
+    // scan, mirroring collectStatement's own check-before-scan ordering.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,9 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => res.json(req.params.id)',
+      '+exports.putWidget = async (req, res) => {',
+      '+  try {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  } catch (err) {',
+      '+    res.status(500).json({ error: "failed" });',
+      '+  }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
+
   it('does not flag a brace-less/concise-body async handler that is wrapped inline by an asyncHandler utility', () => {
     const diff = [
       'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',

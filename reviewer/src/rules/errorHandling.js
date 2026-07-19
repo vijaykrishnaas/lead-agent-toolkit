@@ -60,45 +60,80 @@ function collectStatement(addedLines, startIdx) {
   return blockLines.join('\n');
 }
 
-// Decides whether the handler starting at addedLines[startIdx] is brace-
-// bodied (its arrow/function body opens a '{' *somewhere*, not necessarily
-// on its own signature line — e.g. `async (req, res) =>` on one line, `{` on
-// the next, a legal and real formatting style) or genuinely brace-less/
-// concise-bodied (no '{' anywhere in the statement). Checking only the
-// signature's own starting line for '{' (the prior version of this check)
-// misclassifies the former as brace-less, which then runs collectStatement
-// instead of collectBoundedBlock -- and collectStatement's own break
-// condition ("depth back to 0 and this line isn't a `.`-continuation") fires
-// the instant it sees the bare '{' line, well before ever reaching a
-// try/catch inside that block, misflagging a genuinely try/catch-wrapped
-// handler as missing error handling. This walks the same statement boundary
-// collectStatement uses, but checks each line for '{' before applying that
-// boundary check, so a brace on any line before the statement would
-// otherwise end is still detected as brace-bodied. collectBoundedBlock
-// itself already scans forward from startIdx looking for the first '{'
-// (see its own loop), so once this returns true it's safe to hand off to it
-// even when the brace isn't on startIdx's own line.
-function handlerHasBraceBody(addedLines, startIdx) {
+// Finds the handler's real body-opening '{', or returns null if the handler
+// is genuinely brace-less/concise-bodied (no such brace anywhere in the
+// statement). A brace is only accepted as "the real one" while paren depth
+// -- counted from the async signature's own opening paren, not from the
+// start of the line -- is back down to <= 0, i.e. once the handler's own
+// parameter list has closed. This exists because a naive per-line
+// `.includes('{')` check (the prior version) is fooled by a brace that
+// appears *inside* the parameter list and fully closes there, e.g. a
+// default-parameter object literal: `async (req, res, opts = {}) =>` on one
+// line, the real body `{` on the next. That prior check would report
+// "brace-bodied" (true, correctly) from the same-line `{}`, but the caller
+// then handed collectBoundedBlock the *signature's own line* as startIdx --
+// and collectBoundedBlock has the identical "first '{' found, wherever it
+// is" contract (correctly, for its other callers), so it too latches onto
+// the default-param braces, sees them balance back to depth 0 by end of
+// that same line, and returns just the one-line signature as "the block" --
+// never reaching the real body (or its try/catch) on the following lines.
+// Gating brace-acceptance on paren depth fixes this: the default-param `{`
+// occurs while paren depth is 1 (still inside the handler's own unclosed
+// parameter-list paren), so it's correctly skipped; the real body `{`
+// (after the parameter list's closing `)` and the `=>`) occurs at paren
+// depth 0, so it's correctly accepted. Depth is counted starting at the
+// async signature's own match position (not column 0 of the line), so an
+// outer wrapper call that's still open at that point -- `asyncHandler(` or
+// a route-registration call like `router.get('/x', ` -- is never mistaken
+// for still being inside the handler's own parameter list.
+function findHandlerBraceStart(addedLines, startIdx) {
+  const signatureMatch = ASYNC_HANDLER_SIGNATURE.exec(addedLines[startIdx].content);
+  const startColumn = signatureMatch ? signatureMatch.index : 0;
   let depth = 0;
   let quoteState = null;
   for (let i = startIdx; i < addedLines.length; i += 1) {
-    const content = addedLines[i].content;
-    const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
+    const rawContent = i === startIdx ? addedLines[i].content.slice(startColumn) : addedLines[i].content;
+    const { masked, quoteState: nextQuoteState } = maskStringLiterals(rawContent, quoteState);
     quoteState = nextQuoteState;
-    if (masked.includes('{')) return true;
+
+    if (i === startIdx) {
+      // On the signature's own line, scan character-by-character so a '{'
+      // is only accepted once depth (counted from this line's own start,
+      // i.e. from the signature match) is back down to <= 0 -- skipping one
+      // that's fully self-contained inside the still-open parameter list.
+      for (let c = 0; c < masked.length; c += 1) {
+        const ch = masked[c];
+        if (ch === '(') depth += 1;
+        else if (ch === ')') depth -= 1;
+        else if (ch === '{' && depth <= 0) {
+          return { lineIndex: i, column: startColumn + c };
+        }
+      }
+    } else if (masked.includes('{')) {
+      // Once the scan has moved past the signature line without yet
+      // resolving (see the continuation/semicolon checks below, evaluated
+      // every iteration including this one), the statement is still open --
+      // so the first '{' found here is safely the real body brace. No
+      // depth-gating is needed for this case: unlike the signature line,
+      // there's no parameter list left to still be inside of.
+      return { lineIndex: i, column: masked.indexOf('{') };
+    }
+
     const trimmed = masked.trim();
     // Same "blank/comment-only line doesn't end the statement" reasoning as
     // collectStatement — a comment between the signature and its opening
     // brace (e.g. `async (req, res) =>` / `// fetch and return` / `{`) must
     // not be mistaken for the statement having ended brace-less.
-    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.')) return false;
-    for (const ch of masked) {
-      if (ch === '(') depth += 1;
-      else if (ch === ')') depth -= 1;
+    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.')) return null;
+    if (i > startIdx) {
+      for (const ch of masked) {
+        if (ch === '(') depth += 1;
+        else if (ch === ')') depth -= 1;
+      }
     }
-    if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) return false;
+    if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) return null;
   }
-  return false;
+  return null;
 }
 
 function check(files) {
@@ -130,15 +165,36 @@ function check(files) {
       // do with this handler. A brace-less handler can never contain a
       // `try { ... }` of its own regardless (that requires braces), so it
       // only needs its own statement's lines checked for an ASYNC_WRAPPER
-      // match — collectStatement bounds that correctly. handlerHasBraceBody
-      // checks the whole statement, not just startIdx's own line, so a
-      // block-bodied handler whose '{' lands on a later line (e.g.
-      // `async (req, res) =>` then `{` on the next line — legal, real
-      // formatting) is still correctly routed to collectBoundedBlock instead
-      // of being misclassified as brace-less.
-      const block = handlerHasBraceBody(addedLines, idx)
-        ? collectBoundedBlock(addedLines, idx)
-        : collectStatement(addedLines, idx);
+      // match — collectStatement bounds that correctly. findHandlerBraceStart
+      // locates the handler's real body brace, not just "does '{' appear
+      // anywhere on startIdx's own line" — so it's immune to a default-
+      // parameter object literal (e.g. `opts = {}`) on the signature line
+      // being mistaken for the body brace, and collectBoundedBlock is handed
+      // a slice starting exactly at that real brace (not at idx's own line,
+      // which could still have an earlier, spurious, already-balanced brace
+      // pair before it that would make collectBoundedBlock stop too soon).
+      const braceStart = findHandlerBraceStart(addedLines, idx);
+      let block;
+      if (braceStart) {
+        // collectBoundedBlock is run on a slice starting exactly at the
+        // real brace (so its own depth-counting can't latch onto an earlier
+        // spurious, already-balanced pair, e.g. a default-parameter object
+        // literal) purely to find how many lines the body spans. The actual
+        // text handed to the TRY_BLOCK/ASYNC_WRAPPER check below is then
+        // re-assembled from the *original, unsliced* lines over that same
+        // span — an ASYNC_WRAPPER match like `asyncHandler(` legitimately
+        // sits *before* the body brace, on the signature line's own prefix,
+        // which the slice deliberately cut off and must not lose.
+        const sliced = addedLines.slice(braceStart.lineIndex);
+        sliced[0] = { ...sliced[0], content: sliced[0].content.slice(braceStart.column) };
+        const lineCount = collectBoundedBlock(sliced, 0).split('\n').length;
+        block = addedLines
+          .slice(braceStart.lineIndex, braceStart.lineIndex + lineCount)
+          .map((l) => l.content)
+          .join('\n');
+      } else {
+        block = collectStatement(addedLines, idx);
+      }
       // Tested against the string/comment-masked block, not the raw one --
       // a comment merely mentioning "try {" or "asyncHandler" (e.g. a TODO)
       // must not be mistaken for a real one and silence a genuine finding.

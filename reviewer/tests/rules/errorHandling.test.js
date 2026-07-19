@@ -301,6 +301,110 @@ describe('error-handling rule', () => {
     expect(handlerIssues[0].message).toContain('getWidget');
   });
 
+  it('does not flag a try/catch-wrapped handler whose signature line has a default-parameter object literal and the real body brace on the next line', () => {
+    // Regression: handlerHasBraceBody (the prior fix for brace-on-next-line
+    // handlers) decided block-bodied-vs-brace-less via a plain per-line
+    // `.includes('{')` check, with no regard for whether that '{' was
+    // actually the handler's own body brace. A default parameter's object
+    // literal on the signature line -- `async (req, res, opts = {}) =>` --
+    // has a '{' that's already balanced (opens and closes) within that same
+    // line, but `.includes('{')` still reported "brace-bodied", and the
+    // caller then handed collectBoundedBlock the signature line itself as
+    // its starting point. collectBoundedBlock has the same "first '{'
+    // found, wherever it is" contract (correct for its other callers), so
+    // it also latched onto the default-param braces, saw them balance back
+    // to depth 0 by the end of that line, and returned just the one-line
+    // signature as "the block" -- never reaching the real body (or its
+    // try/catch) on the following lines. A fully try/catch-wrapped handler
+    // was misflagged as missing error handling as a result.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,9 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res, opts = {}) =>',
+      '+{',
+      '+  try {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  } catch (err) {',
+      '+    res.status(500).json({ error: "failed" });',
+      '+  }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
+  it('flags a handler with no try/catch whose signature line has a default-parameter object literal and the real body brace on the next line', () => {
+    // Companion case to the regression above: confirms the fix doesn't
+    // overcorrect into never flagging this shape at all -- one with
+    // genuinely no error handling still gets caught.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,5 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res, opts = {}) =>',
+      '+{',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
+
+  it('does not flag a try/catch-wrapped handler with a same-line default-parameter object literal and a same-line real body brace (both on the signature line)', () => {
+    // Companion coverage: when the default-param braces AND the real body
+    // brace are both on the signature's own line, the fix's depth-gated
+    // scan must still find the real (later, still-open) brace rather than
+    // stopping at the earlier, self-contained default-param pair.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,4 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res, opts = {}) => {',
+      '+  try { res.json(1); } catch (err) { res.status(500).json({ error: err.message }); }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
+  it('does not flag an asyncHandler-wrapped handler whose default-parameter object literal precedes the real body brace, and still credits the asyncHandler wrapper', () => {
+    // Regression: an earlier version of this fix, once it correctly located
+    // the real body brace, handed collectBoundedBlock a slice of the source
+    // starting exactly at that brace -- which fixed the premature-
+    // termination bug above, but discarded everything before the brace,
+    // including an ASYNC_WRAPPER match like `asyncHandler(` that
+    // legitimately sits on the signature line's own prefix, before the
+    // brace. That regressed a real, already-passing case (an asyncHandler-
+    // wrapped handler) into being misflagged as unwrapped. The block used
+    // for the TRY_BLOCK/ASYNC_WRAPPER check must be reassembled from the
+    // original, unsliced lines so text before the real brace is still seen.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,4 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = asyncHandler(async (req, res, opts = {}) => {',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+});',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
   it('does not flag a try/catch-wrapped handler whose signature line has a trailing comment containing braces', () => {
     // Regression: maskStringLiterals masked string-literal content but not
     // comments, so a same-line trailing comment on the handler's signature

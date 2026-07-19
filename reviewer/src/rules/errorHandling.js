@@ -9,19 +9,31 @@ const ASYNC_WRAPPER = /asyncHandler/;
 const THEN_CALL = /\.then\s*\(/;
 const CATCH_CALL = /\.catch\s*\(/;
 
-// Collects the lines belonging to the .then() statement starting at
+// Collects the lines belonging to the single statement starting at
 // addedLines[startIdx], from that line up through the line where the
 // statement actually ends: parens balanced (depth <= 0) AND either the
 // line ends with a `;`, or the following line isn't a `.`-prefixed chain
 // continuation (so an unrelated next statement is never pulled in). This is
 // a statement-boundary walk, not a brace-delimited block, so it can't reuse
-// collectBoundedBlock (which stops strictly at open/close-char balance).
-// Parens inside string/template literals (e.g. a callback body logging a
-// message containing a literal ")") are masked out via maskStringLiterals
-// first, so they can't be mistaken for the statement's real paren
-// structure — same bug class and fix as collectBoundedBlock's, see
-// CLAUDE.md's string-literal-aware depth-counting guideline.
-function collectThenStatement(addedLines, startIdx) {
+// collectBoundedBlock (which stops strictly at open/close-char balance and,
+// for an occurrence whose starting line never opens a brace at all, falls
+// back to reading all the way to the end of input — see
+// collectBoundedBlock.js's own "no opening brace at all" test case. That
+// fallback is correct for *its* contract, but wrong for a statement-shaped
+// occurrence: it would sweep every unrelated following statement into the
+// window). Parens inside string/template literals (e.g. a callback body
+// logging a message containing a literal ")") are masked out via
+// maskStringLiterals first, so they can't be mistaken for the statement's
+// real paren structure — same bug class and fix as collectBoundedBlock's,
+// see CLAUDE.md's string-literal-aware depth-counting guideline.
+// Shared by two occurrence shapes: a .then() chain (a statement that may
+// have its own brace-delimited callback bodies nested inside its parens)
+// and a brace-less/concise-body async handler (e.g.
+// `async (req, res) => res.json(x);`, no `{` anywhere) — both need "this
+// one statement's own lines, not whatever collectBoundedBlock's brace-only
+// contract would sweep in when the statement never opens a brace on its own
+// starting line.
+function collectStatement(addedLines, startIdx) {
   let depth = 0;
   let quoteState = null;
   const blockLines = [];
@@ -59,7 +71,22 @@ function check(files) {
     });
 
     handlerIndexes.forEach((idx) => {
-      const block = collectBoundedBlock(addedLines, idx);
+      // collectBoundedBlock is only safe to use once the handler's own
+      // starting line actually opens a brace: for an occurrence whose
+      // starting line never opens one at all (a concise/expression-bodied
+      // arrow handler, e.g. `async (req, res) => res.json(x);` — no `{`
+      // anywhere), collectBoundedBlock's documented fallback for that case
+      // is "read to the end of input" (see its own test of the same name),
+      // which sweeps every unrelated statement/handler after this one into
+      // the window and can satisfy TRY_BLOCK/ASYNC_WRAPPER off content that
+      // has nothing to do with this handler. A brace-less handler can never
+      // contain a `try { ... }` of its own regardless (that requires
+      // braces), so it only needs its own statement's lines checked for an
+      // ASYNC_WRAPPER match — collectStatement bounds that correctly.
+      const { masked: firstLineMasked } = maskStringLiterals(addedLines[idx].content);
+      const block = firstLineMasked.includes('{')
+        ? collectBoundedBlock(addedLines, idx)
+        : collectStatement(addedLines, idx);
       if (!TRY_BLOCK.test(block) && !ASYNC_WRAPPER.test(block)) {
         const line = addedLines[idx];
         issues.push({
@@ -80,14 +107,14 @@ function check(files) {
     // positive on a real multi-line-formatted chain), while a window
     // that's too large can pull in an unrelated statement's .catch() and
     // silence a genuinely uncaught chain right next to it (false
-    // negative). collectThenStatement walks forward tracking paren depth
+    // negative). collectStatement walks forward tracking paren depth
     // and stops at the statement's actual end (a balanced, semicolon-
     // terminated line, or the first following line that isn't a `.`
     // chain continuation), so the window always matches the real
     // boundary of the one chain being checked.
     addedLines.forEach((line, idx) => {
       if (!THEN_CALL.test(line.content)) return;
-      const window = collectThenStatement(addedLines, idx);
+      const window = collectStatement(addedLines, idx);
       if (!CATCH_CALL.test(window)) {
         issues.push({
           file: file.file,

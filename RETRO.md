@@ -315,3 +315,136 @@ already applied to plugin skill-copy parity.
   carried forward again from round 1's own deferred list — still no run has
   observed either triggering condition (a >1000-PR window post-task-13's own
   pagination fix, or a real rendered sink for standup output).
+
+# Retro round 3 — self-audit of tasks 17–18 (2026-07-19)
+
+Source: every PROGRESS.md entry since round 2 (the pre-round-2 "adversarial
+bug-hunt run" with 4 fixes, task 17, the post-task-17 hunt, task 18, and the
+post-task-18 hunt — all 2026-07-19) and every SKILL_CHANGELOG.md entry added
+since round 2, read in full. Tasks 17–18 (round 2's two proposals) are both
+`[DONE]`, and TASKS.md has no other non-DONE/non-BLOCKED item, so this run
+does what the task-18 PROGRESS.md entry's own open question anticipated
+("should the next scheduled run do another round-3 self-audit?") rather than
+leaving the backlog empty.
+
+## What failed since round 2
+
+**1. Both of round 2's proposals closed cleanly, with no regressions.**
+Task 17 hardened `resolveJwtSecret()` and wired it into both call sites;
+task 18 added `docProseDrift.test.js`. Neither introduced a new instance of
+any previously-documented bug class — confirmed by re-reading both task
+diffs and their PROGRESS.md entries in full.
+
+**2. Task 17 itself shipped a new instance of round 2's own newly-proposed
+fix having a gap one level deeper than the fix itself — the classic
+"the fix works, but a caller of the fixed thing wasn't updated" shape.**
+The post-task-17 hunt found `authController.js`'s `register` called
+`User.create(...)` (a DB write) before `signToken(...)`, which task 17 had
+just wired to throw in production on a bad secret — so a production
+misconfiguration still persisted the account before failing, orphaning it
+(every retry then hit the pre-existing duplicate-email 409, with no way to
+complete registration short of an operator fixing the secret). Task 17's own
+regression test for this exact scenario asserted only on the HTTP response,
+never on whether `User.create` was called, so it passed unchanged despite
+the account being created. This is a new bug class (precondition-check
+ordering relative to a persistent side effect), not a recurrence of any of
+the nine guidelines already in CLAUDE.md before this run — codified as its
+own new guideline the same run it was found.
+
+**3. Task 18 shipped a real false-pass in the very test it added to catch
+drift, found the same run.** The post-task-18 hunt found `mentionsSkill`
+(new in task 18) used raw substring `includes` per hyphen-split skill-name
+token; for `review-pr`, token `"pr"` substring-matches `Express`/`approach`,
+and token `"review"` substring-matches `"reviewer"` — this repo's own
+package name, present in nearly every description the test checks.
+Reproduced directly: stripping every literal mention of the skill from the
+real README left `mentionsSkill` still returning `true`. This is the same
+underlying "narrow-mock/narrow-match hides a real gap" family round 2's item
+3 already tracked (the `reviewPrCli.js` hardcoded-message bug), but a third,
+distinct sub-shape (substring-vs-word-boundary, not single-canned-mock-shape)
+— codified as its own new guideline rather than folded into item 3's, since
+the two are different mechanically (a return-value mock in one, a string
+match in the other) even though both are "the check didn't exercise the
+combination that breaks."
+
+**4. Both new bugs (items 2 and 3) were found and fixed in the same run that
+introduced them, by the very next adversarial hunt — the discipline this
+repo has followed since round 1 continues to hold.** Neither sat across
+multiple runs the way the JWT_SECRET/doc-drift items (round 2) did before
+promotion; both are one-off findings so far, not repeated patterns, so
+neither warrants a structural fix or a backlog item beyond the guideline
+already added for each.
+
+**5. The `findExistingBotComment` comment-authorship trust boundary (first
+raised post-task-16, deferred in round 2 as "one mention") was independently
+re-examined in the "adversarial bug-hunt run" entry right after round 2 —
+its impact analysis was wrong the first time and got corrected.** The
+original reasoning called the exploitable impact "self-limited to griefing
+the spoofer's own comment"; re-tracing the logic this run confirmed a
+spoofed marker-prefixed comment posted *after* the real bot comment instead
+causes `findExistingBotComment`'s last-match-wins search to PATCH the
+spoofed comment on every future run, permanently orphaning the original
+legitimate comment (which keeps showing stale content while still carrying
+the marker) — damage to a comment other than the spoofer's own. That run
+explicitly left this uncorrected and unpromoted, "flagging the corrected
+impact analysis for whoever next revisits it." This round is that revisit
+(see item 6 below and the newly-proposed task 19).
+
+## What to improve
+
+- Items 2 and 3 above are each single-instance findings fixed same-run — no
+  structural fix warranted yet, matching round 2's own "wait for a second
+  recurrence before going structural" stance (applied there to the
+  exemption-scope and narrow-mock shapes, neither of which has recurred a
+  second time either as of this run).
+- The `findExistingBotComment` trust boundary (item 5) was deferred twice
+  now not for lack of repeated mentions (it has three: post-task-16, the
+  round-2 RETRO addendum, and the corrected-impact adversarial-hunt entry)
+  but for lack of a fix without a real compatibility cost. Reviewing
+  `postReviewComment.js` directly this round surfaced a fix that avoids both
+  previously-identified costs (see task 19 below) — this is the same
+  "keep looking for a scoped fix once severity is confirmed, don't just
+  keep re-logging the tradeoff" move round 2 applied to JWT_SECRET, adapted
+  to a case where the blocker was solution-shaped rather than
+  priority-shaped.
+
+## Proposed new backlog tasks
+
+**19. Make `findExistingBotComment`'s bot-comment identification resistant
+to spoofing by a non-owning PR commenter, via a token-keyed marker instead
+of author-identity verification.** Both previously-considered fixes have
+real costs: `GET /user` fails for GitHub App/Actions-installation tokens
+(breaking the default `GITHUB_TOKEN` credential shape in CI), and a
+`comment.user.type === 'Bot'` check would misclassify a human operator's own
+PAT-authored comment as not-the-bot's-own, breaking local/PAT usage (the
+`--token` override `review-pr`'s own SKILL.md documents as supported).
+Neither of those costs applies to deriving the marker itself from an HMAC
+keyed by the GitHub token (e.g.
+`` `<!-- lead-agent-toolkit:review-pr:${hmacSha256Hex(token, `${owner}/${repo}#${prNumber}`).slice(0, 16)} -->` ``
+instead of the current fixed, publicly-readable-in-source-code marker
+string) — unpredictable to anyone without the token, no extra API call, and
+identical behavior whether the token is a PAT or a GitHub Actions
+`GITHUB_TOKEN`. A token rotation between runs would just fail to find the
+old comment and post a new one — the same graceful fallback the code
+already has for "no prior comment exists," not a new failure mode. Evidence:
+raised in the post-task-16 hunt entry, re-analyzed with an escalated impact
+in the following "adversarial bug-hunt run" entry (spoofing can permanently
+orphan the real bot comment, not just self-limited griefing to the
+spoofer's own text), and deferred twice — round 2's RETRO ("one mention")
+and that same adversarial-hunt entry ("flagging for whoever next revisits
+this") — for lack of a cost-free fix; this is the first round to identify
+one.
+
+## Not proposed as tasks (explicitly deferred, still no strong evidence)
+
+- **Template-literal Express route paths in `docDrift`** (confirmed-but-
+  unfixed in the post-task-13 hunt entry, no design decision made on the
+  correct failure mode). Still only the one mention since round 1 — no new
+  occurrence this round, and still no agreed-on correct behavior, so
+  promoting it now would mean deciding a design question inside a backlog
+  task description rather than the task doing well-scoped implementation
+  work.
+- **`collectPullRequests`' pagination cap and standup markdown-escaping**,
+  carried forward again — still no run has observed either triggering
+  condition (a >1000-PR window post-task-13's own pagination fix, or a real
+  rendered sink for standup output).

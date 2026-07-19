@@ -41,14 +41,21 @@ function collectStatement(addedLines, startIdx) {
     const content = addedLines[i].content;
     const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
     quoteState = nextQuoteState;
-    if (i > startIdx && depth <= 0 && !masked.trim().startsWith('.')) break;
+    const trimmed = masked.trim();
+    // A blank or comment-only line (nothing left after masking) is never
+    // itself a `.`-chain continuation, but it also doesn't end a statement
+    // in real JS — a chain or a signature-then-brace statement can legally
+    // have an explanatory comment or blank line sitting between two of its
+    // own real lines. Only a genuinely non-blank, non-continuation line
+    // signals the statement actually ended.
+    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.')) break;
 
     blockLines.push(content);
     for (const ch of masked) {
       if (ch === '(') depth += 1;
       else if (ch === ')') depth -= 1;
     }
-    if (depth <= 0 && /;\s*$/.test(masked.trimEnd())) break;
+    if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) break;
   }
   return blockLines.join('\n');
 }
@@ -79,12 +86,17 @@ function handlerHasBraceBody(addedLines, startIdx) {
     const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
     quoteState = nextQuoteState;
     if (masked.includes('{')) return true;
-    if (i > startIdx && depth <= 0 && !masked.trim().startsWith('.')) return false;
+    const trimmed = masked.trim();
+    // Same "blank/comment-only line doesn't end the statement" reasoning as
+    // collectStatement — a comment between the signature and its opening
+    // brace (e.g. `async (req, res) =>` / `// fetch and return` / `{`) must
+    // not be mistaken for the statement having ended brace-less.
+    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.')) return false;
     for (const ch of masked) {
       if (ch === '(') depth += 1;
       else if (ch === ')') depth -= 1;
     }
-    if (depth <= 0 && /;\s*$/.test(masked.trimEnd())) return false;
+    if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) return false;
   }
   return false;
 }
@@ -127,7 +139,15 @@ function check(files) {
       const block = handlerHasBraceBody(addedLines, idx)
         ? collectBoundedBlock(addedLines, idx)
         : collectStatement(addedLines, idx);
-      if (!TRY_BLOCK.test(block) && !ASYNC_WRAPPER.test(block)) {
+      // Tested against the string/comment-masked block, not the raw one --
+      // a comment merely mentioning "try {" or "asyncHandler" (e.g. a TODO)
+      // must not be mistaken for a real one and silence a genuine finding.
+      // See CLAUDE.md's string-literal-aware depth-counting guideline; the
+      // same masking that protects brace-depth counting from a stray
+      // string/comment character must also protect a keyword-presence
+      // check from a stray string/comment *word*.
+      const maskedBlock = maskStringLiterals(block).masked;
+      if (!TRY_BLOCK.test(maskedBlock) && !ASYNC_WRAPPER.test(maskedBlock)) {
         const line = addedLines[idx];
         issues.push({
           file: file.file,
@@ -155,7 +175,8 @@ function check(files) {
     addedLines.forEach((line, idx) => {
       if (!THEN_CALL.test(line.content)) return;
       const window = collectStatement(addedLines, idx);
-      if (!CATCH_CALL.test(window)) {
+      const maskedWindow = maskStringLiterals(window).masked;
+      if (!CATCH_CALL.test(maskedWindow)) {
         issues.push({
           file: file.file,
           line: line.newLine,

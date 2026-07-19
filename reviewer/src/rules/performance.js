@@ -1,5 +1,6 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
+const { maskStringLiterals } = require('../utils/maskStringLiterals');
 
 // The param-list group is matched lazily (not `[^)]*`) so a nested paren in
 // a default value or destructuring default (e.g. `({ id = genId() }) => {`)
@@ -21,7 +22,15 @@ function check(files) {
     addedLines.forEach((line, idx) => {
       if (!FOREACH_START.test(line.content)) return;
       const block = collectBoundedBlock(addedLines, idx);
-      if (AWAIT_PATTERN.test(block)) {
+      // Tested against the string/comment-masked block, not the raw one --
+      // a comment merely mentioning "await" (e.g. "// do not await here")
+      // must not be mistaken for a real one and produce a false positive.
+      // Same bug class and fix as errorHandling.js's TRY_BLOCK/ASYNC_WRAPPER
+      // check, and the same reasoning as CLAUDE.md's string-literal-aware
+      // depth-counting guideline, applied to a keyword-presence check
+      // instead of a depth count.
+      const maskedBlock = maskStringLiterals(block).masked;
+      if (AWAIT_PATTERN.test(maskedBlock)) {
         issues.push({
           file: file.file,
           line: line.newLine,

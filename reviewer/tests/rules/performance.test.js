@@ -119,4 +119,26 @@ describe('performance rule', () => {
     expect(issues).toHaveLength(1);
     expect(issues[0].line).toBe(1);
   });
+
+  it('does not flag a clean forEach just because a comment inside it mentions "await"', () => {
+    // Regression: AWAIT_PATTERN was tested against the raw, unmasked block
+    // text (shared collectBoundedBlock, same as errorHandling.js's
+    // TRY_BLOCK/ASYNC_WRAPPER check), so a comment merely mentioning
+    // "await" (e.g. "do not await here") produced a false positive against
+    // a forEach callback with no real await at all.
+    const diff = [
+      'diff --git a/src/jobs/runner.js b/src/jobs/runner.js',
+      '--- a/src/jobs/runner.js',
+      '+++ b/src/jobs/runner.js',
+      '@@ -1,1 +1,4 @@',
+      ' const items = require("./items");',
+      '+items.forEach((item) => {',
+      '+  // do not await here, keep this synchronous',
+      '+  processSync(item);',
+      '+});',
+    ].join('\n');
+
+    const issues = performanceRule.check(parseDiff(diff));
+    expect(issues).toEqual([]);
+  });
 });

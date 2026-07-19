@@ -384,4 +384,118 @@ describe('error-handling rule', () => {
     expect(handlerIssues).toHaveLength(1);
     expect(handlerIssues[0].message).toContain('getWidget');
   });
+
+  it('does not flag a try/catch-wrapped handler whose opening brace is preceded by a comment-only line', () => {
+    // Regression: collectStatement/handlerHasBraceBody's continuation check
+    // ("this line isn't a `.`-chain continuation") treated any non-`.`-
+    // starting line as ending the statement, including a comment-only line
+    // -- so a handler with an explanatory comment between its signature and
+    // its own opening brace was misclassified as brace-less and truncated
+    // before ever reaching its real try/catch.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,8 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) =>',
+      '+  // fetch and return the widget',
+      '+  {',
+      '+    try {',
+      '+      res.json(await Widget.findById(req.params.id));',
+      '+    } catch (err) {',
+      '+      res.status(500).json({ error: err.message });',
+      '+    }',
+      '+  };',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
+  it('flags a handler with no try/catch even when a comment sits between the signature and a brace with no real body', () => {
+    // Companion to the case above: confirms the fix doesn't overcorrect
+    // into never flagging this shape -- a handler with the same
+    // comment-before-brace formatting but genuinely no try/catch inside
+    // still gets caught.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,6 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) =>',
+      '+  // fetch and return the widget',
+      '+  {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  };',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
+
+  it('does not flag a .then()/.catch() chain with a comment-only line between the two calls', () => {
+    // Regression: same continuation-check flaw as the brace-body case above
+    // -- a comment-only line between `.then(doA)` and its own `.catch(...)`
+    // was treated as ending the statement, truncating collectStatement's
+    // window before it ever reached the chain's real .catch().
+    const diff = [
+      'diff --git a/src/jobs/runner.js b/src/jobs/runner.js',
+      '--- a/src/jobs/runner.js',
+      '+++ b/src/jobs/runner.js',
+      '@@ -1,1 +1,5 @@',
+      ' const job = require("./job");',
+      '+job',
+      '+  .then(doA)',
+      '+  // explanatory comment about doA',
+      '+  .catch(handleA);',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+  });
+
+  it('flags an async handler with no try/catch even when a comment inside the block mentions "try {" and "asyncHandler"', () => {
+    // Regression: TRY_BLOCK/ASYNC_WRAPPER were tested against the raw,
+    // unmasked block text, so a comment merely mentioning "try {" or
+    // "asyncHandler" (e.g. a TODO) satisfied the check without any real
+    // error handling present, silencing a genuine finding.
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,5 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => {',
+      '+  // TODO: wrap this in try { ... } catch (err) { ... }, or use asyncHandler',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].message).toContain('getWidget');
+  });
+
+  it('flags a .then() call with no real .catch() even when a comment on the line mentions ".catch("', () => {
+    // Same bug class and fix as the case above, for the .then()/.catch()
+    // check: CATCH_CALL was tested against the raw window text, so a
+    // trailing comment mentioning ".catch(" satisfied the check without a
+    // real .catch() anywhere in the chain.
+    const diff = [
+      'diff --git a/src/jobs/runner.js b/src/jobs/runner.js',
+      '--- a/src/jobs/runner.js',
+      '+++ b/src/jobs/runner.js',
+      '@@ -1,1 +1,3 @@',
+      ' const job = require("./job");',
+      '+job.then(doA); // should really add a .catch(handleA) here later',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(parseDiff(diff));
+    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(true);
+  });
 });

@@ -1,6 +1,8 @@
+const walk = require('acorn-walk');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
+const { parseAst } = require('../utils/parseAst');
 
 // The param-list group is matched lazily (not `[^)]*`) so a nested paren in
 // a default value or destructuring default (e.g. `({ id = genId() }) => {`)
@@ -11,11 +13,14 @@ const FOREACH_START = /\.forEach\(\s*(async\s+)?\(.*?\)\s*=>\s*{/;
 const AWAIT_PATTERN = /\bawait\b/;
 const DEEP_CLONE_ANTIPATTERN = /JSON\.parse\(\s*JSON\.stringify\(/;
 
-function check(files) {
+// Text/regex-based path: derives .forEach() callback boundaries by
+// hand-rolled brace/paren depth counting over the diff's added lines only.
+// This is the fallback used when the post-image file content can't be
+// resolved or fails to parse as JS; see checkFileAst below for the
+// AST-based path used when full file content is available.
+function checkFileRegex(file, addedLines) {
   const issues = [];
-  for (const file of files) {
-    const addedLines = collectAddedLines(file);
-
+  {
     // Scoped per .forEach() call: an await inside one forEach block — or
     // anywhere else in the file diff — must not be attributed to, or
     // silence the check for, a different forEach block in the same file.
@@ -60,6 +65,104 @@ function check(files) {
         });
       }
     }
+  }
+  return issues;
+}
+
+// AST-based path: parses the resolved post-image file content once and maps
+// each diff-added line onto real AST nodes, so a .forEach() callback's own
+// body is found from the parse tree instead of hand-rolled brace counting.
+// Only used when file.content is resolvable and parses as valid JS; see
+// `check` below for the fallback.
+function subtreeHasAwait(node) {
+  let found = false;
+  walk.full(node, (n) => {
+    if (n.type === 'AwaitExpression') found = true;
+  });
+  return found;
+}
+
+function isMemberCall(node, objectName, propertyName) {
+  return (
+    node.type === 'CallExpression' &&
+    node.callee.type === 'MemberExpression' &&
+    !node.callee.computed &&
+    node.callee.property.type === 'Identifier' &&
+    node.callee.property.name === propertyName &&
+    node.callee.object.type === 'Identifier' &&
+    node.callee.object.name === objectName
+  );
+}
+
+function checkFileAst(file, addedLines) {
+  const addedLineNumbers = new Set(addedLines.map((l) => l.newLine));
+  const lineContent = new Map(addedLines.map((l) => [l.newLine, l.content]));
+  const ast = parseAst(file.content);
+  const issues = [];
+
+  walk.simple(ast, {
+    CallExpression(node) {
+      if (
+        node.callee.type !== 'MemberExpression' ||
+        node.callee.computed ||
+        node.callee.property.type !== 'Identifier' ||
+        node.callee.property.name !== 'forEach'
+      ) {
+        return;
+      }
+      const callback = node.arguments[0];
+      if (!callback || (callback.type !== 'ArrowFunctionExpression' && callback.type !== 'FunctionExpression')) {
+        return;
+      }
+      const line = node.loc.start.line;
+      if (!addedLineNumbers.has(line)) return;
+      if (!subtreeHasAwait(callback.body)) return;
+      issues.push({
+        file: file.file,
+        line,
+        severity: 'medium',
+        message: 'await used inside a .forEach() callback; the awaits run concurrently and unordered, not sequentially.',
+        fix: 'Use a for...of loop (for sequential awaits) or Promise.all(items.map(...)) (for concurrent awaits) instead of .forEach().',
+      });
+    },
+  });
+
+  walk.simple(ast, {
+    CallExpression(node) {
+      if (!isMemberCall(node, 'JSON', 'parse')) return;
+      const arg = node.arguments[0];
+      if (!arg || !isMemberCall(arg, 'JSON', 'stringify')) return;
+      const line = node.loc.start.line;
+      if (!addedLineNumbers.has(line)) return;
+      issues.push({
+        file: file.file,
+        line,
+        severity: 'low',
+        message: `JSON.parse(JSON.stringify(...)) deep-clone anti-pattern: "${(lineContent.get(line) || '').trim()}"`,
+        fix: 'Use structuredClone(value) (Node 20+) or a dedicated cloning utility instead of the JSON round-trip.',
+      });
+    },
+  });
+
+  return issues;
+}
+
+function check(files) {
+  const issues = [];
+  for (const file of files) {
+    const addedLines = collectAddedLines(file);
+    // AST path only attempted when the caller resolved full post-image
+    // content; falls back to the regex path on any parse failure so a
+    // resolvable-but-unparsable file never drops findings entirely.
+    if (typeof file.content === 'string') {
+      try {
+        issues.push(...checkFileAst(file, addedLines));
+        continue;
+      } catch (err) {
+        // fall through to the regex path
+      }
+    }
+    issues.push(...checkFileRegex(file, addedLines));
   }
   return issues;
 }

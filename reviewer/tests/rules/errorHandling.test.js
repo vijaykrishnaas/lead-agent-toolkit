@@ -2,20 +2,35 @@ const fs = require('fs');
 const path = require('path');
 const { parseDiff } = require('../../src/diffParser');
 const errorHandlingRule = require('../../src/rules/errorHandling');
+const { reconstructFileContent } = require('../helpers/reconstructFileContent');
 
 function loadFixture(name) {
   return fs.readFileSync(path.join(__dirname, '..', 'fixtures', name), 'utf8');
 }
 
+// Every case below runs against both `files` variants: the plain diff-only
+// parse (exercises errorHandling.js's regex/text-boundary fallback path)
+// and the same files with post-image content reconstructed and attached
+// (exercises the AST path -- or the regex fallback again, for the handful
+// of fixtures whose reconstructed text isn't valid standalone JS on its
+// own). Same fixtures, same expected results, both paths -- see
+// CLAUDE.md AUDIT.md F3 / task 23: "all existing rule fixtures become the
+// acceptance suite" for the AST path.
+function bothPaths(diffText) {
+  const files = parseDiff(diffText);
+  return [files, reconstructFileContent(files)];
+}
+
 describe('error-handling rule', () => {
   it('flags an async route handler with no try/catch and no asyncHandler wrapper', () => {
-    const files = parseDiff(loadFixture('error-handling-no-catch.diff'));
-    const issues = errorHandlingRule.check(files);
+    for (const files of bothPaths(loadFixture('error-handling-no-catch.diff'))) {
+      const issues = errorHandlingRule.check(files);
 
-    const handlerIssue = issues.find((i) => /async route handler/i.test(i.message));
-    expect(handlerIssue).toBeDefined();
-    expect(handlerIssue.severity).toBe('high');
-    expect(handlerIssue.file).toBe('src/controllers/widgetsController.js');
+      const handlerIssue = issues.find((i) => /async route handler/i.test(i.message));
+      expect(handlerIssue).toBeDefined();
+      expect(handlerIssue.severity).toBe('high');
+      expect(handlerIssue.file).toBe('src/controllers/widgetsController.js');
+    }
   });
 
   it('does not flag an async handler that is wrapped in try/catch', () => {
@@ -35,8 +50,10 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('does not flag an async handler wrapped by an asyncHandler utility', () => {
@@ -51,20 +68,23 @@ describe('error-handling rule', () => {
       '+});',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags the second handler when only the first of two handlers in a file has a try/catch', () => {
     // Regression: the rule used to decide hasTry/hasAsyncWrapper once for
     // the whole file diff, so a try/catch on one handler silenced the
     // check for every other handler added in the same file.
-    const files = parseDiff(loadFixture('error-handling-mixed-handlers.diff'));
-    const issues = errorHandlingRule.check(files);
+    for (const files of bothPaths(loadFixture('error-handling-mixed-handlers.diff'))) {
+      const issues = errorHandlingRule.check(files);
 
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('deleteWidget');
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('deleteWidget');
+    }
   });
 
   it('flags both handlers when unrelated code with its own try/catch sits between them', () => {
@@ -95,11 +115,13 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(2);
-    expect(handlerIssues.some((i) => i.message.includes('getWidget'))).toBe(true);
-    expect(handlerIssues.some((i) => i.message.includes('deleteWidget'))).toBe(true);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(2);
+      expect(handlerIssues.some((i) => i.message.includes('getWidget'))).toBe(true);
+      expect(handlerIssues.some((i) => i.message.includes('deleteWidget'))).toBe(true);
+    }
   });
 
   it('flags an uncaught .then() chain even when an earlier chain in the same file has a .catch()', () => {
@@ -116,10 +138,12 @@ describe('error-handling rule', () => {
       '+}',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const thenIssues = issues.filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
-    expect(thenIssues).toHaveLength(1);
-    expect(thenIssues[0].line).toBe(5);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const thenIssues = issues.filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
+      expect(thenIssues).toHaveLength(1);
+      expect(thenIssues[0].line).toBe(5);
+    }
   });
 
   it('flags a .then() chain with no matching .catch()', () => {
@@ -132,8 +156,10 @@ describe('error-handling rule', () => {
       '+  return db.remove().then((result) => result.count);',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(true);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(true);
+    }
   });
 
   it('does not flag a caught chain whose .catch() falls outside a fixed small line window (multi-line-formatted chain)', () => {
@@ -155,8 +181,10 @@ describe('error-handling rule', () => {
       '+}',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags an uncaught .then() even when an unrelated adjacent statement has its own .catch() one line later', () => {
@@ -174,10 +202,12 @@ describe('error-handling rule', () => {
       '+}',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const thenIssues = issues.filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
-    expect(thenIssues).toHaveLength(1);
-    expect(thenIssues[0].line).toBe(2);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const thenIssues = issues.filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
+      expect(thenIssues).toHaveLength(1);
+      expect(thenIssues[0].line).toBe(2);
+    }
   });
 
   it('does not flag a caught chain whose callback body contains a closing paren inside a string literal', () => {
@@ -198,8 +228,10 @@ describe('error-handling rule', () => {
       '+}',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags a brace-less/concise-body async handler with no try/catch, without sweeping in a later handler\'s try/catch', () => {
@@ -228,10 +260,12 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('flags a brace-less handler ending via ASI (no trailing semicolon) that is immediately followed by another handler, instead of crediting it with the following handler\'s own try/catch', () => {
@@ -270,10 +304,12 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('does not flag a brace-less/concise-body async handler that is wrapped inline by an asyncHandler utility', () => {
@@ -286,8 +322,10 @@ describe('error-handling rule', () => {
       '+exports.getWidget = asyncHandler(async (req, res) => res.json(await Widget.findById(req.params.id)));',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('does not flag a try/catch-wrapped handler whose opening brace is on the line after the signature', () => {
@@ -317,8 +355,10 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags a handler with no try/catch whose opening brace is on the line after the signature', () => {
@@ -337,10 +377,12 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('does not flag a try/catch-wrapped handler whose signature line has a default-parameter object literal and the real body brace on the next line', () => {
@@ -375,8 +417,10 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags a handler with no try/catch whose signature line has a default-parameter object literal and the real body brace on the next line', () => {
@@ -395,10 +439,12 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('does not flag a try/catch-wrapped handler with a same-line default-parameter object literal and a same-line real body brace (both on the signature line)', () => {
@@ -417,8 +463,10 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('does not flag an asyncHandler-wrapped handler whose default-parameter object literal precedes the real body brace, and still credits the asyncHandler wrapper', () => {
@@ -443,8 +491,10 @@ describe('error-handling rule', () => {
       '+});',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('does not flag a try/catch-wrapped handler whose default-parameter value is a multi-line object literal with its own nested braces', () => {
@@ -484,8 +534,10 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags a handler with no try/catch whose default-parameter value is a multi-line object literal with its own nested braces', () => {
@@ -507,10 +559,12 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('does not flag a try/catch-wrapped handler whose signature line has a trailing comment containing braces', () => {
@@ -541,8 +595,10 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags an async handler with no try/catch even when the signature line has a trailing comment containing braces', () => {
@@ -562,10 +618,12 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('flags an async handler with no try/catch even when the block contains a string literal with a stray "{"', () => {
@@ -591,10 +649,12 @@ describe('error-handling rule', () => {
       '+}',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('does not flag a try/catch-wrapped handler whose opening brace is preceded by a comment-only line', () => {
@@ -621,8 +681,10 @@ describe('error-handling rule', () => {
       '+  };',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags a handler with no try/catch even when a comment sits between the signature and a brace with no real body', () => {
@@ -643,10 +705,12 @@ describe('error-handling rule', () => {
       '+  };',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('does not flag a .then()/.catch() chain with a comment-only line between the two calls', () => {
@@ -666,8 +730,10 @@ describe('error-handling rule', () => {
       '+  .catch(handleA);',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+    }
   });
 
   it('flags an async handler with no try/catch even when a comment inside the block mentions "try {" and "asyncHandler"', () => {
@@ -687,10 +753,12 @@ describe('error-handling rule', () => {
       '+};',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
-    expect(handlerIssues).toHaveLength(1);
-    expect(handlerIssues[0].message).toContain('getWidget');
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+      expect(handlerIssues).toHaveLength(1);
+      expect(handlerIssues[0].message).toContain('getWidget');
+    }
   });
 
   it('flags a .then() call with no real .catch() even when a comment on the line mentions ".catch("', () => {
@@ -707,7 +775,94 @@ describe('error-handling rule', () => {
       '+job.then(doA); // should really add a .catch(handleA) here later',
     ].join('\n');
 
-    const issues = errorHandlingRule.check(parseDiff(diff));
-    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(true);
+    for (const files of bothPaths(diff)) {
+      const issues = errorHandlingRule.check(files);
+      expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(true);
+    }
+  });
+});
+
+describe('error-handling rule (AST path, direct)', () => {
+  // The cases above all reuse the regex-path fixtures with reconstructed
+  // content attached, which for several of them (e.g. incomplete snippets
+  // that aren't valid standalone JS) still exercises the regex fallback --
+  // proving fallback correctness, not the AST path itself. These cases use
+  // hand-written, syntactically complete file content so file.content is
+  // guaranteed to parse and the AST path is definitely what ran.
+  function withContent(diffText, content) {
+    const files = parseDiff(diffText);
+    files.forEach((file) => { file.content = content; });
+    return files;
+  }
+
+  it('flags an async handler with no try/catch via the AST path on a syntactically complete file', () => {
+    const content = [
+      'const Widget = require("../models/Widget");',
+      'exports.getWidget = async (req, res) => {',
+      '  res.json(await Widget.findById(req.params.id));',
+      '};',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,4 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => {',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, content));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].line).toBe(2);
+  });
+
+  it('does not flag an async handler wrapped in try/catch via the AST path', () => {
+    const content = [
+      'const Widget = require("../models/Widget");',
+      'exports.getWidget = async (req, res) => {',
+      '  try {',
+      '    res.json(await Widget.findById(req.params.id));',
+      '  } catch (err) {',
+      '    res.status(500).json({ error: "failed" });',
+      '  }',
+      '};',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,8 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => {',
+      '+  try {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  } catch (err) {',
+      '+    res.status(500).json({ error: "failed" });',
+      '+  }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, content));
+    expect(issues.some((i) => /async route handler/i.test(i.message))).toBe(false);
+  });
+
+  it('falls back to the regex path when the resolved content fails to parse', () => {
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,4 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => {',
+      '+  res.json(await Widget.findById(req.params.id));',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, 'this is not { valid JS ('));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
   });
 });

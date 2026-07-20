@@ -2,22 +2,34 @@ const fs = require('fs');
 const path = require('path');
 const { parseDiff } = require('../../src/diffParser');
 const performanceRule = require('../../src/rules/performance');
+const { reconstructFileContent } = require('../helpers/reconstructFileContent');
 
 function loadFixture(name) {
   return fs.readFileSync(path.join(__dirname, '..', 'fixtures', name), 'utf8');
 }
 
+// See errorHandling.test.js's bothPaths for the rationale: every case here
+// runs against both the diff-only parse (regex/text-boundary fallback) and
+// the same files with reconstructed post-image content attached (AST path,
+// or the fallback again for the handful of fixtures whose reconstructed
+// text isn't valid standalone JS on its own).
+function bothPaths(diffText) {
+  const files = parseDiff(diffText);
+  return [files, reconstructFileContent(files)];
+}
+
 describe('performance rule', () => {
   it('flags await used inside a .forEach() callback', () => {
-    const files = parseDiff(loadFixture('performance-await-in-foreach.diff'));
-    const issues = performanceRule.check(files);
+    for (const files of bothPaths(loadFixture('performance-await-in-foreach.diff'))) {
+      const issues = performanceRule.check(files);
 
-    expect(issues).toHaveLength(1);
-    expect(issues[0]).toMatchObject({
-      file: 'src/services/notifyService.js',
-      severity: 'medium',
-    });
-    expect(issues[0].message).toMatch(/forEach/);
+      expect(issues).toHaveLength(1);
+      expect(issues[0]).toMatchObject({
+        file: 'src/services/notifyService.js',
+        severity: 'medium',
+      });
+      expect(issues[0].message).toMatch(/forEach/);
+    }
   });
 
   it('flags the JSON.parse(JSON.stringify(...)) deep-clone anti-pattern', () => {
@@ -30,14 +42,17 @@ describe('performance rule', () => {
       '+  return JSON.parse(JSON.stringify(obj));',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toHaveLength(1);
-    expect(issues[0].severity).toBe('low');
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].severity).toBe('low');
+    }
   });
 
   it('returns no issues for a clean diff', () => {
-    const files = parseDiff(loadFixture('clean.diff'));
-    expect(performanceRule.check(files)).toEqual([]);
+    for (const files of bothPaths(loadFixture('clean.diff'))) {
+      expect(performanceRule.check(files)).toEqual([]);
+    }
   });
 
   it('does not flag a clean forEach just because an unrelated await appears later in the same file', () => {
@@ -55,8 +70,10 @@ describe('performance rule', () => {
       '+});',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toEqual([]);
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toEqual([]);
+    }
   });
 
   it('flags await inside a .forEach() whose callback has a destructuring default containing a nested call', () => {
@@ -74,9 +91,11 @@ describe('performance rule', () => {
       '+});',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toHaveLength(1);
-    expect(issues[0].line).toBe(1);
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].line).toBe(1);
+    }
   });
 
   it('does not let a clean forEach silence — or misattribute the line of — a later bad forEach in the same file', () => {
@@ -94,9 +113,11 @@ describe('performance rule', () => {
       '+});',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toHaveLength(1);
-    expect(issues[0].line).toBe(5);
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].line).toBe(5);
+    }
   });
 
   it('flags await inside a .forEach() whose callback body contains a closing brace inside a string literal', () => {
@@ -115,9 +136,11 @@ describe('performance rule', () => {
       '+});',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toHaveLength(1);
-    expect(issues[0].line).toBe(1);
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].line).toBe(1);
+    }
   });
 
   it('does not flag a JSON.parse(JSON.stringify(...)) mention that only appears inside a comment', () => {
@@ -133,8 +156,10 @@ describe('performance rule', () => {
       '+  // avoid JSON.parse(JSON.stringify(obj)) here, use structuredClone',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toEqual([]);
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toEqual([]);
+    }
   });
 
   it('does not flag a .forEach() mention that only appears inside a comment, even when real unrelated code nearby contains a real await', () => {
@@ -154,8 +179,10 @@ describe('performance rule', () => {
       '+}',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toEqual([]);
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toEqual([]);
+    }
   });
 
   it('does not flag a clean forEach just because a comment inside it mentions "await"', () => {
@@ -176,7 +203,85 @@ describe('performance rule', () => {
       '+});',
     ].join('\n');
 
-    const issues = performanceRule.check(parseDiff(diff));
-    expect(issues).toEqual([]);
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toEqual([]);
+    }
+  });
+});
+
+describe('performance rule (AST path, direct)', () => {
+  // See errorHandling.test.js's equivalent block: these use hand-written,
+  // syntactically complete file content so the AST path is definitely what
+  // ran, rather than incidentally falling back on an incomplete snippet.
+  function withContent(diffText, content) {
+    const files = parseDiff(diffText);
+    files.forEach((file) => { file.content = content; });
+    return files;
+  }
+
+  it('flags await inside a .forEach() via the AST path on a syntactically complete file', () => {
+    const content = [
+      'const mailer = require("../lib/mailer");',
+      'async function notifyAll(users) {',
+      '  users.forEach(async (user) => {',
+      '    await mailer.send(user.email);',
+      '  });',
+      '}',
+      'module.exports = { notifyAll };',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/services/notifyService.js b/src/services/notifyService.js',
+      '--- a/src/services/notifyService.js',
+      '+++ b/src/services/notifyService.js',
+      '@@ -1,1 +1,6 @@',
+      ' const mailer = require("../lib/mailer");',
+      '+async function notifyAll(users) {',
+      '+  users.forEach(async (user) => {',
+      '+    await mailer.send(user.email);',
+      '+  });',
+      '+}',
+      '+module.exports = { notifyAll };',
+    ].join('\n');
+
+    const issues = performanceRule.check(withContent(diff, content));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].line).toBe(3);
+  });
+
+  it('flags the JSON.parse(JSON.stringify(...)) deep-clone anti-pattern via the AST path', () => {
+    const content = [
+      'function clone(obj) {',
+      '  return JSON.parse(JSON.stringify(obj));',
+      '}',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/utils/clone.js b/src/utils/clone.js',
+      '--- a/src/utils/clone.js',
+      '+++ b/src/utils/clone.js',
+      '@@ -1,1 +1,3 @@',
+      ' function clone(obj) {',
+      '+  return JSON.parse(JSON.stringify(obj));',
+      '+}',
+    ].join('\n');
+
+    const issues = performanceRule.check(withContent(diff, content));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].severity).toBe('low');
+  });
+
+  it('falls back to the regex path when the resolved content fails to parse', () => {
+    const diff = [
+      'diff --git a/src/utils/clone.js b/src/utils/clone.js',
+      '--- a/src/utils/clone.js',
+      '+++ b/src/utils/clone.js',
+      '@@ -1,1 +1,2 @@',
+      ' function clone(obj) {',
+      '+  return JSON.parse(JSON.stringify(obj));',
+    ].join('\n');
+
+    const issues = performanceRule.check(withContent(diff, 'this is not { valid JS ('));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].severity).toBe('low');
   });
 });

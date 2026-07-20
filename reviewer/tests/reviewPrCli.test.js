@@ -156,6 +156,37 @@ describe('runReviewPrCli', () => {
     expect(deps.stdout.text).not.toContain('Posted review comment');
   });
 
+  it('resolves the head sha via git rev-parse and passes it through to reviewDiff as review options', async () => {
+    const reviewDiff = jest.fn(() => ({ risk: 'none', issues: [] }));
+    const execGit = jest.fn((gitArgs) => {
+      if (gitArgs[0] === 'rev-parse') return 'deadbeef\n';
+      return loadFixture('clean.diff');
+    });
+    const deps = basePassingDeps({ execGit, reviewDiff, repo: '/repo' });
+
+    await runReviewPrCli([...BASE_ARGV, '--repo', '/repo'], deps);
+
+    expect(execGit).toHaveBeenCalledWith(['rev-parse', 'head'], '/repo');
+    expect(reviewDiff).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.anything(),
+      { execGit, repo: '/repo', sha: 'deadbeef' },
+    );
+  });
+
+  it('still posts the review when git rev-parse fails, falling back to no content-resolution options', async () => {
+    const execGit = jest.fn((gitArgs) => {
+      if (gitArgs[0] === 'rev-parse') throw new Error('fatal: ambiguous argument');
+      return loadFixture('clean.diff');
+    });
+    const deps = basePassingDeps({ execGit });
+
+    const exitCode = await runReviewPrCli(BASE_ARGV, deps);
+
+    expect(exitCode).toBe(0);
+    expect(deps.stdout.text).toContain('# Code Review Report');
+  });
+
   it('returns exit code 1 and writes to stderr on invalid args, without calling git', async () => {
     const execGit = jest.fn();
     const stderr = makeStream();

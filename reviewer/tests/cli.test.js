@@ -159,6 +159,36 @@ describe('runCli', () => {
     expect(stderr.text).toContain('unexpected rule failure');
   });
 
+  it('resolves the head sha via git rev-parse and passes it through to reviewDiff as review options', () => {
+    const reviewDiff = jest.fn(() => ({ risk: 'none', issues: [] }));
+    const execGit = jest.fn((gitArgs) => {
+      if (gitArgs[0] === 'rev-parse') return 'deadbeef\n';
+      return loadFixture('clean.diff');
+    });
+
+    runCli(['base..head', '--repo', '/repo'], { execGit, reviewDiff, stdout: makeStream(), stderr: makeStream() });
+
+    expect(execGit).toHaveBeenCalledWith(['rev-parse', 'head'], '/repo');
+    expect(reviewDiff).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.anything(),
+      { execGit, repo: '/repo', sha: 'deadbeef' },
+    );
+  });
+
+  it('still produces a report when git rev-parse fails, falling back to no content-resolution options', () => {
+    const stdout = makeStream();
+    const execGit = jest.fn((gitArgs) => {
+      if (gitArgs[0] === 'rev-parse') throw new Error('fatal: ambiguous argument');
+      return loadFixture('clean.diff');
+    });
+
+    const exitCode = runCli(['base..head'], { execGit, stdout, stderr: makeStream() });
+
+    expect(exitCode).toBe(0);
+    expect(stdout.text).toContain('# Code Review Report');
+  });
+
   it('passes --config through to loadRules', () => {
     const loadRules = jest.fn(() => []);
     const execGit = () => loadFixture('clean.diff');

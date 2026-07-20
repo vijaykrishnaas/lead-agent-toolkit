@@ -62,6 +62,20 @@ function runCli(argv, deps = {}) {
     return 1;
   }
 
+  // Resolving the head sha lets reviewDiff attach each file's post-image
+  // content (via `git show <sha>:<path>`) so AST-capable rules can use it.
+  // This is a best-effort enhancement, not a requirement: if the ref can't
+  // be resolved (e.g. a bare/shallow repo, or a ref that only exists in the
+  // diff text itself), review continues without it and every rule falls
+  // back to its diff-only text/regex path exactly as before.
+  let reviewOptions = {};
+  try {
+    const headSha = execGit(['rev-parse', args.head], args.repo).trim();
+    reviewOptions = { execGit, repo: args.repo, sha: headSha };
+  } catch (err) {
+    reviewOptions = {};
+  }
+
   let rules;
   try {
     rules = loadRulesFn(args.config === undefined ? DEFAULT_CONFIG_PATH : args.config);
@@ -72,7 +86,7 @@ function runCli(argv, deps = {}) {
 
   let report;
   try {
-    const result = reviewDiffFn(diffText, rules);
+    const result = reviewDiffFn(diffText, rules, reviewOptions);
     report = formatReport(result, { range: args.range });
   } catch (err) {
     stderr.write(`Review failed: ${err.message}\n`);

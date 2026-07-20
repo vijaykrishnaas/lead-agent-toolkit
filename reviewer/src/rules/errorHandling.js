@@ -1,6 +1,8 @@
+const walk = require('acorn-walk');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
+const { parseAst } = require('../utils/parseAst');
 
 const ASYNC_HANDLER_SIGNATURE = /async\s*(\(|function)/;
 const HANDLER_PARAMS = /req\s*,\s*res/;
@@ -159,12 +161,15 @@ function findHandlerBraceStart(addedLines, startIdx) {
   return null;
 }
 
-function check(files) {
+// Text/regex-based path: derives handler and .then()-chain boundaries by
+// hand-rolled brace/paren depth counting over the diff's added lines only
+// (no access to the rest of the file). This is the only path available when
+// the post-image file content can't be resolved (e.g. a bare diff fed via
+// stdin with no repo access) or fails to parse as JS. See checkFileAst below
+// for the AST-based path used when full file content is available.
+function checkFileRegex(file, addedLines) {
   const issues = [];
-  for (const file of files) {
-    const addedLines = collectAddedLines(file);
-
-    // Handlers are analyzed per-block (each handler's own brace-bounded
+  // Handlers are analyzed per-block (each handler's own brace-bounded
     // body), not file-wide and not "up to the next handler": a try/catch or
     // asyncHandler wrapper on one handler — or on unrelated code sitting
     // between two handlers — must not silence the check for a sibling
@@ -265,6 +270,149 @@ function check(files) {
         });
       }
     });
+  return issues;
+}
+
+// AST-based path: parses the resolved post-image file content once and maps
+// each diff-added line onto real AST nodes, so handler and .then()-chain
+// boundaries come from the actual parse tree instead of hand-rolled
+// brace/paren counting. This sidesteps the whole recurring bug class in
+// checkFileRegex above (default-parameter braces, ASI, ASI-adjacent
+// handlers, ...) structurally: a real parser already knows where a function
+// or a statement ends. Only used when file.content is resolvable and parses
+// as valid JS; see `check` below for the fallback.
+function isRouteHandlerParams(params) {
+  return (
+    params.length >= 2 &&
+    params[0].type === 'Identifier' &&
+    params[0].name === 'req' &&
+    params[1].type === 'Identifier' &&
+    params[1].name === 'res'
+  );
+}
+
+function isWrappedByAsyncHandler(ancestors) {
+  const parent = ancestors[ancestors.length - 2];
+  return (
+    !!parent &&
+    parent.type === 'CallExpression' &&
+    parent.callee.type === 'Identifier' &&
+    parent.callee.name === 'asyncHandler'
+  );
+}
+
+// Searches the handler body's entire subtree for a try/catch, regardless of
+// nesting depth -- matching checkFileRegex's TRY_BLOCK, which is tested
+// against the whole reassembled block text and doesn't distinguish a
+// top-level try from one nested inside a further callback.
+function subtreeHasTryStatement(node) {
+  let found = false;
+  walk.full(node, (n) => {
+    if (n.type === 'TryStatement') found = true;
+  });
+  return found;
+}
+
+function isCatchCall(node) {
+  return (
+    node.type === 'CallExpression' &&
+    node.callee.type === 'MemberExpression' &&
+    !node.callee.computed &&
+    node.callee.property.type === 'Identifier' &&
+    node.callee.property.name === 'catch'
+  );
+}
+
+function subtreeHasCatchCall(node) {
+  let found = false;
+  walk.full(node, (n) => {
+    if (isCatchCall(n)) found = true;
+  });
+  return found;
+}
+
+// Finds the nearest enclosing statement (not a bare BlockStatement, which
+// can hold several sibling statements) so a .then() call is judged against
+// the one statement/chain it's actually part of, not the whole containing
+// block.
+function findEnclosingStatement(ancestors) {
+  for (let i = ancestors.length - 1; i >= 0; i -= 1) {
+    const node = ancestors[i];
+    if (node.type !== 'BlockStatement' && /(Statement|Declaration)$/.test(node.type)) {
+      return node;
+    }
+  }
+  return ancestors[0];
+}
+
+function checkFileAst(file, addedLines) {
+  const addedLineNumbers = new Set(addedLines.map((l) => l.newLine));
+  const lineContent = new Map(addedLines.map((l) => [l.newLine, l.content]));
+  const ast = parseAst(file.content);
+  const issues = [];
+
+  function handleHandlerCandidate(node, state, ancestors) {
+    if (!node.async || !isRouteHandlerParams(node.params)) return;
+    const line = node.loc.start.line;
+    if (!addedLineNumbers.has(line)) return;
+    if (isWrappedByAsyncHandler(ancestors) || subtreeHasTryStatement(node.body)) return;
+    issues.push({
+      file: file.file,
+      line,
+      severity: 'high',
+      message: `Async route handler added without a try/catch or an asyncHandler wrapper: "${(lineContent.get(line) || '').trim()}"`,
+      fix: 'Wrap the handler body in try/catch (or wrap the handler itself with an asyncHandler utility) and forward errors to a catch-all error middleware.',
+    });
+  }
+
+  walk.ancestor(ast, {
+    ArrowFunctionExpression: handleHandlerCandidate,
+    FunctionExpression: handleHandlerCandidate,
+    FunctionDeclaration: handleHandlerCandidate,
+  });
+
+  const reportedThenLines = new Set();
+  walk.ancestor(ast, {
+    CallExpression(node, state, ancestors) {
+      if (node.callee.type !== 'MemberExpression' || node.callee.computed) return;
+      if (node.callee.property.type !== 'Identifier' || node.callee.property.name !== 'then') return;
+      const line = node.loc.start.line;
+      if (!addedLineNumbers.has(line) || reportedThenLines.has(line)) return;
+      const statement = findEnclosingStatement(ancestors);
+      if (subtreeHasCatchCall(statement)) return;
+      reportedThenLines.add(line);
+      issues.push({
+        file: file.file,
+        line,
+        severity: 'medium',
+        message: 'Promise chain uses .then() without a matching .catch() in this diff.',
+        fix: 'Add a .catch() handler (or use try/catch with await) so a rejected promise cannot go unhandled.',
+      });
+    },
+  });
+
+  return issues;
+}
+
+function check(files) {
+  const issues = [];
+  for (const file of files) {
+    const addedLines = collectAddedLines(file);
+    // AST path only attempted when the caller resolved full post-image
+    // content (see reviewer.js's optional git-show resolution); falls back
+    // to the regex path below on any parse failure (e.g. a diff fragment
+    // reconstructed for testing that isn't valid standalone JS, or a
+    // genuine syntax error) so a resolvable-but-broken file never drops
+    // findings entirely.
+    if (typeof file.content === 'string') {
+      try {
+        issues.push(...checkFileAst(file, addedLines));
+        continue;
+      } catch (err) {
+        // fall through to the regex path
+      }
+    }
+    issues.push(...checkFileRegex(file, addedLines));
   }
   return issues;
 }

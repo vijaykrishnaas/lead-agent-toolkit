@@ -70,4 +70,52 @@ describe('reviewDiff', () => {
       ],
     });
   });
+
+  it('resolves and attaches each file\'s post-image content via git show when execGit/repo/sha options are given', () => {
+    const capturedFiles = [];
+    const captureRule = {
+      category: 'capture',
+      check: (files) => {
+        capturedFiles.push(...files);
+        return [];
+      },
+    };
+    const execGit = jest.fn(() => 'const widget = 1;\n');
+
+    reviewDiff(loadFixture('error-handling-no-catch.diff'), [captureRule], {
+      execGit,
+      repo: '/repo',
+      sha: 'deadbeef',
+    });
+
+    expect(execGit).toHaveBeenCalledWith(['show', 'deadbeef:src/controllers/widgetsController.js'], '/repo');
+    expect(capturedFiles[0].content).toBe('const widget = 1;\n');
+  });
+
+  it('does not attach content, and rules see the diff-only files exactly as before, when no options are given', () => {
+    const capturedFiles = [];
+    const captureRule = {
+      category: 'capture',
+      check: (files) => {
+        capturedFiles.push(...files);
+        return [];
+      },
+    };
+
+    reviewDiff(loadFixture('error-handling-no-catch.diff'), [captureRule]);
+
+    expect(capturedFiles[0].content).toBeUndefined();
+  });
+
+  it('leaves content unattached (and rules unaffected) when git show fails for a file', () => {
+    const result = reviewDiff(loadFixture('error-handling-no-catch.diff'), undefined, {
+      execGit: () => {
+        throw new Error('fatal: not found');
+      },
+      repo: '/repo',
+      sha: 'deadbeef',
+    });
+
+    expect(result.issues.some((i) => i.category === 'error-handling')).toBe(true);
+  });
 });

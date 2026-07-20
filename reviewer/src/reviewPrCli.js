@@ -79,6 +79,18 @@ async function runReviewPrCli(argv, deps = {}) {
     return 1;
   }
 
+  // Best-effort: lets reviewDiff resolve each file's post-image content for
+  // AST-capable rules; falls back to the diff-only text/regex path on any
+  // failure (see cli.js for the same pattern).
+  let reviewOptions = {};
+  try {
+    const head = RANGE_PATTERN.exec(args.range)[2];
+    const headSha = execGit(['rev-parse', head], args.repo).trim();
+    reviewOptions = { execGit, repo: args.repo, sha: headSha };
+  } catch (err) {
+    reviewOptions = {};
+  }
+
   let rules;
   try {
     rules = loadRulesFn(args.config === undefined ? DEFAULT_CONFIG_PATH : args.config);
@@ -89,7 +101,7 @@ async function runReviewPrCli(argv, deps = {}) {
 
   let report;
   try {
-    const result = reviewDiffFn(diffText, rules);
+    const result = reviewDiffFn(diffText, rules, reviewOptions);
     report = formatReport(result, { range: args.range });
   } catch (err) {
     stderr.write(`Review failed: ${err.message}\n`);

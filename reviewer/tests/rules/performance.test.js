@@ -120,6 +120,44 @@ describe('performance rule', () => {
     expect(issues[0].line).toBe(1);
   });
 
+  it('does not flag a JSON.parse(JSON.stringify(...)) mention that only appears inside a comment', () => {
+    // Regression: DEEP_CLONE_ANTIPATTERN was tested against the raw line
+    // content, so a comment merely mentioning the pattern (e.g. explaining
+    // why to avoid it) was flagged as if it were real code.
+    const diff = [
+      'diff --git a/src/utils/clone.js b/src/utils/clone.js',
+      '--- a/src/utils/clone.js',
+      '+++ b/src/utils/clone.js',
+      '@@ -1,1 +1,2 @@',
+      ' function clone(obj) {',
+      '+  // avoid JSON.parse(JSON.stringify(obj)) here, use structuredClone',
+    ].join('\n');
+
+    const issues = performanceRule.check(parseDiff(diff));
+    expect(issues).toEqual([]);
+  });
+
+  it('does not flag a .forEach() mention that only appears inside a comment, even when real unrelated code nearby contains a real await', () => {
+    // Regression: FOREACH_START was tested against the raw line content, so
+    // a comment merely mentioning forEach syntax (e.g. describing old code)
+    // was treated as a real forEach start. collectBoundedBlock then walked
+    // into the following genuinely async code and found its unrelated
+    // await, misattributing it to the fake forEach at the comment's line.
+    const diff = [
+      'diff --git a/src/jobs/runner.js b/src/jobs/runner.js',
+      '--- a/src/jobs/runner.js',
+      '+++ b/src/jobs/runner.js',
+      '@@ -1,1 +1,4 @@',
+      '+// old code used items.forEach((item) => {',
+      '+async function handler() {',
+      '+  await doSomething();',
+      '+}',
+    ].join('\n');
+
+    const issues = performanceRule.check(parseDiff(diff));
+    expect(issues).toEqual([]);
+  });
+
   it('does not flag a clean forEach just because a comment inside it mentions "await"', () => {
     // Regression: AWAIT_PATTERN was tested against the raw, unmasked block
     // text (shared collectBoundedBlock, same as errorHandling.js's

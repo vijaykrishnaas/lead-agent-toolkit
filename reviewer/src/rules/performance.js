@@ -20,7 +20,12 @@ function check(files) {
     // anywhere else in the file diff — must not be attributed to, or
     // silence the check for, a different forEach block in the same file.
     addedLines.forEach((line, idx) => {
-      if (!FOREACH_START.test(line.content)) return;
+      // Tested against the comment/string-masked line, not the raw one --
+      // a comment merely mentioning forEach syntax (e.g. describing old
+      // code) must not be mistaken for a real forEach start and go on to
+      // misattribute an unrelated await from the following code to it.
+      const maskedLine = maskStringLiterals(line.content).masked;
+      if (!FOREACH_START.test(maskedLine)) return;
       const block = collectBoundedBlock(addedLines, idx);
       // Tested against the string/comment-masked block, not the raw one --
       // a comment merely mentioning "await" (e.g. "// do not await here")
@@ -42,7 +47,10 @@ function check(files) {
     });
 
     for (const line of addedLines) {
-      if (DEEP_CLONE_ANTIPATTERN.test(line.content)) {
+      // Same reasoning as the FOREACH_START check above -- a comment
+      // merely mentioning the anti-pattern must not be flagged as if it
+      // were real code.
+      if (DEEP_CLONE_ANTIPATTERN.test(maskStringLiterals(line.content).masked)) {
         issues.push({
           file: file.file,
           line: line.newLine,

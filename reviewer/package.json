@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Diff -> structured review JSON: risk assessment and categorized issues (security, missing-tests, error-handling, performance, style)",
   "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "jest",
     "review": "node src/cli.js",

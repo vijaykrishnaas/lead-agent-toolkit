@@ -1,0 +1,13 @@
+{
+  "name": "lead-agent-toolkit",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Root harness for reviewer/ and sample-app/ — npm test runs both packages' suites.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "npm --prefix reviewer test && npm --prefix sample-app test",
+    "install:all": "npm --prefix reviewer install && npm --prefix sample-app install"
+  }
+}

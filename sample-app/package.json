@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Minimal Express+Mongo REST API (users, auth, tasks CRUD)",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node src/server.js",
     "test": "jest --runInBand"

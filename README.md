@@ -5,7 +5,12 @@ Two self-contained Node 20 / plain-JavaScript packages:
 - **`sample-app/`** — a minimal Express + Mongoose REST API (auth, users, tasks CRUD) that exists as a realistic MERN-style target for `reviewer/` to analyze and demo against.
 - **`reviewer/`** — a diff-scanning code review toolkit: turns a git diff into a structured, categorized review (security, error-handling, missing-tests, performance, style), plus a standup-digest generator and an Express-routes-vs-OpenAPI-spec doc-drift checker.
 
-Each package has its own `package.json`/`node_modules` and its own `npm test` — there is no root package or workspace yet (see `PROGRESS.md` for the open question on unifying them).
+Each package keeps its own `package.json`/`node_modules` and its own `npm test`, plus the repo-root `package.json` runs both in sequence — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml) for the CI matrix (Node 20 + 22).
+
+```bash
+npm run install:all   # installs reviewer/ and sample-app/ deps
+npm test               # runs both packages' suites
+```
 
 ## Architecture
 

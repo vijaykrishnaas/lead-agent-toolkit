@@ -1138,3 +1138,28 @@ Rather than continue the last six runs' pattern of re-reading `dd660a9`'s own di
 **Correction (same run, minutes later):** the Reviewer-cadence change did NOT apply — the platform rejects agent edits to Routines created via the app/API ("agents can only update routines they created"). Cadence stays 12/day until Vijay changes it himself in the Routines UI: Reviewer cron `0 1,5,9,13,17,21 * * *` (6/day) is the recommended value; Builder unchanged. The sentence above claiming the rewire happened is superseded by this correction; left in place per invariant 2 (no history rewritten).
 
 **Open questions for Vijay:** LLM-layer and SARIF-vs-comment decisions from part 2 still pending; plus the Reviewer cadence change above, now confirmed to require his hands.
+
+## 2026-07-20 (task 20: repo harness + CI)
+
+**Done:** Fetched all branches, checked out `claude/dev` (`3da3bb9`, "Correct part-3 entry"). Task 20 was the topmost non-DONE/non-BLOCKED `TASKS.md` item (items 1-19 all `[DONE]`), so worked it top-down per the standing instruction — no reordering needed. Baseline `npm test` green in both packages before starting (`reviewer/` 314/314, `sample-app/` 48/48).
+
+Implemented per AUDIT.md F4/F12's exact scope (task 20's own wording):
+- Added root `package.json` (`private: true`, `engines: {"node": ">=20"}`, `scripts.test` running `npm --prefix reviewer test && npm --prefix sample-app test`, plus an `install:all` convenience script) — the first `npm test` invocable at the repo root.
+- Added `engines: {"node": ">=20"}` to both `reviewer/package.json` and `sample-app/package.json` (previously absent in either — F12: CLAUDE.md's header claims Node 20 but nothing enforced it).
+- Added `.github/workflows/ci.yml`: a `test` job matrixed on Node `20.x`/`22.x`, triggered on push and pull_request to `claude/dev` and `main`, running `npm ci` in each package directory (both packages' `package-lock.json` are already tracked in git, confirmed via `git ls-files`) followed by root `npm test`.
+- Updated the stale README.md line claiming "there is no root package or workspace yet" (a doc-drift instance of exactly the class task 18's `docProseDrift.test.js` guards against, though for prose outside that test's own skill-mention scope) to describe the new root harness instead, plus a short `npm run install:all` / `npm test` usage snippet near the top.
+
+Verified `npm test` at the repo root actually runs both suites end-to-end and reports both summaries; re-ran after every edit. Validated the workflow YAML parses (`python3 -c "import yaml; yaml.safe_load(...)"`).
+
+**Test run:** `reviewer/` 314/314 green (unchanged — no reviewer source touched), `sample-app/` 48/48 green (unchanged), both confirmed again via the new root `npm test`.
+
+**Decisions:**
+- No new Jest tests added: this task is repo-harness/CI configuration (package.json fields, a GitHub Actions YAML file), not JS logic under either package's `src/`, so there's no unit behavior to regression-test the way a rule/CLI change would need. Root `npm test`'s own successful run (314 + 48 passing) is the acceptance check task 20 itself specifies.
+- Did not add a CI job for `reviewer`'s dogfood-review-itself step (task 28) or the invariant linter (task 29) — both explicitly depend on this workflow existing and are separate backlog items; left for future runs.
+- Could not execute the GitHub Actions workflow itself in this sandbox (no GitHub Actions runner available here) — validated by parsing the YAML and by manually reproducing the workflow's own steps (`npm ci` in each package, then root `npm test`) locally, which passed.
+- Did not touch CLAUDE.md, skills, or `review-rules.yaml` this run, so no `SKILL_CHANGELOG.md` entry is required under invariant 3.
+
+**Open questions for Vijay:**
+- Same as always-open: `GET /api/users/:id` cross-user lookup was closed by your 2026-07-20 decision as task 24 (not yet implemented — next candidate once picked up top-down).
+- AUDIT.md F5 ("PR `claude/dev` -> `main` once task 20's CI is green") is now actionable: task 20 is done and the workflow is in place on `claude/dev`. Merging to `main` and confirming the Actions run itself goes green on GitHub (unverifiable from this sandbox) is a Vijay action per that finding's own framing, not backlog work for a Routine.
+- LLM-layer and SARIF-vs-comment decisions (IDEAS.md, part 2) and the Reviewer cadence change (part 3) remain pending from the prior entry, unchanged by this run.

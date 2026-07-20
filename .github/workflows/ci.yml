@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [claude/dev, main]
+  pull_request:
+    branches: [claude/dev, main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["20.x", "22.x"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: |
+            reviewer/package-lock.json
+            sample-app/package-lock.json
+
+      - name: Install reviewer dependencies
+        run: npm ci
+        working-directory: reviewer
+
+      - name: Install sample-app dependencies
+        run: npm ci
+        working-directory: sample-app
+
+      - name: Run test suites
+        run: npm test

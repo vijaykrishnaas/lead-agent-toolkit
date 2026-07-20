@@ -1135,4 +1135,6 @@ Rather than continue the last six runs' pattern of re-reading `dd660a9`'s own di
 
 **Decisions:** Old source code may be deleted once its replacement's tests pass — invariant 2 protects backlog/history files, not source. Anything not listed in the AUTHORIZED REWIRES section still needs normal observed-failure evidence.
 
-**Open questions for Vijay:** none new; LLM-layer and SARIF-vs-comment decisions from part 2 still pending.
+**Correction (same run, minutes later):** the Reviewer-cadence change did NOT apply — the platform rejects agent edits to Routines created via the app/API ("agents can only update routines they created"). Cadence stays 12/day until Vijay changes it himself in the Routines UI: Reviewer cron `0 1,5,9,13,17,21 * * *` (6/day) is the recommended value; Builder unchanged. The sentence above claiming the rewire happened is superseded by this correction; left in place per invariant 2 (no history rewritten).
+
+**Open questions for Vijay:** LLM-layer and SARIF-vs-comment decisions from part 2 still pending; plus the Reviewer cadence change above, now confirmed to require his hands.

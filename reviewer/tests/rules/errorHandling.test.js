@@ -865,4 +865,90 @@ describe('error-handling rule (AST path, direct)', () => {
     const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
     expect(handlerIssues).toHaveLength(1);
   });
+
+  it('still flags the outer handler when its own try/catch is missing but a nested unrelated helper function has one', () => {
+    // Regression: subtreeHasTryStatement used to walk the handler body's
+    // *entire* subtree, including any function defined and called within
+    // it, so an inner helper's own try/catch silenced the check for the
+    // outer handler that has no try/catch of its own. See CLAUDE.md
+    // guideline 2 / subtreeInOwnScope.js.
+    const content = [
+      'const Widget = require("../models/Widget");',
+      'router.get("/outer", async (req, res) => {',
+      '  const helper = async (req2, res2) => {',
+      '    try {',
+      '      res2.json(1);',
+      '    } catch (e) {',
+      '      console.log(e);',
+      '    }',
+      '  };',
+      '  res.json(await helper(req, res));',
+      '});',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,10 @@',
+      ' const Widget = require("../models/Widget");',
+      '+router.get("/outer", async (req, res) => {',
+      '+  const helper = async (req2, res2) => {',
+      '+    try {',
+      '+      res2.json(1);',
+      '+    } catch (e) {',
+      '+      console.log(e);',
+      '+    }',
+      '+  };',
+      '+  res.json(await helper(req, res));',
+      '+});',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, content));
+    const handlerIssues = issues.filter((i) => /async route handler/i.test(i.message));
+    expect(handlerIssues).toHaveLength(1);
+    expect(handlerIssues[0].line).toBe(2);
+  });
+
+  it('still flags a .then() without its own .catch() when a nested unrelated callback has an unchained .catch()', () => {
+    // Same bug class as above, applied to subtreeHasCatchCall: a .catch()
+    // call sitting inside the .then() callback's own body (not chained onto
+    // the outer promise) must not be mistaken for the outer chain's catch.
+    const content = [
+      'const x = 1;',
+      'foo.then((res) => {',
+      '  bar().catch((e) => { console.log(e); });',
+      '});',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -1,1 +1,4 @@',
+      ' const x = 1;',
+      '+foo.then((res) => {',
+      '+  bar().catch((e) => { console.log(e); });',
+      '+});',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, content));
+    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(true);
+  });
+
+  it('does not flag a .then() whose .catch() is chained directly onto the same statement', () => {
+    const content = [
+      'const x = 1;',
+      'foo().then((res) => { console.log(res); }).catch((err) => { console.log(err); });',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -1,1 +1,2 @@',
+      ' const x = 1;',
+      '+foo().then((res) => { console.log(res); }).catch((err) => { console.log(err); });',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, content));
+    expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
+  });
 });

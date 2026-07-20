@@ -284,4 +284,34 @@ describe('performance rule (AST path, direct)', () => {
     expect(issues).toHaveLength(1);
     expect(issues[0].severity).toBe('low');
   });
+
+  it('does not flag a .forEach() callback whose own body never awaits, even when it defines a nested async helper that does', () => {
+    // Regression: subtreeHasAwait used to walk the callback body's *entire*
+    // subtree, including any function declared and called within it, so an
+    // inner helper's own await got blamed on the outer .forEach() callback
+    // even though the callback itself never awaits anything and its
+    // iterations still run concurrently/unordered exactly as normal. See
+    // CLAUDE.md guideline 2 / subtreeInOwnScope.js.
+    const content = [
+      'const items = [];',
+      'items.forEach((item) => {',
+      '  const inner = async () => { await doSomething(item); };',
+      '  inner();',
+      '});',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/utils/batch.js b/src/utils/batch.js',
+      '--- a/src/utils/batch.js',
+      '+++ b/src/utils/batch.js',
+      '@@ -1,1 +1,5 @@',
+      ' const items = [];',
+      '+items.forEach((item) => {',
+      '+  const inner = async () => { await doSomething(item); };',
+      '+  inner();',
+      '+});',
+    ].join('\n');
+
+    const issues = performanceRule.check(withContent(diff, content));
+    expect(issues.some((i) => /await used inside a \.forEach\(\)/i.test(i.message))).toBe(false);
+  });
 });

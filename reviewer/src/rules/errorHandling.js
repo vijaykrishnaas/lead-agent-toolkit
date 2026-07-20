@@ -3,6 +3,7 @@ const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
 const { parseAst } = require('../utils/parseAst');
+const { subtreeInOwnScope } = require('../utils/subtreeInOwnScope');
 
 const ASYNC_HANDLER_SIGNATURE = /async\s*(\(|function)/;
 const HANDLER_PARAMS = /req\s*,\s*res/;
@@ -301,16 +302,12 @@ function isWrappedByAsyncHandler(ancestors) {
   );
 }
 
-// Searches the handler body's entire subtree for a try/catch, regardless of
-// nesting depth -- matching checkFileRegex's TRY_BLOCK, which is tested
-// against the whole reassembled block text and doesn't distinguish a
-// top-level try from one nested inside a further callback.
+// Searches the handler body's own subtree for a try/catch, at any nesting
+// depth of blocks/statements, but never descending into a nested function
+// defined within the handler -- that inner function's own try/catch belongs
+// to its own execution, not the outer handler's (see subtreeInOwnScope).
 function subtreeHasTryStatement(node) {
-  let found = false;
-  walk.full(node, (n) => {
-    if (n.type === 'TryStatement') found = true;
-  });
-  return found;
+  return subtreeInOwnScope(node, (n) => n.type === 'TryStatement');
 }
 
 function isCatchCall(node) {
@@ -323,12 +320,12 @@ function isCatchCall(node) {
   );
 }
 
+// Same own-function-scope restriction as subtreeHasTryStatement: a .catch()
+// call sitting inside a nested callback's own body (as opposed to chained
+// directly onto the statement's own promise expression) belongs to that
+// nested callback's own chain, not the outer .then() being checked.
 function subtreeHasCatchCall(node) {
-  let found = false;
-  walk.full(node, (n) => {
-    if (isCatchCall(n)) found = true;
-  });
-  return found;
+  return subtreeInOwnScope(node, isCatchCall);
 }
 
 // Finds the nearest enclosing statement (not a bare BlockStatement, which

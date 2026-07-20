@@ -3,6 +3,7 @@ const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
 const { parseAst } = require('../utils/parseAst');
+const { subtreeInOwnScope } = require('../utils/subtreeInOwnScope');
 
 // The param-list group is matched lazily (not `[^)]*`) so a nested paren in
 // a default value or destructuring default (e.g. `({ id = genId() }) => {`)
@@ -74,12 +75,13 @@ function checkFileRegex(file, addedLines) {
 // body is found from the parse tree instead of hand-rolled brace counting.
 // Only used when file.content is resolvable and parses as valid JS; see
 // `check` below for the fallback.
+// Own-function-scope only: an await inside a nested function defined within
+// the .forEach() callback (e.g. a helper the callback declares but doesn't
+// itself await) belongs to that inner function's own execution, not the
+// callback's -- it doesn't make the callback's own iterations run
+// out-of-order. See subtreeInOwnScope.
 function subtreeHasAwait(node) {
-  let found = false;
-  walk.full(node, (n) => {
-    if (n.type === 'AwaitExpression') found = true;
-  });
-  return found;
+  return subtreeInOwnScope(node, (n) => n.type === 'AwaitExpression');
 }
 
 function isMemberCall(node, objectName, propertyName) {

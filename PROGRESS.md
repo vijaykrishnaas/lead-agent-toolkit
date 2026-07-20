@@ -1,5 +1,7 @@
 # Progress Log
 
+> Convention (documented 2026-07-20, AUDIT.md F11): append new entries at the BOTTOM of this file. Historical entries above line ~800 are in mixed order (early runs prepended); they are left untouched per hard invariant 2.
+
 ## 2026-07-19 (self-audit round 4)
 
 **Done:** Fetched all branches, checked out `claude/dev` (up to date with `origin/claude/dev`, HEAD at the post-task-19 hunt commit `2415f5a`), ran `npm install && npm test` in `reviewer/` (267/267 green) and `sample-app/` (44/44 green) to confirm a clean baseline. All 19 backlog tasks are `[DONE]` — no non-DONE, non-BLOCKED item in TASKS.md — so, per rounds 1–3's own precedent ("self-audit-and-propose is itself the complete deliverable when the backlog is empty"), did a round-4 self-audit rather than leaving the backlog empty: read every PROGRESS.md entry since round 3 (the post-round-3 adversarial hunt with 3 fixes, task 19, and the post-task-19 hunt) and every SKILL_CHANGELOG.md entry added since round 3, then appended a "Retro round 4" section to `RETRO.md` (rounds 1–3's content preserved, nothing deleted, per hard invariant 2).
@@ -1106,3 +1108,17 @@ Rather than continue the last six runs' pattern of re-reading `dd660a9`'s own di
 **Open questions for Vijay:**
 - Same as always-open: `GET /api/users/:id` cross-user lookup — still unresolved, not re-litigated this run.
 - Same process flags as run 7, still unanswered: (1) whether to keep mining `errorHandling.js`/adjacent rules for progressively narrower edge cases by default when the backlog is empty, or replace that standing behavior with something else Vijay specifies; (2) whether the sprawling `errorHandling.js`-recurrence paragraph in `CLAUDE.md` should be pruned/consolidated now that it is long enough to be a real reading-cost tax on every future run. Eleventh restatement of an empty backlog, not re-deciding either question unilaterally.
+
+## 2026-07-20 (external audit run, requested by Vijay)
+
+**Done:** Full audit of everything on `claude/dev` (`e674f2a`, 56 commits) by a Vijay-initiated session, independent of the Builder/Reviewer Routines. Verified both suites green before any change (`reviewer/` 314/314, `sample-app/` 48/48, Node 22). Wrote `AUDIT.md` (findings F1–F13 with evidence, what-went-well record, finding→task map). Appended TASKS.md items 20–28 (add-only; items 1–19 untouched). Documented PROGRESS.md's append-at-bottom convention in the file header (F11). No product code changed — implementation is deliberately left to the Routines via the new backlog.
+
+**Decisions (made by Vijay, 2026-07-20 — these close standing open questions):**
+- `GET /api/users/:id`: restrict to self, 403 otherwise (task 24). Closes the oldest always-open question (~15 restatements). Stop restating it; it is now backlog work.
+- CLAUDE.md guideline bloat: consolidate per task 21 (compact rules stay; recurrence narratives move verbatim to `docs/GUIDELINES_HISTORY.md`). Closes runs 7–8's process flag (1).
+- Empty-backlog behavior: formalize per task 22 (oldest open question → least-recently-audited module → RETRO). Closes runs 7–8's process flag (2) / the 9-times-restated standing question.
+- Delivery: this audit merges directly into `claude/dev` with Vijay's explicit permission so Routines pick up task 20 next run.
+
+**Open questions for Vijay:**
+- PR `claude/dev` → `main` once task 20's CI is green (AUDIT.md F5) — Vijay action, not backlog work.
+- Routine cadence reduction once the backlog empties again (AUDIT.md F6) — Routine config lives outside the repo.

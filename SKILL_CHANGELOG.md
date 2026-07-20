@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-20 (external audit run, part 3: AUTHORIZED REWIRES section + tasks 31–32)
+**Change:** Added the "AUTHORIZED REWIRES" section to CLAUDE.md below the hard invariants (invariants untouched), pre-approving four structural rewrites (RW1 AST replacement, RW2 CLI-parser unification, RW3 integration-test layer, RW4 rule-interface change) as a Vijay-granted, explicitly scoped exception to the "no speculative rewrites" bar. Appended TASKS.md items 31–32 (add-only; items 1–30 untouched).
+
+**Evidence:** PROGRESS.md 2026-07-20 "part 3" entry records Vijay's grant verbatim in intent. Each rewire is additionally evidence-backed on its own: RW1 — the ten-recurrence boundary-derivation trail (AUDIT.md F3); RW2 — the silent-undefined flag bug shipped independently in all four parsers (post-task-10 entry); RW3 — two shipped bugs (duplicate-key race, owner scoping) that mock-only tests could not reach (2026-07-19 adversarial bug-hunt entry); RW4 — required enabler for RW1's `git show` file resolution. The section exists so a future run can execute these without re-litigating the evidence bar, while everything unlisted keeps the original discipline.
+
 ## 2026-07-20 (external audit run, part 2: IDEAS.md + tasks 29–30)
 **Change:** Appended TASKS.md items 29–30 (backlog content change; items 1–28 untouched). Added `IDEAS.md`, an explicitly non-backlog candidate menu whose header restates CLAUDE.md's evidence bar for promotion.
 

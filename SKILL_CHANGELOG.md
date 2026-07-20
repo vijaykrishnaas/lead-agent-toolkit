@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-20 (self-scheduled routine run: empty-backlog behavior, task 22)
+**Change:** Added a new "EMPTY-BACKLOG BEHAVIOR" section to CLAUDE.md (below the hard invariants, before the AUTHORIZED REWIRES block): when no TASKS.md item is non-DONE/non-BLOCKED, a run must in order (a) work the oldest unresolved PROGRESS.md open question, (b) else adversarially hunt the module least recently touched per SKILL_CHANGELOG.md/PROGRESS.md — never the newest diff, (c) else self-audit into RETRO.md (propose only, no code) — and must record which branch it took in its own PROGRESS.md entry. Marked TASKS.md item 22 `[DONE]`.
+
+**Evidence:** AUDIT.md F1 — eleven consecutive runs improvised the same "hunt the newest not-yet-reviewed diff" behavior once all 19 original backlog tasks were `[DONE]`, and the last several of those finds were progressively narrower edge cases in the same ~80-line `errorHandling.js` boundary machinery (run 7's own PROGRESS.md entry flagged the diminishing marginal value; the external audit's F1 finding independently confirmed it and specified this exact three-branch procedure, explicitly reversing the newest-diff default to a least-recently-audited-module default for branch (b)). PROGRESS.md, 2026-07-20 "self-scheduled routine run — empty-backlog behavior, task 22" entry. Suite unaffected (CLAUDE.md-only change): `reviewer/` 316/316 green, `sample-app/` 49/49 green, both re-verified after this change.
+
 ## 2026-07-20 (external audit run, part 3: AUTHORIZED REWIRES section + tasks 31–32)
 **Change:** Added the "AUTHORIZED REWIRES" section to CLAUDE.md below the hard invariants (invariants untouched), pre-approving four structural rewrites (RW1 AST replacement, RW2 CLI-parser unification, RW3 integration-test layer, RW4 rule-interface change) as a Vijay-granted, explicitly scoped exception to the "no speculative rewrites" bar. Appended TASKS.md items 31–32 (add-only; items 1–30 untouched).
 

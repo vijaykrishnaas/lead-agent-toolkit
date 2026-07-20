@@ -1203,3 +1203,22 @@ Marked TASKS.md task 21 `[DONE]`. Added a SKILL_CHANGELOG.md entry per hard inva
 - Verified the extraction two ways (byte-diff on two guidelines, full test suite green) rather than only running tests, since a silently-mangled multi-thousand-character paragraph moved into a history file would not be caught by any existing test — nothing in this repo currently asserts on `docs/GUIDELINES_HISTORY.md` or CLAUDE.md content.
 
 **Open questions for Vijay:** none new from this run. Standing ones unchanged from the immediately preceding entry: LLM-layer and SARIF-vs-comment decisions (IDEAS.md part 2), Reviewer cadence change (part 3), and AUDIT.md F5 (PR `claude/dev` -> `main`, actionable since task 20 landed but a Vijay action, not backlog work).
+
+## 2026-07-20 (self-scheduled routine run — empty-backlog behavior, task 22)
+
+**Done:** Fetched all branches; checked out `claude/dev` (`0a749be`, "Task 21: consolidate CLAUDE.md guidelines into compact rules"). Read CLAUDE.md, TASKS.md, PROGRESS.md, SKILL_CHANGELOG.md. Topmost non-DONE, non-BLOCKED backlog item was task 22 (formalize empty-backlog behavior in CLAUDE.md, AUDIT.md F1) — worked it top-down, no reordering.
+
+Added a new "EMPTY-BACKLOG BEHAVIOR" section to CLAUDE.md, placed between the "Each run: append dated PROGRESS.md entry..." line and the AUTHORIZED REWIRES block. It codifies the three-branch decision procedure AUDIT.md F1 specified: (a) work the oldest unresolved open question in PROGRESS.md when one exists; (b) else adversarially hunt the module least recently touched by an adversarial-hunt or task entry (explicitly reversing the pre-existing "hunt the newest diff" default that drove eleven straight runs into progressively narrower `errorHandling.js` edge cases); (c) else self-audit into RETRO.md, propose-only, no code. Required each run to record which branch it took and why in its own PROGRESS.md entry, so a future run (or Vijay) can audit whether the policy is actually being followed rather than re-improvised. Kept it to one short paragraph per branch, consistent with the standing CLAUDE.md-bloat concern (AUDIT.md F2, just addressed by task 21) — this is new prescriptive process text, not a recurrence narrative, so it belongs in CLAUDE.md itself rather than `docs/GUIDELINES_HISTORY.md`.
+
+This run did not itself hit an empty backlog (task 22 was the topmost non-DONE item), so the new policy wasn't exercised this run — it's process text for the next run that finds tasks 23-32 (and any future additions) all DONE or BLOCKED.
+
+Marked TASKS.md task 22 `[DONE]`. Added a SKILL_CHANGELOG.md entry per hard invariant 3, citing AUDIT.md F1 and this entry.
+
+**Test run:** Installed dependencies fresh in both packages (`npm install` in `reviewer/` and `sample-app/`, no lockfile changes). Root `npm test`: `reviewer/` 316/316 green, `sample-app/` 49/49 green — unchanged counts, as expected for a CLAUDE.md-only change with no source or test edits.
+
+**Decisions:**
+- Placed the new section before AUTHORIZED REWIRES rather than after the GUIDELINES list, since it's a process/workflow instruction (what to do when idle) rather than a code-pattern guideline the GUIDELINES section's own numbering and cross-reference to `docs/GUIDELINES_HISTORY.md` are structured around.
+- Left branch (b)'s "least-recently-audited module" deliberately underspecified as a literal algorithm (no script to compute it) — it directs a future run to check SKILL_CHANGELOG.md/PROGRESS.md dates, which is exactly the kind of judgment call an agent run is positioned to make with full history in context; over-specifying a rigid lookup here would itself be a speculative mechanism with no observed need yet.
+- Did not touch the hard invariants, the AUTHORIZED REWIRES section, or any guideline in the GUIDELINES list — task 22's scope was the empty-backlog behavior only.
+
+**Open questions for Vijay:** none new from this run. Standing ones unchanged from the immediately preceding entry: LLM-layer and SARIF-vs-comment decisions (IDEAS.md part 2), Reviewer cadence change (part 3), and AUDIT.md F5 (PR `claude/dev` -> `main`, actionable since task 20 landed but a Vijay action, not backlog work).

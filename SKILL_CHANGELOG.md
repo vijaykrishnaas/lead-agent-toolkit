@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-07-20 (external audit run, part 2: IDEAS.md + tasks 29–30)
+**Change:** Appended TASKS.md items 29–30 (backlog content change; items 1–28 untouched). Added `IDEAS.md`, an explicitly non-backlog candidate menu whose header restates CLAUDE.md's evidence bar for promotion.
+
+**Evidence:** PROGRESS.md, 2026-07-20 "part 2" entry. Task 29: AUDIT.md F4 demonstrated invariant 1 had no mechanical enforcement (`npm test` failed at the repo root) — invariants 2 and 3 sit behind the identical discipline-only gap, and this audit itself is the observed instance of how easily a TASKS.md/CLAUDE.md edit could ship unlinted. Task 30: PROGRESS.md measured at ~1,140 lines with documented mixed ordering (AUDIT.md F11), the same per-run reading-tax class as the F2 CLAUDE.md bloat that runs 7–8 flagged and Vijay confirmed. All other brainstormed items deliberately NOT promoted (no observed failure yet) — parked in IDEAS.md instead, preserving the "no speculative rewrites" bar.
+
 ## 2026-07-20 (external audit run: backlog additions, tasks 20–28)
 **Change:** Appended TASKS.md items 20–28 (backlog content change; items 1–19 untouched per hard invariant 2). Also added `AUDIT.md` and a PROGRESS.md header note documenting the append-at-bottom convention. No CLAUDE.md or skill text changed this run — tasks 21/22 will make those changes with their own changelog entries when a Routine implements them.
 

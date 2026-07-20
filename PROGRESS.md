@@ -1122,3 +1122,9 @@ Rather than continue the last six runs' pattern of re-reading `dd660a9`'s own di
 **Open questions for Vijay:**
 - PR `claude/dev` → `main` once task 20's CI is green (AUDIT.md F5) — Vijay action, not backlog work.
 - Routine cadence reduction once the backlog empties again (AUDIT.md F6) — Routine config lives outside the repo.
+
+## 2026-07-20 (external audit run, part 2: brainstorm + IDEAS.md)
+
+**Done:** Follow-up to the same-day audit, requested by Vijay ("complete brainstorm"). Added `IDEAS.md` — a curated backlog-candidate menu (reviewer detection depth, CI-fit features like SARIF/baseline/suppressions, standup/doc-drift extensions, sample-app hardening, process/meta ideas). IDEAS.md is explicitly NOT backlog: promotion still requires evidence per CLAUDE.md's bar; it exists so RETRO rounds promote from a standing menu instead of re-deriving candidates. Promoted the two ideas that already have observed evidence into TASKS.md as items 29 (invariant linter in CI — same enforcement gap F4 proved for invariant 1) and 30 (PROGRESS.md rollover — this file is ~1,140 lines with mixed ordering, the same reading-tax class as F2). Both suites re-verified green before commit (reviewer 314/314, sample-app 48/48).
+
+**Open questions for Vijay:** the two biggest IDEAS.md swings need his call before any promotion: (1) LLM-assisted review layer (cost/latency budget), (2) SARIF/code-scanning vs. PR-comment as the primary CI output.

@@ -35,11 +35,17 @@ describe('Users', () => {
     expect(res.status).toBe(404);
   });
 
-  test('GET /:id returns a user by id', async () => {
-    User.findById.mockResolvedValue({ _id: 'u2', name: 'Carl', email: 'carl@example.com' });
-    const res = await request(app).get('/api/users/u2').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
+  test('GET /:id returns the caller\'s own profile', async () => {
+    User.findById.mockResolvedValue({ _id: 'u1', name: 'Bob', email: 'bob@example.com' });
+    const res = await request(app).get('/api/users/u1').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
     expect(res.status).toBe(200);
-    expect(res.body.name).toBe('Carl');
+    expect(res.body.name).toBe('Bob');
+  });
+
+  test('GET /:id forbids viewing another user', async () => {
+    const res = await request(app).get('/api/users/u2').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
+    expect(res.status).toBe(403);
+    expect(User.findById).not.toHaveBeenCalled();
   });
 
   test('PUT /:id updates the caller\'s own profile', async () => {
@@ -108,7 +114,7 @@ describe('Users', () => {
     const castErr = new Error('Cast to ObjectId failed');
     castErr.name = 'CastError';
     User.findById.mockRejectedValue(castErr);
-    const res = await request(app).get('/api/users/not-a-valid-id').set('Authorization', `Bearer ${token('u1', 'bob@example.com')}`);
+    const res = await request(app).get('/api/users/not-a-valid-id').set('Authorization', `Bearer ${token('not-a-valid-id', 'bob@example.com')}`);
     expect(res.status).toBe(400);
   });
 

@@ -29,20 +29,26 @@ paths:
           description: OK
   /api/users/{id}:
     get:
-      summary: Get a user by id
+      summary: Get a user by id (self only)
       responses:
         '200':
           description: OK
+        '403':
+          description: Forbidden - cannot view another user
     put:
       summary: Update a user by id
       responses:
         '200':
           description: OK
+        '403':
+          description: Forbidden - cannot modify another user
     delete:
       summary: Delete a user by id
       responses:
         '204':
           description: No Content
+        '403':
+          description: Forbidden - cannot delete another user
   /api/tasks:
     post:
       summary: Create a task

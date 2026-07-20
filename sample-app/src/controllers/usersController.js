@@ -9,6 +9,9 @@ async function getMe(req, res) {
 }
 
 async function getById(req, res) {
+  if (req.params.id !== req.user.id) {
+    return res.status(403).json({ error: 'Cannot view another user' });
+  }
   const user = await User.findById(req.params.id);
   if (!user) {
     return res.status(404).json({ error: 'User not found' });

@@ -2,6 +2,7 @@ const walk = require('acorn-walk');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
+const { memberCallLine } = require('../utils/memberCallLine');
 const { parseAst } = require('../utils/parseAst');
 const { subtreeInOwnScope } = require('../utils/subtreeInOwnScope');
 
@@ -373,7 +374,7 @@ function checkFileAst(file, addedLines) {
     CallExpression(node, state, ancestors) {
       if (node.callee.type !== 'MemberExpression' || node.callee.computed) return;
       if (node.callee.property.type !== 'Identifier' || node.callee.property.name !== 'then') return;
-      const line = node.loc.start.line;
+      const line = memberCallLine(node);
       if (!addedLineNumbers.has(line) || reportedThenLines.has(line)) return;
       const statement = findEnclosingStatement(ancestors);
       if (subtreeHasCatchCall(statement)) return;

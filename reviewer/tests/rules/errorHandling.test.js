@@ -951,4 +951,41 @@ describe('error-handling rule (AST path, direct)', () => {
     const issues = errorHandlingRule.check(withContent(diff, content));
     expect(issues.some((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message))).toBe(false);
   });
+
+  it('flags an uncaught .then() appended as a chain continuation onto an already-existing base statement', () => {
+    // Regression: the .then()/.catch() CallExpression walk used
+    // `node.loc.start.line` to both scope the check to the diff and report
+    // the finding's line. For a multi-line member chain
+    // (`promise\n  .then(...)`), a CallExpression's own start position is
+    // its *base object's* line ("promise"), not the line the `.then(`
+    // token itself sits on. When the base statement already existed and
+    // only the `.then()` continuation line was newly added, the base
+    // object's line is absent from `addedLineNumbers`, so the check silently
+    // never fired -- a real false negative the regex fallback path (which
+    // scopes to the actual `.then(` line) did not share. See
+    // memberCallLine.js.
+    const content = [
+      'function cleanup() {',
+      '  const promise = getPromise();',
+      '  promise',
+      '    .then((r) => r.count);',
+      '}',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/jobs/cleanup.js b/src/jobs/cleanup.js',
+      '--- a/src/jobs/cleanup.js',
+      '+++ b/src/jobs/cleanup.js',
+      '@@ -1,3 +1,4 @@',
+      ' function cleanup() {',
+      '   const promise = getPromise();',
+      '   promise',
+      '+    .then((r) => r.count);',
+      ' }',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, content));
+    const thenIssues = issues.filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
+    expect(thenIssues).toHaveLength(1);
+    expect(thenIssues[0].line).toBe(4);
+  });
 });

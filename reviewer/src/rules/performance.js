@@ -2,6 +2,7 @@ const walk = require('acorn-walk');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
+const { memberCallLine } = require('../utils/memberCallLine');
 const { parseAst } = require('../utils/parseAst');
 const { subtreeInOwnScope } = require('../utils/subtreeInOwnScope');
 
@@ -116,7 +117,7 @@ function checkFileAst(file, addedLines) {
       if (!callback || (callback.type !== 'ArrowFunctionExpression' && callback.type !== 'FunctionExpression')) {
         return;
       }
-      const line = node.loc.start.line;
+      const line = memberCallLine(node);
       if (!addedLineNumbers.has(line)) return;
       if (!subtreeHasAwait(callback.body)) return;
       issues.push({
@@ -134,7 +135,7 @@ function checkFileAst(file, addedLines) {
       if (!isMemberCall(node, 'JSON', 'parse')) return;
       const arg = node.arguments[0];
       if (!arg || !isMemberCall(arg, 'JSON', 'stringify')) return;
-      const line = node.loc.start.line;
+      const line = memberCallLine(node);
       if (!addedLineNumbers.has(line)) return;
       issues.push({
         file: file.file,

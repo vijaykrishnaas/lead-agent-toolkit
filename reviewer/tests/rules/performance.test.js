@@ -314,4 +314,64 @@ describe('performance rule (AST path, direct)', () => {
     const issues = performanceRule.check(withContent(diff, content));
     expect(issues.some((i) => /await used inside a \.forEach\(\)/i.test(i.message))).toBe(false);
   });
+
+  it('flags await inside a .forEach() appended as a chain continuation onto an already-existing base statement', () => {
+    // Regression: same bug class as errorHandling.test.js's equivalent
+    // .then() case. The forEach CallExpression walk used
+    // `node.loc.start.line`, which for a multi-line member chain
+    // (`items\n  .forEach(...)`) is the *base object's* line, not the line
+    // `.forEach(` itself sits on. When the base statement already existed
+    // and only the `.forEach()` continuation was newly added, the base
+    // object's line was absent from `addedLineNumbers`, silently dropping a
+    // genuine, newly-added await-in-forEach finding. See memberCallLine.js.
+    const content = [
+      'async function run(items) {',
+      '  items',
+      '    .forEach(async (item) => {',
+      '      await save(item);',
+      '    });',
+      '}',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/jobs/run.js b/src/jobs/run.js',
+      '--- a/src/jobs/run.js',
+      '+++ b/src/jobs/run.js',
+      '@@ -1,2 +1,5 @@',
+      ' async function run(items) {',
+      '   items',
+      '+    .forEach(async (item) => {',
+      '+      await save(item);',
+      '+    });',
+      ' }',
+    ].join('\n');
+
+    const issues = performanceRule.check(withContent(diff, content));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].line).toBe(3);
+  });
+
+  it('flags a JSON.parse(JSON.stringify(...)) call whose .parse( is on its own line, appended onto an already-existing JSON identifier line', () => {
+    // Same bug class, applied to the deep-clone AST check's outer
+    // `JSON.parse(...)` CallExpression.
+    const content = [
+      'function clone(obj) {',
+      '  return JSON',
+      '    .parse(JSON.stringify(obj));',
+      '}',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/utils/clone.js b/src/utils/clone.js',
+      '--- a/src/utils/clone.js',
+      '+++ b/src/utils/clone.js',
+      '@@ -1,2 +1,3 @@',
+      ' function clone(obj) {',
+      '   return JSON',
+      '+    .parse(JSON.stringify(obj));',
+      ' }',
+    ].join('\n');
+
+    const issues = performanceRule.check(withContent(diff, content));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].line).toBe(3);
+  });
 });

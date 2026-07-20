@@ -16,11 +16,21 @@ function joinPath(prefix, routePath) {
 // router file can itself mount a nested sub-router (router.use(prefix,
 // subRouter)), and that nested router's routes must not be dropped just
 // because only the top-level app entry file was ever walked for mounts.
-// `visited` guards against an (unexpected but possible) require cycle
-// between router files sending this into an infinite loop.
-function collectFromFile(filePath, prefix, readFile, visited) {
-  if (visited.has(filePath)) return [];
-  visited.add(filePath);
+// `ancestors` guards against an (unexpected but possible) require cycle
+// between router files sending this into an infinite loop. It must only
+// track the current root-to-node recursion path, not every file visited
+// anywhere in the tree — the same router file legitimately gets required
+// and mounted more than once from unrelated call sites (e.g. API
+// versioning: the same router mounted under both '/api/v1/things' and
+// '/api/v2/things'), and a whole-tree-shared visited set would silently
+// drop the second mount's routes as if it were a cycle. Passing a fresh
+// Set (current path + this file) to each child call keeps cycle detection
+// scoped to genuine ancestor chains while leaving sibling branches
+// independent.
+function collectFromFile(filePath, prefix, readFile, ancestors) {
+  if (ancestors.has(filePath)) return [];
+  const nextAncestors = new Set(ancestors);
+  nextAncestors.add(filePath);
 
   const source = readFile(filePath);
   const { directRoutes, mounts } = parseAppEntrySource(source);
@@ -30,7 +40,7 @@ function collectFromFile(filePath, prefix, readFile, visited) {
   const fileDir = path.dirname(filePath);
   for (const { prefix: mountPrefix, requirePath } of mounts) {
     const routerPath = path.resolve(fileDir, requirePath.endsWith('.js') ? requirePath : `${requirePath}.js`);
-    routes.push(...collectFromFile(routerPath, joinPath(prefix, mountPrefix), readFile, visited));
+    routes.push(...collectFromFile(routerPath, joinPath(prefix, mountPrefix), readFile, nextAncestors));
   }
 
   return routes;

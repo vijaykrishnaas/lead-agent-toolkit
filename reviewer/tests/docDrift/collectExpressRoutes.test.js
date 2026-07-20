@@ -85,6 +85,60 @@ describe('collectExpressRoutes', () => {
     ]);
   });
 
+  it('collects routes from a router file mounted at two different prefixes, instead of dropping the second mount', () => {
+    // Regression: the cycle guard used a single `visited` Set shared across
+    // the entire recursive walk, so mounting the same router file a second
+    // time under a different prefix (a legitimate pattern, e.g. API
+    // versioning) was treated as if it were a require cycle and silently
+    // produced zero routes for the second mount.
+    const thingsRouterSource = `
+      router.get('/', list);
+      router.get('/:id', getById);
+    `;
+    const readFile = jest.fn((filePath) => {
+      if (filePath === appEntryPath) {
+        return `
+          const thingsRoutes = require('./routes/things.routes');
+          app.use('/api/v1/things', thingsRoutes);
+          app.use('/api/v2/things', thingsRoutes);
+        `;
+      }
+      if (filePath === path.resolve('/repo/src', './routes/things.routes.js')) return thingsRouterSource;
+      throw new Error(`unexpected read: ${filePath}`);
+    });
+
+    const routes = collectExpressRoutes({ appEntryPath }, { readFile });
+
+    expect(routes).toEqual([
+      { method: 'GET', path: '/api/v1/things' },
+      { method: 'GET', path: '/api/v1/things/:id' },
+      { method: 'GET', path: '/api/v2/things' },
+      { method: 'GET', path: '/api/v2/things/:id' },
+    ]);
+  });
+
+  it('still guards against a genuine require cycle along one ancestor chain', () => {
+    const readFile = jest.fn((filePath) => {
+      if (filePath === appEntryPath) {
+        return `const a = require('./routes/a.routes');\napp.use('/api/a', a);`;
+      }
+      if (filePath === path.resolve('/repo/src', './routes/a.routes.js')) {
+        return `router.get('/', listA);\nconst b = require('./b.routes');\nrouter.use('/b', b);`;
+      }
+      if (filePath === path.resolve('/repo/src/routes', './b.routes.js')) {
+        return `router.get('/', listB);\nconst a = require('./a.routes');\nrouter.use('/a-again', a);`;
+      }
+      throw new Error(`unexpected read: ${filePath}`);
+    });
+
+    const routes = collectExpressRoutes({ appEntryPath }, { readFile });
+
+    expect(routes).toEqual([
+      { method: 'GET', path: '/api/a' },
+      { method: 'GET', path: '/api/a/b' },
+    ]);
+  });
+
   it('resolves a requirePath that already ends in .js without appending a second .js', () => {
     const readFile = jest.fn((filePath) => {
       if (filePath === appEntryPath) {

@@ -8,9 +8,9 @@ const PLACEHOLDER_SECRET = 'change-me'; // matches JWT_SECRET in .env.example
 function resolveJwtSecret() {
   const secret = process.env.JWT_SECRET;
   if (process.env.NODE_ENV === 'production') {
-    if (!secret || secret === PLACEHOLDER_SECRET) {
+    if (!secret || secret === PLACEHOLDER_SECRET || secret === DEV_SECRET) {
       throw new Error(
-        'JWT_SECRET must be set to a real secret in production (it is currently unset or still the .env.example placeholder).'
+        'JWT_SECRET must be set to a real secret in production (it is currently unset or still a known default/placeholder value).'
       );
     }
     return secret;

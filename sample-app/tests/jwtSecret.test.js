@@ -37,6 +37,12 @@ describe('resolveJwtSecret', () => {
     expect(() => resolveJwtSecret()).toThrow(/JWT_SECRET/);
   });
 
+  test('throws in production when JWT_SECRET is still the dev default', () => {
+    process.env.NODE_ENV = 'production';
+    process.env.JWT_SECRET = DEV_SECRET;
+    expect(() => resolveJwtSecret()).toThrow(/JWT_SECRET/);
+  });
+
   test('returns JWT_SECRET in production when it is a real value', () => {
     process.env.NODE_ENV = 'production';
     process.env.JWT_SECRET = 'a-real-production-secret';

@@ -16,6 +16,23 @@ const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\
 const ROUTE_CALL_PATTERN = /\.route\(\s*(['"])(.*?)\1\s*\)/g;
 const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION})\\(`);
 
+// Mirror of METHOD_CALL_PATTERN/ROUTE_CALL_PATTERN/MOUNT_PATTERN above, but
+// matching a template-literal-delimited (backtick) path/prefix argument
+// instead of a quoted one. A template literal can embed an interpolated
+// expression (e.g. `` `/api/${version}/things` ``) whose actual runtime
+// value can't be determined by static text scanning, so none of the three
+// quote-only patterns above ever match it -- the route/mount silently never
+// appeared on the code side of the comparison at all (AUDIT.md F8). These
+// patterns only need to detect *that* such a call exists and where, not
+// resolve its path, so they stop right after the opening backtick.
+const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*\``, 'g');
+const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*`/g;
+const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*`/g;
+
+function lineNumberAt(text, index) {
+  return text.slice(0, index).split('\n').length;
+}
+
 // Walks forward from `chainStart` (right after a .route(path) call)
 // collecting only .<verb>(...) calls that are *directly* chained — i.e.
 // nothing but whitespace (or a masked-out comment, which reads as
@@ -125,4 +142,45 @@ function parseAppEntrySource(source) {
   return { directRoutes, mounts };
 }
 
-module.exports = { parseRouterSource, parseAppEntrySource };
+// Finds router/app verb calls, .route() calls, and app|router.use() mounts
+// whose path/prefix argument is a template literal, in either a router file
+// or an app entry file's source text. Returns explicit warning findings
+// (type 'unparsed-route') instead of the silent skip described above, so a
+// doc-drift report can say "this route exists but couldn't be checked"
+// rather than reading as full, verified coverage. Matched against
+// commentMasked (not raw source) for the same reason every other detection
+// regex in this file is: a commented-out/dead-code occurrence must not be
+// reported as a real, live one.
+function findUnparsedRoutes(source) {
+  const { masked: commentMasked } = maskComments(source);
+  const findings = [];
+
+  for (const match of commentMasked.matchAll(UNPARSED_METHOD_CALL_PATTERN)) {
+    findings.push({
+      type: 'unparsed-route',
+      method: match[1].toUpperCase(),
+      line: lineNumberAt(commentMasked, match.index),
+      reason: 'route exists but path could not be statically resolved',
+    });
+  }
+  for (const match of commentMasked.matchAll(UNPARSED_ROUTE_CALL_PATTERN)) {
+    findings.push({
+      type: 'unparsed-route',
+      method: null,
+      line: lineNumberAt(commentMasked, match.index),
+      reason: 'route exists but path could not be statically resolved',
+    });
+  }
+  for (const match of commentMasked.matchAll(UNPARSED_MOUNT_PATTERN)) {
+    findings.push({
+      type: 'unparsed-route',
+      method: 'MOUNT',
+      line: lineNumberAt(commentMasked, match.index),
+      reason: 'mount exists but prefix could not be statically resolved',
+    });
+  }
+
+  return findings;
+}
+
+module.exports = { parseRouterSource, parseAppEntrySource, findUnparsedRoutes };

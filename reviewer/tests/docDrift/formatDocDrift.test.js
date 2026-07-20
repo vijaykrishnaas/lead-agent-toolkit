@@ -41,4 +41,70 @@ describe('formatDocDriftReport', () => {
     expect(report).toContain('**Routes source:** `src/app.js`');
     expect(report).toContain('**OpenAPI spec:** `openapi.yaml`');
   });
+
+  it('lists unparsed-route findings in their own section, with file, line, method and reason', () => {
+    const result = {
+      missingFromSpec: [],
+      missingFromCode: [],
+      unparsedRoutes: [
+        {
+          type: 'unparsed-route',
+          method: 'GET',
+          line: 12,
+          reason: 'route exists but path could not be statically resolved',
+          file: 'src/routes/tasks.routes.js',
+        },
+        {
+          type: 'unparsed-route',
+          method: 'MOUNT',
+          line: 3,
+          reason: 'mount exists but prefix could not be statically resolved',
+          file: 'src/app.js',
+        },
+      ],
+    };
+
+    const report = formatDocDriftReport(result);
+
+    expect(report).toContain('## Unparsed routes — could not be statically verified (2)');
+    expect(report).toContain('- `src/routes/tasks.routes.js:12` (GET — route exists but path could not be statically resolved)');
+    expect(report).toContain('- `src/app.js:3` (MOUNT — mount exists but prefix could not be statically resolved)');
+  });
+
+  it('does not report "No drift detected" when unparsedRoutes is non-empty, even if both mismatch lists are empty', () => {
+    // AUDIT.md F8: an unresolved template-literal route must not read as
+    // full, verified coverage just because no drift happened to be found
+    // among the routes that *could* be checked.
+    const result = {
+      missingFromSpec: [],
+      missingFromCode: [],
+      unparsedRoutes: [
+        {
+          type: 'unparsed-route',
+          method: 'GET',
+          line: 5,
+          reason: 'route exists but path could not be statically resolved',
+          file: 'src/routes/things.routes.js',
+        },
+      ],
+    };
+
+    const report = formatDocDriftReport(result);
+
+    expect(report).not.toContain('No drift detected');
+    expect(report).toContain('## Routes missing from OpenAPI spec (0)');
+    expect(report).toContain('## OpenAPI paths missing from routes (0)');
+    expect(report).toContain('## Unparsed routes — could not be statically verified (1)');
+  });
+
+  it('omits the unparsed-routes section content but still shows "_None._" when unparsedRoutes is empty and drift exists elsewhere', () => {
+    const result = {
+      missingFromSpec: [{ method: 'POST', path: '/api/tasks' }],
+      missingFromCode: [],
+      unparsedRoutes: [],
+    };
+
+    const report = formatDocDriftReport(result);
+    expect(report).toContain('## Unparsed routes — could not be statically verified (0)');
+  });
 });

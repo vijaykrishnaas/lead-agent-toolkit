@@ -1,4 +1,4 @@
-const { parseRouterSource, parseAppEntrySource } = require('../../src/docDrift/parseExpressRoutes');
+const { parseRouterSource, parseAppEntrySource, findUnparsedRoutes } = require('../../src/docDrift/parseExpressRoutes');
 
 describe('parseRouterSource', () => {
   it('extracts one route per router.<verb>(path, ...) call', () => {
@@ -273,5 +273,64 @@ describe('parseAppEntrySource', () => {
       { prefix: '/api/tasks', requirePath: './routes/tasks.routes' },
       { prefix: '/api/users', requirePath: './routes/users.routes' },
     ]);
+  });
+});
+
+describe('findUnparsedRoutes', () => {
+  it('reports a template-literal router.<verb>() path as an unparsed-route finding, and does not extract it as a real route', () => {
+    // AUDIT.md F8: METHOD_CALL_PATTERN only matches quote-delimited paths,
+    // so a template-literal path (interpolated, can't be resolved
+    // statically) previously just vanished from the route list entirely --
+    // neither documented-and-missing nor implemented, silently invisible.
+    const source = "router.get('/', list);\nrouter.get(`/widgets/${id}`, getWidget);";
+
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/' }]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      {
+        type: 'unparsed-route',
+        method: 'GET',
+        line: 2,
+        reason: 'route exists but path could not be statically resolved',
+      },
+    ]);
+  });
+
+  it('reports a template-literal .route(path) call as an unparsed-route finding', () => {
+    const source = 'router.route(`/widgets/${id}`).get(getWidget).post(createWidget);';
+
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      {
+        type: 'unparsed-route',
+        method: null,
+        line: 1,
+        reason: 'route exists but path could not be statically resolved',
+      },
+    ]);
+  });
+
+  it('reports a template-literal app|router.use() mount prefix as its own unparsed-route finding', () => {
+    const source = "const tasksRoutes = require('./routes/tasks.routes');\napp.use(`/api/${version}/tasks`, tasksRoutes);";
+
+    const { mounts } = parseAppEntrySource(source);
+    expect(mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      {
+        type: 'unparsed-route',
+        method: 'MOUNT',
+        line: 2,
+        reason: 'mount exists but prefix could not be statically resolved',
+      },
+    ]);
+  });
+
+  it('does not treat a commented-out template-literal route call as a real unparsed finding', () => {
+    const source = '// router.get(`/widgets/${id}`, getWidget);\nrouter.get(\'/\', list);';
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('returns no findings when every route/mount in the source uses a plain quoted path', () => {
+    const source = "router.get('/', list);\napp.use('/api/tasks', tasksRoutes);";
+    expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });

@@ -16,11 +16,11 @@ function generateDocDrift(options = {}, deps = {}) {
   const compareRoutesFn = deps.compareRoutes || compareRoutes;
   const formatReport = deps.formatDocDriftReport || formatDocDriftReport;
 
-  const codeRoutes = collectExpressRoutesFn({ appEntryPath }, deps);
+  const { routes: codeRoutes, unparsedRoutes } = collectExpressRoutesFn({ appEntryPath }, deps);
   const specRoutes = parseOpenApiSpecFn(readOpenApiFile(openapiPath));
   const result = compareRoutesFn(codeRoutes, specRoutes);
 
-  return formatReport(result, { app: appEntryPath, openapi: openapiPath });
+  return formatReport({ ...result, unparsedRoutes }, { app: appEntryPath, openapi: openapiPath });
 }
 
 module.exports = { generateDocDrift };

@@ -43,7 +43,7 @@ describe('collectExpressRoutes', () => {
       throw new Error(`unexpected read: ${filePath}`);
     });
 
-    const routes = collectExpressRoutes({ appEntryPath }, { readFile });
+    const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
 
     expect(routes).toEqual([
       { method: 'GET', path: '/health' },
@@ -76,7 +76,7 @@ describe('collectExpressRoutes', () => {
       throw new Error(`unexpected read: ${filePath}`);
     });
 
-    const routes = collectExpressRoutes({ appEntryPath }, { readFile });
+    const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
 
     expect(routes).toEqual([
       { method: 'GET', path: '/api/tasks' },
@@ -107,7 +107,7 @@ describe('collectExpressRoutes', () => {
       throw new Error(`unexpected read: ${filePath}`);
     });
 
-    const routes = collectExpressRoutes({ appEntryPath }, { readFile });
+    const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
 
     expect(routes).toEqual([
       { method: 'GET', path: '/api/v1/things' },
@@ -131,7 +131,7 @@ describe('collectExpressRoutes', () => {
       throw new Error(`unexpected read: ${filePath}`);
     });
 
-    const routes = collectExpressRoutes({ appEntryPath }, { readFile });
+    const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
 
     expect(routes).toEqual([
       { method: 'GET', path: '/api/a' },
@@ -150,5 +150,56 @@ describe('collectExpressRoutes', () => {
     collectExpressRoutes({ appEntryPath }, { readFile });
 
     expect(readFile).toHaveBeenCalledWith(path.resolve('/repo/src', './routes/tasks.routes.js'));
+  });
+
+  it('reports an unparsed-route finding, tagged with its own file, for a template-literal route path', () => {
+    // AUDIT.md F8: a template-literal path (e.g. router.get(`/widgets/${id}`,
+    // ...)) can't be statically resolved, so it must not just silently vanish
+    // from the collected route set -- it needs an explicit warning finding
+    // instead, tagged with the file it came from (not the app entry file),
+    // so a report reader knows exactly where to look.
+    const readFile = jest.fn((filePath) => {
+      if (filePath === appEntryPath) return `const tasksRoutes = require('./routes/tasks.routes');\napp.use('/api/tasks', tasksRoutes);`;
+      if (filePath === path.resolve('/repo/src', './routes/tasks.routes.js')) {
+        return "router.get('/', list);\nrouter.get(`/widgets/${id}`, getWidget);";
+      }
+      throw new Error(`unexpected read: ${filePath}`);
+    });
+
+    const { routes, unparsedRoutes } = collectExpressRoutes({ appEntryPath }, { readFile });
+
+    expect(routes).toEqual([{ method: 'GET', path: '/api/tasks' }]);
+    expect(unparsedRoutes).toEqual([
+      {
+        type: 'unparsed-route',
+        method: 'GET',
+        line: 2,
+        reason: 'route exists but path could not be statically resolved',
+        file: path.resolve('/repo/src', './routes/tasks.routes.js'),
+      },
+    ]);
+  });
+
+  it('reports an unparsed-route finding for a template-literal mount prefix, and does not recurse into it', () => {
+    const readFile = jest.fn((filePath) => {
+      if (filePath === appEntryPath) {
+        return "const tasksRoutes = require('./routes/tasks.routes');\napp.use(`/api/${version}/tasks`, tasksRoutes);";
+      }
+      throw new Error(`unexpected read: ${filePath}`);
+    });
+
+    const { routes, unparsedRoutes } = collectExpressRoutes({ appEntryPath }, { readFile });
+
+    expect(routes).toEqual([]);
+    expect(unparsedRoutes).toEqual([
+      {
+        type: 'unparsed-route',
+        method: 'MOUNT',
+        line: 2,
+        reason: 'mount exists but prefix could not be statically resolved',
+        file: appEntryPath,
+      },
+    ]);
+    expect(readFile).toHaveBeenCalledTimes(1);
   });
 });

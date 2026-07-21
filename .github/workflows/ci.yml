@@ -34,3 +34,42 @@ jobs:
 
       - name: Run test suites
         run: npm test
+
+  dogfood:
+    name: Reviewer dogfood (non-blocking)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: npm
+          cache-dependency-path: reviewer/package-lock.json
+
+      - name: Install reviewer dependencies
+        run: npm ci
+        working-directory: reviewer
+
+      - name: Determine this push's diff range
+        id: range
+        shell: bash
+        env:
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_AFTER_SHA: ${{ github.event.after }}
+        run: |
+          RANGE=$(node scripts/resolvePushRange.js)
+          echo "range=${RANGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Run reviewer on this push's diff
+        run: node reviewer/src/cli.js "${{ steps.range.outputs.range }}" --out dogfood-report.md
+
+      - name: Upload dogfood report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dogfood-review-report
+          path: dogfood-report.md

@@ -93,6 +93,30 @@ describe('maskStringLiterals', () => {
     expect(masked).toBe('const url =                          ;');
     expect(masked.length).toBe(content.length);
   });
+
+  it('preserves embedded newlines when a multi-line template literal is masked in a single call', () => {
+    // Regression: a caller that masks a whole multi-line file as one string
+    // (e.g. docDrift/parseExpressRoutes.js) derives line numbers from the
+    // masked text by counting '\n' characters. The old code replaced every
+    // masked character -- including a literal newline inside a multi-line
+    // template literal -- with a single space, silently merging source
+    // lines and undercounting every line number computed from text after
+    // the literal. A per-line caller never notices (a single line's own
+    // content has no embedded '\n' to begin with).
+    const content = 'const x = `line1\nline2\nline3`;\nrouter.get(`/x`);';
+    const { masked } = maskStringLiterals(content);
+    expect(masked.length).toBe(content.length);
+    expect((masked.match(/\n/g) || []).length).toBe((content.match(/\n/g) || []).length);
+    expect(masked).toBe('const x =       \n     \n      ;\nrouter.get(    );');
+  });
+
+  it('preserves embedded newlines when a multi-line /* */ block comment is masked in a single call', () => {
+    const content = 'const a = 1;\n/* start\n   still going\n*/\nconst b = 2;';
+    const { masked } = maskStringLiterals(content);
+    expect(masked.length).toBe(content.length);
+    expect((masked.match(/\n/g) || []).length).toBe((content.match(/\n/g) || []).length);
+    expect(masked.split('\n')[4]).toBe('const b = 2;');
+  });
 });
 
 describe('maskComments', () => {
@@ -115,6 +139,19 @@ describe('maskComments', () => {
     const content = 'const url = "http://example.com/* not a comment */";';
     const { masked } = maskComments(content);
     expect(masked).toBe(content);
+  });
+
+  it('preserves embedded newlines when a multi-line /* */ block comment is masked in a single call', () => {
+    // Same regression as maskStringLiterals's own case: a caller deriving
+    // line numbers from masked text (docDrift/parseExpressRoutes.js's
+    // findUnparsedRoutes) needs the masked text's own line count to match
+    // the source's, or every line number reported for text after a
+    // multi-line block comment is undercounted.
+    const content = 'const a = 1;\n/* start\n   still going\n*/\nrouter.get(`/x`);';
+    const { masked } = maskComments(content);
+    expect(masked.length).toBe(content.length);
+    expect((masked.match(/\n/g) || []).length).toBe((content.match(/\n/g) || []).length);
+    expect(masked.split('\n')[4]).toBe('router.get(`/x`);');
   });
 
   it('does not mask a // that appears inside a string, even when a real comment follows', () => {

@@ -333,4 +333,30 @@ describe('findUnparsedRoutes', () => {
     const source = "router.get('/', list);\napp.use('/api/tasks', tasksRoutes);";
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
+
+  it('reports the correct line number when a multi-line /* */ block comment precedes the unparsed route', () => {
+    // Regression: maskComments used to replace every character of a block
+    // comment -- including its own embedded newlines -- with a single
+    // space, so lineNumberAt (which counts '\n' in the masked text) lost
+    // one line per newline swallowed inside any preceding block comment
+    // and reported an earlier, wrong line for every finding after it.
+    const source = [
+      "const express = require('express');",
+      '/*',
+      ' * multi-line block comment',
+      ' * spanning several lines',
+      ' */',
+      'const router = express.Router();',
+      'router.get(`/widgets/${id}`, getWidget);',
+    ].join('\n');
+
+    expect(findUnparsedRoutes(source)).toEqual([
+      {
+        type: 'unparsed-route',
+        method: 'GET',
+        line: 7,
+        reason: 'route exists but path could not be statically resolved',
+      },
+    ]);
+  });
 });

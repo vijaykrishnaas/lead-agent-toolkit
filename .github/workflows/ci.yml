@@ -35,6 +35,38 @@ jobs:
       - name: Run test suites
         run: npm test
 
+  invariant-lint:
+    name: Invariant lint (CLAUDE.md hard invariants 2 & 3)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+
+      - name: Determine this run's diff range
+        id: range
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_AFTER_SHA: ${{ github.event.after }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            RANGE="${PR_BASE_SHA}..${PR_HEAD_SHA}"
+          else
+            RANGE=$(node scripts/resolvePushRange.js)
+          fi
+          echo "range=${RANGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Lint hard invariants 2 & 3
+        run: node scripts/invariantLint.js "${{ steps.range.outputs.range }}"
+
   dogfood:
     name: Reviewer dogfood (non-blocking)
     runs-on: ubuntu-latest

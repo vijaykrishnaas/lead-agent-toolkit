@@ -5,6 +5,7 @@ const { maskStringLiterals } = require('../utils/maskStringLiterals');
 const { memberCallLine } = require('../utils/memberCallLine');
 const { parseAst } = require('../utils/parseAst');
 const { subtreeInOwnScope } = require('../utils/subtreeInOwnScope');
+const { walkStatement } = require('../utils/statementWalk');
 
 const ASYNC_HANDLER_SIGNATURE = /async\s*(\(|function)/;
 const HANDLER_PARAMS = /req\s*,\s*res/;
@@ -25,43 +26,22 @@ const CATCH_CALL = /\.catch\s*\(/;
 // collectBoundedBlock.js's own "no opening brace at all" test case. That
 // fallback is correct for *its* contract, but wrong for a statement-shaped
 // occurrence: it would sweep every unrelated following statement into the
-// window). Parens inside string/template literals (e.g. a callback body
-// logging a message containing a literal ")") are masked out via
-// maskStringLiterals first, so they can't be mistaken for the statement's
-// real paren structure — same bug class and fix as collectBoundedBlock's,
-// see CLAUDE.md's string-literal-aware depth-counting guideline.
-// Shared by two occurrence shapes: a .then() chain (a statement that may
-// have its own brace-delimited callback bodies nested inside its parens)
-// and a brace-less/concise-body async handler (e.g.
-// `async (req, res) => res.json(x);`, no `{` anywhere) — both need "this
-// one statement's own lines, not whatever collectBoundedBlock's brace-only
-// contract would sweep in when the statement never opens a brace on its own
-// starting line.
+// window). A blank or comment-only line never itself ends the statement
+// (see walkStatement's own doc comment) — a chain or a signature-then-brace
+// statement can legally have an explanatory comment or blank line sitting
+// between two of its own real lines. Shared by two occurrence shapes: a
+// .then() chain (a statement that may have its own brace-delimited callback
+// bodies nested inside its parens) and a brace-less/concise-body async
+// handler (e.g. `async (req, res) => res.json(x);`, no `{` anywhere) — both
+// need "this one statement's own lines, not whatever collectBoundedBlock's
+// brace-only contract would sweep in when the statement never opens a brace
+// on its own starting line." Delegates the actual walk (masking, paren
+// depth, check-before-scan) to the shared statementWalk helper — see
+// AUDIT.md F9 and findHandlerBraceStart below, which walks the identical
+// loop for a different purpose.
 function collectStatement(addedLines, startIdx) {
-  let depth = 0;
-  let quoteState = null;
-  const blockLines = [];
-  for (let i = startIdx; i < addedLines.length; i += 1) {
-    const content = addedLines[i].content;
-    const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
-    quoteState = nextQuoteState;
-    const trimmed = masked.trim();
-    // A blank or comment-only line (nothing left after masking) is never
-    // itself a `.`-chain continuation, but it also doesn't end a statement
-    // in real JS — a chain or a signature-then-brace statement can legally
-    // have an explanatory comment or blank line sitting between two of its
-    // own real lines. Only a genuinely non-blank, non-continuation line
-    // signals the statement actually ended.
-    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.')) break;
-
-    blockLines.push(content);
-    for (const ch of masked) {
-      if (ch === '(') depth += 1;
-      else if (ch === ')') depth -= 1;
-    }
-    if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) break;
-  }
-  return blockLines.join('\n');
+  const { lines } = walkStatement(addedLines, startIdx);
+  return lines.map((line) => line.content).join('\n');
 }
 
 // Finds the handler's real body-opening '{', or returns null if the handler
@@ -110,57 +90,33 @@ function collectStatement(addedLines, startIdx) {
 // anywhere is only ever accepted once the same running `depth` the
 // signature-line scan already used is back down to <= 0, no matter which
 // line it's on.
+// Checked before scanning each line's own characters, using depth as
+// carried over from the end of the previous line (walkStatement's own
+// check-before-scan ordering): a brace-less handler that ends via ASI (no
+// trailing ';', e.g. `async (req, res) => res.json(x)` with no semicolon)
+// has already implicitly ended once depth returns to <= 0 on a prior line
+// with no brace found. Scanning a line's characters for '{' before checking
+// this (the pre-consolidation ordering bug — see AUDIT.md F9 / run 6's
+// PROGRESS.md entry) would search a following, unrelated line/statement for
+// a brace and could return a completely different handler's own body brace
+// as if it belonged to this one. `exemptLeadingBrace: true` below asks
+// walkStatement to exempt a line whose trimmed content itself starts with
+// '{' from that bail-out: that's exactly the shape of a legitimate real
+// body brace sitting alone on its own line (e.g. after a comment between
+// the signature and the brace), and must fall through to the character
+// scan so it can be recognized. An unrelated following statement (a
+// different handler's own signature, e.g.
+// `exports.putWidget = async (req, res) => {`) never starts with '{'
+// itself, so this exemption doesn't reopen the ASI bug above.
 function findHandlerBraceStart(addedLines, startIdx) {
   const signatureMatch = ASYNC_HANDLER_SIGNATURE.exec(addedLines[startIdx].content);
   const startColumn = signatureMatch ? signatureMatch.index : 0;
-  let depth = 0;
-  let quoteState = null;
-  for (let i = startIdx; i < addedLines.length; i += 1) {
-    const rawContent = i === startIdx ? addedLines[i].content.slice(startColumn) : addedLines[i].content;
-    const { masked, quoteState: nextQuoteState } = maskStringLiterals(rawContent, quoteState);
-    quoteState = nextQuoteState;
-    const trimmed = masked.trim();
-
-    // Checked *before* scanning this line's own characters, using depth as
-    // carried over from the end of the previous line: a brace-less handler
-    // that ends via ASI (no trailing ';', e.g. `async (req, res) =>
-    // res.json(x)` with no semicolon) has already implicitly ended once
-    // depth returns to <= 0 on a prior line with no brace found. Scanning
-    // this line's characters for '{' *before* this check (the prior
-    // ordering) would search a following, unrelated line/statement for a
-    // brace and could return a completely different handler's own body
-    // brace as if it belonged to this one — see CLAUDE.md's per-occurrence
-    // boundary-derivation guideline; this is the same class of bug as
-    // collectStatement's own "check-before-scan" ordering exists to
-    // prevent, applied here to brace *acceptance* instead of block
-    // *collection*.
-    //
-    // A line whose trimmed content itself starts with '{' is exempted from
-    // this bail-out: that's exactly the shape of a legitimate real body
-    // brace sitting alone on its own line (e.g. after a comment between the
-    // signature and the brace), and must fall through to the character
-    // scan below so it can be recognized and accepted. An unrelated
-    // following statement (a different handler's own signature, e.g.
-    // `exports.putWidget = async (req, res) => {`) never starts with '{'
-    // itself, so this exemption doesn't reopen the ASI bug above — that
-    // scan is still stopped by this same check on its own non-'{'-starting
-    // first line.
-    if (i > startIdx && depth <= 0 && trimmed !== '' && !trimmed.startsWith('.') && !trimmed.startsWith('{')) {
-      return null;
-    }
-
-    for (let c = 0; c < masked.length; c += 1) {
-      const ch = masked[c];
-      if (ch === '(') depth += 1;
-      else if (ch === ')') depth -= 1;
-      else if (ch === '{' && depth <= 0) {
-        return { lineIndex: i, column: (i === startIdx ? startColumn : 0) + c };
-      }
-    }
-
-    if (depth <= 0 && trimmed !== '' && /;\s*$/.test(masked.trimEnd())) return null;
-  }
-  return null;
+  const { found } = walkStatement(addedLines, startIdx, {
+    startColumn,
+    exemptLeadingBrace: true,
+    onChar: (ch, depth, lineIndex, column) => (ch === '{' && depth <= 0 ? { lineIndex, column } : null),
+  });
+  return found;
 }
 
 // Text/regex-based path: derives handler and .then()-chain boundaries by

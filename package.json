@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "npm --prefix reviewer test && npm --prefix sample-app test",
-    "install:all": "npm --prefix reviewer install && npm --prefix sample-app install"
+    "install:all": "npm --prefix reviewer install && npm --prefix sample-app install",
+    "sync-plugin": "node scripts/syncPlugin.js"
   }
 }

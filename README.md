@@ -126,6 +126,20 @@ repo's standalone `.claude/skills/` (`plugin/skills/*` are exact copies of
 `reviewer/tests/plugin.test.js` checks against every directory under
 `.claude/skills/`, not a hardcoded list).
 
+**Skills are edited only under `.claude/skills/`** — never edit a file under
+`plugin/skills/` directly, since the next sync overwrites it. After changing
+a skill, run:
+
+```bash
+npm run sync-plugin
+```
+
+from the repo root (`scripts/syncPlugin.js`) to mirror `.claude/skills/*`
+into `plugin/skills/*` (copies new/changed files, removes anything under
+`plugin/skills/` that no longer exists in `.claude/skills/`), then re-run
+`npm test` so `reviewer/tests/plugin.test.js`'s byte-parity check and
+`reviewer/tests/syncPlugin.test.js` both confirm the two trees agree.
+
 **Test it for a single session**, from the repo root:
 
 ```bash

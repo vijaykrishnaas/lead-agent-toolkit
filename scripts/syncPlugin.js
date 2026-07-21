@@ -18,6 +18,9 @@ function mirrorDir(sourceDir, destDir) {
   for (const entry of sourceEntries) {
     const sourcePath = path.join(sourceDir, entry.name);
     const destPath = path.join(destDir, entry.name);
+    if (fs.existsSync(destPath) && fs.lstatSync(destPath).isDirectory() !== entry.isDirectory()) {
+      fs.rmSync(destPath, { recursive: true, force: true });
+    }
     if (entry.isDirectory()) {
       mirrorDir(sourcePath, destPath);
     } else if (entry.isFile()) {

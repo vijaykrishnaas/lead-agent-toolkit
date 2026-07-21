@@ -97,6 +97,22 @@ describe('syncPlugin', () => {
     expect(secondRunContent).toBe(firstRunContent);
   });
 
+  it('replaces a stale destination file with a directory when the source entry becomes a directory', () => {
+    writeFile(sourceDir, 'foo/SKILL.md', 'new content');
+    writeFile(destDir, 'foo', 'stale file content');
+
+    expect(() => syncPlugin({ sourceDir, destDir })).not.toThrow();
+    expect(fs.readFileSync(path.join(destDir, 'foo', 'SKILL.md'), 'utf8')).toBe('new content');
+  });
+
+  it('replaces a stale destination directory with a file when the source entry becomes a file', () => {
+    writeFile(sourceDir, 'foo', 'new file content');
+    writeFile(destDir, 'foo/SKILL.md', 'stale dir content');
+
+    expect(() => syncPlugin({ sourceDir, destDir })).not.toThrow();
+    expect(fs.readFileSync(path.join(destDir, 'foo'), 'utf8')).toBe('new file content');
+  });
+
   it('creates the destination root directory when it does not exist yet', () => {
     fs.rmSync(destDir, { recursive: true, force: true });
     writeFile(sourceDir, 'review-pr/SKILL.md', 'review-pr content');

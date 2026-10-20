@@ -1534,3 +1534,13 @@ Marked TASKS.md item 29 `[DONE]`.
 - Task 32 (RW3, mongodb-memory-server) will likely go BLOCKED in the cloud: fastdl.mongodb.org returns 403 through the proxy. Either allow that host in the environment's network policy, or approve a fallback (e.g. a MONGOMS_SYSTEM_BINARY from an apt-installed mongod in the setup script).
 - No notifications were chosen, so a BLOCKED or `paused` loop is visible only in `runs.jsonl`/PROGRESS.md. Check `npm run run-log -- idle-streak` or the scheduled-task list occasionally.
 - Standing: LLM-layer and SARIF-vs-comment (IDEAS.md part 2); AUDIT.md F5 (PR `claude/dev` -> `main`); the strict vs. tag-exempt TASKS.md rule in the invariant linter.
+
+## 2026-10-20 (Builder run: task 30, PROGRESS.md rollover — BLOCKED)
+
+**Done:** Prototyped the rollover (script moved all 2026-07 entries verbatim into `PROGRESS-2026-07.md`, 0 lines lost by multiset diff) but did not commit it. Marked task 30 `[BLOCKED]`.
+
+**Why blocked:** `scripts/invariantLint.js` flags any line removed from PROGRESS.md, so a verbatim move would fail the blocking `invariant-lint` CI job. The fix is small (treat a line as preserved if it appears in a `PROGRESS-<YYYY-MM>.md` archive at head, plus 2 tests), but the permission classifier denied the edit to that file as "self-modification" of invariant enforcement. I did not work around it.
+
+**Open questions for Vijay:**
+- Approve editing `scripts/invariantLint.js` to make the PROGRESS check archive-aware (then remove the BLOCKED tag; the prototype script is trivial to redo), or drop task 30.
+- Builder will otherwise proceed to task 31 next run (topmost non-BLOCKED).

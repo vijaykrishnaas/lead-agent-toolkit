@@ -1573,3 +1573,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Did not make the integration tests skip when the binary is missing — that would let the layer silently not run, defeating its purpose (it exists because mocks hid real-query bugs). Next run will have task 32 skipped and fall to EMPTY-BACKLOG (a)/(b).
 
 **Open questions for Vijay:** Allowlist `fastdl.mongodb.org` for this environment (or provide a `MONGOMS_SYSTEM_BINARY`/preinstalled mongod), then remove the BLOCKED tag on task 32. Still outstanding: approve the `scripts/invariantLint.js` edit for task 30.
+
+## 2026-10-20 — Reviewer run (f5b81fb..87eca68)
+- Done: reviewed f5b81fb..87eca68 (docs/log only: task 32 BLOCKED tag, reviewer log) — 0 findings. Backlog has no actionable item (30, 32 BLOCKED) → EMPTY-BACKLOG (b): hunted `diffParser.js`, the module with the oldest last-touch (2026-07-17) and fewest hunt mentions. Reproduced a bug: an in-hunk deleted line `-- x` (raw `--- x`) or added line `++ x` (raw `+++ x`) was treated as a file header, silently dropping lines and creating a phantom file entry. Fixed test-first: a `---` line is a header only as a `---`/`+++`/`@@` triple. 435 reviewer tests green (+1).
+- Decisions: used triple lookahead rather than hunk line counts, since existing fixtures have header counts inconsistent with their bodies. No new tasks/FEATURE.
+- Open questions for Vijay: still outstanding — approve `scripts/invariantLint.js` edit (task 30); allowlist `fastdl.mongodb.org` (task 32).

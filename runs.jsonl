@@ -4,3 +4,4 @@
 {"ts":"2026-10-20T19:07:53.704Z","trigger":"builder","outcome":"done","task":"31","tests":"green","sha":"d0e729b","summary":"RW2: four CLI parsers unified into utils/parseArgv.js (+7 tests)"}
 {"ts":"2026-10-20T19:36:08.835Z","trigger":"reviewer","outcome":"done","task":"null","tests":"green","sha":"f5b81fb","summary":"Reviewed 720b2bd..f5b81fb (task 31 parseArgv RW2): 0 findings, behavior-preserving; no changes beyond log"}
 {"ts":"2026-10-20T20:07:53.181Z","trigger":"builder","outcome":"blocked","task":"32","tests":"green","sha":"2c96616","summary":"Task 32 BLOCKED: mongod download 403 from sandbox proxy; sample-app changes reverted, tagged in TASKS.md"}
+{"ts":"2026-10-20T20:37:21.785Z","trigger":"reviewer","outcome":"done","task":"null","tests":"green","sha":"87eca68","summary":"Reviewed f5b81fb..87eca68 (docs only): 0 findings; EMPTY-BACKLOG (b) hunt of diffParser.js: fixed in-hunk '-- x'/'++ x' lines misparsed as file headers (+1 test)"}

@@ -61,4 +61,27 @@ describe('parseDiff', () => {
     const files = parseDiff(twoFileDiff);
     expect(files.map((f) => f.file)).toEqual(['src/foo.js', 'src/bar.js']);
   });
+
+  it('does not mistake in-hunk lines starting with "-- " or "++ " for file headers', () => {
+    const diff = [
+      'diff --git a/q.sql b/q.sql',
+      '--- a/q.sql',
+      '+++ b/q.sql',
+      '@@ -1,3 +1,3 @@',
+      ' keep',
+      '--- old comment',
+      '+++ new',
+      ' tail',
+    ].join('\n');
+    const files = parseDiff(diff);
+    expect(files).toHaveLength(1);
+    expect(files[0].file).toBe('q.sql');
+    const lines = files[0].hunks[0].lines;
+    expect(lines.map((l) => [l.type, l.content])).toEqual([
+      ['context', 'keep'],
+      ['del', '-- old comment'],
+      ['add', '++ new'],
+      ['context', 'tail'],
+    ]);
+  });
 });

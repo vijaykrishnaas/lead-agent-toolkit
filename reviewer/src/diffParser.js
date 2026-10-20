@@ -19,16 +19,23 @@ function parseDiff(diffText) {
   let oldLine = 0;
   let newLine = 0;
 
-  for (const rawLine of lines) {
+  // A `--- `/`+++ ` line is a file header only as a `---`,`+++`,`@@` triple;
+  // inside a hunk it is a deleted `-- x` / added `++ x` content line.
+  const isFileHeaderStart = (i) =>
+    lines[i].startsWith('--- ') && lines[i + 1] !== undefined && lines[i + 1].startsWith('+++ ') &&
+    (lines[i + 2] === undefined || lines[i + 2].startsWith('@@') || !currentHunk);
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const rawLine = lines[i];
     if (rawLine.startsWith('diff --git')) {
       currentFile = null;
       currentHunk = null;
       continue;
     }
-    if (rawLine.startsWith('--- ')) {
+    if (isFileHeaderStart(i)) {
       continue;
     }
-    if (rawLine.startsWith('+++ ')) {
+    if (rawLine.startsWith('+++ ') && lines[i - 1] !== undefined && lines[i - 1].startsWith('--- ') && isFileHeaderStart(i - 1)) {
       const path = stripPrefix(rawLine.slice(4).trim());
       currentFile = { file: path, hunks: [] };
       files.push(currentFile);

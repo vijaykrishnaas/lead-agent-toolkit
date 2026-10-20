@@ -120,6 +120,29 @@ describe('lintInvariants', () => {
     expect(lintInvariants({ range: 'base..head', execGit })).toEqual([]);
   });
 
+  it('flags removed runs.jsonl entries', () => {
+    const execGit = fakeExecGit({
+      files: ['runs.jsonl'],
+      contents: {
+        base: { 'runs.jsonl': '{"outcome":"noop"}\n{"outcome":"done"}\n' },
+        head: { 'runs.jsonl': '{"outcome":"done"}\n' },
+      },
+    });
+    const violations = lintInvariants({ range: 'base..head', execGit });
+    expect(violations.some((v) => v.includes('runs.jsonl') && v.includes('noop'))).toBe(true);
+  });
+
+  it('does not flag creating or appending to runs.jsonl', () => {
+    const execGit = fakeExecGit({
+      files: ['runs.jsonl'],
+      contents: {
+        base: {},
+        head: { 'runs.jsonl': '{"outcome":"noop"}\n' },
+      },
+    });
+    expect(lintInvariants({ range: 'base..head', execGit })).toEqual([]);
+  });
+
   it('flags removed SKILL_CHANGELOG.md content', () => {
     const execGit = fakeExecGit({
       files: ['SKILL_CHANGELOG.md'],

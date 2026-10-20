@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Mechanically enforces CLAUDE.md's hard invariants 2 and 3 against a commit range:
-// (a) no existing TASKS.md task line, PROGRESS.md line, or SKILL_CHANGELOG.md line may
-//     be removed (reordering is fine; deletion is not);
+// (a) no existing TASKS.md task line, PROGRESS.md line, SKILL_CHANGELOG.md line, or
+//     runs.jsonl line (the scheduled-loop run log) may be removed (reordering is fine; deletion is not);
 // (b) a diff touching CLAUDE.md, .claude/skills/**, or that substantively changes
 //     TASKS.md's backlog (an added task, edited task wording, or reordering) must add
 //     at least one non-blank SKILL_CHANGELOG.md line in the same diff. Marking an
@@ -16,6 +16,7 @@ const { execFileSync } = require('child_process');
 const TASKS_FILE = 'TASKS.md';
 const PROGRESS_FILE = 'PROGRESS.md';
 const CHANGELOG_FILE = 'SKILL_CHANGELOG.md';
+const RUNS_FILE = 'runs.jsonl';
 const CLAUDE_FILE = 'CLAUDE.md';
 const SKILLS_DIR_PREFIX = '.claude/skills/';
 
@@ -173,6 +174,9 @@ function lintInvariants({ range, execGit }) {
   }
   if (files.includes(CHANGELOG_FILE)) {
     violations.push(...lintHistoryFile(execGit, base, head, CHANGELOG_FILE));
+  }
+  if (files.includes(RUNS_FILE)) {
+    violations.push(...lintHistoryFile(execGit, base, head, RUNS_FILE));
   }
   violations.push(...lintChangelogAddition(execGit, base, head, files));
 

@@ -1505,3 +1505,32 @@ Marked TASKS.md item 29 `[DONE]`.
 **Open questions for Vijay:**
 - This run's scoping decision (check (b) exempts in-place TASKS.md tag changes) is a real, documented deviation from task 29's own literal wording, chosen because the literal reading contradicted ~10 prior commits' settled practice. If you'd instead prefer the stricter literal rule going forward (every TASKS.md-touching commit, including a bare `[DONE]` mark, must carry a SKILL_CHANGELOG.md line), say so and a future run can tighten `tasksChangedSubstantively` to always return `true` — that's a one-line change, isolated behind the existing test suite.
 - Standing, unchanged from prior entries: LLM-layer and SARIF-vs-comment decisions (IDEAS.md part 2), Reviewer cadence change (part 3), and AUDIT.md F5 (PR `claude/dev` -> `main`, actionable since task 20 landed but a Vijay action, not backlog work).
+
+## 2026-10-20 (Vijay-requested setup run: hourly Builder/Reviewer scheduled loop)
+
+**Done:** Vijay asked for continuous refinement and review driven by two scheduled tasks every hour, with everything logged. Before building anything, raised these clarifying points with Vijay:
+- No `staging` branch exists, and CLAUDE.md says "claude/dev only".
+- The previous Builder/Reviewer routines last committed 2026-07-21, and no scheduled tasks exist on the account now.
+- Two hourly triggers mean 48 runs/day, against AUDIT.md F6's finding that idle runs converge on identical hunting.
+- Only tasks 30–32 remain open.
+- MongoDB binary downloads are blocked (403) in the cloud environment, which affects task 32 (RW3).
+
+**Decisions (Vijay, 2026-10-20):**
+- Branch: keep `claude/dev`.
+- Cadence: hourly for both triggers, with an idle backoff.
+- Scope after the backlog: bug hunts plus implementing new features.
+- Logging: a structured `runs.jsonl` in the repo, with no push/email notifications.
+
+**Change:**
+- CLAUDE.md: added a SCHEDULED LOOP section (SKILL_CHANGELOG entry of the same date).
+- New `scripts/runLog.js` with `append` and `idle-streak` commands (`npm run run-log`), plus 20 tests.
+- `scripts/invariantLint.js`: `runs.jsonl` is now append-only (+2 tests).
+- README: documents the loop.
+- Created the two scheduled tasks; they are configured outside the repo.
+
+**Verification:** `npm test` green at the repo root, both suites.
+
+**Open questions for Vijay:**
+- Task 32 (RW3, mongodb-memory-server) will likely go BLOCKED in the cloud: fastdl.mongodb.org returns 403 through the proxy. Either allow that host in the environment's network policy, or approve a fallback (e.g. a MONGOMS_SYSTEM_BINARY from an apt-installed mongod in the setup script).
+- No notifications were chosen, so a BLOCKED or `paused` loop is visible only in `runs.jsonl`/PROGRESS.md. Check `npm run run-log -- idle-streak` or the scheduled-task list occasionally.
+- Standing: LLM-layer and SARIF-vs-comment (IDEAS.md part 2); AUDIT.md F5 (PR `claude/dev` -> `main`); the strict vs. tag-exempt TASKS.md rule in the invariant linter.

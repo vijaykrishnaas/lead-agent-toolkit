@@ -1,5 +1,10 @@
 # Skill Changelog
 
+## 2026-10-20 (Vijay-requested setup run: hourly Builder/Reviewer scheduled loop)
+**Change:** Added a "SCHEDULED LOOP" section to CLAUDE.md (below the hard invariants, which are untouched). It covers: two hourly scheduled tasks (Builder at :05, Reviewer at :35 UTC) on claude/dev; separate roles (only the Reviewer adds tasks; at most one evidence-cited `[FEATURE]` task per UTC day); an idle backoff that pauses both after 3 consecutive `noop` runs; a rebase-before-push concurrency rule; and a per-run structured log in `runs.jsonl`, with `noop` runs exempt from the PROGRESS.md entry requirement. Added `scripts/runLog.js` (plus tests) and extended `scripts/invariantLint.js` so CI rejects a diff that removes `runs.jsonl` history.
+
+**Evidence:** PROGRESS.md 2026-07-20 "part 3" entry and AUDIT.md F6: with an empty backlog the Builder and Reviewer prompts "converge on identical behavior (both end up hunting)". That entry also left "Routine cadence reduction once the backlog empties again (AUDIT.md F6)" as a standing open question; no run has happened since 2026-07-21. Vijay decided it on 2026-10-20 (PROGRESS.md entry of that date): hourly for both triggers, but with an idle backoff, explicit role separation so the two runs stop converging, and a scoped allowance to implement new features. The feature allowance is a deliberate exception to "no speculative rewrites", bounded by the one-per-day cap and the evidence-of-a-gap requirement.
+
 ## 2026-07-21 (self-scheduled adversarial-hunt run — recent-commits bug hunt, part 2)
 **Change:** Added guideline 26 to CLAUDE.md's GUIDELINES list (below the hard invariants), with the full recurrence narrative appended to `docs/GUIDELINES_HISTORY.md` in the same commit per guideline 24: a directory-mirroring/sync utility must check whether a same-named destination entry's type (file vs. directory) matches the source entry's type before writing, and remove the mismatched-type destination entry first — otherwise `fs.copyFileSync`/`fs.mkdirSync` throw instead of syncing.
 

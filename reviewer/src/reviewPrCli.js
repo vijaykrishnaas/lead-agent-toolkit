@@ -5,8 +5,9 @@ const { loadRules, DEFAULT_CONFIG_PATH } = require('./config/loadRules');
 const { formatMarkdownReport } = require('./format/markdownReport');
 const { postReviewComment, tokenFromEnv } = require('./github/postReviewComment');
 const { parseArgv } = require('./utils/parseArgv');
+const { parseGitHubRemote } = require('./utils/parseGitHubRemote');
 
-const USAGE = 'Usage: review-pr -- --owner <owner> --gh-repo <name> --pr <number> <base>..<head> '
+const USAGE = 'Usage: review-pr -- [--owner <owner>] [--gh-repo <name>] --pr <number> <base>..<head> '
   + '[--repo <path>] [--config <path>] [--token <token>] [--out <file>] [--no-post]';
 const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
 
@@ -26,7 +27,9 @@ const ARG_SPEC = {
   positional: 'range',
 };
 
-function parseReviewPrArgs(argv) {
+// `inferRepo` (optional) returns { owner, repo } or null; it only fills in
+// --owner/--gh-repo when the flags are absent, so explicit flags always win.
+function parseReviewPrArgs(argv, inferRepo) {
   const args = parseArgv(argv, {
     ...ARG_SPEC,
     defaults: {
@@ -34,6 +37,13 @@ function parseReviewPrArgs(argv) {
       repo: process.cwd(), config: undefined, token: null, out: null, noPost: false,
     },
   });
+  if ((!args.owner || !args.ghRepo) && inferRepo) {
+    const inferred = inferRepo();
+    if (inferred) {
+      args.owner = args.owner || inferred.owner;
+      args.ghRepo = args.ghRepo || inferred.repo;
+    }
+  }
   if (!args.owner) throw new Error('Missing required --owner <owner>.');
   if (!args.ghRepo) throw new Error('Missing required --gh-repo <name>.');
   if (!args.pr) throw new Error('Missing required --pr <number>.');
@@ -63,7 +73,16 @@ async function runReviewPrCli(argv, deps = {}) {
 
   let args;
   try {
-    args = parseReviewPrArgs(argv);
+    // Pre-scan --repo so the origin remote is read from the repo being reviewed.
+    const repoFlag = argv.indexOf('--repo');
+    const repoDir = repoFlag !== -1 && argv[repoFlag + 1] ? argv[repoFlag + 1] : process.cwd();
+    args = parseReviewPrArgs(argv, () => {
+      try {
+        return parseGitHubRemote(execGit(['remote', 'get-url', 'origin'], repoDir).trim());
+      } catch (err) {
+        return null;
+      }
+    });
   } catch (err) {
     stderr.write(`${err.message}\n${USAGE}\n`);
     return 1;

@@ -261,3 +261,8 @@
 **Change:** TASKS.md task 32 tagged `[BLOCKED: ...]` (no reordering, no deletion), per invariant 1's "mark task BLOCKED" path.
 
 **Evidence:** PROGRESS.md 2026-10-20 Builder entry (task 32): `mongodb-memory-server` installed fine but its mongod download (`fastdl.mongodb.org`) returns 403 from the run sandbox proxy, so an integration layer could not be verified green; nothing was committed beyond this tag.
+
+## 2026-10-20 (EMPTY-BACKLOG (a): owner/repo inference for review-pr)
+**Change:** `.claude/skills/review-pr/SKILL.md` (and synced `plugin/skills/` copy) now documents `--owner`/`--gh-repo` as optional; `reviewPrCli` infers them from `git remote get-url origin` when absent, explicit flags always win.
+
+**Evidence:** PROGRESS.md task-6, task-9 and task-10 entries all raised "infer owner/repo from `git remote get-url origin` vs. always-explicit" as an open question and it was restated unresolved through the later entries (oldest unresolved question per EMPTY-BACKLOG (a)); the 2026-07-18 task-13 entry's own open question asks for restated questions to be resolved rather than re-logged.

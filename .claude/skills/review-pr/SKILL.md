@@ -34,7 +34,7 @@ From the repo root:
 
 ```bash
 node reviewer/src/reviewPrCli.js \
-  --owner <owner> --gh-repo <repo-name> --pr <number> <base>..<head> \
+  [--owner <owner>] [--gh-repo <repo-name>] --pr <number> <base>..<head> \
   [--repo <path-to-local-git-repo>] [--config <path-to-review-rules.yaml>] \
   [--token <token>] [--out <file>] [--no-post]
 ```

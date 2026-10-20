@@ -13,6 +13,41 @@ function makeStream() {
 
 const BASE_ARGV = ['--owner', 'vijaykrishnaas', '--gh-repo', 'lead-agent-toolkit', '--pr', '42', 'base..head'];
 
+describe('parseReviewPrArgs owner/repo inference', () => {
+  it('fills missing --owner/--gh-repo from the inferRepo callback', () => {
+    const args = parseReviewPrArgs(['--pr', '1', 'a..b'], () => ({ owner: 'o', repo: 'r' }));
+    expect(args.owner).toBe('o');
+    expect(args.ghRepo).toBe('r');
+  });
+
+  it('lets explicit flags win over the inferred values', () => {
+    const args = parseReviewPrArgs(['--owner', 'mine', '--pr', '1', 'a..b'], () => ({ owner: 'o', repo: 'r' }));
+    expect(args.owner).toBe('mine');
+    expect(args.ghRepo).toBe('r');
+  });
+
+  it('still errors when inference yields nothing', () => {
+    expect(() => parseReviewPrArgs(['--pr', '1', 'a..b'], () => null)).toThrow(/--owner/);
+  });
+
+  it('runReviewPrCli infers owner/repo from the origin remote and posts there', async () => {
+    const postReviewComment = jest.fn().mockResolvedValue({ action: 'created' });
+    const execGit = jest.fn((gitArgs) => {
+      if (gitArgs[0] === 'remote') return 'git@github.com:inferred-owner/inferred-repo.git\n';
+      if (gitArgs[0] === 'diff') return loadFixture('security-hardcoded-secret.diff');
+      return 'abc123\n';
+    });
+    const exitCode = await runReviewPrCli(['--pr', '7', 'base..head', '--token', 't'], {
+      execGit, postReviewComment, stdout: makeStream(), stderr: makeStream(),
+    });
+    expect(exitCode).toBe(0);
+    expect(postReviewComment).toHaveBeenCalledWith(
+      expect.objectContaining({ owner: 'inferred-owner', repo: 'inferred-repo', prNumber: '7' }),
+      expect.anything(),
+    );
+  });
+});
+
 describe('parseReviewPrArgs', () => {
   it('parses owner/gh-repo/pr and the base..head range', () => {
     const args = parseReviewPrArgs(BASE_ARGV);
@@ -187,14 +222,14 @@ describe('runReviewPrCli', () => {
     expect(deps.stdout.text).toContain('# Code Review Report');
   });
 
-  it('returns exit code 1 and writes to stderr on invalid args, without calling git', async () => {
-    const execGit = jest.fn();
+  it('returns exit code 1 and writes to stderr on invalid args, without running git diff', async () => {
+    const execGit = jest.fn(() => { throw new Error('no remote'); });
     const stderr = makeStream();
 
     const exitCode = await runReviewPrCli(['--owner', 'o'], { execGit, stdout: makeStream(), stderr });
 
     expect(exitCode).toBe(1);
-    expect(execGit).not.toHaveBeenCalled();
+    expect(execGit).not.toHaveBeenCalledWith(['diff', expect.anything()], expect.anything());
     expect(stderr.text).toContain('--gh-repo');
   });
 

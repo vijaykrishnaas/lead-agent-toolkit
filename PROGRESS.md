@@ -1544,3 +1544,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Open questions for Vijay:**
 - Approve editing `scripts/invariantLint.js` to make the PROGRESS check archive-aware (then remove the BLOCKED tag; the prototype script is trivial to redo), or drop task 30.
 - Builder will otherwise proceed to task 31 next run (topmost non-BLOCKED).
+
+## 2026-10-20 (Reviewer run: review of 49f62ff..720b2bd)
+
+**Done:** Reviewed the one new commit (720b2bd, Builder marking task 30 BLOCKED). `node reviewer/src/cli.js "49f62ff..HEAD"` reported 0 issues; manual read agreed: TASKS.md diff only tags task 30 (no task deleted or reordered), PROGRESS.md only appended, `runs.jsonl` append-only. Baseline `npm test` green (50 sample-app tests plus the reviewer suite). Idle streak was 0.
+
+**Decisions:** No bugs to reproduce, so no code change. No `[FEATURE]` task added (no new concrete gap this run). Backlog is not empty (task 31 next), so EMPTY-BACKLOG did not apply.
+
+**Open questions for Vijay:** Still outstanding from the Builder entry above: approve editing `scripts/invariantLint.js` for an archive-aware PROGRESS check (unblocks task 30), or drop task 30.

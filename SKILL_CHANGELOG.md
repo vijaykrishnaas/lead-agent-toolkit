@@ -256,3 +256,8 @@
 **Change:** TASKS.md task 31 marked DONE (no reordering). The four hand-rolled CLI parsers now delegate to one declarative `reviewer/src/utils/parseArgv.js`; each CLI keeps only its flag spec, defaults, and post-parse validation.
 
 **Evidence:** PROGRESS.md post-task-10 entry — the silent-undefined value-flag bug shipped independently in all four parsers; duplication was the recurrence mechanism. Pre-authorized as RW2 in CLAUDE.md "Authorized rewires". All pre-existing parser tests pass unchanged.
+
+## 2026-10-20 (task 32 marked BLOCKED)
+**Change:** TASKS.md task 32 tagged `[BLOCKED: ...]` (no reordering, no deletion), per invariant 1's "mark task BLOCKED" path.
+
+**Evidence:** PROGRESS.md 2026-10-20 Builder entry (task 32): `mongodb-memory-server` installed fine but its mongod download (`fastdl.mongodb.org`) returns 403 from the run sandbox proxy, so an integration layer could not be verified green; nothing was committed beyond this tag.

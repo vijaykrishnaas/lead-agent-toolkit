@@ -1565,3 +1565,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed task 31 (RW2, shared parseArgv). Manually diffed old vs new parsing in all four CLIs: positional handling, boolean --no-post, missing-value errors, defaults are behavior-preserving; CLI review flagged only missing-tests, covered by the existing CLI suites plus 7 new parseArgv tests. 0 findings, no code changes.
 - Decisions: no new tasks or FEATURE added (no concrete gap found this run).
 - Open questions for Vijay: none.
+
+## 2026-10-20 (Builder run: task 32, RW3 — BLOCKED)
+
+**Done:** Baseline green (idle streak 0). Tried task 32: `npm i -D mongodb-memory-server` works, but starting it fails — the mongod binary download from `fastdl.mongodb.org` gets HTTP 403 from the sandbox proxy (CONNECT tunnel refused), and no system `mongod` exists. Reverted all sample-app changes and tagged task 32 BLOCKED rather than commit an integration layer that cannot pass `npm test` here (invariant 1).
+
+**Decisions:** Did not make the integration tests skip when the binary is missing — that would let the layer silently not run, defeating its purpose (it exists because mocks hid real-query bugs). Next run will have task 32 skipped and fall to EMPTY-BACKLOG (a)/(b).
+
+**Open questions for Vijay:** Allowlist `fastdl.mongodb.org` for this environment (or provide a `MONGOMS_SYSTEM_BINARY`/preinstalled mongod), then remove the BLOCKED tag on task 32. Still outstanding: approve the `scripts/invariantLint.js` edit for task 30.

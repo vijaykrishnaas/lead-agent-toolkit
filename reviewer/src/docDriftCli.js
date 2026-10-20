@@ -1,26 +1,18 @@
 const fs = require('fs');
 const { generateDocDrift } = require('./docDrift/generateDocDrift');
-const { consumeFlagValue } = require('./utils/consumeFlagValue');
+const { parseArgv } = require('./utils/parseArgv');
 
 const USAGE = 'Usage: doc-drift --app <path-to-express-entry> --openapi <path-to-openapi.yaml> [--out <file>]';
 
-// Flags that take a following value. A flag given as the last token in argv,
-// or immediately followed by another flag, must fail loudly rather than
-// silently taking a wrong value — see the CLAUDE.md guideline on
-// value-taking CLI flags.
-const VALUE_FLAGS = { '--app': 'app', '--openapi': 'openapi', '--out': 'out' };
+// Value-taking flags error loudly when their value is absent (shared parseArgv,
+// see the CLAUDE.md guideline on value-taking CLI flags).
+const ARG_SPEC = {
+  defaults: { app: null, openapi: null, out: null },
+  flags: { '--app': { key: 'app' }, '--openapi': { key: 'openapi' }, '--out': { key: 'out' } },
+};
 
 function parseDocDriftArgs(argv) {
-  const args = { app: null, openapi: null, out: null };
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    const key = VALUE_FLAGS[arg];
-    if (key) {
-      args[key] = consumeFlagValue(argv, ++i, arg);
-    } else {
-      throw new Error(`Unrecognized argument: ${arg}`);
-    }
-  }
+  const args = parseArgv(argv, ARG_SPEC);
   if (!args.app) throw new Error('Missing required --app <path-to-express-entry>.');
   if (!args.openapi) throw new Error('Missing required --openapi <path-to-openapi.yaml>.');
   return args;

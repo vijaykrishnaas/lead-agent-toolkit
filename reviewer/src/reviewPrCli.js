@@ -4,38 +4,36 @@ const { reviewDiff } = require('./reviewer');
 const { loadRules, DEFAULT_CONFIG_PATH } = require('./config/loadRules');
 const { formatMarkdownReport } = require('./format/markdownReport');
 const { postReviewComment, tokenFromEnv } = require('./github/postReviewComment');
-const { consumeFlagValue } = require('./utils/consumeFlagValue');
+const { parseArgv } = require('./utils/parseArgv');
 
 const USAGE = 'Usage: review-pr -- --owner <owner> --gh-repo <name> --pr <number> <base>..<head> '
   + '[--repo <path>] [--config <path>] [--token <token>] [--out <file>] [--no-post]';
 const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
 
-// Flags that take a following value. A flag given as the last token in argv,
-// or immediately followed by another flag, must fail loudly rather than
-// silently taking a wrong value — see the CLAUDE.md guideline on
-// value-taking CLI flags.
-const VALUE_FLAGS = {
-  '--owner': 'owner', '--gh-repo': 'ghRepo', '--pr': 'pr', '--repo': 'repo', '--config': 'config', '--token': 'token', '--out': 'out',
+// Value-taking flags error loudly when their value is absent (shared parseArgv,
+// see the CLAUDE.md guideline on value-taking CLI flags).
+const ARG_SPEC = {
+  flags: {
+    '--owner': { key: 'owner' },
+    '--gh-repo': { key: 'ghRepo' },
+    '--pr': { key: 'pr' },
+    '--repo': { key: 'repo' },
+    '--config': { key: 'config' },
+    '--token': { key: 'token' },
+    '--out': { key: 'out' },
+    '--no-post': { key: 'noPost', takesValue: false },
+  },
+  positional: 'range',
 };
 
 function parseReviewPrArgs(argv) {
-  const args = {
-    owner: null, ghRepo: null, pr: null, range: null,
-    repo: process.cwd(), config: undefined, token: null, out: null, noPost: false,
-  };
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    const key = VALUE_FLAGS[arg];
-    if (key) {
-      args[key] = consumeFlagValue(argv, ++i, arg);
-    } else if (arg === '--no-post') {
-      args.noPost = true;
-    } else if (!args.range && !arg.startsWith('--')) {
-      args.range = arg;
-    } else {
-      throw new Error(`Unrecognized argument: ${arg}`);
-    }
-  }
+  const args = parseArgv(argv, {
+    ...ARG_SPEC,
+    defaults: {
+      owner: null, ghRepo: null, pr: null, range: null,
+      repo: process.cwd(), config: undefined, token: null, out: null, noPost: false,
+    },
+  });
   if (!args.owner) throw new Error('Missing required --owner <owner>.');
   if (!args.ghRepo) throw new Error('Missing required --gh-repo <name>.');
   if (!args.pr) throw new Error('Missing required --pr <number>.');

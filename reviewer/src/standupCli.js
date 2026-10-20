@@ -1,33 +1,32 @@
 const fs = require('fs');
 const { generateStandup } = require('./standup/generateStandup');
 const { tokenFromEnv } = require('./github/postReviewComment');
-const { consumeFlagValue } = require('./utils/consumeFlagValue');
+const { parseArgv } = require('./utils/parseArgv');
 
 const USAGE = 'Usage: standup [--owner <owner>] [--gh-repo <name>] [--repo <path>] '
   + '[--since <iso-date>] [--token <token>] [--out <file>]';
 
-// Flags that take a following value. A flag given as the last token in argv
-// (or immediately followed by another flag) must fail loudly rather than
-// silently taking `undefined` as its value — see the CLAUDE.md guideline on
-// value-taking CLI flags for why (an unnoticed missing value for --owner
-// previously produced a commits-only report with no error at all).
-const VALUE_FLAGS = {
-  '--owner': 'owner', '--gh-repo': 'ghRepo', '--repo': 'repo', '--since': 'since', '--token': 'token', '--out': 'out',
+// Value-taking flags error loudly when their value is absent (shared parseArgv;
+// an unnoticed missing value for --owner previously produced a commits-only
+// report with no error at all — see the CLAUDE.md guideline on value flags).
+const ARG_SPEC = {
+  flags: {
+    '--owner': { key: 'owner' },
+    '--gh-repo': { key: 'ghRepo' },
+    '--repo': { key: 'repo' },
+    '--since': { key: 'since' },
+    '--token': { key: 'token' },
+    '--out': { key: 'out' },
+  },
 };
 
 function parseStandupArgs(argv) {
-  const args = {
-    owner: null, ghRepo: null, repo: process.cwd(), since: null, token: null, out: null,
-  };
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    const key = VALUE_FLAGS[arg];
-    if (key) {
-      args[key] = consumeFlagValue(argv, ++i, arg);
-    } else {
-      throw new Error(`Unrecognized argument: ${arg}`);
-    }
-  }
+  const args = parseArgv(argv, {
+    ...ARG_SPEC,
+    defaults: {
+      owner: null, ghRepo: null, repo: process.cwd(), since: null, token: null, out: null,
+    },
+  });
   if ((args.owner && !args.ghRepo) || (!args.owner && args.ghRepo)) {
     throw new Error('--owner and --gh-repo must both be given (or both omitted) to include pull requests.');
   }

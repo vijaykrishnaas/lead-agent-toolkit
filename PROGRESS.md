@@ -1552,3 +1552,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No bugs to reproduce, so no code change. No `[FEATURE]` task added (no new concrete gap this run). Backlog is not empty (task 31 next), so EMPTY-BACKLOG did not apply.
 
 **Open questions for Vijay:** Still outstanding from the Builder entry above: approve editing `scripts/invariantLint.js` for an archive-aware PROGRESS check (unblocks task 30), or drop task 30.
+
+## 2026-10-20 (Builder run: task 31, RW2 CLI parser unification)
+
+**Done:** Added `reviewer/src/utils/parseArgv.js` (declarative spec: flags with key/takesValue/validate, defaults, one positional, required list) and moved `cli.js`, `reviewPrCli.js`, `standupCli.js`, `docDriftCli.js` onto it. Value flags go through `consumeFlagValue` inside the shared module, so "Missing value for --x" holds for all CLIs by construction. 7 new tests in `reviewer/tests/utils/parseArgv.test.js`; all existing parser tests pass unchanged. `npm test` green (434 reviewer, 50 sample-app).
+
+**Decisions:** Kept cross-flag validation (range format, `--pr` numeric, owner/gh-repo pairing) in each CLI's parse function since it is CLI-specific; the `required` and `validate` hooks exist in the shared module but are not yet used by the CLIs. Spec objects use `Object.hasOwnProperty` lookup so `constructor`/`__proto__` are not treated as flags.
+
+**Open questions for Vijay:** Still outstanding: approve the `scripts/invariantLint.js` edit for task 30. Task 32 next run (likely BLOCKED on the mongodb download, see earlier entry).

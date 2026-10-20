@@ -3,30 +3,23 @@ const { execFileSync } = require('child_process');
 const { reviewDiff } = require('./reviewer');
 const { loadRules, DEFAULT_CONFIG_PATH } = require('./config/loadRules');
 const { formatMarkdownReport } = require('./format/markdownReport');
-const { consumeFlagValue } = require('./utils/consumeFlagValue');
+const { parseArgv } = require('./utils/parseArgv');
 
 const USAGE = 'Usage: review -- <base>..<head> [--repo <path>] [--config <path>] [--out <file>]';
 const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
 
-// Flags that take a following value. A flag given as the last token in argv,
-// or immediately followed by another flag, must fail loudly rather than
-// silently taking a wrong value — see the CLAUDE.md guideline on
-// value-taking CLI flags.
-const VALUE_FLAGS = { '--repo': 'repo', '--config': 'config', '--out': 'out' };
+// Value-taking flags error loudly when their value is absent (shared parseArgv,
+// see the CLAUDE.md guideline on value-taking CLI flags).
+const ARG_SPEC = {
+  defaults: { range: null, repo: process.cwd(), config: undefined, out: null },
+  flags: {
+    '--repo': { key: 'repo' }, '--config': { key: 'config' }, '--out': { key: 'out' },
+  },
+  positional: 'range',
+};
 
 function parseArgs(argv) {
-  const args = { range: null, repo: process.cwd(), config: undefined, out: null };
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    const key = VALUE_FLAGS[arg];
-    if (key) {
-      args[key] = consumeFlagValue(argv, ++i, arg);
-    } else if (!args.range && !arg.startsWith('--')) {
-      args.range = arg;
-    } else {
-      throw new Error(`Unrecognized argument: ${arg}`);
-    }
-  }
+  const args = parseArgv(argv, { ...ARG_SPEC, defaults: { ...ARG_SPEC.defaults, repo: process.cwd() } });
   if (!args.range) throw new Error('Missing <base>..<head> range.');
   const match = RANGE_PATTERN.exec(args.range);
   if (!match) throw new Error(`Invalid range "${args.range}" — expected <base>..<head>.`);

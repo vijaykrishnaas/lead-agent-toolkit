@@ -1560,3 +1560,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Kept cross-flag validation (range format, `--pr` numeric, owner/gh-repo pairing) in each CLI's parse function since it is CLI-specific; the `required` and `validate` hooks exist in the shared module but are not yet used by the CLIs. Spec objects use `Object.hasOwnProperty` lookup so `constructor`/`__proto__` are not treated as flags.
 
 **Open questions for Vijay:** Still outstanding: approve the `scripts/invariantLint.js` edit for task 30. Task 32 next run (likely BLOCKED on the mongodb download, see earlier entry).
+
+## 2026-10-20 — Reviewer run (720b2bd..f5b81fb)
+- Done: reviewed task 31 (RW2, shared parseArgv). Manually diffed old vs new parsing in all four CLIs: positional handling, boolean --no-post, missing-value errors, defaults are behavior-preserving; CLI review flagged only missing-tests, covered by the existing CLI suites plus 7 new parseArgv tests. 0 findings, no code changes.
+- Decisions: no new tasks or FEATURE added (no concrete gap found this run).
+- Open questions for Vijay: none.

@@ -1789,3 +1789,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Two defects reproduced, then fixed test-first with regression tests in `reviewer/tests/runLog.test.js`: (1) `parseArgs` rejected any value starting with `--` (e.g. `--summary "--fix: foo"`) as "Missing value"; it now rejects only when the next token is itself a known flag name (guideline 7 behavior preserved). (2) `parseLog` accepted valid-JSON non-object lines (`null`), so `idle-streak` crashed with an opaque TypeError; it now throws "runs.jsonl line N is not a JSON object". Suite green (reviewer 472, sample-app 55).
 **Decisions:** Left `parseLog`'s line numbering (counts only non-blank lines) as is — cosmetic, no observed trigger.
 **Open questions for Vijay:** None new. Task 30 and 32 remain BLOCKED on your approval/allowlist.
+
+## 2026-10-21 (Reviewer run, 20:35 UTC)
+**Done:** Reviewed 64c9d95..4789bc6 (one code commit, 7d09ab8 `scripts/runLog.js`): no defects; operator precedence in the new flag-value check is correct and the null/array log-line rejection is covered by tests. Reviewer CLI reported 0 issues. Baseline `npm test` green.
+**Branch taken:** EMPTY-BACKLOG (b) — backlog has no actionable tasks. Hunted `diffParser`, `standup/collectCommits`, `collectPullRequests`, `parseGitHubRemote` (not touched by recent hunts). Probed spaced/tab-suffixed paths, renames, quoted paths: all parsed correctly. An invalid `since` passed directly to `collectPullRequests` silently returns `[]`, but the only caller (`generateStandup`) validates it first, so no reproducible user-facing bug; no change made.
+**Decisions:** No code or skill changes, so no SKILL_CHANGELOG entry.
+**Open questions for Vijay:** none new.

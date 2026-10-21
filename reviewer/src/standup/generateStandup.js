@@ -15,6 +15,10 @@ async function generateStandup(options = {}, deps = {}) {
   const { repo = process.cwd(), owner, ghRepo } = options;
   const since = options.since instanceof Date ? options.since : new Date(options.since || Date.now() - ONE_DAY_MS);
 
+  if (Number.isNaN(since.getTime())) {
+    throw new Error(`Invalid since — could not parse "${options.since}" as a date.`);
+  }
+
   const collectCommitsFn = deps.collectCommits || collectCommits;
   const collectPullRequestsFn = deps.collectPullRequests || collectPullRequests;
 

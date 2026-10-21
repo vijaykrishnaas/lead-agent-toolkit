@@ -1758,3 +1758,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 1. Reviewed 3f9e8eb..28c40e3 (the reviewer's own missing-tests/deleted-file fix plus logs): verified, no defects; the CLI's one finding was the `diffParser.js` change having no same-diff test file, but the `deleted` flag is exercised end to end by the new missingTests test. Backlog empty -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/docDrift/` (compareRoutes/parseOpenApi, oldest-touched, 2026-07-18). Reproduced: `normalizeRoutePath` dropped a param constraint with a `[^)]*` regex, so nested parens (`:name(\w+(?:x)?)`) left a stray `?)` and the route read as drift. Fixed test-first with a paren-depth scan. Optional `:id?` params left as-is (no OpenAPI equivalent, unreachable in sample-app).
 **Decisions:** Small direct fix; no new tasks, no [FEATURE], no guideline/skill change.
 **Open questions for Vijay:** None new.
+
+## 2026-10-21 (Reviewer run, 17:3x UTC)
+**Done:** Reviewed 28c40e3..6063e23 — only code change was `compareRoutes.js` `replaceParams` (nested-paren param constraints); read it, no defect (CLI report: 0 issues). EMPTY-BACKLOG (b) taken: backlog empty (30, 32 BLOCKED), no new commits needing task work; hunted least-recently-touched `parseOpenApi.js`, `groupByAuthor.js`, `collectPullRequests.js`. `parseOpenApi`/`groupByAuthor` clean. Found: `generateStandup` with unparseable `--since` ran collectors against an Invalid Date and died with the cryptic "Invalid time value". Fixed test-first (fails pre-fix): validates up front with "Invalid since — could not parse ..." before any collection.
+**Decisions:** Small, reproduced, fixed directly; no new tasks, no FEATURE task today.
+**Open questions for Vijay:** none new.

@@ -68,4 +68,11 @@ describe('generateStandup', () => {
     expect(report).toContain('## Alice');
     expect(report).toContain('Fix bug');
   });
+
+  it('rejects an unparseable since before collecting anything', async () => {
+    const collectCommits = jest.fn(() => []);
+    await expect(generateStandup({ since: 'garbage' }, { collectCommits }))
+      .rejects.toThrow(/Invalid since.*garbage/);
+    expect(collectCommits).not.toHaveBeenCalled();
+  });
 });

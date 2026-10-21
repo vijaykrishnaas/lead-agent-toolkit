@@ -1744,3 +1744,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 0. Reviewed 012aefa..434ff0d (style.js var fix, 2 postReviewComment tests, logs): verified, no defects; the CLI's one finding was `.then()` prose inside PROGRESS.md (not code). Backlog empty -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/rules/security.js` (last touched 2026-07-19, oldest rule module). Reproduced: `SECRET_PATTERN` required the operator right after the keyword, so quoted-key forms `{ "password": "hunter22" }` / `{ 'apiKey': '...' }` evaded the hardcoded-credential check. Fixed test-first by allowing an optional closing quote after the keyword; `process.env` values still not flagged.
 **Decisions:** Small direct fix; no new tasks, no [FEATURE], no guideline/skill change (so no SKILL_CHANGELOG entry).
 **Open questions for Vijay:** None new.
+
+## 2026-10-21 — Reviewer run (scheduled, 6)
+**Done:** Baseline green, idle-streak 1. Reviewed 434ff0d..HEAD (security.js quoted-key fix + logs): no defects. Only the reviewer's own fix and a builder noop landed, backlog empty -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/diffParser.js` (oldest-touched module not yet hunted). Reproduced: git-quoted paths (non-ASCII or `"` in filename, `+++ "b/caf\303\251.js"`) kept their quotes and `b/` prefix, so rules/missing-tests/resolveFileContent saw a bogus filename. Added a failing-first test and `unquotePath` (octal/escape decoding) in `stripPrefix`; 464 + 51 tests green.
+**Decisions:** Small direct fix; no new tasks, no [FEATURE], no guideline/skill change (no SKILL_CHANGELOG entry).
+**Open questions for Vijay:** None new.

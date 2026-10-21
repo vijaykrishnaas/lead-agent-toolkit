@@ -7,8 +7,31 @@ function parseHunkHeader(line) {
   };
 }
 
+const QUOTED_ESCAPES = { n: '\n', t: '\t', '"': '"', '\\': '\\' };
+
+// Git wraps paths with special characters in double quotes and C-escapes them
+// (non-ASCII bytes as octal), so decode before stripping the a/ b/ prefix.
+function unquotePath(path) {
+  if (!(path.length >= 2 && path.startsWith('"') && path.endsWith('"'))) return path;
+  const bytes = [];
+  const inner = path.slice(1, -1);
+  for (let i = 0; i < inner.length; i += 1) {
+    const octal = /^[0-7]{3}/.exec(inner.slice(i + 1, i + 4));
+    if (inner[i] === '\\' && octal) {
+      bytes.push(parseInt(octal[0], 8));
+      i += 3;
+    } else if (inner[i] === '\\' && QUOTED_ESCAPES[inner[i + 1]] !== undefined) {
+      bytes.push(...Buffer.from(QUOTED_ESCAPES[inner[i + 1]]));
+      i += 1;
+    } else {
+      bytes.push(...Buffer.from(inner[i]));
+    }
+  }
+  return Buffer.from(bytes).toString('utf8');
+}
+
 function stripPrefix(path) {
-  return path.replace(/^[ab]\//, '');
+  return unquotePath(path).replace(/^[ab]\//, '');
 }
 
 function parseDiff(diffText) {

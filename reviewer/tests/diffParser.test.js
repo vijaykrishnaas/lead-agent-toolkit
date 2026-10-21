@@ -100,4 +100,22 @@ describe('parseDiff', () => {
     expect(files[0].file).toBe('src/gone.js');
     expect(files[0].hunks[0].lines.map((l) => l.type)).toEqual(['del', 'del']);
   });
+
+  test('unquotes and decodes git-quoted paths (non-ASCII, escaped quote) and strips the prefix', () => {
+    const diff = [
+      'diff --git "a/caf\\303\\251.js" "b/caf\\303\\251.js"',
+      '--- "a/caf\\303\\251.js"',
+      '+++ "b/caf\\303\\251.js"',
+      '@@ -1,1 +1,2 @@',
+      ' a',
+      '+b',
+      'diff --git "a/x\\"y.js" "b/x\\"y.js"',
+      '--- "a/x\\"y.js"',
+      '+++ "b/x\\"y.js"',
+      '@@ -1 +1,2 @@',
+      ' a',
+      '+b',
+    ].join('\n');
+    expect(parseDiff(diff).map((f) => f.file)).toEqual(['café.js', 'x"y.js']);
+  });
 });

@@ -1669,3 +1669,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Idle-streak 0, baseline green. Took the 2026-07-18 question "should `collectPullRequests` paginate past its 50-per-page/1000-PR cap, or is the cap fine?" (oldest remaining not needing Vijay). Reproduced: 20 full in-window pages returned a silently truncated list. Added a regression test (failed first); the function now throws a "window too large" error when the page cap is exhausted with no older PR seen. Suite green (458 reviewer + 51 sample-app).
 - Decisions: fail loudly rather than raise the cap (a pathological window is better narrowed than silently cut); normal termination paths unchanged. No guideline added (single sink).
 - Open questions for Vijay: `standup` inference with `--no-prs`; allowlist `fastdl.mongodb.org` (task 32).
+
+## 2026-10-21 (Reviewer run: review a502522..5f65957, EMPTY-BACKLOG (b) hunt)
+- Done: baseline green (51 sample-app + reviewer suites), idle-streak 0. Reviewed a502522..5f65957 — one code commit (eab662a, `collectPullRequests` page-cap throw); `reviewer/src/cli.js` reports 0 issues. Verified manually: `exhausted` is cleared on every normal exit (empty page, short page, older PR hit), so only 20 full in-window pages throw; `standupCli` wraps `generateStandup` in try/catch so the error surfaces as a CLI message. 0 findings.
+- Branch taken: no code needing fixes, backlog empty → EMPTY-BACKLOG (b). Hunted `standup/collectCommits.js` + `groupByAuthor.js` (least recently hunted; last touched in the 2026-07-18 build). Unit-separator parsing, empty output, subject containing the separator, and non-string authors behave correctly; no reproduced bug, no code change.
+- Open questions for Vijay: none new.

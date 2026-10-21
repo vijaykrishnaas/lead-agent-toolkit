@@ -274,3 +274,7 @@
 ## 2026-10-21 (Reviewer: EMPTY-BACKLOG (b) hunt, sample-app error handler)
 **Change:** No skill/CLAUDE.md change. Adversarial hunt of `sample-app/src/app.js` + tasks/users controllers; code fix in the catch-all error middleware with regression tests.
 **Evidence:** PROGRESS.md 2026-10-21 Reviewer 19:3x entry — reproduced malformed JSON body and oversized body both returning 500 instead of 400/413.
+
+## 2026-10-21 (Builder: EMPTY-BACKLOG (b) hunt, scripts/runLog.js)
+**Change:** No skill/CLAUDE.md change. Code fix in `scripts/runLog.js` (flag-like values accepted; non-object log lines rejected clearly) with regression tests.
+**Evidence:** PROGRESS.md 2026-10-21 Builder runLog entry — reproduced `--summary "--fix: foo"` failing as missing value and `null` line crashing `idle-streak`.

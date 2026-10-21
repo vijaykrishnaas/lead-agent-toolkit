@@ -34,6 +34,12 @@ describe('parseArgs', () => {
   });
 });
 
+describe('parseArgs, values that look like flags', () => {
+  it('accepts a value starting with -- when it is not a known flag name', () => {
+    expect(parseArgs(['--summary', '--fix: foo', '--tests', 'green'])).toEqual({ summary: '--fix: foo', tests: 'green' });
+  });
+});
+
 describe('buildEntry', () => {
   it('builds a normalized entry with defaults', () => {
     expect(buildEntry({ trigger: 'reviewer', outcome: 'noop', summary: ' idle ' }, NOW)).toEqual({
@@ -70,6 +76,12 @@ describe('idleStreak', () => {
 
   it('is reset by a paused entry so re-enabled triggers start fresh', () => {
     expect(idleStreak([e('noop'), e('noop'), e('noop'), e('paused')])).toBe(0);
+  });
+});
+
+describe('parseLog, non-object lines', () => {
+  it('rejects a valid-JSON line that is not an object, naming the line', () => {
+    expect(() => parseLog('{"outcome":"noop"}\nnull\n')).toThrow('line 2');
   });
 });
 

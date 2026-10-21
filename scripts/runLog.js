@@ -20,7 +20,7 @@ function parseArgs(argv) {
       throw new Error(`Unknown argument: ${flag}`);
     }
     const value = argv[i + 1];
-    if (value === undefined || value.startsWith('--')) {
+    if (value === undefined || VALUE_FLAGS.includes(value.replace(/^--/, '')) && value.startsWith('--')) {
       throw new Error(`Missing value for ${flag}`);
     }
     opts[flag.slice(2)] = value;
@@ -59,11 +59,16 @@ function parseLog(content) {
     .split('\n')
     .filter((line) => line.trim().length > 0)
     .map((line, i) => {
+      let entry;
       try {
-        return JSON.parse(line);
+        entry = JSON.parse(line);
       } catch (err) {
         throw new Error(`runs.jsonl line ${i + 1} is not valid JSON: ${err.message}`);
       }
+      if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
+        throw new Error(`runs.jsonl line ${i + 1} is not a JSON object`);
+      }
+      return entry;
     });
 }
 

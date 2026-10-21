@@ -1783,3 +1783,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 0. Reviewed d54a84a..HEAD (missingTests sourceDirs normalization; auth middleware case-insensitive Bearer): read both, no defects. CLI's one finding (auth.js changed, "no test file changed") is the known 1:1 basename-matching open question — `authMiddleware.test.js` was added in the same diff. EMPTY-BACKLOG (b): backlog empty (30, 32 BLOCKED); hunted `sample-app/src/app.js` error middleware (oldest-touched, 2026-07-17). Reproduced: malformed JSON body and >100kb body from `express.json()` hit the catch-all as 500 instead of 400/413. Fixed test-first (tests/app.test.js) by honoring body-parser's 4xx `status` when `err.type` is set. Tasks/users controllers otherwise checked (CastError/ValidationError/self-only paths covered).
 **Decisions:** Small direct fix; no new tasks, no FEATURE task.
 **Open questions for Vijay:** none new.
+
+## 2026-10-21 (Builder run: EMPTY-BACKLOG (b) hunt — scripts/runLog.js)
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED); (a) has no unresolved questions left after the prior sweeps, so (b): hunted `scripts/runLog.js`, the loop's own logger, which no recent hunt/task entry had touched.
+**Done:** Two defects reproduced, then fixed test-first with regression tests in `reviewer/tests/runLog.test.js`: (1) `parseArgs` rejected any value starting with `--` (e.g. `--summary "--fix: foo"`) as "Missing value"; it now rejects only when the next token is itself a known flag name (guideline 7 behavior preserved). (2) `parseLog` accepted valid-JSON non-object lines (`null`), so `idle-streak` crashed with an opaque TypeError; it now throws "runs.jsonl line N is not a JSON object". Suite green (reviewer 472, sample-app 55).
+**Decisions:** Left `parseLog`'s line numbering (counts only non-blank lines) as is — cosmetic, no observed trigger.
+**Open questions for Vijay:** None new. Task 30 and 32 remain BLOCKED on your approval/allowlist.

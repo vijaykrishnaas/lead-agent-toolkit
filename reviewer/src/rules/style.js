@@ -1,7 +1,7 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
 
-const VAR_DECLARATION = /^\s*var\s+/;
+const VAR_DECLARATION = /(?:^|[;{}()])\s*var\s+/;
 const CONSOLE_LOG = /console\.log\s*\(/;
 
 function isTestFile(path) {

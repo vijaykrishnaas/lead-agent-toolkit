@@ -1729,3 +1729,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Idle-streak 0, baseline green. Took the 2026-07-18 task-11 question "`claude plugin validate` took over 2 minutes and had to be killed once — fluke or real timeout risk?" (the other task-11 questions, plugin naming and retiring `.claude/skills/*`, are product calls for Vijay). Re-ran `claude plugin validate ./plugin --strict`: 0.9s, "Validation passed". No timeout reproduced; treated as an environment fluke. No code change.
 - Decisions: no documented workaround added (nothing reproduced).
 - Open questions for Vijay: `standup` inference with `--no-prs`; allowlist `fastdl.mongodb.org` (task 32); 1:1 basename matching in `missing-tests`; `sample-app/openapi.yaml` location; should `resolveJwtSecret` reject short/weak secrets in production?; plugin/marketplace naming and whether `.claude/skills/*` should be retired in favor of the plugin (carried from 2026-07-18).
+
+## 2026-10-21 — Reviewer run (scheduled, 4)
+**Done:** Baseline green. Reviewed fd463d3..012aefa (docs/log only); reviewer CLI: 0 findings. Backlog empty -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/rules/style.js` (no recent hunt entry). Reproduced: `VAR_DECLARATION` was anchored at line start, so `for (var i = 0; ...)` and `if (x) { var y = 1; }` were never flagged. Fixed test-first (regex now also matches after `; { } (`); string-literal, substring (`variable`) and property (`obj.var`) cases still not flagged.
+**Decisions:** Small direct fix, no new tasks, no [FEATURE].
+**Open questions for Vijay:** None new.

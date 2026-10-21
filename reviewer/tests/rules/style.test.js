@@ -70,4 +70,21 @@ describe('style rule', () => {
 
     expect(styleRule.check(parseDiff(diff))).toEqual([]);
   });
+
+  it('flags "var" declared mid-line (for-init, after a brace) but not as a substring or in a string', () => {
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -0,0 +1,5 @@',
+      '+for (var i = 0; i < 3; i++) {}',
+      '+if (x) { var y = 1; }',
+      '+const msg = "use var x here";',
+      '+const variable = 1;',
+      '+obj.var = 2;',
+      '',
+    ].join('\n');
+    const issues = styleRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1, 2]);
+  });
 });

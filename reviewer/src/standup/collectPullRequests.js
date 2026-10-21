@@ -27,6 +27,9 @@ async function collectPullRequests({ owner, repo, since } = {}, deps = {}) {
   }
 
   const sinceDate = since instanceof Date ? since : new Date(since);
+  if (Number.isNaN(sinceDate.getTime())) {
+    throw new Error(`Invalid since — could not parse "${since}" as a date.`);
+  }
   const headers = { Accept: 'application/vnd.github+json', 'User-Agent': 'lead-agent-toolkit-reviewer' };
   if (deps.token) headers.Authorization = `Bearer ${deps.token}`;
 

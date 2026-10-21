@@ -1806,3 +1806,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED). Hunted `scripts/resolvePushRange.js` (no prior hunt entry): zero/missing `before`, missing parent, and empty-tree fallbacks all behave as documented; nothing reproducible.
 **Decisions:** No code, skill, or backlog changes, so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** unchanged (tasks 30 and 32 BLOCKED on approval/allowlist).
+
+## 2026-10-21 (Reviewer run, 23:35 UTC)
+**Done:** Baseline green, idle-streak 1. Reviewed 18522a4..9beadde (only a reviewer log commit and a builder noop; no code). **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `reviewer/src/standup/collectPullRequests.js` (no prior hunt entry). Reproduced: an unparseable `since` gave an Invalid Date, every comparison was false, and the function silently returned `[]` (generateStandup guards this, direct callers did not). Fixed test-first: throws `Invalid since`, same wording as generateStandup (+1 test).
+**Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
+**Open questions for Vijay:** unchanged (tasks 30 and 32 BLOCKED).

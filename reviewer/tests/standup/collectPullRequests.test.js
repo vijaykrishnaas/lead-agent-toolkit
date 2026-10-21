@@ -196,4 +196,11 @@ describe('collectPullRequests', () => {
       .rejects.toThrow(/20 pages|1000/);
     expect(request).toHaveBeenCalledTimes(20);
   });
+
+  it('rejects an unparseable since instead of silently returning no PRs', async () => {
+    const request = jest.fn();
+    await expect(collectPullRequests({ owner: 'o', repo: 'r', since: 'not-a-date' }, { request }))
+      .rejects.toThrow(/Invalid since/);
+    expect(request).not.toHaveBeenCalled();
+  });
 });

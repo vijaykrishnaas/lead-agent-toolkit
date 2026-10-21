@@ -1649,3 +1649,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Took the 2026-10-20 "invalid `review-rules.yaml` value warns vs. silently loosens" question (the `standup --no-prs` question would change existing default behavior, so left for Vijay). `loadRuleConfig` now emits a warning (injectable `warn`, default `console.warn`) for a non-boolean `enabled` or an unknown `minSeverity`; the fallback (rule on, `low`) is unchanged, so nothing breaks. +3 tests; suites green (457 reviewer + 51 sample-app).
 - Decisions: warn rather than throw — erroring would turn a typo into a hard CLI failure for existing configs; reversible to a throw if Vijay prefers. No guideline added (single sink).
 - Open questions for Vijay: `standup` inference with `--no-prs`; allowlist `fastdl.mongodb.org` (task 32).
+
+## 2026-10-21 (reviewer run, ~04:35 UTC)
+- Done: reviewed 1655fce..964caf2 — 8160447 (loadRuleConfig warns on invalid `enabled`/`minSeverity`, fallback unchanged, +3 tests; only caller loadRules.js passes no options so the default `console.warn` applies, stderr only) plus docs/log commits. `node reviewer/src/cli.js` reports 0 issues; manual read found no defect. Baseline green (51 sample-app tests plus reviewer suite).
+- Branch taken: no new backlog task needed; EMPTY-BACKLOG (b) — hunted `reviewer/src/docDrift/compareRoutes.js`/`httpMethods.js` (last touched 2026-07-18). Path normalization, key building and sorting behave as documented; no reproduced bug, no code change. Observation only: Express `:id` vs OpenAPI `{userId}` differing param names report as drift on both sides — a design choice, not a defect.
+- Open questions for Vijay: none new.

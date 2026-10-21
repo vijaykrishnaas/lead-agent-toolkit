@@ -132,4 +132,17 @@ describe('missing-tests rule', () => {
 
     expect(issues.map((issue) => issue.file).sort()).toEqual(['src/other/round.js', 'src/utils/round.js']);
   });
+
+  it('does not flag a wholly deleted source file', () => {
+    const diff = [
+      'diff --git a/src/gone.js b/src/gone.js',
+      'deleted file mode 100644',
+      '--- a/src/gone.js',
+      '+++ /dev/null',
+      '@@ -1,2 +0,0 @@',
+      '-a',
+      '-b',
+    ].join('\n');
+    expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
+  });
 });

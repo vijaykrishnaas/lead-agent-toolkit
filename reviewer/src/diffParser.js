@@ -62,8 +62,10 @@ function parseDiff(diffText) {
       let path = stripPrefix(rawLine.slice(4).trim());
       // A deleted file's post-image header is `+++ /dev/null`; name it by the
       // pre-image path instead.
-      if (path === '/dev/null') path = stripPrefix(lines[i - 1].slice(4).trim());
+      const deleted = path === '/dev/null';
+      if (deleted) path = stripPrefix(lines[i - 1].slice(4).trim());
       currentFile = { file: path, hunks: [] };
+      if (deleted) currentFile.deleted = true;
       files.push(currentFile);
       currentHunk = null;
       continue;

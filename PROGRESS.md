@@ -1749,3 +1749,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 1. Reviewed 434ff0d..HEAD (security.js quoted-key fix + logs): no defects. Only the reviewer's own fix and a builder noop landed, backlog empty -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/diffParser.js` (oldest-touched module not yet hunted). Reproduced: git-quoted paths (non-ASCII or `"` in filename, `+++ "b/caf\303\251.js"`) kept their quotes and `b/` prefix, so rules/missing-tests/resolveFileContent saw a bogus filename. Added a failing-first test and `unquotePath` (octal/escape decoding) in `stripPrefix`; 464 + 51 tests green.
 **Decisions:** Small direct fix; no new tasks, no [FEATURE], no guideline/skill change (no SKILL_CHANGELOG entry).
 **Open questions for Vijay:** None new.
+
+## 2026-10-21 (Reviewer run: review fd53649..HEAD, EMPTY-BACKLOG (b) hunt)
+**Done:** Baseline green, idle-streak 1. Reviewed fd53649..3f9e8eb (the reviewer's own diffParser quoted-path fix plus a builder noop log); reviewer CLI: 0 findings. Backlog empty (30, 32 BLOCKED) -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/rules/missingTests.js` (not named in a recent hunt). Reproduced: since the earlier deleted-file naming fix (`+++ /dev/null` now yields the real path), a wholly deleted `src/` file was flagged "changed but no test file changed". Fixed test-first (failed before, passes after): `parseDiff` marks `deleted: true` on such files and `missing-tests` skips them. 465 reviewer + 51 sample-app tests green.
+**Open questions for Vijay:** none new.

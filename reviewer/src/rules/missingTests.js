@@ -74,7 +74,7 @@ function check(files, options = {}) {
     : DEFAULT_SOURCE_DIRS;
   const sourceDirPattern = buildSourceDirPattern(sourceDirs);
 
-  const sourceFiles = files.filter((f) => sourceDirPattern.test(f.file) && !isTestFile(f.file));
+  const sourceFiles = files.filter((f) => sourceDirPattern.test(f.file) && !isTestFile(f.file) && !f.deleted);
   const testFiles = files.filter((f) => isTestFile(f.file));
 
   if (sourceFiles.length === 0) return [];

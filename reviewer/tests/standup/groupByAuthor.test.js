@@ -24,6 +24,14 @@ describe('groupByAuthor', () => {
     expect(groups.get('Unknown').pullRequests).toEqual(pullRequests);
   });
 
+  it('buckets whitespace-only authors under "Unknown" too', () => {
+    const commits = [{ hash: 'a', author: '   ', date: 'd1', message: 'm1' }];
+
+    const groups = groupByAuthor({ commits });
+
+    expect([...groups.keys()]).toEqual(['Unknown']);
+  });
+
   it('returns an empty map for no commits and no pull requests', () => {
     expect(groupByAuthor({}).size).toBe(0);
     expect(groupByAuthor().size).toBe(0);

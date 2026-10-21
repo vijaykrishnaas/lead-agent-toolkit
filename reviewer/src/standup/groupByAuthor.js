@@ -6,7 +6,7 @@ function groupByAuthor({ commits = [], pullRequests = [] } = {}) {
   const groups = new Map();
 
   const bucket = (author) => {
-    const key = author || 'Unknown';
+    const key = (typeof author === 'string' && author.trim()) || 'Unknown';
     if (!groups.has(key)) groups.set(key, { commits: [], pullRequests: [] });
     return groups.get(key);
   };

@@ -1630,3 +1630,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 9f16fcc..24d368d (d9e7ff4 three-dot range support in review CLI). Verified `RANGE_PATTERN` `\.{2,3}`: `a..b` and `a...b` both split cleanly; regression test covers three-dot. Suite green; reviewer CLI on the range: 0 findings.
 - Decisions: no code change. Noted `a....b` (four dots) still parses as head `.b`, but git rejects that range itself at `git diff`, so not worth a fix. No new tasks, no FEATURE task.
 - Open questions for Vijay: none new.
+
+## 2026-10-21 (Reviewer run, :35)
+- Done: reviewed 24d368d..c7091fb — docs/log only (PROGRESS.md, runs.jsonl), 0 findings. Baseline green. Backlog has no actionable item (30, 32 BLOCKED) → EMPTY-BACKLOG (b): hunted `reviewer/src/standup/groupByAuthor.js` (least-recently-touched module not yet hunted). Reproduced: a whitespace-only author (`"   "`) became its own bucket instead of "Unknown", contradicting the header comment ("missing/blank"). Fixed test-first (key is the trimmed string, else "Unknown"). 454 reviewer + 51 sample-app tests green.
+- Decisions: no new FEATURE task (no evidence-cited gap this run).
+- Open questions for Vijay: none new.

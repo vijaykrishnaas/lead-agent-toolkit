@@ -145,4 +145,25 @@ describe('missing-tests rule', () => {
     ].join('\n');
     expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
   });
+
+  describe('malformed sourceDirs entries from config', () => {
+    const files = parseDiff([
+      'diff --git a/app/x.js b/app/x.js',
+      '--- a/app/x.js',
+      '+++ b/app/x.js',
+      '@@ -1,1 +1,2 @@',
+      ' a',
+      '+b',
+    ].join('\n'));
+
+    it('treats a trailing-slash entry the same as the bare directory', () => {
+      expect(missingTestsRule.check(files, { sourceDirs: ['app/'] })).toHaveLength(1);
+    });
+
+    it('ignores non-string and empty entries instead of throwing or matching everything', () => {
+      expect(missingTestsRule.check(files, { sourceDirs: [42, '', 'app'] })).toHaveLength(1);
+      expect(() => missingTestsRule.check(files, { sourceDirs: [42] })).not.toThrow();
+      expect(missingTestsRule.check(files, { sourceDirs: [42] })).toEqual(missingTestsRule.check(files));
+    });
+  });
 });

@@ -266,3 +266,7 @@
 **Change:** `.claude/skills/review-pr/SKILL.md` (and synced `plugin/skills/` copy) now documents `--owner`/`--gh-repo` as optional; `reviewPrCli` infers them from `git remote get-url origin` when absent, explicit flags always win.
 
 **Evidence:** PROGRESS.md task-6, task-9 and task-10 entries all raised "infer owner/repo from `git remote get-url origin` vs. always-explicit" as an open question and it was restated unresolved through the later entries (oldest unresolved question per EMPTY-BACKLOG (a)); the 2026-07-18 task-13 entry's own open question asks for restated questions to be resolved rather than re-logged.
+
+## 2026-10-21 (Reviewer: EMPTY-BACKLOG (b) hunt, missingTests sourceDirs)
+**Change:** No skill/CLAUDE.md change. Adversarial hunt of `config/*` and `rules/missingTests.js`; code fix in `missingTests.js` (sourceDirs normalization) with regression tests.
+**Evidence:** PROGRESS.md 2026-10-21 Reviewer 18:3x entry — reproduced silent rule disable (`'app/'`) and crash (`[42]`) from user-edited review-rules.yaml.

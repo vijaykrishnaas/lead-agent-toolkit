@@ -69,9 +69,15 @@ function hasMatchingTestFile(sourceFile, testFiles, siblings) {
 // -- e.g. nested packages like sample-app/src, or a client/src + server/src
 // MERN split -- without hardcoding every repo layout into the rule itself.
 function check(files, options = {}) {
-  const sourceDirs = Array.isArray(options.sourceDirs) && options.sourceDirs.length > 0
+  // Config is user-edited YAML: drop non-string/empty entries and trailing
+  // slashes ("app/" would otherwise build the never-matching "app//").
+  const configured = Array.isArray(options.sourceDirs)
     ? options.sourceDirs
-    : DEFAULT_SOURCE_DIRS;
+      .filter((dir) => typeof dir === 'string')
+      .map((dir) => dir.replace(/\/+$/, ''))
+      .filter((dir) => dir.length > 0)
+    : [];
+  const sourceDirs = configured.length > 0 ? configured : DEFAULT_SOURCE_DIRS;
   const sourceDirPattern = buildSourceDirPattern(sourceDirs);
 
   const sourceFiles = files.filter((f) => sourceDirPattern.test(f.file) && !isTestFile(f.file) && !f.deleted);

@@ -1800,3 +1800,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 1. Reviewed 4789bc6..1057ad3 (only the reviewer's own log/progress commit and a builder noop); reviewer CLI: 0 findings. Backlog empty (30, 32 BLOCKED) -> EMPTY-BACKLOG branch (b): hunted `scripts/invariantLint.js` (no recent hunt entry). Reproduced: `parseTasks` stripped only the first bracket tag, so marking a task that carries a descriptive tag (`[FEATURE]`, `[RW2, ...]`) as `[DONE]`, or a `[BLOCKED: ... [x] ...]` reason with nested brackets, read as a wording edit and wrongly demanded a SKILL_CHANGELOG line (CI failure on a routine status flip). Fixed test-first: only a leading bracket-balanced `[DONE]`/`[BLOCKED...]` status is stripped; dropping/adding a descriptive tag still counts as substantive. 3 regression tests added.
 **Decisions:** No SKILL_CHANGELOG entry: no skills, CLAUDE.md, or backlog order changed.
 **Open questions for Vijay:** unchanged (product calls).
+
+## 2026-10-21 (Reviewer run, 22:35 UTC)
+**Done:** Baseline green, idle-streak 1. Reviewed 1057ad3..18522a4 (one code commit, 1344ff3 `scripts/invariantLint.js` stripStatusTag): bracket-balanced stripping is correct, unbalanced `[BLOCKED` falls back to unchanged text; reviewer CLI 0 findings.
+**Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED). Hunted `scripts/resolvePushRange.js` (no prior hunt entry): zero/missing `before`, missing parent, and empty-tree fallbacks all behave as documented; nothing reproducible.
+**Decisions:** No code, skill, or backlog changes, so no SKILL_CHANGELOG entry.
+**Open questions for Vijay:** unchanged (tasks 30 and 32 BLOCKED on approval/allowlist).

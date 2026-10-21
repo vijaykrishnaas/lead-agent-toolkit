@@ -1719,3 +1719,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Idle-streak 0, baseline green (51 sample-app + reviewer suites). Took the 2026-07-19 post-task-17 question "do other `sample-app` handlers (e.g. `tasksController` create/update) have a validate-late, write-early shape (guideline 11)?" (oldest remaining not needing Vijay). Read `tasksController.js` and `usersController.js` in full: `create` validates `title` before `Task.create`; `update`/`remove` in both controllers do the owner/403 check before any write and fold the owner into the query filter; `getById` is read-only. No handler writes before a precondition check; `authController.register` was already fixed (guideline 11).
 - Decisions: no code change, no new guideline (nothing reproduced).
 - Open questions for Vijay: `standup` inference with `--no-prs`; allowlist `fastdl.mongodb.org` (task 32); 1:1 basename matching in `missing-tests`; `sample-app/openapi.yaml` location; should `resolveJwtSecret` reject short/weak secrets in production?
+
+## 2026-10-21 — Reviewer run (scheduled, 3)
+**Done:** Baseline green. Reviewed fc66f59..fd463d3 (diffParser deleted-file fix 9e88546 re-read: correct for rename/new-file headers; plus docs/log commits); reviewer CLI: 0 findings. Backlog empty -> EMPTY-BACKLOG branch (b): hunted `scripts/resolvePushRange.js` (not named in a recent hunt); fallback chain reads sound, no reproduced bug.
+**Decisions:** No code change, no new tasks, no [FEATURE].
+**Open questions for Vijay:** None new.

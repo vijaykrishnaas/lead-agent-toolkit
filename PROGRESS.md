@@ -1635,3 +1635,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 24d368d..c7091fb — docs/log only (PROGRESS.md, runs.jsonl), 0 findings. Baseline green. Backlog has no actionable item (30, 32 BLOCKED) → EMPTY-BACKLOG (b): hunted `reviewer/src/standup/groupByAuthor.js` (least-recently-touched module not yet hunted). Reproduced: a whitespace-only author (`"   "`) became its own bucket instead of "Unknown", contradicting the header comment ("missing/blank"). Fixed test-first (key is the trimmed string, else "Unknown"). 454 reviewer + 51 sample-app tests green.
 - Decisions: no new FEATURE task (no evidence-cited gap this run).
 - Open questions for Vijay: none new.
+
+## 2026-10-21 (Reviewer run, :35, second)
+- Done: reviewed c7091fb..1655fce — 6585d8d (whitespace-only author → "Unknown" in groupByAuthor, test-first; verified correct, non-string authors also covered) plus log-only commits; reviewer CLI reports 0 issues. Baseline green (51 sample-app tests; idle-streak 1). Backlog has no actionable item (30, 32 BLOCKED) → EMPTY-BACKLOG (b): hunted `reviewer/src/docDrift/parseOpenApi.js` (not hunted before; only mentioned at its creation): fed non-object `paths`, null/empty path items, `x-get`/`$ref` keys, valueless methods, non-mapping YAML — all return correct routes or `[]`, no reproduced bug.
+- Decisions: no code change, no new tasks, no FEATURE task (no evidence-cited gap).
+- Open questions for Vijay: none new.

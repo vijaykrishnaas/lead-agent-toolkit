@@ -1615,3 +1615,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Took the oldest unresolved open question not needing Vijay's input: the 2026-07-19 "Mongoose `ValidationError.message` passthrough in `app.js`'s error middleware" question (still unresolved; a mocked-rejection reproduction showed schema paths and the submitted value echoed to the client). Added a regression test in `sample-app/tests/tasks.test.js` (failed before the fix), then changed the middleware to return a generic `{ error: 'Validation failed' }` 400. Suite green (452 reviewer + 51 sample-app).
 - Decisions: generic message with no field list (field names also expose schema shape); no server-side logging added since the app has no logger. Controllers' own explicit 400 messages are unaffected. No guideline added (single sink).
 - Open questions for Vijay: unchanged — `standup` inference with `--no-prs`; invalid `review-rules.yaml` values warn vs. silently loosen; approve `scripts/invariantLint.js` edit (task 30); allowlist `fastdl.mongodb.org` (task 32).
+
+## 2026-10-21 — Reviewer run (:35 UTC)
+- Done: reviewed 2ffa6f4..9f16fcc (096623a generic 400 for Mongoose ValidationError). Verified diff: handler returns fixed message, regression test asserts no echo of detail; suite green (51 sample-app tests). Reviewer CLI's one `missing-tests` hit on `app.js` is a basename-convention false positive by design (test is `tasks.test.js`), not a defect in the change.
+- Decisions: no code change, no new tasks, no FEATURE task. Note: `usersController`/`authController` 11000 branches were not re-audited this run.
+- Open questions for Vijay: none new.

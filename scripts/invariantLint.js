@@ -21,7 +21,22 @@ const CLAUDE_FILE = 'CLAUDE.md';
 const SKILLS_DIR_PREFIX = '.claude/skills/';
 
 const TASK_LINE_NUMBER = /^(\d+)\.\s/;
-const TASK_LINE = /^(\d+)\.\s*(?:\[[^\]]*\]\s*)?(.*)$/;
+const TASK_LINE = /^(\d+)\.\s*(.*)$/;
+const STATUS_TAG_START = /^\[(?:DONE|BLOCKED)\b/;
+
+// Strips a leading [DONE] / [BLOCKED: ...] status tag (bracket-balanced, so a
+// BLOCKED reason containing "[x]" is removed whole). Descriptive tags such as
+// [FEATURE] or [RW2] stay in the text so dropping or adding one counts as a
+// wording edit, while prepending a status to a tagged task does not.
+function stripStatusTag(text) {
+  if (!STATUS_TAG_START.test(text)) return text;
+  let depth = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    if (text[i] === '[') depth += 1;
+    else if (text[i] === ']' && --depth === 0) return text.slice(i + 1).trimStart();
+  }
+  return text;
+}
 
 function splitRange(range) {
   const sepIndex = range.indexOf('..');
@@ -92,7 +107,7 @@ function parseTasks(content) {
   if (content === null) return tasks;
   for (const rawLine of content.split('\n')) {
     const match = TASK_LINE.exec(rawLine.trimEnd());
-    if (match) tasks.push({ number: match[1], text: match[2] });
+    if (match) tasks.push({ number: match[1], text: stripStatusTag(match[2]) });
   }
   return tasks;
 }

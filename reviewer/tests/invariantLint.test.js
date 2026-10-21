@@ -230,6 +230,20 @@ describe('tasksChangedSubstantively', () => {
     ).toBe(true);
   });
 
+  it('is false when a task that already carries a descriptive tag is marked [DONE]', () => {
+    expect(tasksChangedSubstantively('1. [FEATURE] a task\n', '1. [DONE] [FEATURE] a task\n')).toBe(false);
+  });
+
+  it('is false when a [BLOCKED: ...] status with nested brackets is replaced by [DONE]', () => {
+    expect(
+      tasksChangedSubstantively('1. [BLOCKED: needs [x] fix] a task\n', '1. [DONE] a task\n')
+    ).toBe(false);
+  });
+
+  it('is true when a descriptive tag is dropped or added without a status change', () => {
+    expect(tasksChangedSubstantively('1. [FEATURE] a task\n', '1. a task\n')).toBe(true);
+  });
+
   it('is true when an existing task\'s wording changes', () => {
     expect(tasksChangedSubstantively('1. a task\n', '1. [DONE] a different task\n')).toBe(true);
   });

@@ -1795,3 +1795,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Branch taken:** EMPTY-BACKLOG (b) — backlog has no actionable tasks. Hunted `diffParser`, `standup/collectCommits`, `collectPullRequests`, `parseGitHubRemote` (not touched by recent hunts). Probed spaced/tab-suffixed paths, renames, quoted paths: all parsed correctly. An invalid `since` passed directly to `collectPullRequests` silently returns `[]`, but the only caller (`generateStandup`) validates it first, so no reproducible user-facing bug; no change made.
 **Decisions:** No code or skill changes, so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** none new.
+
+## 2026-10-21 (Reviewer run: review 4789bc6..HEAD, EMPTY-BACKLOG (b) hunt — scripts/invariantLint.js)
+**Done:** Baseline green, idle-streak 1. Reviewed 4789bc6..1057ad3 (only the reviewer's own log/progress commit and a builder noop); reviewer CLI: 0 findings. Backlog empty (30, 32 BLOCKED) -> EMPTY-BACKLOG branch (b): hunted `scripts/invariantLint.js` (no recent hunt entry). Reproduced: `parseTasks` stripped only the first bracket tag, so marking a task that carries a descriptive tag (`[FEATURE]`, `[RW2, ...]`) as `[DONE]`, or a `[BLOCKED: ... [x] ...]` reason with nested brackets, read as a wording edit and wrongly demanded a SKILL_CHANGELOG line (CI failure on a routine status flip). Fixed test-first: only a leading bracket-balanced `[DONE]`/`[BLOCKED...]` status is stripped; dropping/adding a descriptive tag still counts as substantive. 3 regression tests added.
+**Decisions:** No SKILL_CHANGELOG entry: no skills, CLAUDE.md, or backlog order changed.
+**Open questions for Vijay:** unchanged (product calls).

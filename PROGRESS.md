@@ -1644,3 +1644,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-21 (Vijay decision: task 30 deferred)
 
 **Decision (Vijay, 2026-10-21):** Task 30 (PROGRESS.md rollover) is deferred. It stays `[BLOCKED]` (invariant 2 forbids deleting it), and Vijay will revisit it later. Runs must not re-raise "approve the archive-aware `scripts/invariantLint.js` change" as an open question, and must not attempt that edit, until Vijay brings it up again.
+
+## 2026-10-21 (Builder run: EMPTY-BACKLOG (a) — invalid review-rules.yaml values)
+- Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Took the 2026-10-20 "invalid `review-rules.yaml` value warns vs. silently loosens" question (the `standup --no-prs` question would change existing default behavior, so left for Vijay). `loadRuleConfig` now emits a warning (injectable `warn`, default `console.warn`) for a non-boolean `enabled` or an unknown `minSeverity`; the fallback (rule on, `low`) is unchanged, so nothing breaks. +3 tests; suites green (457 reviewer + 51 sample-app).
+- Decisions: warn rather than throw — erroring would turn a typo into a hard CLI failure for existing configs; reversible to a throw if Vijay prefers. No guideline added (single sink).
+- Open questions for Vijay: `standup` inference with `--no-prs`; allowlist `fastdl.mongodb.org` (task 32).

@@ -6,8 +6,16 @@ const yaml = require('js-yaml');
 const DEFAULT_CONFIG_PATH = path.join(__dirname, '..', '..', '..', 'review-rules.yaml');
 const VALID_SEVERITIES = ['low', 'medium', 'high'];
 
-function normalizeCategoryConfig(raw) {
+// An invalid value still falls back to the permissive default (rule on, "low"),
+// but is reported so a typo does not silently loosen the rule.
+function normalizeCategoryConfig(category, raw, warn) {
   const source = raw && typeof raw === 'object' ? raw : {};
+  if (source.enabled !== undefined && typeof source.enabled !== 'boolean') {
+    warn(`review-rules: invalid "enabled" for ${category} (${JSON.stringify(source.enabled)}); expected true/false, rule stays enabled`);
+  }
+  if (source.minSeverity !== undefined && !VALID_SEVERITIES.includes(source.minSeverity)) {
+    warn(`review-rules: invalid "minSeverity" for ${category} (${JSON.stringify(source.minSeverity)}); expected ${VALID_SEVERITIES.join('/')}, using "low"`);
+  }
   const enabled = source.enabled !== false;
   const minSeverity = VALID_SEVERITIES.includes(source.minSeverity) ? source.minSeverity : 'low';
   const options = source.options && typeof source.options === 'object' ? source.options : {};
@@ -17,7 +25,7 @@ function normalizeCategoryConfig(raw) {
 // Missing config file -> all rules run with defaults (matches reviewDiff's
 // own behavior when no config is supplied at all). A malformed file is a
 // real error and is not swallowed.
-function loadRuleConfig(configPath = DEFAULT_CONFIG_PATH) {
+function loadRuleConfig(configPath = DEFAULT_CONFIG_PATH, { warn = console.warn } = {}) {
   let parsed;
   try {
     parsed = yaml.load(fs.readFileSync(configPath, 'utf8'));
@@ -32,7 +40,7 @@ function loadRuleConfig(configPath = DEFAULT_CONFIG_PATH) {
   const rawRules = parsed && typeof parsed.rules === 'object' && parsed.rules !== null ? parsed.rules : {};
   const rules = {};
   for (const category of Object.keys(rawRules)) {
-    rules[category] = normalizeCategoryConfig(rawRules[category]);
+    rules[category] = normalizeCategoryConfig(category, rawRules[category], warn);
   }
   return { rules };
 }

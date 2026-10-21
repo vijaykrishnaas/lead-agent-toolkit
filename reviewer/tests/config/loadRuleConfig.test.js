@@ -39,4 +39,36 @@ describe('loadRuleConfig', () => {
     );
     expect(config.rules.security.enabled).toBe(true);
   });
+
+  describe('invalid values', () => {
+    function loadWith(yamlText) {
+      const fs = require('fs');
+      const os = require('os');
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rules-'));
+      const file = path.join(dir, 'rules.yaml');
+      fs.writeFileSync(file, yamlText);
+      const warn = jest.fn();
+      const config = loadRuleConfig(file, { warn });
+      return { config, warn };
+    }
+
+    it('warns on an invalid minSeverity but still falls back to "low"', () => {
+      const { config, warn } = loadWith('rules:\n  security:\n    minSeverity: hgih\n');
+      expect(config.rules.security.minSeverity).toBe('low');
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toMatch(/minSeverity.*security.*hgih/);
+    });
+
+    it('warns on a non-boolean enabled value', () => {
+      const { config, warn } = loadWith('rules:\n  style:\n    enabled: "false"\n');
+      expect(config.rules.style.enabled).toBe(true);
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toMatch(/enabled.*style/);
+    });
+
+    it('does not warn for valid or omitted values', () => {
+      const { warn } = loadWith('rules:\n  security:\n    enabled: false\n    minSeverity: high\n  style: {}\n');
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -1640,3 +1640,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed c7091fb..1655fce — 6585d8d (whitespace-only author → "Unknown" in groupByAuthor, test-first; verified correct, non-string authors also covered) plus log-only commits; reviewer CLI reports 0 issues. Baseline green (51 sample-app tests; idle-streak 1). Backlog has no actionable item (30, 32 BLOCKED) → EMPTY-BACKLOG (b): hunted `reviewer/src/docDrift/parseOpenApi.js` (not hunted before; only mentioned at its creation): fed non-object `paths`, null/empty path items, `x-get`/`$ref` keys, valueless methods, non-mapping YAML — all return correct routes or `[]`, no reproduced bug.
 - Decisions: no code change, no new tasks, no FEATURE task (no evidence-cited gap).
 - Open questions for Vijay: none new.
+
+## 2026-10-21 (Vijay decision: task 30 deferred)
+
+**Decision (Vijay, 2026-10-21):** Task 30 (PROGRESS.md rollover) is deferred. It stays `[BLOCKED]` (invariant 2 forbids deleting it), and Vijay will revisit it later. Runs must not re-raise "approve the archive-aware `scripts/invariantLint.js` change" as an open question, and must not attempt that edit, until Vijay brings it up again.

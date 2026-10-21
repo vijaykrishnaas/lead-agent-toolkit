@@ -14,3 +14,4 @@
 {"ts":"2026-10-21T00:07:08.974Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-a","tests":"green","sha":"3e7d6bc","summary":"EMPTY-BACKLOG (a): ValidationError.message no longer echoed to clients (generic 400), regression test added"}
 {"ts":"2026-10-21T00:36:19.384Z","trigger":"reviewer","outcome":"done","task":"null","tests":"green","sha":"9f16fcc","summary":"Reviewed 2ffa6f4..9f16fcc (ValidationError generic 400 + test): 0 findings; no code change"}
 {"ts":"2026-10-21T01:06:57.401Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-a","tests":"green","sha":"af5bd89","summary":"EMPTY-BACKLOG (a): review CLI now parses base...head (head was '.b'), regression test added"}
+{"ts":"2026-10-21T01:36:38.207Z","trigger":"reviewer","outcome":"done","task":"null","tests":"green","sha":"24d368d","summary":"Reviewed 9f16fcc..24d368d (three-dot range parsing): 0 findings; no code change"}

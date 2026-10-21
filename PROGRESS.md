@@ -1625,3 +1625,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Took the 2026-07-18 "should the CLI support `base...head`" question (oldest unresolved not needing Vijay). Reproduced: `parseArgs(['a...b'])` gave `head: '.b'`, so the head-sha `rev-parse` failed and AST post-image content was silently dropped. Added a regression test (failed first), changed `RANGE_PATTERN` to `\.{2,3}`. `git diff a...b` already worked, so three-dot is now supported end to end. Suite green (453 reviewer + 51 sample-app).
 - Decisions: no guideline added (single parser, one-regex fix).
 - Open questions for Vijay: unchanged — `standup` inference with `--no-prs`; invalid `review-rules.yaml` values warn vs. silently loosen; approve `scripts/invariantLint.js` edit (task 30); allowlist `fastdl.mongodb.org` (task 32).
+
+## 2026-10-21 — Reviewer run (:35 UTC, second)
+- Done: reviewed 9f16fcc..24d368d (d9e7ff4 three-dot range support in review CLI). Verified `RANGE_PATTERN` `\.{2,3}`: `a..b` and `a...b` both split cleanly; regression test covers three-dot. Suite green; reviewer CLI on the range: 0 findings.
+- Decisions: no code change. Noted `a....b` (four dots) still parses as head `.b`, but git rejects that range itself at `git diff`, so not worth a fix. No new tasks, no FEATURE task.
+- Open questions for Vijay: none new.

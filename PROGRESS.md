@@ -1753,3 +1753,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-21 (Reviewer run: review fd53649..HEAD, EMPTY-BACKLOG (b) hunt)
 **Done:** Baseline green, idle-streak 1. Reviewed fd53649..3f9e8eb (the reviewer's own diffParser quoted-path fix plus a builder noop log); reviewer CLI: 0 findings. Backlog empty (30, 32 BLOCKED) -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/rules/missingTests.js` (not named in a recent hunt). Reproduced: since the earlier deleted-file naming fix (`+++ /dev/null` now yields the real path), a wholly deleted `src/` file was flagged "changed but no test file changed". Fixed test-first (failed before, passes after): `parseDiff` marks `deleted: true` on such files and `missing-tests` skips them. 465 reviewer + 51 sample-app tests green.
 **Open questions for Vijay:** none new.
+
+## 2026-10-21 — Reviewer run (scheduled, 7)
+**Done:** Baseline green, idle-streak 1. Reviewed 3f9e8eb..28c40e3 (the reviewer's own missing-tests/deleted-file fix plus logs): verified, no defects; the CLI's one finding was the `diffParser.js` change having no same-diff test file, but the `deleted` flag is exercised end to end by the new missingTests test. Backlog empty -> EMPTY-BACKLOG branch (b): hunted `reviewer/src/docDrift/` (compareRoutes/parseOpenApi, oldest-touched, 2026-07-18). Reproduced: `normalizeRoutePath` dropped a param constraint with a `[^)]*` regex, so nested parens (`:name(\w+(?:x)?)`) left a stray `?)` and the route read as drift. Fixed test-first with a paren-depth scan. Optional `:id?` params left as-is (no OpenAPI equivalent, unreachable in sample-app).
+**Decisions:** Small direct fix; no new tasks, no [FEATURE], no guideline/skill change.
+**Open questions for Vijay:** None new.

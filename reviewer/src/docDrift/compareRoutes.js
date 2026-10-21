@@ -5,8 +5,38 @@
 // with the conversion -- otherwise ':id(\d+)' -> '{id}(\d+)' never matches
 // its documented '{id}' counterpart, and the same real, fully-documented
 // route is reported as drift on both sides.
+// Replaces each ':name' / ':name(constraint)' with '{name}'. The constraint is
+// skipped by paren depth, not a [^)]* regex, so a nested group inside it
+// (':name(\w+(?:x)?)') is dropped whole instead of leaving a stray ')'.
+function replaceParams(routePath) {
+  let out = '';
+  let i = 0;
+  const paramStart = /:([A-Za-z_$][\w$]*)/y;
+  while (i < routePath.length) {
+    paramStart.lastIndex = i;
+    const m = routePath[i] === ':' ? paramStart.exec(routePath) : null;
+    if (!m) {
+      out += routePath[i];
+      i += 1;
+      continue;
+    }
+    out += `{${m[1]}}`;
+    i += m[0].length;
+    if (routePath[i] === '(') {
+      let depth = 0;
+      do {
+        if (routePath[i] === '\\') i += 1;
+        else if (routePath[i] === '(') depth += 1;
+        else if (routePath[i] === ')') depth -= 1;
+        i += 1;
+      } while (i < routePath.length && depth > 0);
+    }
+  }
+  return out;
+}
+
 function normalizeRoutePath(routePath) {
-  const withBraceParams = routePath.replace(/:([A-Za-z_$][\w$]*)(\([^)]*\))?/g, '{$1}');
+  const withBraceParams = replaceParams(routePath);
   if (withBraceParams === '/') return withBraceParams;
   return withBraceParams.replace(/\/$/, '');
 }

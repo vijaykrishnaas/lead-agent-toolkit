@@ -18,6 +18,11 @@ describe('normalizeRoutePath', () => {
     expect(normalizeRoutePath('/api/users/{id}')).toBe('/api/users/{id}');
   });
 
+  it('drops a param regex constraint that contains nested parentheses', () => {
+    expect(normalizeRoutePath('/files/:name(\\w+(?:x)?)')).toBe('/files/{name}');
+    expect(normalizeRoutePath('/files/:name(\\d{2}|(a))/raw')).toBe('/files/{name}/raw');
+  });
+
   it('drops an Express param regex constraint so a fully-documented route does not read as drift', () => {
     // Regression: ':id(\d+)' only had the ':name' prefix converted, leaving
     // the constraint suffix ("(\d+)") in place -- so ':id(\d+)' normalized

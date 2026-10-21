@@ -32,6 +32,16 @@ describe('Tasks', () => {
     expect(Task.create).toHaveBeenCalledWith(expect.objectContaining({ title: 'Write tests', owner: 'u1' }));
   });
 
+  test('does not echo Mongoose ValidationError detail to the client', async () => {
+    const err = new Error('Task validation failed: owner: Cast to ObjectId failed for value "secret-value"');
+    err.name = 'ValidationError';
+    Task.create.mockRejectedValue(err);
+    const res = await request(app).post('/api/tasks').set('Authorization', auth).send({ title: 'x' });
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'Validation failed' });
+    expect(JSON.stringify(res.body)).not.toContain('secret-value');
+  });
+
   test('rejects task creation without a title', async () => {
     const res = await request(app).post('/api/tasks').set('Authorization', auth).send({});
     expect(res.status).toBe(400);

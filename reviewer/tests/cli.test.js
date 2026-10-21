@@ -12,6 +12,12 @@ function makeStream() {
 }
 
 describe('parseArgs', () => {
+  test('three-dot range splits into base and head without a leading dot on head', () => {
+    const args = parseArgs(['main...feature']);
+    expect(args.base).toBe('main');
+    expect(args.head).toBe('feature');
+  });
+
   it('parses a base..head range', () => {
     const args = parseArgs(['abc123..def456']);
     expect(args.range).toBe('abc123..def456');

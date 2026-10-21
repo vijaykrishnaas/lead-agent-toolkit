@@ -1620,3 +1620,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 2ffa6f4..9f16fcc (096623a generic 400 for Mongoose ValidationError). Verified diff: handler returns fixed message, regression test asserts no echo of detail; suite green (51 sample-app tests). Reviewer CLI's one `missing-tests` hit on `app.js` is a basename-convention false positive by design (test is `tasks.test.js`), not a defect in the change.
 - Decisions: no code change, no new tasks, no FEATURE task. Note: `usersController`/`authController` 11000 branches were not re-audited this run.
 - Open questions for Vijay: none new.
+
+## 2026-10-21 (Builder run: EMPTY-BACKLOG (a) — three-dot range parsing)
+- Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Took the 2026-07-18 "should the CLI support `base...head`" question (oldest unresolved not needing Vijay). Reproduced: `parseArgs(['a...b'])` gave `head: '.b'`, so the head-sha `rev-parse` failed and AST post-image content was silently dropped. Added a regression test (failed first), changed `RANGE_PATTERN` to `\.{2,3}`. `git diff a...b` already worked, so three-dot is now supported end to end. Suite green (453 reviewer + 51 sample-app).
+- Decisions: no guideline added (single parser, one-regex fix).
+- Open questions for Vijay: unchanged — `standup` inference with `--no-prs`; invalid `review-rules.yaml` values warn vs. silently loosen; approve `scripts/invariantLint.js` edit (task 30); allowlist `fastdl.mongodb.org` (task 32).

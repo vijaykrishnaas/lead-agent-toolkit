@@ -36,7 +36,10 @@ function parseDiff(diffText) {
       continue;
     }
     if (rawLine.startsWith('+++ ') && lines[i - 1] !== undefined && lines[i - 1].startsWith('--- ') && isFileHeaderStart(i - 1)) {
-      const path = stripPrefix(rawLine.slice(4).trim());
+      let path = stripPrefix(rawLine.slice(4).trim());
+      // A deleted file's post-image header is `+++ /dev/null`; name it by the
+      // pre-image path instead.
+      if (path === '/dev/null') path = stripPrefix(lines[i - 1].slice(4).trim());
       currentFile = { file: path, hunks: [] };
       files.push(currentFile);
       currentHunk = null;

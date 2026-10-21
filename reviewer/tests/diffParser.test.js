@@ -84,4 +84,20 @@ describe('parseDiff', () => {
       ['context', 'tail'],
     ]);
   });
+
+  it('names a deleted file by its --- path, not /dev/null', () => {
+    const diff = [
+      'diff --git a/src/gone.js b/src/gone.js',
+      'deleted file mode 100644',
+      '--- a/src/gone.js',
+      '+++ /dev/null',
+      '@@ -1,2 +0,0 @@',
+      '-a',
+      '-b',
+    ].join('\n');
+    const files = parseDiff(diff);
+    expect(files).toHaveLength(1);
+    expect(files[0].file).toBe('src/gone.js');
+    expect(files[0].hunks[0].lines.map((l) => l.type)).toEqual(['del', 'del']);
+  });
 });

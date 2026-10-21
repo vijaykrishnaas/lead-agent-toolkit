@@ -1704,3 +1704,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (51 sample-app tests). Reviewed 260c67e..b82a02c (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 findings). Backlog empty -> EMPTY-BACKLOG branch (b): hunted least-referenced utils (`memberCallLine.js`, `resolveFileContent.js`; `auth.routes.js` is a trivial route table). Probed optional-chain, multi-line and computed member calls against `memberCallLine`: correct lines, no reproduced bug.
 **Decisions:** No code change, no new tasks, no [FEATURE] added.
 **Open questions for Vijay:** None new.
+
+## 2026-10-21 (Builder run: EMPTY-BACKLOG (a) — 2026-07-19 raw-containment sweep question)
+- Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Idle-streak 0, baseline green (51 sample-app + reviewer suites). Took the 2026-07-19 post-task-18 question "do other test files/scripts use raw `.includes()`/`.indexOf()` for prose/text containment beyond `docProseDrift.test.js`?" (oldest remaining not needing Vijay). Grepped `reviewer/tests`, `sample-app/tests`, `scripts` for non-assertion `.includes(`/`.indexOf(` calls: all hits are array membership (`runLog.js` enums, `invariantLint.js` file lists), positional lookups on fixed headings (`formatStandup.test.js`), or `indexOf(':')`/`indexOf('..')` delimiter splits. No free-text mention check remains; guideline 13 already covers `docProseDrift.test.js`/`missingTests.js`.
+- Decisions: no code change, no new guideline (nothing reproduced).
+- Open questions for Vijay: `standup` inference with `--no-prs`; allowlist `fastdl.mongodb.org` (task 32); 1:1 basename matching in `missing-tests`; `sample-app/openapi.yaml` location; should `resolveJwtSecret` reject short/weak secrets in production?

@@ -107,4 +107,15 @@ describe('formatDocDriftReport', () => {
     const report = formatDocDriftReport(result);
     expect(report).toContain('## Unparsed routes — could not be statically verified (0)');
   });
+
+  test('a backtick or newline in a route path/file cannot break out of its code span or forge report lines', () => {
+    const out = formatDocDriftReport({
+      missingFromSpec: [{ method: 'GET', path: '/a`\n## Forged' }],
+      missingFromCode: [],
+      unparsedRoutes: [{ file: 'x`y.js', line: 3, reason: 'r' }],
+    });
+    expect(out).not.toMatch(/^## Forged/m);
+    expect(out).toContain('- ``GET /a` ## Forged``');
+    expect(out).toContain('- ``x`y.js:3`` (r)');
+  });
 });

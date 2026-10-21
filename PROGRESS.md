@@ -1763,3 +1763,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Reviewed 28c40e3..6063e23 — only code change was `compareRoutes.js` `replaceParams` (nested-paren param constraints); read it, no defect (CLI report: 0 issues). EMPTY-BACKLOG (b) taken: backlog empty (30, 32 BLOCKED), no new commits needing task work; hunted least-recently-touched `parseOpenApi.js`, `groupByAuthor.js`, `collectPullRequests.js`. `parseOpenApi`/`groupByAuthor` clean. Found: `generateStandup` with unparseable `--since` ran collectors against an Invalid Date and died with the cryptic "Invalid time value". Fixed test-first (fails pre-fix): validates up front with "Invalid since — could not parse ..." before any collection.
 **Decisions:** Small, reproduced, fixed directly; no new tasks, no FEATURE task today.
 **Open questions for Vijay:** none new.
+
+## 2026-10-21 — Builder run (scheduled, 18:05 UTC)
+**Done:** Baseline green, idle-streak 0. Backlog empty (30, 32 BLOCKED). EMPTY-BACKLOG branch taken: (a) skipped — remaining open questions are product calls for Vijay, unchanged; (b) hunted `reviewer/src/format/markdownReport.js` and `reviewer/src/docDrift/formatDocDrift.js` (last audited 2026-07, oldest in PROGRESS.md). `markdownReport` clean. Reproduced in `formatDocDrift`: route paths and file names were interpolated raw into inline code spans, so a backtick plus newline (`/a\`\n## Forged`) closed the span and forged a report heading (guideline 15 sink class). Fixed test-first (failed pre-fix): `codeSpan()` collapses newlines and uses a fence longer than any inner backtick run.
+**Decisions:** Small direct fix, no new tasks or guideline (existing guideline 15 covers it). `unparsedRoutes[].reason` is internally generated, left as is.
+**Open questions for Vijay:** none new.

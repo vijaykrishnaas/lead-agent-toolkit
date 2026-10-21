@@ -270,3 +270,7 @@
 ## 2026-10-21 (Reviewer: EMPTY-BACKLOG (b) hunt, missingTests sourceDirs)
 **Change:** No skill/CLAUDE.md change. Adversarial hunt of `config/*` and `rules/missingTests.js`; code fix in `missingTests.js` (sourceDirs normalization) with regression tests.
 **Evidence:** PROGRESS.md 2026-10-21 Reviewer 18:3x entry — reproduced silent rule disable (`'app/'`) and crash (`[42]`) from user-edited review-rules.yaml.
+
+## 2026-10-21 (Reviewer: EMPTY-BACKLOG (b) hunt, sample-app error handler)
+**Change:** No skill/CLAUDE.md change. Adversarial hunt of `sample-app/src/app.js` + tasks/users controllers; code fix in the catch-all error middleware with regression tests.
+**Evidence:** PROGRESS.md 2026-10-21 Reviewer 19:3x entry — reproduced malformed JSON body and oversized body both returning 500 instead of 400/413.

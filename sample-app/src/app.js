@@ -23,6 +23,12 @@ function createApp() {
     if (err.name === 'ValidationError') {
       return res.status(400).json({ error: 'Validation failed' });
     }
+    // body-parser (express.json) errors carry a 4xx status and a type tag.
+    if (typeof err.type === 'string' && err.status >= 400 && err.status < 500) {
+      return res.status(err.status).json({
+        error: err.status === 400 ? 'Invalid JSON body' : 'Request body rejected',
+      });
+    }
     return res.status(500).json({ error: 'Internal server error' });
   });
 

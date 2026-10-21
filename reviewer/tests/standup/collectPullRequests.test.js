@@ -179,4 +179,21 @@ describe('collectPullRequests', () => {
       expect.anything(),
     );
   });
+
+  it('throws instead of silently truncating when the page cap is hit with every PR still in the window', async () => {
+    const fullPage = Array.from({ length: 50 }, (_, i) => ({
+      number: i + 1,
+      title: `PR ${i + 1}`,
+      user: { login: 'alice' },
+      state: 'open',
+      merged_at: null,
+      updated_at: '2026-07-18T10:00:00Z',
+      html_url: `https://github.com/o/r/pull/${i + 1}`,
+    }));
+    const request = jest.fn().mockImplementation(async () => makeResponse({ json: fullPage }));
+
+    await expect(collectPullRequests({ owner: 'o', repo: 'r', since }, { request }))
+      .rejects.toThrow(/20 pages|1000/);
+    expect(request).toHaveBeenCalledTimes(20);
+  });
 });

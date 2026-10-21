@@ -1664,3 +1664,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green, idle-streak 0. Reviewed 964caf2..a502522 — docs/log commits only (a08b221, a502522); `reviewer/src/cli.js` reports 0 issues. Verified the builder's tasksController claim against the code description in its entry: no code changed, no defect.
 - Branch taken: no new commits with code → EMPTY-BACKLOG (b). Hunted `reviewer/src/utils/parseGitHubRemote.js` (only 2 prior PROGRESS mentions). Valid https/ssh/scp forms, trailing `/` and `.git/`, credentials, look-alike hosts (`evilgithub.com`) and extra path segments all behave correctly. `github.com:443` ports, `ssh://…:22` and uppercase `GitHub.com` return null (fail-safe, not a defect: caller treats null as "not a GitHub remote"). No reproduced bug, no code change.
 - Open questions for Vijay: none new.
+
+## 2026-10-21 (Builder run: EMPTY-BACKLOG (a) — PR pagination cap)
+- Done: backlog had no actionable item (30, 32 BLOCKED) → branch (a). Idle-streak 0, baseline green. Took the 2026-07-18 question "should `collectPullRequests` paginate past its 50-per-page/1000-PR cap, or is the cap fine?" (oldest remaining not needing Vijay). Reproduced: 20 full in-window pages returned a silently truncated list. Added a regression test (failed first); the function now throws a "window too large" error when the page cap is exhausted with no older PR seen. Suite green (458 reviewer + 51 sample-app).
+- Decisions: fail loudly rather than raise the cap (a pathological window is better narrowed than silently cut); normal termination paths unchanged. No guideline added (single sink).
+- Open questions for Vijay: `standup` inference with `--no-prs`; allowlist `fastdl.mongodb.org` (task 32).

@@ -31,6 +31,7 @@ async function collectPullRequests({ owner, repo, since } = {}, deps = {}) {
   if (deps.token) headers.Authorization = `Bearer ${deps.token}`;
 
   const inWindow = [];
+  let exhausted = true;
   for (let page = 1; page <= MAX_PAGES; page += 1) {
     const url = `${GITHUB_API_URL}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
       + `/pulls?state=all&sort=updated&direction=desc&per_page=${PER_PAGE}&page=${page}`;
@@ -45,7 +46,7 @@ async function collectPullRequests({ owner, repo, since } = {}, deps = {}) {
 
     // eslint-disable-next-line no-await-in-loop
     const pulls = await response.json();
-    if (pulls.length === 0) break;
+    if (pulls.length === 0) { exhausted = false; break; }
 
     let hitOlder = false;
     for (const pr of pulls) {
@@ -57,7 +58,15 @@ async function collectPullRequests({ owner, repo, since } = {}, deps = {}) {
       }
     }
 
-    if (hitOlder || pulls.length < PER_PAGE) break;
+    if (hitOlder || pulls.length < PER_PAGE) { exhausted = false; break; }
+  }
+
+  // Every page was full and in-window: more PRs may exist past the cap, so
+  // fail loudly rather than return a silently truncated list.
+  if (exhausted) {
+    throw new Error(
+      `Pull request window too large — fetched ${MAX_PAGES} pages (${MAX_PAGES * PER_PAGE} PRs) all updated since ${sinceDate.toISOString()}; narrow the window.`,
+    );
   }
 
   return inWindow.map((pr) => ({

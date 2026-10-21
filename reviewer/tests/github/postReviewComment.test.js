@@ -73,6 +73,21 @@ describe('postReviewComment', () => {
     await expect(postReviewComment(baseArgs, { request })).rejects.toThrow(/500.*Server Error/s);
   });
 
+  it('propagates a network-level rejection of the comment search request', async () => {
+    const request = jest.fn().mockRejectedValue(new Error('ECONNRESET'));
+
+    await expect(postReviewComment(baseArgs, { request })).rejects.toThrow(/ECONNRESET/);
+    expect(request).toHaveBeenCalledTimes(1);
+  });
+
+  it('propagates a network-level rejection of the post request', async () => {
+    const request = jest.fn()
+      .mockResolvedValueOnce(noExistingComments())
+      .mockRejectedValueOnce(new Error('ETIMEDOUT'));
+
+    await expect(postReviewComment(baseArgs, { request })).rejects.toThrow(/ETIMEDOUT/);
+  });
+
   it('URL-encodes owner/repo/prNumber so a stray "/" cannot redirect the request to a different API path', async () => {
     const request = jest.fn()
       .mockResolvedValueOnce(noExistingComments())

@@ -1,6 +1,6 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 
-const SECRET_PATTERN = /(password|secret|apikey|api_key|token)\s*[:=]\s*['"`][^'"`]{3,}['"`]/i;
+const SECRET_PATTERN = /(password|secret|apikey|api_key|token)['"`]?\s*[:=]\s*['"`][^'"`]{3,}['"`]/i;
 // \beval\s*\( catches the direct call form (`eval(x)`). It does not catch
 // bracket-property access (`global['eval'](x)`, `window["eval"](x)`), a
 // trivial one-line evasion with identical runtime semantics: `eval` there is

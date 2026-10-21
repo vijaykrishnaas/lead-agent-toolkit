@@ -102,4 +102,19 @@ describe('security rule', () => {
     const files = parseDiff(loadFixture('clean.diff'));
     expect(securityRule.check(files)).toEqual([]);
   });
+
+  it('flags a hardcoded credential assigned via a quoted object key', () => {
+    const diff = [
+      'diff --git a/src/c.js b/src/c.js',
+      '--- a/src/c.js',
+      '+++ b/src/c.js',
+      '@@ -0,0 +1,3 @@',
+      '+const a = { "password": "hunter22" };',
+      "+const b = { 'apiKey': 'abcd1234' };",
+      "+const c = { 'token': process.env.T };",
+      '',
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1, 2]);
+  });
 });

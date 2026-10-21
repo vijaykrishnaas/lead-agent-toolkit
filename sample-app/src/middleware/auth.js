@@ -3,7 +3,8 @@ const { resolveJwtSecret } = require('../config/jwtSecret');
 
 function auth(req, res, next) {
   const header = req.header('Authorization') || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  // The auth scheme is case-insensitive (RFC 7235).
+  const token = /^bearer /i.test(header) ? header.slice(7) : null;
   if (!token) {
     return res.status(401).json({ error: 'Missing or invalid Authorization header' });
   }

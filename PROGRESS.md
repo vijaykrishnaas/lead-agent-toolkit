@@ -1831,3 +1831,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls for Vijay. Hunted `reviewer/src/rules/missingTests.js` (plus `formatDocDrift.js`, `resolveFileContent.js`; the latter two behave). Reproduced: changed `src/styles.css`, `src/data.json`, `src/README.md` each got a "no test file changed" finding. Fixed test-first: only .js/.jsx/.mjs/.cjs/.ts/.tsx files count as source. 478 reviewer + 55 sample-app tests green.
 **Decisions:** Extension allowlist kept to code types so existing jsx/ts handling is unchanged.
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Reviewer)
+- Reviewed dc7f17f..037056d: CLI reports no issues; manual read of the missingTests CODE_FILE_PATTERN change is sound.
+- Branch: reviewed commits (not EMPTY-BACKLOG). Fixed one reproduced bug test-first: `src/a.test.ts` was treated as untested source because TEST_SUFFIX_PATTERN only matched `.test.js`. Pattern now covers test/spec across all code extensions.
+- Open questions for Vijay: none new.

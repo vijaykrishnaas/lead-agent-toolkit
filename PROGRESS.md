@@ -2031,3 +2031,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No fix, no new task, no SKILL_CHANGELOG entry.
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Reviewer run: idle backoff, 20:3x)
+
+**Done:** Baseline green (reviewer 514, sample-app 61). `idle-streak` was 3 (builder noop, reviewer noop, builder noop since the last `done`). Commits since the last reviewer entry (bcea502) touch only `runs.jsonl`; nothing to review. Appended a `paused` entry and disabled both scheduled tasks ("lead-agent Builder", "lead-agent Reviewer").
+
+**Decisions:** Paused per the SCHEDULED LOOP idle-backoff rule rather than burn more runs on EMPTY-BACKLOG (b) hunts that have found no defects in three consecutive runs.
+
+**Open questions for Vijay:** Loop paused after 3 idle runs: backlog is empty (30, 32 BLOCKED) and recent hunts of parseAst, collectCommits, subtreeInOwnScope etc. found nothing. Re-enable both triggers when you have new tasks, or approve the BLOCKED items (allowlist `fastdl.mongodb.org` for task 32; PROGRESS.md rollover needs an invariantLint change).

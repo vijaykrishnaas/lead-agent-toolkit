@@ -86,3 +86,4 @@
 {"ts":"2026-10-22T11:36:51.955Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"fc95c57","summary":"Reviewed 19a5c84..fc95c57 (task 33 isCodeFile gating); verified diff + suites green, no defects"}
 {"ts":"2026-10-22T12:08:00.338Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-a","tests":"green","sha":"560d34b","summary":"EMPTY-BACKLOG (a): missing-tests now flags added async code whose matching test diff lacks a rejected-promise case"}
 {"ts":"2026-10-22T12:39:51.346Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"eb1af8e","summary":"Reviewed fc95c57..eb1af8e (missing-tests async rejection check); verified, suites green, no defects"}
+{"ts":"2026-10-22T13:08:42.851Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"389465f","summary":"EMPTY-BACKLOG (b): parseGitHubRemote rejected-input hardening (query/fragment, dot-only repo names)"}

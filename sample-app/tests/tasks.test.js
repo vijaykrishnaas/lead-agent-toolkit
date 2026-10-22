@@ -47,6 +47,24 @@ describe('Tasks', () => {
     expect(res.status).toBe(400);
   });
 
+  test.each([['whitespace-only', '   '], ['non-string', { $ne: null }], ['numeric', 5]])(
+    'rejects a %s title on create without touching the database',
+    async (_label, title) => {
+      const res = await request(app).post('/api/tasks').set('Authorization', auth).send({ title });
+      expect(res.status).toBe(400);
+      expect(Task.create).not.toHaveBeenCalled();
+    },
+  );
+
+  test.each([['whitespace-only', '   '], ['non-string', ['x']], ['null', null]])(
+    'rejects a %s title on update without touching the database',
+    async (_label, title) => {
+      const res = await request(app).put('/api/tasks/t1').set('Authorization', auth).send({ title });
+      expect(res.status).toBe(400);
+      expect(Task.findOneAndUpdate).not.toHaveBeenCalled();
+    },
+  );
+
   test('lists tasks scoped to the owner', async () => {
     Task.find.mockResolvedValue([{ _id: 't1', title: 'A' }, { _id: 't2', title: 'B' }]);
     const res = await request(app).get('/api/tasks').set('Authorization', auth);

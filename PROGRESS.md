@@ -1855,3 +1855,11 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-22 (Reviewer, third run)
 - Reviewed 9b46de7..HEAD (loadRuleConfig unknown-category/non-mapping warnings). Verified by hand: shipped review-rules.yaml loads with 0 warnings; a `securty` typo warns once with the real category list. CLI's only finding (loadRules.js changed, no test file) was valid: the `loadRules`→`knownCategories` wiring had no test. Added an integration test (485 reviewer tests green). No code defects, no new tasks, no SKILL_CHANGELOG entry.
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b) — tasksController hunt)
+
+**Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls for Vijay. Hunted `sample-app/src/controllers/tasksController.js` and routes (fewest PROGRESS.md mentions; `tasks.routes.js` last touched 2026-07-17). Reproduced: `POST /api/tasks` accepted a whitespace-only title (`!title` is truthy for `"   "`) and a numeric title (coerced to string by Mongoose); `PUT /api/tasks/:id` accepted whitespace-only, array, and `null` titles and passed them to the DB. Fixed test-first with an `isValidTitle` check (non-empty trimmed string) on create and on update when `title` is present; +6 tests asserting 400 and no DB call.
+
+**Decisions:** Did not type-check `description`/`completed` — Mongoose casts or rejects them (CastError → 400 via the error middleware), no observed bad outcome. Did not touch the unwrapped `auth.routes.js` handlers: they carry their own try/catch for every stage.
+
+**Open questions for Vijay:** none new (unchanged: `standup --no-prs`; allowlist `fastdl.mongodb.org`; 1:1 basename matching; openapi.yaml location; weak-secret rejection; plugin naming; doc-drift param-name strictness).

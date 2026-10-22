@@ -1876,3 +1876,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Reviewer, 92d73eb)
+- Done: reviewed 1d9b3bd..92d73eb (performance rule now treats `for await` inside a forEach callback as await). Verified the change is confined to `subtreeHasAwait` (single caller, still stops at nested function scope); reviewer CLI reports 0 issues; `npm test` green.
+- Decisions: no fixes or new tasks needed.
+- Open questions for Vijay: none new.

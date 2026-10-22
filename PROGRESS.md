@@ -1863,3 +1863,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Did not type-check `description`/`completed` — Mongoose casts or rejects them (CastError → 400 via the error middleware), no observed bad outcome. Did not touch the unwrapped `auth.routes.js` handlers: they carry their own try/catch for every stage.
 
 **Open questions for Vijay:** none new (unchanged: `standup --no-prs`; allowlist `fastdl.mongodb.org`; 1:1 basename matching; openapi.yaml location; weak-secret rejection; plugin naming; doc-drift param-name strictness).
+
+## 2026-10-22 (Reviewer run: review 997aa10..HEAD)
+
+**Done:** Baseline green, idle-streak 0. Reviewed 997aa10..HEAD (tasksController `isValidTitle` on create/update, loadRules wiring test). Read the diff: create rejects non-string/blank titles, update only validates when `title !== undefined` (null correctly rejected), side-effect collaborator asserted uncalled. `description`/`completed` fall through to Mongoose casting + `runValidators`, with CastError already mapped by the catch-all (checked in an earlier hunt), so no reproducible defect. CLI's one finding (tasksController.js changed, "no test file changed") is the known 1:1 basename-matching open question; `tasks.test.js` changed in the same diff. **Branch:** nothing new to fix, no task/feature added.
+**Open questions for Vijay:** none new (basename-matching missing-tests heuristic remains the standing one).

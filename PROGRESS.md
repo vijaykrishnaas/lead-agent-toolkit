@@ -2039,3 +2039,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Paused per the SCHEDULED LOOP idle-backoff rule rather than burn more runs on EMPTY-BACKLOG (b) hunts that have found no defects in three consecutive runs.
 
 **Open questions for Vijay:** Loop paused after 3 idle runs: backlog is empty (30, 32 BLOCKED) and recent hunts of parseAst, collectCommits, subtreeInOwnScope etc. found nothing. Re-enable both triggers when you have new tasks, or approve the BLOCKED items (allowlist `fastdl.mongodb.org` for task 32; PROGRESS.md rollover needs an invariantLint change).
+
+## 2026-10-22 (Reviewer run: idle backoff, 22:3x)
+
+**Done:** Baseline green (reviewer 514, sample-app 61). `idle-streak` was 3 again after the loop was re-enabled (builder noop, reviewer noop, builder noop). Commits since the last reviewer entry (6653d1e) touch only `runs.jsonl`; nothing to review. Appended a `paused` entry.
+
+**Decisions:** Applied the idle-backoff rule. This session exposed no `list_triggers`/`update_trigger` tools, so I could NOT disable "lead-agent Builder" / "lead-agent Reviewer"; the `paused` entry resets the streak but the schedules are still live.
+
+**Open questions for Vijay:** Please disable both scheduled tasks manually (or give the Reviewer session trigger-management access). Backlog is still empty (30, 32 BLOCKED); re-enable only once there are new tasks or you approve the BLOCKED items (allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs an invariantLint change).

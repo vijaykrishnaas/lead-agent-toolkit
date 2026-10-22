@@ -1939,3 +1939,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed task 33 (isCodeFile gating in errorHandling/performance/style). Gate is applied before any line collection, test covers md-ignored/js-flagged for all three rules. Baseline green (root 61, reviewer 499). No defects found, no tasks added.
 - Decisions: left .mts/.cts unmatched — acorn path can't parse TS anyway and no observed failure.
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (a))
+
+**Done:** Backlog had no actionable item (30, 32 BLOCKED) and idle-streak was 0, baseline green → branch (a). Took the oldest unresolved open question by date: 2026-07-17 "should the reviewer treat 'no rejected-promise test per async handler' as a first-class `missing-tests` finding?" (the other 07-17 questions were resolved by tasks 20/24). `missingTests.js` now emits a `low` finding when a source file adds async code (comment-masked) and its matching changed test file(s) add no rejection-path line (`reject|toThrow|throw|.catch(`). 3 new tests (flag, no flag with rejection case, `async` only in a comment); suite green (502 reviewer + 61 sample-app).
+
+**Decisions:** Severity `low` and added-lines-only heuristic, since the test diff may not show a pre-existing rejection case; refactored `hasMatchingTestFile` into `matchingTestFiles` (same matching logic). Not a CLAUDE.md/skill change, so no SKILL_CHANGELOG entry.
+
+**Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).

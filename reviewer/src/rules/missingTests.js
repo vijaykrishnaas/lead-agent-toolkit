@@ -1,4 +1,5 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
+const { maskComments } = require('../utils/maskStringLiterals');
 
 const TEST_FILE_PATTERN = /(^|\/)tests\//;
 const TEST_SUFFIX_PATTERN = /\.(test|spec)\.(js|jsx|mjs|cjs|ts|tsx)$/;
@@ -56,15 +57,28 @@ function testFileReferencesSource(testFile, sourceFile) {
 // test file must also reference this file's own parent directory in its
 // import -- otherwise a test for one sibling would silently satisfy the
 // check for an entirely different, untested file that just shares a name.
-function hasMatchingTestFile(sourceFile, testFiles, siblings) {
+function matchingTestFiles(sourceFile, testFiles, siblings) {
   const sourceBase = baseName(sourceFile.file).replace(/\.js$/, '');
   const candidates = testFiles.filter((testFile) => {
     const testBase = baseName(testFile.file).replace(/\.test\.js$/, '').replace(/\.js$/, '');
     return testBase === sourceBase;
   });
-  if (candidates.length === 0) return false;
-  if (siblings.length <= 1) return true;
-  return candidates.some((testFile) => testFileReferencesSource(testFile, sourceFile));
+  if (siblings.length <= 1) return candidates;
+  return candidates.filter((testFile) => testFileReferencesSource(testFile, sourceFile));
+}
+
+const ASYNC_PATTERN = /\basync\b/;
+const REJECTION_PATTERN = /reject|toThrow|throw\b|\.catch\(/i;
+
+function addedText(file) {
+  return collectAddedLines(file).map((line) => line.content).join('\n');
+}
+
+// Source adds async code (comments masked, so "async" in a comment doesn't
+// count) but none of its matching test diffs add a rejection-path case.
+function lacksRejectionCase(sourceFile, matchedTests) {
+  if (!ASYNC_PATTERN.test(maskComments(addedText(sourceFile)).masked)) return false;
+  return !matchedTests.some((testFile) => REJECTION_PATTERN.test(addedText(testFile)));
 }
 
 // `options.sourceDirs` lets config (review-rules.yaml, via the rule loader)
@@ -102,21 +116,31 @@ function check(files, options = {}) {
   // changed in the same commit -- including two different source files that
   // happen to share a basename in different directories (see
   // hasMatchingTestFile's `siblings` handling).
-  return sourceFiles
-    .filter((file) => {
-      const siblings = sourceFilesByBase.get(baseName(file.file).replace(/\.js$/, ''));
-      return !hasMatchingTestFile(file, testFiles, siblings);
-    })
-    .map((file) => {
-      const firstAdd = collectAddedLines(file)[0];
-      return {
+  const issues = [];
+  for (const file of sourceFiles) {
+    const siblings = sourceFilesByBase.get(baseName(file.file).replace(/\.js$/, ''));
+    const matched = matchingTestFiles(file, testFiles, siblings);
+    const firstAdd = collectAddedLines(file)[0];
+    const line = firstAdd ? firstAdd.newLine : 1;
+    if (matched.length === 0) {
+      issues.push({
         file: file.file,
-        line: firstAdd ? firstAdd.newLine : 1,
+        line,
         severity: 'medium',
         message: `Source file "${file.file}" changed but no test file changed in this diff.`,
         fix: 'Add or update a corresponding test under tests/ covering the new or changed behavior, including a rejected-promise case for async handlers.',
-      };
-    });
+      });
+    } else if (lacksRejectionCase(file, matched)) {
+      issues.push({
+        file: file.file,
+        line,
+        severity: 'low',
+        message: `Source file "${file.file}" adds async code but its changed test file(s) add no rejected-promise case.`,
+        fix: 'Add a test where the awaited collaborator rejects and assert the error is handled.',
+      });
+    }
+  }
+  return issues;
 }
 
 module.exports = { category: 'missing-tests', check };

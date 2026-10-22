@@ -182,4 +182,40 @@ describe('missing-tests rule', () => {
       expect(missingTestsRule.check([file('src/a.test.ts'), file('src/b.spec.jsx')])).toEqual([]);
     });
   });
+  describe('rejected-promise coverage for async source changes', () => {
+    function diffWith(srcLine, testLines) {
+      return [
+        'diff --git a/src/svc/load.js b/src/svc/load.js',
+        '--- a/src/svc/load.js',
+        '+++ b/src/svc/load.js',
+        '@@ -1,1 +1,2 @@',
+        ' const x = 1;',
+        srcLine,
+        'diff --git a/tests/load.test.js b/tests/load.test.js',
+        '--- a/tests/load.test.js',
+        '+++ b/tests/load.test.js',
+        `@@ -1,1 +1,${1 + testLines.length} @@`,
+        " const { load } = require('../src/svc/load');",
+        ...testLines,
+      ].join('\n');
+    }
+
+    it('flags an added async function whose matching test diff has no rejection case', () => {
+      const diff = diffWith('+async function load() { return 1; }', ["+test('loads', async () => { expect(await load()).toBe(1); });"]);
+      const issues = missingTestsRule.check(parseDiff(diff));
+      expect(issues).toHaveLength(1);
+      expect(issues[0]).toMatchObject({ file: 'src/svc/load.js', severity: 'low' });
+      expect(issues[0].message).toMatch(/rejected-promise/);
+    });
+
+    it('does not flag when the matching test adds a rejection case', () => {
+      const diff = diffWith('+async function load() { return 1; }', ["+test('rejects', async () => { await expect(load()).rejects.toThrow(); });"]);
+      expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
+    });
+
+    it('does not flag when "async" appears only in a comment', () => {
+      const diff = diffWith('+// async note', ["+test('loads', () => {});"]);
+      expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
+    });
+  });
 });

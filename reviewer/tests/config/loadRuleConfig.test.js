@@ -93,5 +93,19 @@ describe('loadRuleConfig', () => {
       expect(warn).toHaveBeenCalledTimes(1);
       expect(warn.mock.calls[0][0]).toMatch(/"rules".*mapping/);
     });
+
+    it('warns when a category is a scalar (e.g. "style: false") instead of a settings mapping', () => {
+      const { config, warn } = loadWith('rules:\n  style: false\n  security:\n');
+      expect(config.rules.style.enabled).toBe(true);
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toMatch(/style.*mapping.*enabled: false/);
+    });
+
+    it('warns when "options" is a list instead of a mapping and uses empty options', () => {
+      const { config, warn } = loadWith('rules:\n  missing-tests:\n    options: [src, lib]\n');
+      expect(config.rules['missing-tests'].options).toEqual({});
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toMatch(/options.*missing-tests.*mapping/);
+    });
   });
 });

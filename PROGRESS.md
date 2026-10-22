@@ -1999,3 +1999,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Left CRLF diffs and `---`/`+++` tab-timestamp paths alone: git never emits the latter, and `\r` in content is faithful to CRLF files. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 
 **Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b), 17:0x)
+
+**Done:** Baseline green, idle-streak 0, backlog empty (30, 32 BLOCKED). **Branch taken:** (b) — (a) skipped again: remaining open questions are product calls for Vijay. Hunted `reviewer/src/config/loadRuleConfig.js` (few audit mentions); `collectAddedLines`, `buildRules` read and sound. Reproduced: `style: false` (a natural way to try to disable a rule) was silently treated as defaults, leaving the rule on with no warning, and `options: [a, b]` (a list) was passed through to rules as the options object. Both now warn; a list `options` falls back to `{}`. +2 tests. Suites green (513 reviewer + 61 sample-app).
+
+**Decisions:** Empty category entries (`style:`) stay silent. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
+
+**Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).

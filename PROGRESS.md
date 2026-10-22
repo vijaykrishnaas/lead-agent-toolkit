@@ -1826,3 +1826,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer + sample-app suites), idle-streak 1. Reviewed 697cff1..dc7f17f (only PROGRESS.md and runs.jsonl; no code). **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `config/buildRules.js` and the three sample-app route files (fewest prior mentions in PROGRESS/SKILL_CHANGELOG/runs). Nothing reproducible: unknown rule severity or minSeverity falls back to low, missing category config falls back to enabled defaults, routes all sit behind auth + asyncHandler (auth routes intentionally public). Observation, not a defect: `buildRules` wraps `check(files)` only, so when RW4 (`check(context)`) is picked up it must be updated together with `reviewer.js`, as RW4 already states.
 **Decisions:** No code, skill, or backlog changes, so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** unchanged (param-name strictness in doc-drift; tasks 30 and 32 BLOCKED).
+
+## 2026-10-22 (Builder)
+**Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls for Vijay. Hunted `reviewer/src/rules/missingTests.js` (plus `formatDocDrift.js`, `resolveFileContent.js`; the latter two behave). Reproduced: changed `src/styles.css`, `src/data.json`, `src/README.md` each got a "no test file changed" finding. Fixed test-first: only .js/.jsx/.mjs/.cjs/.ts/.tsx files count as source. 478 reviewer + 55 sample-app tests green.
+**Decisions:** Extension allowlist kept to code types so existing jsx/ts handling is unchanged.
+**Open questions for Vijay:** none new.

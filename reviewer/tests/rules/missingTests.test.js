@@ -166,4 +166,16 @@ describe('missing-tests rule', () => {
       expect(missingTestsRule.check(files, { sourceDirs: [42] })).toEqual(missingTestsRule.check(files));
     });
   });
+  describe('non-code files under a source dir', () => {
+    const file = (name) => ({ file: name, hunks: [{ lines: [{ type: 'add', content: 'x', newLine: 1 }] }] });
+
+    it('does not demand tests for css/json/md files', () => {
+      expect(missingTestsRule.check([file('src/styles.css'), file('src/data.json'), file('src/README.md')])).toEqual([]);
+    });
+
+    it('still flags a changed code file alongside them', () => {
+      const findings = missingTestsRule.check([file('src/styles.css'), file('src/app.jsx')]);
+      expect(findings.map((f) => f.file)).toEqual(['src/app.jsx']);
+    });
+  });
 });

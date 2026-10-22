@@ -2007,3 +2007,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Empty category entries (`style:`) stay silent. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 
 **Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).
+
+## 2026-10-22 (Reviewer run, 17:3x)
+
+**Done:** Baseline green, idle-streak 0. Reviewed a5affaa..3dc66b7 (`loadRuleConfig` scalar/list warnings, commit 98b3336). `reviewer/src/cli.js` reports 0 issues; manual read confirms falsy scalars (`false`, `0`, `""`) and arrays warn, `undefined`/`null` (empty `style:`) stay silent, and defaults are unchanged. Tests cover both new warnings. No defects, no tasks added (no new gap evidence for a [FEATURE] today).
+
+**Decisions:** No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
+
+**Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).

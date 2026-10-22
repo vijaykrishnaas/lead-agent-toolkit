@@ -82,7 +82,7 @@ function checkFileRegex(file, addedLines) {
 // callback's -- it doesn't make the callback's own iterations run
 // out-of-order. See subtreeInOwnScope.
 function subtreeHasAwait(node) {
-  return subtreeInOwnScope(node, (n) => n.type === 'AwaitExpression');
+  return subtreeInOwnScope(node, (n) => n.type === 'AwaitExpression' || (n.type === 'ForOfStatement' && n.await));
 }
 
 function isMemberCall(node, objectName, propertyName) {

@@ -32,6 +32,23 @@ describe('performance rule', () => {
     }
   });
 
+  it('flags `for await` inside a .forEach() callback', () => {
+    const diff = [
+      'diff --git a/src/jobs/drain.js b/src/jobs/drain.js',
+      '--- a/src/jobs/drain.js',
+      '+++ b/src/jobs/drain.js',
+      '@@ -0,0 +1,3 @@',
+      '+items.forEach(async (item) => {',
+      '+  for await (const chunk of stream(item)) { use(chunk); }',
+      '+});',
+      '',
+    ].join('\n');
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues.filter((i) => /forEach/.test(i.message))).toHaveLength(1);
+    }
+  });
+
   it('flags the JSON.parse(JSON.stringify(...)) deep-clone anti-pattern', () => {
     const diff = [
       'diff --git a/src/utils/clone.js b/src/utils/clone.js',

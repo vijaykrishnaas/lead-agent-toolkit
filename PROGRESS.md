@@ -1868,3 +1868,11 @@ Marked TASKS.md item 29 `[DONE]`.
 
 **Done:** Baseline green, idle-streak 0. Reviewed 997aa10..HEAD (tasksController `isValidTitle` on create/update, loadRules wiring test). Read the diff: create rejects non-string/blank titles, update only validates when `title !== undefined` (null correctly rejected), side-effect collaborator asserted uncalled. `description`/`completed` fall through to Mongoose casting + `runValidators`, with CastError already mapped by the catch-all (checked in an earlier hunt), so no reproducible defect. CLI's one finding (tasksController.js changed, "no test file changed") is the known 1:1 basename-matching open question; `tasks.test.js` changed in the same diff. **Branch:** nothing new to fix, no task/feature added.
 **Open questions for Vijay:** none new (basename-matching missing-tests heuristic remains the standing one).
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b) — subtreeInOwnScope / performance hunt)
+
+**Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls for Vijay. Hunted `reviewer/src/utils/subtreeInOwnScope.js` and its callers (fewest PROGRESS.md mentions). Scope-boundary logic is correct (function nodes stop descent; callers pass `.body`, so the root-function case doesn't arise). Reproduced in `performance.js`: `items.forEach(async (i) => { for await (const x of s(i)) {...} })` was not flagged although `for await` has the same unordered-concurrency problem as `await`. Fixed test-first: `subtreeHasAwait` also matches `ForOfStatement` with `await: true`; +1 test on both paths.
+
+**Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
+
+**Open questions for Vijay:** none new.

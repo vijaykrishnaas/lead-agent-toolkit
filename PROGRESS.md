@@ -1910,3 +1910,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No fixes, no new tasks, no SKILL_CHANGELOG entry. Known minor: `isAwaitedInTryCatch` treats `await foo(x.then(f))` as handled; left as-is (far-fetched).
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b) — parseArgv / consumeFlagValue hunt)
+
+**Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls for Vijay. Hunted `reviewer/src/utils/parseArgv.js` / `consumeFlagValue.js` (5 PROGRESS/SKILL_CHANGELOG mentions, among the least audited). Reproduced: a value-taking flag given an empty string (`--repo "$UNSET_VAR"`) was accepted as a valid value, so e.g. `--token ""` silently fell back to env and `--out ""` set an empty path, instead of the "Missing value" error guideline 7 requires. Fixed test-first in `consumeFlagValue` (empty string now counts as missing); +1 test. Other probes (repeated flags, `__proto__`-style names, extra positionals) behaved correctly.
+
+**Decisions:** Fix lives in the shared helper so all four CLIs inherit it. No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
+
+**Open questions for Vijay:** none new.

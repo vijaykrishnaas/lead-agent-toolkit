@@ -12,4 +12,8 @@ describe('consumeFlagValue', () => {
   it('throws when the value looks like another flag, instead of silently consuming it', () => {
     expect(() => consumeFlagValue(['--out', '--repo', '/tmp'], 1, '--out')).toThrow('Missing value for --out.');
   });
+
+  it('throws when the value is an empty string (e.g. an unset shell variable)', () => {
+    expect(() => consumeFlagValue(['--out', ''], 1, '--out')).toThrow('Missing value for --out.');
+  });
 });

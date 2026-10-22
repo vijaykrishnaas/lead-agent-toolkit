@@ -34,4 +34,19 @@ describe('loadRules integration', () => {
 
     expect(configuredResult).toEqual(defaultResult);
   });
+  it('warns about a misspelled category using the real rule categories, but not for the shipped config', () => {
+    const os = require('os');
+    const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'rules-')), 'typo.yaml');
+    fs.writeFileSync(tmp, 'rules:\n  securty:\n    enabled: false\n');
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      loadRules();
+      expect(spy).not.toHaveBeenCalled();
+      loadRules(tmp);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy.mock.calls[0][0]).toMatch(/unknown category "securty".*security/);
+    } finally {
+      spy.mockRestore();
+    }
+  });
 });

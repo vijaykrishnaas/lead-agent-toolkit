@@ -1851,3 +1851,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls. Hunted `config/loadRuleConfig.js` (plus `collectAddedLines.js`, `generateDocDrift.js`; both fine). Reproduced: a misspelled category (`securty: enabled: false`) was silently ignored, leaving the intended rule on, and `rules:` written as a list produced categories "0","1" with no warning. Fixed test-first (3 tests): `loadRuleConfig` takes `knownCategories` (passed by `loadRules` from the base rules) and warns on unknown categories; a non-mapping `rules` value warns and is ignored. The shipped review-rules.yaml loads with no warnings. 484 reviewer + 55 sample-app tests green.
 **Decisions:** Warn rather than throw, matching the existing invalid-value behavior. No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Reviewer, third run)
+- Reviewed 9b46de7..HEAD (loadRuleConfig unknown-category/non-mapping warnings). Verified by hand: shipped review-rules.yaml loads with 0 warnings; a `securty` typo warns once with the real category list. CLI's only finding (loadRules.js changed, no test file) was valid: the `loadRules`→`knownCategories` wiring had no test. Added an integration test (485 reviewer tests green). No code defects, no new tasks, no SKILL_CHANGELOG entry.
+- Open questions for Vijay: none new.

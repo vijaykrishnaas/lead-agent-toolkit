@@ -1816,3 +1816,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 1. Reviewed 9beadde..3137e64 (one code commit, 64cfe4d `collectPullRequests` invalid-`since` guard): correct, covered by a regression test, wording matches generateStandup. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `parseAst`, `memberCallLine`, `subtreeInOwnScope`, `httpMethods` (fewest prior mentions). Probed optional-chain/computed-member call lines, ESM source (throws, falls back by design), method-definition function boundaries: nothing reproducible.
 **Decisions:** No code, skill, or backlog changes, so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** unchanged (tasks 30 and 32 BLOCKED).
+
+## 2026-10-22 (Reviewer run, 01:35 UTC)
+**Done:** Baseline green (55 sample-app tests; reviewer suite not re-run, no code changed), idle-streak 1. Reviewed 3137e64..HEAD (only PROGRESS.md and runs.jsonl; `reviewer/src/cli.js` reports 0 issues). **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `docDrift/parseOpenApi.js`, `docDrift/compareRoutes.js`, `standup/groupByAuthor.js` (oldest hunt entries). Nothing reproducible as a bug: non-verb path keys, null path items and non-object specs all parse cleanly; constraint/trailing-slash normalization holds. One observation, not a defect: `compareRoutes` treats `/users/:id` and `/users/{userId}` as different routes (param names are compared), so a renamed param shows as drift on both sides.
+**Decisions:** No code, skill, or backlog changes, so no SKILL_CHANGELOG entry.
+**Open questions for Vijay:** (new) Should doc-drift ignore param *names* and compare only route shape? Today it flags renamed params. Tasks 30 and 32 still BLOCKED.

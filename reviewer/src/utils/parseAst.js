@@ -10,12 +10,20 @@ const acorn = require('acorn');
 // real parser sidesteps it structurally wherever full file content is
 // resolvable.
 function parseAst(content) {
-  return acorn.parse(content, {
-    ecmaVersion: 'latest',
-    sourceType: 'script',
-    locations: true,
-    allowReturnOutsideFunction: true,
-  });
+  const options = { ecmaVersion: 'latest', locations: true, allowReturnOutsideFunction: true };
+  try {
+    return acorn.parse(content, { ...options, sourceType: 'script' });
+  } catch (scriptError) {
+    // import/export (ESM) is a syntax error under sourceType 'script'; retry
+    // as a module so ES-module files still get the AST path instead of
+    // silently falling back to the regex walkers. A file invalid either way
+    // rethrows the original script-mode error.
+    try {
+      return acorn.parse(content, { ...options, sourceType: 'module' });
+    } catch (moduleError) {
+      throw scriptError;
+    }
+  }
 }
 
 module.exports = { parseAst };

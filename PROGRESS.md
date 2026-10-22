@@ -1947,3 +1947,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Severity `low` and added-lines-only heuristic, since the test diff may not show a pre-existing rejection case; refactored `hasMatchingTestFile` into `matchingTestFiles` (same matching logic). Not a CLAUDE.md/skill change, so no SKILL_CHANGELOG entry.
 
 **Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).
+
+## 2026-10-22 — Reviewer run (fc95c57..eb1af8e)
+- Done: reviewed the missing-tests async-rejection check (560d34b/eb1af8e). Matching refactor preserves behavior; `async` word-boundary avoids `asyncHandler`, comments masked. CLI on the range reports 0 issues; baseline green (reviewer 502, sample-app 61). No defects, no tasks added.
+- Decisions: the added-lines-only heuristic and loose `throw\b` match are acknowledged builder trade-offs (low severity); no observed failure, so no change.
+- Open questions for Vijay: none new.

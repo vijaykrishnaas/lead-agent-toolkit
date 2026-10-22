@@ -98,3 +98,23 @@ describe('compareRoutes', () => {
     ]);
   });
 });
+
+describe('compareRoutes param-name independence', () => {
+  it('treats routes differing only in param name as the same route (OpenAPI templating is positional)', () => {
+    const result = compareRoutes(
+      [{ method: 'GET', path: '/users/:id' }],
+      [{ method: 'GET', path: '/users/{userId}' }]
+    );
+    expect(result.missingFromSpec).toEqual([]);
+    expect(result.missingFromCode).toEqual([]);
+  });
+
+  it('still reports a genuinely different path', () => {
+    const result = compareRoutes(
+      [{ method: 'GET', path: '/users/:id/tasks' }],
+      [{ method: 'GET', path: '/users/{userId}' }]
+    );
+    expect(result.missingFromSpec).toHaveLength(1);
+    expect(result.missingFromCode).toHaveLength(1);
+  });
+});

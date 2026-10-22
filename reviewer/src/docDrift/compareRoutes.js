@@ -42,7 +42,9 @@ function normalizeRoutePath(routePath) {
 }
 
 function routeKey(route) {
-  return `${route.method.toUpperCase()} ${normalizeRoutePath(route.path)}`;
+  // OpenAPI templating is positional: '/users/{id}' and '/users/{userId}' are
+  // the same path, so param names are erased for comparison only.
+  return `${route.method.toUpperCase()} ${normalizeRoutePath(route.path).replace(/\{[^}]*\}/g, '{}')}`;
 }
 
 // Compares the routes actually defined in code against the routes documented

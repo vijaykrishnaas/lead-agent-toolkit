@@ -1965,3 +1965,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed parseGitHubRemote hardening (cef8363). Found dot-only *owner* (`github.com/../r`) still parsed; added failing tests, fixed in same file. Suites green (507 + 61).
 - Decisions: small reproduced bug → fixed directly, no new task or feature.
 - Open questions for Vijay: none.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b), 14:1x)
+
+**Done:** Baseline green, idle-streak 0, backlog empty (30, 32 BLOCKED). **Branch taken:** (b) — (a) skipped again: remaining open questions are product calls for Vijay. Hunted the docDrift comparison path (`httpMethods`/`parseOpenApi`/`compareRoutes`, few audit mentions; `memberCallLine` read and sound). Reproduced: code `/users/:id` vs spec `/users/{userId}` reported as drift on both sides, though OpenAPI path templating is positional. Fixed test-first in `compareRoutes.js` `routeKey` (param names erased for comparison only; reported paths stay original; `normalizeRoutePath` contract unchanged). +2 tests. Suite green (509 reviewer + 61 sample-app).
+
+**Decisions:** Erase names in the key rather than in `normalizeRoutePath`, so existing normalization tests/semantics are untouched. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
+
+**Open questions for Vijay:** none new.

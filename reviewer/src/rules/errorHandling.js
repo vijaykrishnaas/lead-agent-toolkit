@@ -299,6 +299,20 @@ function findEnclosingStatement(ancestors) {
   return ancestors[0];
 }
 
+// True when the call is awaited inside the `try` block of a try/catch within
+// its own function: the awaited rejection lands in that catch, so a missing
+// .catch() is not an unhandled rejection. Un-awaited calls escape the try.
+function isAwaitedInTryCatch(ancestors) {
+  let awaited = false;
+  for (let i = ancestors.length - 2; i >= 0; i -= 1) {
+    const node = ancestors[i];
+    if (/Function/.test(node.type)) return false;
+    if (node.type === 'AwaitExpression') awaited = true;
+    if (node.type === 'TryStatement' && node.handler && ancestors[i + 1] === node.block) return awaited;
+  }
+  return false;
+}
+
 function checkFileAst(file, addedLines) {
   const addedLineNumbers = new Set(addedLines.map((l) => l.newLine));
   const lineContent = new Map(addedLines.map((l) => [l.newLine, l.content]));
@@ -330,8 +344,11 @@ function checkFileAst(file, addedLines) {
     CallExpression(node, state, ancestors) {
       if (node.callee.type !== 'MemberExpression' || node.callee.computed) return;
       if (node.callee.property.type !== 'Identifier' || node.callee.property.name !== 'then') return;
+      // .then(onFulfilled, onRejected) carries its own rejection handler.
+      if (node.arguments.length >= 2) return;
       const line = memberCallLine(node);
       if (!addedLineNumbers.has(line) || reportedThenLines.has(line)) return;
+      if (isAwaitedInTryCatch(ancestors)) return;
       const statement = findEnclosingStatement(ancestors);
       if (subtreeHasCatchCall(statement)) return;
       reportedThenLines.add(line);

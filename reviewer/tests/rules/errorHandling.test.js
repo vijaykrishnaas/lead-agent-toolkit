@@ -988,4 +988,43 @@ describe('error-handling rule (AST path, direct)', () => {
     expect(thenIssues).toHaveLength(1);
     expect(thenIssues[0].line).toBe(4);
   });
+  function thenIssuesFor(content, addedFrom) {
+    const lines = content.split('\n');
+    const diff = [
+      'diff --git a/src/jobs/x.js b/src/jobs/x.js',
+      '--- a/src/jobs/x.js',
+      '+++ b/src/jobs/x.js',
+      `@@ -0,0 +1,${lines.length} @@`,
+      ...lines.map((l) => `+${l}`),
+    ].join('\n');
+    return errorHandlingRule
+      .check(withContent(diff, content))
+      .filter((i) => /\.then\(\) without a matching \.catch\(\)/i.test(i.message));
+  }
+
+  it('does not flag an awaited .then() inside a try block that has a catch', () => {
+    const content = [
+      'async function f() {',
+      '  try {',
+      '    await p.then((x) => x);',
+      '  } catch (e) {}',
+      '}',
+    ].join('\n');
+    expect(thenIssuesFor(content)).toHaveLength(0);
+  });
+
+  it('still flags an un-awaited .then() inside a try block (rejection escapes the try)', () => {
+    const content = [
+      'async function f() {',
+      '  try {',
+      '    p.then((x) => x);',
+      '  } catch (e) {}',
+      '}',
+    ].join('\n');
+    expect(thenIssuesFor(content)).toHaveLength(1);
+  });
+
+  it('does not flag a two-argument .then(onFulfilled, onRejected)', () => {
+    expect(thenIssuesFor('p.then((x) => x, (e) => log(e));')).toHaveLength(0);
+  });
 });

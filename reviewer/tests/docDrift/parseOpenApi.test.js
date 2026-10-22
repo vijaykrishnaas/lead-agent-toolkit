@@ -40,6 +40,12 @@ paths:
     expect(parseOpenApiSpec(yamlText)).toEqual([{ method: 'GET', path: '/api/tasks' }]);
   });
 
+  it('recognizes the trace verb defined by OpenAPI 3.x', () => {
+    expect(parseOpenApiSpec('paths:\n  /w:\n    trace:\n      summary: t\n')).toEqual([
+      { method: 'TRACE', path: '/w' },
+    ]);
+  });
+
   it('returns an empty array when the spec has no paths', () => {
     expect(parseOpenApiSpec('openapi: 3.0.3\ninfo:\n  title: x\n  version: "1.0"\n')).toEqual([]);
   });

@@ -1894,3 +1894,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 92d73eb..819c27a (parseAst ESM retry); sound, CLI reports 0 issues. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `errorHandling.js`'s AST `.then()` check (uses `memberCallLine`, the least-audited util). Reproduced two false positives on the AST path: an awaited `.then()` inside a try block with a catch, and a two-argument `.then(onFulfilled, onRejected)`. Fixed test-first (`isAwaitedInTryCatch`, arity check); an un-awaited `.then()` in a try is still flagged. `npm test` green.
 - Decisions: the regex fallback path still has the same two false positives; left as-is since it only runs when file content is unresolvable. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b) — docDrift httpMethods hunt)
+
+**Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls for Vijay. Hunted `reviewer/src/docDrift/httpMethods.js` (2 PROGRESS/SKILL_CHANGELOG mentions, last touched 2026-07-18). Reproduced: `HTTP_METHODS` omitted `trace`, which both Express (`router.trace`) and OpenAPI 3.x support, so a TRACE route was silently dropped from both sides' route lists. Fixed test-first (+1 test each in `parseExpressRoutes` and `parseOpenApi`); both parsers share the one list, so one-line fix.
+
+**Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
+
+**Open questions for Vijay:** none new.

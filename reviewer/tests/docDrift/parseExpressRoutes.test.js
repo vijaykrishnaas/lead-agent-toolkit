@@ -64,6 +64,12 @@ describe('parseRouterSource', () => {
       { method: 'GET', path: '/widgets' },
     ]);
   });
+  it('recognizes router.trace(...), which Express supports and OpenAPI 3.x documents', () => {
+    expect(parseRouterSource("router.trace('/widgets', traceHandler);")).toEqual([
+      { method: 'TRACE', path: '/widgets' },
+    ]);
+  });
+
   it('extracts routes defined via router.route(path).<verb>() chaining', () => {
     // Regression: METHOD_CALL_PATTERN requires the verb call to be
     // immediately preceded by "router." or "app.", so a chained call like

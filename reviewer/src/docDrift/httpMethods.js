@@ -5,6 +5,6 @@
 // with a verb only one side understands silently drops off that side's
 // route list and compareRoutes() reports it as drift that doesn't
 // actually exist.
-const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'];
+const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'];
 
 module.exports = { HTTP_METHODS };

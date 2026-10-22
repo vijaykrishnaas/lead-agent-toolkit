@@ -1973,3 +1973,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Erase names in the key rather than in `normalizeRoutePath`, so existing normalization tests/semantics are untouched. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 — Reviewer run (c37de91..da69719)
+- Done: reviewed 20ef785 (docDrift `compareRoutes` ignores path-param names) and the cb9b980 follow-up. Read the diff and ran `reviewer/src/cli.js` (0 issues). Checked that `:id` vs `{userId}` compares equal, a genuinely different path is still reported, and names are erased only in the comparison key, so reports keep each side's original path. No defects. Suites green.
+- Decisions: nothing to fix, no new tasks, no feature added today.
+- Open questions for Vijay: none new.

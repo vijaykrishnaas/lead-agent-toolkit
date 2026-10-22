@@ -1846,3 +1846,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 037056d..9b46de7 (parseGitHubRemote port/case fix, missingTests suffix fix): CLI reports no issues. Probed the new regex by hand (`github.com:evil/o/r`, `github.com.evil.com`, scp-style `git@github.com:123/repo`, oversized port): no mis-parses beyond the inherent scp `:123/repo` ambiguity, which resolves to owner=123 as before.
 - Branch: reviewed commits; no defects reproduced, so no code change, no new tasks, no SKILL_CHANGELOG entry.
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder, third run)
+**Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls. Hunted `config/loadRuleConfig.js` (plus `collectAddedLines.js`, `generateDocDrift.js`; both fine). Reproduced: a misspelled category (`securty: enabled: false`) was silently ignored, leaving the intended rule on, and `rules:` written as a list produced categories "0","1" with no warning. Fixed test-first (3 tests): `loadRuleConfig` takes `knownCategories` (passed by `loadRules` from the base rules) and warns on unknown categories; a non-mapping `rules` value warns and is ignored. The shipped review-rules.yaml loads with no warnings. 484 reviewer + 55 sample-app tests green.
+**Decisions:** Warn rather than throw, matching the existing invalid-value behavior. No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
+**Open questions for Vijay:** none new.

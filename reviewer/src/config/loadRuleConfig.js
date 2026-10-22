@@ -25,7 +25,9 @@ function normalizeCategoryConfig(category, raw, warn) {
 // Missing config file -> all rules run with defaults (matches reviewDiff's
 // own behavior when no config is supplied at all). A malformed file is a
 // real error and is not swallowed.
-function loadRuleConfig(configPath = DEFAULT_CONFIG_PATH, { warn = console.warn } = {}) {
+// `knownCategories`, when given, lets a misspelled category name be reported
+// instead of silently leaving the intended rule at its defaults.
+function loadRuleConfig(configPath = DEFAULT_CONFIG_PATH, { warn = console.warn, knownCategories } = {}) {
   let parsed;
   try {
     parsed = yaml.load(fs.readFileSync(configPath, 'utf8'));
@@ -37,9 +39,17 @@ function loadRuleConfig(configPath = DEFAULT_CONFIG_PATH, { warn = console.warn 
     }
   }
 
-  const rawRules = parsed && typeof parsed.rules === 'object' && parsed.rules !== null ? parsed.rules : {};
+  const rulesValue = parsed && parsed.rules;
+  const isMapping = typeof rulesValue === 'object' && rulesValue !== null && !Array.isArray(rulesValue);
+  if (rulesValue !== undefined && rulesValue !== null && !isMapping) {
+    warn('review-rules: "rules" must be a mapping of category -> settings; ignoring it, all rules stay enabled');
+  }
+  const rawRules = isMapping ? rulesValue : {};
   const rules = {};
   for (const category of Object.keys(rawRules)) {
+    if (knownCategories && !knownCategories.includes(category)) {
+      warn(`review-rules: unknown category "${category}"; known categories: ${knownCategories.join(', ')}`);
+    }
     rules[category] = normalizeCategoryConfig(category, rawRules[category], warn);
   }
   return { rules };

@@ -70,5 +70,28 @@ describe('loadRuleConfig', () => {
       const { warn } = loadWith('rules:\n  security:\n    enabled: false\n    minSeverity: high\n  style: {}\n');
       expect(warn).not.toHaveBeenCalled();
     });
+
+    it('warns on a category that matches no known rule (typo would silently keep the rule on)', () => {
+      const fs = require('fs');
+      const os = require('os');
+      const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'rules-')), 'rules.yaml');
+      fs.writeFileSync(file, 'rules:\n  securty:\n    enabled: false\n  style: {}\n');
+      const warn = jest.fn();
+      loadRuleConfig(file, { warn, knownCategories: ['security', 'style'] });
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toMatch(/unknown.*securty/);
+    });
+
+    it('does not warn about categories when no known list is supplied', () => {
+      const { warn } = loadWith('rules:\n  anything:\n    enabled: false\n');
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('warns when "rules" is a list instead of a mapping', () => {
+      const { config, warn } = loadWith('rules:\n  - security\n  - style\n');
+      expect(config.rules).toEqual({});
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn.mock.calls[0][0]).toMatch(/"rules".*mapping/);
+    });
   });
 });

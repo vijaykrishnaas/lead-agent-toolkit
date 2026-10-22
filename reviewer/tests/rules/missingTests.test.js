@@ -177,5 +177,9 @@ describe('missing-tests rule', () => {
       const findings = missingTestsRule.check([file('src/styles.css'), file('src/app.jsx')]);
       expect(findings.map((f) => f.file)).toEqual(['src/app.jsx']);
     });
+
+    it('treats .test/.spec files of any code extension as test files, not source', () => {
+      expect(missingTestsRule.check([file('src/a.test.ts'), file('src/b.spec.jsx')])).toEqual([]);
+    });
   });
 });

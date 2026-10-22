@@ -1,7 +1,7 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 
 const TEST_FILE_PATTERN = /(^|\/)tests\//;
-const TEST_SUFFIX_PATTERN = /\.test\.js$/;
+const TEST_SUFFIX_PATTERN = /\.(test|spec)\.(js|jsx|mjs|cjs|ts|tsx)$/;
 // Only code files can need a test; a changed .css/.json/.md under src/ is not
 // a testable source file.
 const CODE_FILE_PATTERN = /\.(js|jsx|mjs|cjs|ts|tsx)$/;

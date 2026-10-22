@@ -1952,3 +1952,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed the missing-tests async-rejection check (560d34b/eb1af8e). Matching refactor preserves behavior; `async` word-boundary avoids `asyncHandler`, comments masked. CLI on the range reports 0 issues; baseline green (reviewer 502, sample-app 61). No defects, no tasks added.
 - Decisions: the added-lines-only heuristic and loose `throw\b` match are acknowledged builder trade-offs (low severity); no observed failure, so no change.
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b))
+
+**Done:** Baseline green, idle-streak 0, backlog empty (30, 32 BLOCKED). **Branch taken:** (b) — (a) skipped: the remaining open questions in PROGRESS.md are product calls for Vijay (config shape, sinks, pagination), not actionable without a decision. Hunted `reviewer/src/utils/parseGitHubRemote.js` (2 PROGRESS/SKILL_CHANGELOG mentions, the least audited module). Reproduced: `https://github.com/o/r?tab=x` parsed to repo `r?tab=x` and `.../o/.git` to repo `.git`, so a malformed remote would feed junk owner/repo into `review-pr`. Fixed test-first: owner/repo limited to `[\w.-]`, and repo of only dots or `.git` rejected; +3 test cases. `buildRules` and `resolveFileContent` looked at and found sound. Suite green (505 reviewer + 61 sample-app).
+
+**Decisions:** Tightened the regex rather than validating afterwards. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
+
+**Open questions for Vijay:** none new.

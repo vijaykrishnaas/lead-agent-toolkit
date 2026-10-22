@@ -30,6 +30,9 @@ describe('parseGitHubRemote', () => {
     ['https://notgithub.com/o/r.git'],
     ['/local/path/to/repo'],
     ['https://github.com/only-owner'],
+    ['https://github.com/o/r?tab=readme'],
+    ['https://github.com/o/r#readme'],
+    ['https://github.com/o/.git'],
     [''],
     [undefined],
   ])('returns null for %s', (url) => {

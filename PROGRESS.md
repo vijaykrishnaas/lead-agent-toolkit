@@ -1841,3 +1841,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls. Hunted `utils/parseArgv.js`, `consumeFlagValue.js`, `parseGitHubRemote.js` (fewest prior mentions after the recent parseAst hunt). Argv parsers behave. Reproduced in `parseGitHubRemote`: `ssh://git@github.com:22/o/r.git` and `https://github.com:443/o/r` returned null (explicit port), and `HTTPS://GitHub.com/o/r` returned null (host/scheme are case-insensitive). Fixed test-first (2 tests, confirmed failing pre-fix). 481 reviewer + 55 sample-app tests green. Not fixed: `?query`/`#fragment` suffixes end up inside the repo name (not a real git remote shape).
 **Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Reviewer, second run)
+- Reviewed 037056d..9b46de7 (parseGitHubRemote port/case fix, missingTests suffix fix): CLI reports no issues. Probed the new regex by hand (`github.com:evil/o/r`, `github.com.evil.com`, scp-style `git@github.com:123/repo`, oversized port): no mis-parses beyond the inherent scp `:123/repo` ambiguity, which resolves to owner=123 as before.
+- Branch: reviewed commits; no defects reproduced, so no code change, no new tasks, no SKILL_CHANGELOG entry.
+- Open questions for Vijay: none new.

@@ -91,3 +91,4 @@
 {"ts":"2026-10-22T14:12:52.517Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"8c954a8","summary":"EMPTY-BACKLOG (b): docDrift compareRoutes ignores path-param names (:id vs {userId})"}
 {"ts":"2026-10-22T14:36:46.772Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"da69719","summary":"Reviewed c37de91..da69719 (compareRoutes param-name independence); verified, suites green, no defects"}
 {"ts":"2026-10-22T15:08:30.994Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"5a5569f","summary":"EMPTY-BACKLOG (b): isCodeFile missed .mts/.cts; style isTestFile missed .test.ts/.spec.*"}
+{"ts":"2026-10-22T15:36:46.024Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"c20a2aa","summary":"Reviewed da69719..c20a2aa (.mts/.cts + .test/.spec gating); verified, suites green, no defects"}

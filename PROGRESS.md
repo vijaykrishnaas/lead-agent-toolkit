@@ -1986,3 +1986,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Minimal regex changes, no new module. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 
 **Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).
+
+## 2026-10-22 — Reviewer run (da69719..c20a2aa)
+- Done: reviewed 7603f6d (`isCodeFile` accepts .mts/.cts; style `isTestFile` accepts .test/.spec on js/ts variants). Read the diff, ran `reviewer/src/cli.js` (1 missing-tests hit on `isCodeFile.js`, a false positive: `codeFileGating.test.js` was updated with .mts/.cts cases in the same commit; the heuristic matches by file name). Suite green (61 + reviewer suites).
+- Decisions: nothing to fix, no new tasks, no feature added today.
+- Open questions for Vijay: none new.

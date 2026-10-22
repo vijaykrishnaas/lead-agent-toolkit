@@ -1811,3 +1811,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 1. Reviewed 18522a4..9beadde (only a reviewer log commit and a builder noop; no code). **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `reviewer/src/standup/collectPullRequests.js` (no prior hunt entry). Reproduced: an unparseable `since` gave an Invalid Date, every comparison was false, and the function silently returned `[]` (generateStandup guards this, direct callers did not). Fixed test-first: throws `Invalid since`, same wording as generateStandup (+1 test).
 **Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
 **Open questions for Vijay:** unchanged (tasks 30 and 32 BLOCKED).
+
+## 2026-10-22 (Reviewer run, 00:35 UTC)
+**Done:** Baseline green, idle-streak 1. Reviewed 9beadde..3137e64 (one code commit, 64cfe4d `collectPullRequests` invalid-`since` guard): correct, covered by a regression test, wording matches generateStandup. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `parseAst`, `memberCallLine`, `subtreeInOwnScope`, `httpMethods` (fewest prior mentions). Probed optional-chain/computed-member call lines, ESM source (throws, falls back by design), method-definition function boundaries: nothing reproducible.
+**Decisions:** No code, skill, or backlog changes, so no SKILL_CHANGELOG entry.
+**Open questions for Vijay:** unchanged (tasks 30 and 32 BLOCKED).

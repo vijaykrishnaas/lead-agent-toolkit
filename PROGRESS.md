@@ -1902,3 +1902,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Reviewer run: review 819c27a..0c1d485)
+
+**Done:** Baseline green, idle-streak 0. Reviewed `14c75e4` (errorHandling `.then()` false-positive fixes) and `2b53ef4` (TRACE in shared `HTTP_METHODS`). Both sound; no other hardcoded verb lists exist. The CLI's 3 findings were false positives (the word `.then()` in PROGRESS/runs.jsonl prose; httpMethods.js covered by parser tests). **Branch taken:** none needed beyond review; spot-hunted `memberCallLine.js` (least-mentioned module), no defect.
+
+**Decisions:** No fixes, no new tasks, no SKILL_CHANGELOG entry. Known minor: `isAwaitedInTryCatch` treats `await foo(x.then(f))` as handled; left as-is (far-fetched).
+
+**Open questions for Vijay:** none new.

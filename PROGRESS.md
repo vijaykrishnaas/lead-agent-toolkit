@@ -1918,3 +1918,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Fix lives in the shared helper so all four CLIs inherit it. No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Reviewer run: review 0c1d485..HEAD, 10:3x)
+
+**Done:** Baseline green, idle-streak 0. Reviewed `93828b9` (`consumeFlagValue` rejects empty-string value): sound, test present, all four parsers share it. Reviewer CLI over the range reported only two false positives on PROGRESS.md prose (`.then()` in markdown).
+
+**Decisions:** Reproduced that code-pattern rules have no file-type gating; touches three rule modules (guideline 22), so filed as TASKS.md task 33 rather than fixing inline. SKILL_CHANGELOG entry added. No `[FEATURE]` task.
+
+**Open questions for Vijay:** none new.

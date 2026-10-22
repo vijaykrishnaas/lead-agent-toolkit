@@ -278,3 +278,7 @@
 ## 2026-10-21 (Builder: EMPTY-BACKLOG (b) hunt, scripts/runLog.js)
 **Change:** No skill/CLAUDE.md change. Code fix in `scripts/runLog.js` (flag-like values accepted; non-object log lines rejected clearly) with regression tests.
 **Evidence:** PROGRESS.md 2026-10-21 Builder runLog entry — reproduced `--summary "--fix: foo"` failing as missing value and `null` line crashing `idle-streak`.
+
+## 2026-10-22 (Reviewer: backlog addition, task 33)
+**Change:** Added TASKS.md task 33 (file-type gating for code-pattern rules). No code change this run.
+**Evidence:** PROGRESS.md 2026-10-22 Reviewer 10:3x entry — reviewer CLI on `0c1d485..HEAD` reported two errorHandling findings on PROGRESS.md prose lines; rules have no extension gating.

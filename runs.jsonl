@@ -88,3 +88,4 @@
 {"ts":"2026-10-22T12:39:51.346Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"eb1af8e","summary":"Reviewed fc95c57..eb1af8e (missing-tests async rejection check); verified, suites green, no defects"}
 {"ts":"2026-10-22T13:08:42.851Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"389465f","summary":"EMPTY-BACKLOG (b): parseGitHubRemote rejected-input hardening (query/fragment, dot-only repo names)"}
 {"ts":"2026-10-22T13:37:37.049Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"c37de91","summary":"Reviewed eb1af8e..c37de91 (parseGitHubRemote hardening); fixed dot-only owner bug test-first"}
+{"ts":"2026-10-22T14:12:52.517Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"8c954a8","summary":"EMPTY-BACKLOG (b): docDrift compareRoutes ignores path-param names (:id vs {userId})"}

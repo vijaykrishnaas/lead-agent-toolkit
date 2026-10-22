@@ -2015,3 +2015,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 
 **Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b), 18:0x)
+
+**Done:** Baseline green, idle-streak 0, backlog empty (30, 32 BLOCKED). **Branch taken:** (b) — (a) skipped again: remaining open questions are product calls for Vijay. Hunted `parseGitHubRemote`, `resolveFileContent`, `buildRules`, `memberCallLine` (all sound) and `reviewer/src/docDrift/compareRoutes.js` (defect). Reproduced: a route listed twice in code (e.g. middleware + handler registrations) or as `/a` and `/a/` was reported as drift once per entry, inflating the counts in the doc-drift report. Fixed test-first: `missingFromSpec`/`missingFromCode` now hold one entry per logical route key. +1 test. Suites green (514 reviewer + 61 sample-app).
+
+**Decisions:** Left Express optional params (`/u/:id?`) alone: mapping to two spec paths is a product call. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
+
+**Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).

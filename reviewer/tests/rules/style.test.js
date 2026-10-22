@@ -36,6 +36,20 @@ describe('style rule', () => {
     expect(styleRule.check(files)).toEqual([]);
   });
 
+  it('does not flag console.log in .test.ts / .spec.js files outside a tests/ dir', () => {
+    for (const name of ['src/a.test.ts', 'src/a.spec.js', 'src/a.spec.tsx']) {
+      const diff = [
+        `diff --git a/${name} b/${name}`,
+        `--- a/${name}`,
+        `+++ b/${name}`,
+        '@@ -1,1 +1,2 @@',
+        " test('x', () => {",
+        '+  console.log("debugging");',
+      ].join('\n');
+      expect(styleRule.check(parseDiff(diff))).toHaveLength(0);
+    }
+  });
+
   it('does not flag a string literal that merely mentions "console.log(" as leftover debug code', () => {
     // Regression: CONSOLE_LOG matched raw line content, so a log/error
     // message string quoted verbatim into an added line (no actual

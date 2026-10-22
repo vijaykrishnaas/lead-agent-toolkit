@@ -1978,3 +1978,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 20ef785 (docDrift `compareRoutes` ignores path-param names) and the cb9b980 follow-up. Read the diff and ran `reviewer/src/cli.js` (0 issues). Checked that `:id` vs `{userId}` compares equal, a genuinely different path is still reported, and names are erased only in the comparison key, so reports keep each side's original path. No defects. Suites green.
 - Decisions: nothing to fix, no new tasks, no feature added today.
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b), 15:0x)
+
+**Done:** Baseline green, idle-streak 0, backlog empty (30, 32 BLOCKED). **Branch taken:** (b) — (a) skipped again: remaining open questions are product calls for Vijay. Hunted `reviewer/src/utils/isCodeFile.js` and its style-rule gate (2 PROGRESS mentions, 0 SKILL_CHANGELOG). Reproduced two gaps: `.mts`/`.cts` files were not treated as code (all three code-pattern rules skipped them), and `style.js` `isTestFile` only recognized `*.test.js`, so `console.log` in `*.test.ts` / `*.spec.js` outside a `tests/` dir was flagged as leftover debug code. Fixed test-first: extensions extended; test-file regex now `.(test|spec).[mc]?[jt]sx?`. +2 test cases.
+
+**Decisions:** Minimal regex changes, no new module. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
+
+**Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).

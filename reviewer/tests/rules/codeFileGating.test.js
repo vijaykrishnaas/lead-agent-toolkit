@@ -19,7 +19,7 @@ function diffFor(file, line) {
 
 describe('code-file gating', () => {
   it('isCodeFile accepts JS/TS extensions only', () => {
-    for (const p of ['a.js', 'a/b.mjs', 'c.cjs', 'd.ts', 'e.tsx', 'f.jsx']) expect(isCodeFile(p)).toBe(true);
+    for (const p of ['a.js', 'a/b.mjs', 'c.cjs', 'd.ts', 'e.tsx', 'f.jsx', 'g.mts', 'h.cts']) expect(isCodeFile(p)).toBe(true);
     for (const p of ['PROGRESS.md', 'a.yaml', 'b.json', 'js', undefined]) expect(isCodeFile(p)).toBe(false);
   });
 

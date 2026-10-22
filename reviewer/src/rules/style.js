@@ -6,7 +6,7 @@ const VAR_DECLARATION = /(?:^|[;{}()])\s*var\s+/;
 const CONSOLE_LOG = /console\.log\s*\(/;
 
 function isTestFile(path) {
-  return /(^|\/)tests\//.test(path) || /\.test\.js$/.test(path);
+  return /(^|\/)tests\//.test(path) || /\.(?:test|spec)\.[mc]?[jt]sx?$/.test(path);
 }
 
 // Matched against the line's string/comment-masked content, not the raw

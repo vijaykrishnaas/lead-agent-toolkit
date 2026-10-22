@@ -1960,3 +1960,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Tightened the regex rather than validating afterwards. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 — Reviewer run (eb1af8e..HEAD)
+- Done: reviewed parseGitHubRemote hardening (cef8363). Found dot-only *owner* (`github.com/../r`) still parsed; added failing tests, fixed in same file. Suites green (507 + 61).
+- Decisions: small reproduced bug → fixed directly, no new task or feature.
+- Open questions for Vijay: none.

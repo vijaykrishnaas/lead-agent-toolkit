@@ -6,7 +6,7 @@ const REMOTE_PATTERN = /^(?:(?:https?|ssh|git):\/\/(?:[^@/]+@)?|[^@/\s]+@)github
 function parseGitHubRemote(url) {
   if (typeof url !== 'string') return null;
   const match = REMOTE_PATTERN.exec(url.trim());
-  if (!match || /^\.+$|^\.git$/.test(match[2])) return null;
+  if (!match || /^\.+$/.test(match[1]) || /^\.+$|^\.git$/.test(match[2])) return null;
   return { owner: match[1], repo: match[2] };
 }
 

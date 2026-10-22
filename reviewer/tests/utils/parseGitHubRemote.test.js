@@ -33,6 +33,8 @@ describe('parseGitHubRemote', () => {
     ['https://github.com/o/r?tab=readme'],
     ['https://github.com/o/r#readme'],
     ['https://github.com/o/.git'],
+    ['https://github.com/../r'],
+    ['https://github.com/./r'],
     [''],
     [undefined],
   ])('returns null for %s', (url) => {

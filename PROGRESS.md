@@ -2023,3 +2023,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Left Express optional params (`/u/:id?`) alone: mapping to two spec paths is a product call. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
 
 **Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).
+
+## 2026-10-22 (Reviewer run, 18:3x)
+
+**Done:** Baseline green (reviewer 514, sample-app 61), idle-streak 0. Reviewed 3dc66b7..c96c0f6 (`compareRoutes` dedupe by route key). Verified the diff and new test; `reviewer/src/cli.js` reports no issues. No defects: when `/a` and `/a/` both appear, the first-listed spelling is reported (cosmetic, input-order dependent).
+
+**Decisions:** No fix, no new task, no SKILL_CHANGELOG entry.
+
+**Open questions for Vijay:** none new.

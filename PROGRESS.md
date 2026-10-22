@@ -1926,3 +1926,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Reproduced that code-pattern rules have no file-type gating; touches three rule modules (guideline 22), so filed as TASKS.md task 33 rather than fixing inline. SKILL_CHANGELOG entry added. No `[FEATURE]` task.
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 (Builder run: task 33, 11:1x)
+
+**Done:** Baseline green, idle-streak 0. Task 33: added `reviewer/src/utils/isCodeFile.js` (js/mjs/cjs/jsx/ts/tsx) and gated `errorHandling`, `performance` and `style` on it (guideline 22: all sibling code-pattern rules). `security`, `docDrift`, `missingTests` untouched as specified. New `reviewer/tests/rules/codeFileGating.test.js`: a `.md` line is ignored by each rule, the same line in `.js` is still flagged. Suite green (499 + 61).
+
+**Decisions:** Gate by extension at the top of each rule's per-file loop, before any regex or AST work. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog-order change; only marked task DONE).
+
+**Open questions for Vijay:** none new.

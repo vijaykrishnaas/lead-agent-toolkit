@@ -1,4 +1,5 @@
 const walk = require('acorn-walk');
+const { isCodeFile } = require('../utils/isCodeFile');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { collectBoundedBlock } = require('../utils/collectBoundedBlock');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
@@ -153,6 +154,7 @@ function checkFileAst(file, addedLines) {
 function check(files) {
   const issues = [];
   for (const file of files) {
+    if (!isCodeFile(file.file)) continue;
     const addedLines = collectAddedLines(file);
     // AST path only attempted when the caller resolved full post-image
     // content; falls back to the regex path on any parse failure so a

@@ -1,3 +1,4 @@
+const { isCodeFile } = require('../utils/isCodeFile');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
 
@@ -21,7 +22,7 @@ function isTestFile(path) {
 function check(files) {
   const issues = [];
   for (const file of files) {
-    if (isTestFile(file.file)) continue;
+    if (!isCodeFile(file.file) || isTestFile(file.file)) continue;
     for (const line of collectAddedLines(file)) {
       const { masked } = maskStringLiterals(line.content);
       if (VAR_DECLARATION.test(masked)) {

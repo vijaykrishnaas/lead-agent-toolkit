@@ -57,10 +57,24 @@ function compareRoutes(codeRoutes, specRoutes) {
   const specKeys = new Set(specRoutes.map(routeKey));
   const codeKeys = new Set(codeRoutes.map(routeKey));
 
-  const missingFromSpec = codeRoutes.filter((route) => !specKeys.has(routeKey(route)));
-  const missingFromCode = specRoutes.filter((route) => !codeKeys.has(routeKey(route)));
+  const missingFromSpecAll = codeRoutes.filter((route) => !specKeys.has(routeKey(route)));
+  const missingFromCodeAll = specRoutes.filter((route) => !codeKeys.has(routeKey(route)));
+
+  // One entry per logical route: a route registered twice (e.g. middleware
+  // then handler) or as '/a' and '/a/' is a single piece of drift.
+  const uniqueByKey = (routes) => {
+    const seen = new Set();
+    return routes.filter((route) => {
+      const key = routeKey(route);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
 
   const byMethodThenPath = (a, b) => (a.method === b.method ? a.path.localeCompare(b.path) : a.method.localeCompare(b.method));
+  const missingFromSpec = uniqueByKey(missingFromSpecAll);
+  const missingFromCode = uniqueByKey(missingFromCodeAll);
   missingFromSpec.sort(byMethodThenPath);
   missingFromCode.sort(byMethodThenPath);
 

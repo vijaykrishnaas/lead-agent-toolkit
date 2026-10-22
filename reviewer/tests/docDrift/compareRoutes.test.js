@@ -117,4 +117,13 @@ describe('compareRoutes param-name independence', () => {
     expect(result.missingFromSpec).toHaveLength(1);
     expect(result.missingFromCode).toHaveLength(1);
   });
+
+  it('reports one logical route once even when it is listed twice or with/without a trailing slash', () => {
+    const result = compareRoutes(
+      [{ method: 'GET', path: '/a' }, { method: 'GET', path: '/a/' }, { method: 'GET', path: '/a' }],
+      [{ method: 'GET', path: '/c' }, { method: 'GET', path: '/c/' }]
+    );
+    expect(result.missingFromSpec).toEqual([{ method: 'GET', path: '/a' }]);
+    expect(result.missingFromCode).toEqual([{ method: 'GET', path: '/c' }]);
+  });
 });

@@ -1934,3 +1934,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Gate by extension at the top of each rule's per-file loop, before any regex or AST work. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog-order change; only marked task DONE).
 
 **Open questions for Vijay:** none new.
+
+## 2026-10-22 — Reviewer run (19a5c84..fc95c57)
+- Done: reviewed task 33 (isCodeFile gating in errorHandling/performance/style). Gate is applied before any line collection, test covers md-ignored/js-flagged for all three rules. Baseline green (root 61, reviewer 499). No defects found, no tasks added.
+- Decisions: left .mts/.cts unmatched — acorn path can't parse TS anyway and no observed failure.
+- Open questions for Vijay: none new.

@@ -16,6 +16,15 @@ describe('parseGitHubRemote', () => {
     expect(parseGitHubRemote('git@github.com:o/my.repo.git')).toEqual({ owner: 'o', repo: 'my.repo' });
   });
 
+  it('accepts an explicit port on a scheme URL', () => {
+    expect(parseGitHubRemote('ssh://git@github.com:22/o/r.git')).toEqual({ owner: 'o', repo: 'r' });
+    expect(parseGitHubRemote('https://github.com:443/o/r')).toEqual({ owner: 'o', repo: 'r' });
+  });
+
+  it('matches scheme and host case-insensitively but preserves owner/repo case', () => {
+    expect(parseGitHubRemote('HTTPS://GitHub.com/Owner/Repo.git')).toEqual({ owner: 'Owner', repo: 'Repo' });
+  });
+
   it.each([
     ['https://gitlab.com/o/r.git'],
     ['https://notgithub.com/o/r.git'],

@@ -1836,3 +1836,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed dc7f17f..037056d: CLI reports no issues; manual read of the missingTests CODE_FILE_PATTERN change is sound.
 - Branch: reviewed commits (not EMPTY-BACKLOG). Fixed one reproduced bug test-first: `src/a.test.ts` was treated as untested source because TEST_SUFFIX_PATTERN only matched `.test.js`. Pattern now covers test/spec across all code extensions.
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder, second run)
+**Done:** Baseline green, idle-streak 0. **Branch taken:** EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); (a) skipped, remaining open questions are product calls. Hunted `utils/parseArgv.js`, `consumeFlagValue.js`, `parseGitHubRemote.js` (fewest prior mentions after the recent parseAst hunt). Argv parsers behave. Reproduced in `parseGitHubRemote`: `ssh://git@github.com:22/o/r.git` and `https://github.com:443/o/r` returned null (explicit port), and `HTTPS://GitHub.com/o/r` returned null (host/scheme are case-insensitive). Fixed test-first (2 tests, confirmed failing pre-fix). 481 reviewer + 55 sample-app tests green. Not fixed: `?query`/`#fragment` suffixes end up inside the repo name (not a real git remote shape).
+**Decisions:** No SKILL_CHANGELOG entry (no skills/CLAUDE.md/backlog changes).
+**Open questions for Vijay:** none new.

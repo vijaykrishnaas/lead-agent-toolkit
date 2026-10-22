@@ -118,4 +118,25 @@ describe('parseDiff', () => {
     ].join('\n');
     expect(parseDiff(diff).map((f) => f.file)).toEqual(['café.js', 'x"y.js']);
   });
+
+  it('treats a whitespace-stripped empty line inside a hunk as an empty context line', () => {
+    // Editors/mailers often strip the single leading space of a blank context line.
+    const diff = [
+      'diff --git a/x.js b/x.js',
+      '--- a/x.js',
+      '+++ b/x.js',
+      '@@ -1,3 +1,4 @@',
+      ' a',
+      '',
+      '+b',
+      ' c',
+      '',
+    ].join('\n');
+    const [file] = parseDiff(diff);
+    const lines = file.hunks[0].lines;
+    expect(lines.map((l) => l.type)).toEqual(['context', 'context', 'add', 'context']);
+    expect(lines[1]).toMatchObject({ content: '', newLine: 2, oldLine: 2 });
+    expect(lines[2]).toMatchObject({ content: 'b', newLine: 3 });
+    expect(lines[3]).toMatchObject({ content: 'c', newLine: 4, oldLine: 3 });
+  });
 });

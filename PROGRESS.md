@@ -1991,3 +1991,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 7603f6d (`isCodeFile` accepts .mts/.cts; style `isTestFile` accepts .test/.spec on js/ts variants). Read the diff, ran `reviewer/src/cli.js` (1 missing-tests hit on `isCodeFile.js`, a false positive: `codeFileGating.test.js` was updated with .mts/.cts cases in the same commit; the heuristic matches by file name). Suite green (61 + reviewer suites).
 - Decisions: nothing to fix, no new tasks, no feature added today.
 - Open questions for Vijay: none new.
+
+## 2026-10-22 (Builder run: EMPTY-BACKLOG (b), 16:0x)
+
+**Done:** Baseline green, idle-streak 0, backlog empty (30, 32 BLOCKED). **Branch taken:** (b) — (a) skipped again: remaining open questions are product calls for Vijay. Hunted `reviewer/src/diffParser.js` (the parser under every rule; no hunt entry in PROGRESS/SKILL_CHANGELOG). Reproduced: a blank context line whose leading space was stripped (common after editor/mail whitespace trimming) was dropped without advancing the line counters, so every later added line in the hunk got a `newLine` one too low. Fixed test-first: a mid-hunk `''` is now an empty context line (the split's trailing `''` is still ignored). Suites green (511 + 61).
+
+**Decisions:** Left CRLF diffs and `---`/`+++` tab-timestamp paths alone: git never emits the latter, and `\r` in content is faithful to CRLF files. No SKILL_CHANGELOG entry (no skill/CLAUDE.md/backlog change).
+
+**Open questions for Vijay:** none new (unchanged: allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs invariantLint change approval).

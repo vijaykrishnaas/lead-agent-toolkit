@@ -92,3 +92,4 @@
 {"ts":"2026-10-22T14:36:46.772Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"da69719","summary":"Reviewed c37de91..da69719 (compareRoutes param-name independence); verified, suites green, no defects"}
 {"ts":"2026-10-22T15:08:30.994Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"5a5569f","summary":"EMPTY-BACKLOG (b): isCodeFile missed .mts/.cts; style isTestFile missed .test.ts/.spec.*"}
 {"ts":"2026-10-22T15:36:46.024Z","trigger":"reviewer","outcome":"done","task":"review","tests":"green","sha":"c20a2aa","summary":"Reviewed da69719..c20a2aa (.mts/.cts + .test/.spec gating); verified, suites green, no defects"}
+{"ts":"2026-10-22T16:07:18.358Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"3c9615c","summary":"EMPTY-BACKLOG (b): diffParser dropped whitespace-stripped blank context lines, skewing later newLine numbers; fixed test-first"}

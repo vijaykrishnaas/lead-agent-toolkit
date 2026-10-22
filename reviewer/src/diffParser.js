@@ -82,7 +82,13 @@ function parseDiff(diffText) {
     if (!currentHunk) continue;
     if (rawLine.startsWith('\\ No newline')) continue;
 
-    if (rawLine.startsWith('+')) {
+    // A blank line mid-hunk is a context line whose leading space was stripped;
+    // the split's trailing '' is just the diff's final newline.
+    if (rawLine === '' && i < lines.length - 1) {
+      currentHunk.lines.push({ type: 'context', content: '', newLine, oldLine });
+      newLine += 1;
+      oldLine += 1;
+    } else if (rawLine.startsWith('+')) {
       currentHunk.lines.push({ type: 'add', content: rawLine.slice(1), newLine, oldLine: null });
       newLine += 1;
     } else if (rawLine.startsWith('-')) {

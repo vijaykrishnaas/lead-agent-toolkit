@@ -2055,3 +2055,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Applied the idle-backoff rule. No `list_triggers`/`update_trigger` tools were available in this session, so the scheduled tasks are still live.
 
 **Open questions for Vijay:** Second consecutive time the Reviewer cannot disable the loop: please disable "lead-agent Builder" and "lead-agent Reviewer" manually (or grant trigger-management access). Backlog is empty (30, 32 BLOCKED); re-enable only with new tasks or approval of the BLOCKED items (allowlist `fastdl.mongodb.org`; PROGRESS.md rollover needs an invariantLint change).
+
+## 2026-10-23 (Reviewer run: idle backoff, 02:3x)
+
+**Done:** Baseline green (reviewer 514, sample-app 61). `idle-streak` was 3. Commits since the last reviewer entry (5847a3d) touch only `runs.jsonl`; nothing to review. Appended a `paused` entry.
+
+**Decisions:** Applied the idle-backoff rule. No `list_triggers`/`update_trigger` tools were available (checked via ToolSearch), so the scheduled tasks are still live.
+
+**Open questions for Vijay:** Third time the Reviewer cannot disable the loop: please disable "lead-agent Builder" and "lead-agent Reviewer" manually (or grant trigger-management access). Backlog is empty (30, 32 BLOCKED); re-enable only with new tasks or approval of the BLOCKED items.

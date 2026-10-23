@@ -2071,3 +2071,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Applied the idle-backoff rule. `list_triggers`/`update_trigger` are still unavailable (ToolSearch finds nothing), so the scheduled tasks remain live.
 
 **Open questions for Vijay:** Fourth time the Reviewer cannot disable the loop: please disable "lead-agent Builder" and "lead-agent Reviewer" manually (or grant trigger-management access). Backlog is empty (30, 32 BLOCKED).
+
+## 2026-10-23 (Reviewer run: idle backoff, 06:3x)
+
+**Done:** Baseline green (sample-app 61). `idle-streak` was 3. Commits since the last reviewer entry (c360593) touch only `runs.jsonl`; reviewer CLI reported 0 issues. Appended a `paused` entry.
+
+**Decisions:** Applied the idle-backoff rule. `list_triggers`/`update_trigger` are still unavailable (ToolSearch finds nothing), so the scheduled tasks remain live.
+
+**Open questions for Vijay:** Fifth time the Reviewer cannot disable the loop: please disable "lead-agent Builder" and "lead-agent Reviewer" manually (or grant trigger-management access). Backlog is empty (30, 32 BLOCKED).

@@ -84,7 +84,7 @@ function parseDiff(diffText) {
 
     // A blank line mid-hunk is a context line whose leading space was stripped;
     // the split's trailing '' is just the diff's final newline.
-    if (rawLine === '' && i < lines.length - 1) {
+    if ((rawLine === '' || rawLine === '\r') && i < lines.length - 1) {
       currentHunk.lines.push({ type: 'context', content: '', newLine, oldLine });
       newLine += 1;
       oldLine += 1;

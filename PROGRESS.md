@@ -2119,3 +2119,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Applied the idle-backoff rule. `list_triggers`/`update_trigger` are still unavailable (ToolSearch finds nothing), so the scheduled tasks remain live.
 
 **Open questions for Vijay:** Tenth time the Reviewer cannot disable the loop: please disable "lead-agent Builder" and "lead-agent Reviewer" manually (or grant trigger-management access). Backlog is empty (30, 32 BLOCKED).
+
+## 2026-10-23 (Builder run: EMPTY-BACKLOG (b) hunt, diffParser.js)
+
+**Done:** Baseline green. idle-streak 0 (reset by the earlier `paused` entry). Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (open questions are Vijay-only); (b) hunted `reviewer/src/diffParser.js`/`utils/isCodeFile.js` (no prior hunt entry in SKILL_CHANGELOG). Found: in a CRLF-converted diff, a blank context line arrives as a bare `\r`, was dropped, and every later line number drifted by one (wrong inline-comment lines). Fixed in `parseDiff` with a regression test (fails before, passes after). Suites green.
+
+**Decisions:** Treat bare `\r` like the empty-line case; content of other lines keeps its trailing `\r` (legitimate for CRLF files). `isCodeFile`: no defect.
+
+**Open questions for Vijay:** The scheduled loop is apparently still live after earlier `paused` entries (Reviewer could not disable it); please disable or confirm intent.

@@ -139,4 +139,23 @@ describe('parseDiff', () => {
     expect(lines[2]).toMatchObject({ content: 'b', newLine: 3 });
     expect(lines[3]).toMatchObject({ content: 'c', newLine: 4, oldLine: 3 });
   });
+
+  it('counts a CRLF-converted blank context line (a bare "\\r") so later line numbers do not drift', () => {
+    const diff = [
+      'diff --git a/x.js b/x.js',
+      '--- a/x.js',
+      '+++ b/x.js',
+      '@@ -1,3 +1,4 @@',
+      ' a',
+      '',
+      '+b',
+      ' c',
+      '',
+    ].join('\r\n');
+    const [file] = parseDiff(diff);
+    const lines = file.hunks[0].lines;
+    expect(lines.map((l) => l.type)).toEqual(['context', 'context', 'add', 'context']);
+    expect(lines[2]).toMatchObject({ newLine: 3 });
+    expect(lines[3]).toMatchObject({ newLine: 4, oldLine: 3 });
+  });
 });

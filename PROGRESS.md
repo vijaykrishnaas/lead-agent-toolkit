@@ -2251,3 +2251,11 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-24 — Reviewer run (log-only review, markdown/standup/PR-collection hunt)
 **Done:** Baseline green (reviewer + sample-app 68), idle-streak 0. Reviewed 17eebae..375d0db: only PROGRESS.md/runs.jsonl changed (no code). Branch (b): hunted `utils/sanitizeMarkdownText.js`, `format/markdownReport.js`, `standup/formatStandup.js`, `standup/collectPullRequests.js`, `utils/consumeFlagValue.js` (none hunted in recent runs.jsonl entries). No defect, no code change. Noted, not actioned: bare URLs in sanitized text still GFM-autolink (inert-text guarantee covers disguised `[text](url)` links only); no realistic harm path.
 **Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, diffParser/loadRuleConfig/collectCommits)
+
+**Done:** Baseline green (reviewer 519, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer/src/diffParser.js`, `config/loadRuleConfig.js`, `standup/collectCommits.js` (no recent hunt entries for them). Probed `--`/`++` content lines inside a hunk, new-file diffs from `/dev/null`, invalid/Date `since`, config type-validation paths. All matched expectations. No defect; no code change.
+
+**Decisions:** No new task or guideline.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

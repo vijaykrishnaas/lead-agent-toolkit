@@ -286,3 +286,7 @@
 ## 2026-10-24 (Reviewer: EMPTY-BACKLOG (b) hunt, rules/security.js)
 **Change:** No skill/CLAUDE.md change. Code fix: `security.js` EVAL_PATTERN now runs on comment-masked line content (guidelines 18/19/22 class); regression test added.
 **Evidence:** PROGRESS.md 2026-10-24 Reviewer entry — `// never call eval(x)` and `/* eval(a) */` were flagged as high-severity eval use.
+
+## 2026-10-24 (Reviewer: EMPTY-BACKLOG (b) hunt, sample-app authController)
+**Change:** No skill/CLAUDE.md change. Code fix: auth login/register lookups now trim+lowercase email, matching the User schema setters; regression tests added.
+**Evidence:** PROGRESS.md 2026-10-24 Reviewer entry (authController) — padded email registered fine but could not log in with the same string.

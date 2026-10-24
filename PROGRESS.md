@@ -2167,3 +2167,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Rejected only non-string values; an empty-string name/email is still silently ignored as before, so no behavior change beyond the wrong-typed case.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: EMPTY-BACKLOG (b) hunt, sample-app authController)
+
+**Done:** Baseline green, idle-streak 1. Reviewed c1c0d4b..dde9f4a: usersController type validation sound; CLI's 2 hits are false positives (the test file did change; `eval(` is prose in PROGRESS.md). Branch (b): hunted authController. The User schema stores email trimmed+lowercased, but `register`/`login` looked up `email.toLowerCase()` untrimmed, so an account registered as " A@x.com" could not log in with that same string (401) and the register duplicate check missed padded emails. Reproduced with two failing tests, then added a `normalizeEmail` helper (trim+lowercase). Suites: reviewer 516, sample-app 68, green.
+
+**Decisions:** Small fix, no new task. Whitespace-only email normalizes to "" and simply finds no user.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

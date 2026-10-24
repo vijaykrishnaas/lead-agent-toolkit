@@ -30,6 +30,16 @@ function computeBotCommentMarker(token, owner, repo, prNumber) {
   return `${BOT_COMMENT_PREFIX}:${suffix} -->`;
 }
 
+// GitHub rejects issue comments over 65536 characters with a 422, so a large
+// review report would fail to post at all; cut it with a visible notice.
+const MAX_COMMENT_LENGTH = 65536;
+const TRUNCATION_NOTICE = '\n\n_…report truncated to fit GitHub\'s comment size limit; run the reviewer locally for the full list._\n';
+
+function fitToCommentLimit(markedBody) {
+  if (markedBody.length <= MAX_COMMENT_LENGTH) return markedBody;
+  return markedBody.slice(0, MAX_COMMENT_LENGTH - TRUNCATION_NOTICE.length) + TRUNCATION_NOTICE;
+}
+
 const COMMENTS_PER_PAGE = 100;
 // Safety cap on pages searched for a prior bot comment, so a PR with a
 // pathologically large comment history can't loop indefinitely.
@@ -116,7 +126,7 @@ async function postReviewComment({ token, owner, repo, prNumber, body }, deps = 
     throw new Error('Missing prNumber — the PR number to comment on.');
   }
 
-  const markedBody = `${computeBotCommentMarker(token, owner, repo, prNumber)}\n${body}`;
+  const markedBody = fitToCommentLimit(`${computeBotCommentMarker(token, owner, repo, prNumber)}\n${body}`);
   const existing = await findExistingBotComment({ token, owner, repo, prNumber }, request);
 
   const url = existing

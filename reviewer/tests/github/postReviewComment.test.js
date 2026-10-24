@@ -38,6 +38,30 @@ describe('postReviewComment', () => {
     expect(result).toEqual({ id: 1, html_url: 'https://github.com/.../comments/1', updated: false });
   });
 
+  it('truncates a body that would exceed GitHub\'s 65536-char comment limit, keeping the marker and a notice', async () => {
+    const request = jest.fn()
+      .mockResolvedValueOnce(noExistingComments())
+      .mockResolvedValueOnce(makeResponse({ json: { id: 1 } }));
+
+    await postReviewComment({ ...baseArgs, body: 'x'.repeat(70000) }, { request });
+
+    const sent = JSON.parse(request.mock.calls[1][1].body).body;
+    expect(sent.length).toBeLessThanOrEqual(65536);
+    expect(sent.startsWith(`${marker}\n`)).toBe(true);
+    expect(sent).toMatch(/truncated/i);
+  });
+
+  it('does not truncate a body at exactly the limit', async () => {
+    const request = jest.fn()
+      .mockResolvedValueOnce(noExistingComments())
+      .mockResolvedValueOnce(makeResponse({ json: { id: 1 } }));
+    const body = 'y'.repeat(65536 - marker.length - 1);
+
+    await postReviewComment({ ...baseArgs, body }, { request });
+
+    expect(JSON.parse(request.mock.calls[1][1].body).body).toBe(`${marker}\n${body}`);
+  });
+
   it('throws without calling request when the token is missing', async () => {
     const request = jest.fn();
 

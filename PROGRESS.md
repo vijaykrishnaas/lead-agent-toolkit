@@ -2398,3 +2398,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 84d348a (directory-index router resolution) and f848002 (OpenAPI basePath/servers prefix): both sound; suite green (reviewer 540, sample-app 72).
 - Gap reproduced in f848002: a protocol-relative server url (`//api.example.com/v1`) was not host-stripped, yielding paths like `//api.example.com/v1/users` and false drift. Fixed test-first (scheme now optional in the strip regex). Scheme-less `api.example.com/v1` is left as a relative path per the OpenAPI spec.
 - Open questions for Vijay: none new.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, github/postReviewComment)
+
+**Done:** Baseline green (reviewer 535, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `github/postReviewComment.js` (marker/pagination re-read, no defect there) and `utils/parseGitHubRemote.js` (no defect); `diffParser.js` skipped as heavily audited. Defect: a review body over GitHub's 65536-character comment limit was posted as-is, so a large diff's report failed with a 422 and nothing was posted. Fixed test-first: the marked body is cut to the limit with a visible truncation notice (marker kept at the start, so update-in-place still works). 2 new tests; reviewer now 543 green.
+
+**Decisions:** Truncate rather than split into several comments, since update-in-place relies on a single marked comment.
+
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

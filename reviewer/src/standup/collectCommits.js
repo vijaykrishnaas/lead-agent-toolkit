@@ -11,6 +11,11 @@ function collectCommits({ repo = process.cwd(), since } = {}, deps = {}) {
   if (!since) {
     throw new Error('Missing since — a Date or ISO date string is required.');
   }
+  // git silently treats an unparseable --since as "no commits"; reject it the
+  // way collectPullRequests does so a typo can't read as an empty standup.
+  if (Number.isNaN(new Date(since).getTime())) {
+    throw new Error(`Invalid since — could not parse "${since}" as a date.`);
+  }
   const sinceIso = since instanceof Date ? since.toISOString() : since;
 
   const output = execGit(['log', `--since=${sinceIso}`, `--pretty=format:%H${FIELD_SEP}%an${FIELD_SEP}%aI${FIELD_SEP}%s`], repo);

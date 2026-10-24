@@ -2191,3 +2191,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, standup collectCommits)
+
+**Done:** Baseline green (reviewer 518, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `standup/collectCommits.js` and `collectPullRequests.js` (not touched by recent hunts; diffParser/collectAddedLines rejected as heavily audited). Found: `collectCommits` passed an unparseable `since` (e.g. `garbage`) straight to `git log --since`, which silently returns zero commits, so a typo read as an empty standup, while `collectPullRequests` already threw "Invalid since". Fixed test-first (reviewer now 519).
+
+**Decisions:** Validate with `new Date(since)` for both Date and string inputs; the original string is still passed to git unchanged. No new guideline.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

@@ -55,4 +55,11 @@ describe('collectCommits', () => {
   it('throws when since is missing', () => {
     expect(() => collectCommits({ repo: '/repo' }, { execGit: jest.fn() })).toThrow(/since/i);
   });
+
+  it('throws on an unparseable since instead of silently returning no commits', () => {
+    const execGit = jest.fn();
+    expect(() => collectCommits({ repo: '/repo', since: 'garbage' }, { execGit })).toThrow(/Invalid since/);
+    expect(() => collectCommits({ repo: '/repo', since: new Date('nope') }, { execGit })).toThrow(/Invalid since/);
+    expect(execGit).not.toHaveBeenCalled();
+  });
 });

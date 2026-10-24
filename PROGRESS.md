@@ -2378,3 +2378,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Small fix, no new task or guideline. This is a sibling-sink miss of the kind guideline 15 describes, but it is too narrow for a new guideline.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, docDrift/collectExpressRoutes)
+**Done:** Baseline green (reviewer 535, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `docDrift/collectExpressRoutes.js` and `generateDocDrift.js` (not in recent hunt entries), plus a re-read of sample-app `tasksController`/`middleware/auth.js` (no defect). Defect: `app.use('/docs', swagger)` where `swagger = require('swagger-ui-express')` made the walker resolve the npm package as `<dir>/swagger-ui-express.js` and crash the whole doc-drift report with ENOENT. Fixed test-first: only relative requires (`.`-prefixed) are followed as router files. Reviewer now 536 tests green.
+**Decisions:** A missing *relative* router file still throws, deliberately loud rather than silently dropping routes.
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

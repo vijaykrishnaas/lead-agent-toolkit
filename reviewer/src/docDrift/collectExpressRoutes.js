@@ -40,6 +40,9 @@ function collectFromFile(filePath, prefix, readFile, ancestors) {
 
   const fileDir = path.dirname(filePath);
   for (const { prefix: mountPrefix, requirePath } of mounts) {
+    // A bare specifier (e.g. 'swagger-ui-express') is an npm package, not a
+    // router file in this repo; resolving it as a path would throw ENOENT.
+    if (!requirePath.startsWith('.')) continue;
     const routerPath = path.resolve(fileDir, requirePath.endsWith('.js') ? requirePath : `${requirePath}.js`);
     const nested = collectFromFile(routerPath, joinPath(prefix, mountPrefix), readFile, nextAncestors);
     routes.push(...nested.routes);

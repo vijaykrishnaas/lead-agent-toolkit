@@ -202,4 +202,15 @@ describe('collectExpressRoutes', () => {
     ]);
     expect(readFile).toHaveBeenCalledTimes(1);
   });
+
+  it('does not try to read a mounted npm package as a router file', () => {
+    const readFile = jest.fn(() => `
+      const swagger = require('swagger-ui-express');
+      app.get('/health', handler);
+      app.use('/docs', swagger);
+    `);
+    const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
+    expect(routes).toEqual([{ method: 'GET', path: '/health' }]);
+    expect(readFile).toHaveBeenCalledTimes(1);
+  });
 });

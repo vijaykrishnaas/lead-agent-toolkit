@@ -2247,3 +2247,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline. Noted, not actioned: mirrorDir skips symlink source entries (neither file nor directory) without removing a stale same-named dest; unrealistic for `.claude/skills`.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 — Reviewer run (log-only review, markdown/standup/PR-collection hunt)
+**Done:** Baseline green (reviewer + sample-app 68), idle-streak 0. Reviewed 17eebae..375d0db: only PROGRESS.md/runs.jsonl changed (no code). Branch (b): hunted `utils/sanitizeMarkdownText.js`, `format/markdownReport.js`, `standup/formatStandup.js`, `standup/collectPullRequests.js`, `utils/consumeFlagValue.js` (none hunted in recent runs.jsonl entries). No defect, no code change. Noted, not actioned: bare URLs in sanitized text still GFM-autolink (inert-text guarantee covers disguised `[text](url)` links only); no realistic harm path.
+**Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

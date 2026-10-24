@@ -70,4 +70,9 @@ paths:
       expect(parseOpenApiSpec(`servers:\n  - url: "${url}"\n${base}`)).toEqual([{ method: 'GET', path: '/users' }]);
     }
   });
+
+  it('strips the host of a protocol-relative server url', () => {
+    const text = 'servers:\n  - url: //api.example.com/v1\npaths:\n  /users:\n    get: {}\n';
+    expect(parseOpenApiSpec(text)).toEqual([{ method: 'GET', path: '/v1/users' }]);
+  });
 });

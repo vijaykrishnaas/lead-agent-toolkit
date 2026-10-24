@@ -2393,3 +2393,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer 535, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `docDrift/parseOpenApi.js` and `compareRoutes.js` (parseOpenApi last touched 2026-07-18, among the least-audited). Defect: Swagger 2 `basePath` / OpenAPI 3 `servers[0].url` path was ignored, so a spec with relative paths reported every route as drift on both sides. Fixed test-first (3 tests): the base path now prefixes spec paths; root, host-only and templated server urls add no prefix.
 **Decisions:** Only the first server is used; templated urls are skipped as not statically resolvable. No new task or guideline.
 **Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-24 (Reviewer) — reviewed b1832d1..a3e7f4e
+- Reviewed 84d348a (directory-index router resolution) and f848002 (OpenAPI basePath/servers prefix): both sound; suite green (reviewer 540, sample-app 72).
+- Gap reproduced in f848002: a protocol-relative server url (`//api.example.com/v1`) was not host-stripped, yielding paths like `//api.example.com/v1/users` and false drift. Fixed test-first (scheme now optional in the strip regex). Scheme-less `api.example.com/v1` is left as a relative path per the OpenAPI spec.
+- Open questions for Vijay: none new.

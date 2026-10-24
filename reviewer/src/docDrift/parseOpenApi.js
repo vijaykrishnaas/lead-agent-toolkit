@@ -13,7 +13,7 @@ function basePathOf(spec) {
   } else if (Array.isArray(spec.servers) && spec.servers[0] && typeof spec.servers[0].url === 'string') {
     const url = spec.servers[0].url;
     if (url.includes('{')) return '';
-    base = url.replace(/^[A-Za-z][A-Za-z0-9+.-]*:\/\/[^/]*/, '');
+    base = url.replace(/^(?:[A-Za-z][A-Za-z0-9+.-]*:)?\/\/[^/]*/, '');
   }
   base = base.replace(/\/+$/, '');
   return base && !base.startsWith('/') ? `/${base}` : base;

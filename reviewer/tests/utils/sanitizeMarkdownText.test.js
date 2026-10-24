@@ -42,4 +42,10 @@ describe('sanitizeMarkdownText', () => {
     // unescaped structural character (which is what would leave it live).
     expect(result).not.toMatch(/(?:^|[^\\])(?:\\\\)+[*_[\]()`]/);
   });
+
+  it('escapes "<" so raw HTML and <https://...> autolinks in diff-controlled text render as inert text', () => {
+    const result = sanitizeMarkdownText('see <https://evil.example> and <img src=x>');
+    expect(result).toBe('see \\<https://evil.example> and \\<img src=x>');
+    expect(result).not.toMatch(/(?:^|[^\\])</);
+  });
 });

@@ -290,3 +290,7 @@
 ## 2026-10-24 (Reviewer: EMPTY-BACKLOG (b) hunt, sample-app authController)
 **Change:** No skill/CLAUDE.md change. Code fix: auth login/register lookups now trim+lowercase email, matching the User schema setters; regression tests added.
 **Evidence:** PROGRESS.md 2026-10-24 Reviewer entry (authController) — padded email registered fine but could not log in with the same string.
+
+## 2026-10-24 (Builder: EMPTY-BACKLOG (b) hunt, sanitizeMarkdownText)
+**Change:** No skill/CLAUDE.md change. Code fix: `sanitizeMarkdownText` now escapes `<`; regression test added.
+**Evidence:** PROGRESS.md 2026-10-24 Builder entry (sanitizeMarkdownText) — `<img ...>` and `<https://evil>` autolinks in diff-controlled text survived into the report posted to PR comments (guideline 15 sink class).

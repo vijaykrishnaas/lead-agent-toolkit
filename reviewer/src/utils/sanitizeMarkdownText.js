@@ -5,7 +5,7 @@
 // before interpolation: embedded newlines are collapsed (otherwise a
 // multi-line value can forge extra report lines — e.g. a fake "## Section"
 // heading — inside what should render as a single list item), and
-// markdown-structural characters (backslash, backtick, *, _, [, ], (, )) are
+// markdown-structural characters (backslash, backtick, *, _, [, ], (, ), <) are
 // backslash-escaped — including the parens, so no unescaped "](" substring
 // survives — so a value like "[x](javascript:...)" or a hardcoded-credential
 // finding that happens to quote a crafted `[Approve without review](https://
@@ -25,13 +25,14 @@
 // backslash character too keeps the total backslash run before any
 // structural character odd (so it always pairs with, and neutralizes, that
 // character) regardless of how many backslashes preceded it in the input.
+// "<" is escaped too so raw HTML and <https://...> autolinks stay inert.
 // Shared by both the standup report and the review report — the review
 // report posts live to GitHub PR comments via postReviewComment, so it is
 // the higher-impact of the two surfaces.
 function sanitizeMarkdownText(text) {
   return String(text)
     .replace(/\r\n|\r|\n/g, ' ')
-    .replace(/[\\`*_[\]()]/g, '\\$&');
+    .replace(/[\\`*_[\]()<]/g, '\\$&');
 }
 
 module.exports = { sanitizeMarkdownText };

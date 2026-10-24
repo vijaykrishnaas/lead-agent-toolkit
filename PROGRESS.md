@@ -2314,3 +2314,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No fix, task, or feature added this run.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, report formatters/sanitizer)
+
+**Done:** Baseline green (reviewer 524, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/sanitizeMarkdownText.js`, `format/markdownReport.js`, `docDrift/formatDocDrift.js`, `standup/groupByAuthor.js`, `standup/collectPullRequests.js`, `utils/resolveFileContent.js` (none in recent hunt entries). Defect: the sanitizer did not escape `<`, so raw HTML and `<https://...>` autolinks quoted from a diff survived into the review report posted to PR comments. Fixed test-first; reviewer now 531 tests green.
+
+**Decisions:** No new task or guideline (single-module fix). Noted, not actioned: `markdownReport` sorts an unknown severity as NaN (rules only emit high/medium/low); bare URLs still autolink under GFM and can't be neutralized by escaping.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

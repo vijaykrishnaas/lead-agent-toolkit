@@ -166,6 +166,23 @@ describe('missing-tests rule', () => {
       expect(missingTestsRule.check(files, { sourceDirs: [42] })).toEqual(missingTestsRule.check(files));
     });
   });
+  describe('basename matching across code extensions and .spec files', () => {
+    const file = (name) => ({ file: name, hunks: [{ lines: [{ type: 'add', content: 'x', newLine: 1 }] }] });
+
+    it.each([
+      ['src/a.ts', 'tests/a.test.ts'],
+      ['src/a.jsx', 'tests/a.test.jsx'],
+      ['src/a.js', 'tests/a.spec.js'],
+      ['src/a.mjs', 'tests/a.spec.mjs'],
+    ])('treats %s as covered by %s', (source, test) => {
+      expect(missingTestsRule.check([file(source), file(test)])).toEqual([]);
+    });
+
+    it('still flags a source whose test has a different basename', () => {
+      expect(missingTestsRule.check([file('src/a.ts'), file('tests/b.test.ts')])).toHaveLength(1);
+    });
+  });
+
   describe('non-code files under a source dir', () => {
     const file = (name) => ({ file: name, hunks: [{ lines: [{ type: 'add', content: 'x', newLine: 1 }] }] });
 

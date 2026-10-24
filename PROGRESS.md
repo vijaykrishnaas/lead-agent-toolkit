@@ -2277,3 +2277,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (68), idle-streak 0. Reviewed 6c37141..HEAD: only PROGRESS.md/runs.jsonl changed (no code). Branch (b): hunted `scripts/runLog.js` (arg parsing, streak, missing-newline append) and `docDrift/parseOpenApi.js`, `docDrift/compareRoutes.js` (null/scalar path items, optional-param expansion incl. `/:id?` at root, param-name erasure): no defect.
 **Decisions:** No new task, guideline, or [FEATURE].
 **Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, missingTests)
+
+**Done:** Baseline green (reviewer 519, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer/src/rules/missingTests.js` (not in recent hunt entries). Defect: test matching stripped only `.js`/`.test.js`, so `.ts`/`.jsx`/`.mjs` sources and `*.spec.js` tests never matched, giving a false "no test changed" finding even when the right test was in the diff. Fixed test-first via a shared `stemName` helper; reviewer now 524 tests green.
+
+**Decisions:** No new task or guideline (single-module fix).
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

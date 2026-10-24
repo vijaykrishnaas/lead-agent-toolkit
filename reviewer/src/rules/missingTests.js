@@ -25,6 +25,12 @@ function baseName(filePath) {
   return segments[segments.length - 1];
 }
 
+// Basename with the code extension and any .test/.spec marker removed, so
+// `a.ts`, `a.test.ts` and `a.spec.js` all reduce to `a`.
+function stemName(filePath) {
+  return baseName(filePath).replace(CODE_FILE_PATTERN, '').replace(/\.(test|spec)$/, '');
+}
+
 // True if `testFile` plausibly imports/requires this specific source file --
 // checked by looking for its parent-directory segment alongside its
 // basename (e.g. "utils/round"), not just the bare basename, so a test
@@ -36,7 +42,7 @@ function baseName(filePath) {
 // substring of "utils/roundRobin", so a require of a completely different,
 // unrelated module would otherwise satisfy the check for "round" too.
 function testFileReferencesSource(testFile, sourceFile) {
-  const segments = sourceFile.file.replace(/\.js$/, '').split('/');
+  const segments = sourceFile.file.replace(CODE_FILE_PATTERN, '').split('/');
   const qualified = segments.slice(-2).join('/'); // e.g. "utils/round"
   const content = testFile.hunks
     .flatMap((hunk) => hunk.lines)
@@ -58,11 +64,8 @@ function testFileReferencesSource(testFile, sourceFile) {
 // import -- otherwise a test for one sibling would silently satisfy the
 // check for an entirely different, untested file that just shares a name.
 function matchingTestFiles(sourceFile, testFiles, siblings) {
-  const sourceBase = baseName(sourceFile.file).replace(/\.js$/, '');
-  const candidates = testFiles.filter((testFile) => {
-    const testBase = baseName(testFile.file).replace(/\.test\.js$/, '').replace(/\.js$/, '');
-    return testBase === sourceBase;
-  });
+  const sourceBase = stemName(sourceFile.file);
+  const candidates = testFiles.filter((testFile) => stemName(testFile.file) === sourceBase);
   if (siblings.length <= 1) return candidates;
   return candidates.filter((testFile) => testFileReferencesSource(testFile, sourceFile));
 }
@@ -104,7 +107,7 @@ function check(files, options = {}) {
 
   const sourceFilesByBase = new Map();
   for (const file of sourceFiles) {
-    const base = baseName(file.file).replace(/\.js$/, '');
+    const base = stemName(file.file);
     if (!sourceFilesByBase.has(base)) sourceFilesByBase.set(base, []);
     sourceFilesByBase.get(base).push(file);
   }
@@ -118,7 +121,7 @@ function check(files, options = {}) {
   // hasMatchingTestFile's `siblings` handling).
   const issues = [];
   for (const file of sourceFiles) {
-    const siblings = sourceFilesByBase.get(baseName(file.file).replace(/\.js$/, ''));
+    const siblings = sourceFilesByBase.get(stemName(file.file));
     const matched = matchingTestFiles(file, testFiles, siblings);
     const firstAdd = collectAddedLines(file)[0];
     const line = firstAdd ? firstAdd.newLine : 1;

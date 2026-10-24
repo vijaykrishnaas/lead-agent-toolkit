@@ -43,7 +43,14 @@ function splitRange(range) {
   if (sepIndex === -1) {
     throw new Error(`Invalid range "${range}": expected "<base>..<head>".`);
   }
-  return { base: range.slice(0, sepIndex), head: range.slice(sepIndex + 2) };
+  const base = range.slice(0, sepIndex);
+  const head = range.slice(sepIndex + 2);
+  // Both sides reach git as arguments ("diff --name-only <base>..<head>"), so a
+  // side starting with "-" would be parsed as an option.
+  if (!base || !head || base.startsWith('-') || head.startsWith('-')) {
+    throw new Error(`Invalid range "${range}": neither side may be empty or start with "-".`);
+  }
+  return { base, head };
 }
 
 function showFile(execGit, ref, filePath) {

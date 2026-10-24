@@ -257,4 +257,8 @@ describe('splitRange', () => {
   it('throws a clear error for a malformed range', () => {
     expect(() => splitRange('not-a-range')).toThrow(/expected/);
   });
+
+  it.each(['--output=x..HEAD', 'main..-p', '-O/etc/passwd..HEAD'])('rejects option-shaped range side in "%s"', (range) => {
+    expect(() => splitRange(range)).toThrow(/Invalid range/);
+  });
 });

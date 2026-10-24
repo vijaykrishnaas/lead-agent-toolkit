@@ -2330,3 +2330,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No defect, fix, task, or feature. Considered `meta.range` in a code span (a git ref may contain a backtick), but it is operator-supplied and not diff-controlled, so no action.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, invariantLint)
+
+**Done:** Baseline green (sample-app 68, reviewer suite green). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `scripts/invariantLint.js` (never previously hunted), plus re-read `standupCli`/`docDriftCli`/`collectCommits` (no defect). Defect: `splitRange` accepted option-shaped sides (`--output=x..HEAD`), which `git diff --name-only <base>..<head>` would parse as an option (same argument-injection class fixed in the review CLIs earlier today). Fixed test-first: `splitRange` now rejects empty or `-`-prefixed sides; 3 new tests.
+
+**Decisions:** No new task or guideline (same single-pattern fix as the CLI range guard).
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

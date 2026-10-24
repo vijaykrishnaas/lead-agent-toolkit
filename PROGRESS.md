@@ -2298,3 +2298,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline (single-pattern fix). Noted, not actioned: reviewPrCli's `a...b` yields head `.b` (pre-existing, separate from this fix).
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, config/buildRules)
+
+**Done:** Baseline green (68 sample-app). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer/src/config/buildRules.js` and `utils/collectAddedLines.js` (oldest by last-commit date, 2026-07-17; no recent hunt entry). Defect: `buildRules` is exported, and a partial category entry such as `{ minSeverity: 'high' }` (no `enabled`) was treated as disabled, because `!undefined` is true, and passed `options: undefined` to the rule. loadRuleConfig always normalizes, so the shipped CLI path was unaffected. Fixed test-first: defaults are merged and only `enabled === false` disables. 1 regression test (failed pre-fix). `collectAddedLines`: no defect.
+
+**Decisions:** No new task or guideline (single-module fix).
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

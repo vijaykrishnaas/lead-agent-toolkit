@@ -49,4 +49,15 @@ describe('buildRules', () => {
     expect(rules).toHaveLength(1);
     expect(rules[0].check([])).toHaveLength(1);
   });
+
+  it('keeps a category enabled and defaults options when its config omits those keys', () => {
+    const issues = [{ file: 'a.js', line: 1, severity: 'high', message: 'm', fix: 'f' }];
+    const style = makeRule('style', issues);
+
+    const rules = buildRules({ rules: { style: { minSeverity: 'high' } } }, [style]);
+
+    expect(rules.map((r) => r.category)).toEqual(['style']);
+    expect(rules[0].check([])).toEqual(issues);
+    expect(style.check).toHaveBeenCalledWith([], {});
+  });
 });

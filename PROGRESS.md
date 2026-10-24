@@ -2264,3 +2264,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 0. Reviewed 375d0db..6c37141: only PROGRESS.md/runs.jsonl changed (no code); reviewer CLI reported 0 issues. Branch (b): hunted `github/postReviewComment.js`, `config/loadRules.js`, `config/buildRules.js` (URL encoding, earliest-marker match, paging cap, severity filter, second-arg forwarding): no defect.
 **Decisions:** No new task, guideline, or [FEATURE].
 **Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, security/style/resolvePushRange/reviewer)
+
+**Done:** Baseline green (reviewer + sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer/src/rules/security.js`, `rules/style.js`, `scripts/resolvePushRange.js`, `reviewer.js` (none in recent runs.jsonl hunt entries). Checked `===` vs SECRET_PATTERN, `tokens`/`passwordHash` identifier near-misses, eval bracket form, style per-line masking, zero-SHA/missing-ref fallbacks in resolvePushRange, computeRisk with unknown severity. No defect; no code change.
+
+**Decisions:** No new task or guideline. Noted, not actioned: `eval(` inside a string literal is flagged (comment-masked only, by design so the bracket form works); low-impact false positive.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

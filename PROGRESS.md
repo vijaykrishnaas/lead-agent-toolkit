@@ -2259,3 +2259,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 — Reviewer run (log-only review, postReviewComment/config hunt)
+**Done:** Baseline green, idle-streak 0. Reviewed 375d0db..6c37141: only PROGRESS.md/runs.jsonl changed (no code); reviewer CLI reported 0 issues. Branch (b): hunted `github/postReviewComment.js`, `config/loadRules.js`, `config/buildRules.js` (URL encoding, earliest-marker match, paging cap, severity filter, second-arg forwarding): no defect.
+**Decisions:** No new task, guideline, or [FEATURE].
+**Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

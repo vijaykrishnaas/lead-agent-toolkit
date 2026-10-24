@@ -2388,3 +2388,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed b1832d1 (skip npm-package mounts): correct. CLI findings on the range were false positives (test-fixture "credential", missing-tests on already-covered controllers).
 - Sibling gap reproduced: `require('./routes')` resolving to `routes/index.js` crashed collectExpressRoutes with ENOENT (only `<path>.js` was tried). Fixed test-first via `resolveRouterPath` (exact → .js → /index.js; non-ENOENT errors rethrown).
 - Open questions for Vijay: none new.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, docDrift/parseOpenApi)
+**Done:** Baseline green (reviewer 535, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `docDrift/parseOpenApi.js` and `compareRoutes.js` (parseOpenApi last touched 2026-07-18, among the least-audited). Defect: Swagger 2 `basePath` / OpenAPI 3 `servers[0].url` path was ignored, so a spec with relative paths reported every route as drift on both sides. Fixed test-first (3 tests): the base path now prefixes spec paths; root, host-only and templated server urls add no prefix.
+**Decisions:** Only the first server is used; templated urls are skipped as not statically resolvable. No new task or guideline.
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

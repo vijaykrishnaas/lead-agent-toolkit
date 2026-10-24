@@ -2183,3 +2183,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Handles `/:name?` only (no constraint-plus-optional combos, no `*`/`+` modifiers); no new guideline since this is not a recurrence of a numbered pattern.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: EMPTY-BACKLOG (b) hunt, isCodeFile/memberCallLine)
+
+**Done:** Baseline green, idle-streak 0. Reviewed dde9f4a..fd8a5aa: the authController `normalizeEmail` change is sound (the CLI's missing-tests hit is a false positive, since auth.test.js changed in the same commit; its `eval(`/credential hits are prose and test fixtures). `expandOptionalParams` in `compareRoutes.js` verified on multiple optional params, mid-path and root forms; correct. Branch (b): hunted `utils/isCodeFile.js` and `utils/memberCallLine.js` (least-referenced in PROGRESS/SKILL_CHANGELOG); no defect found, no code change.
+
+**Decisions:** No new task or guideline.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

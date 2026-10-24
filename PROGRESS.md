@@ -2215,3 +2215,11 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-24 — Reviewer run (log-only review, parseArgv hunt)
 **Done:** Baseline green, idle-streak 0. Reviewed 289a831..eb695bb: only PROGRESS.md/runs.jsonl changed (no code); builder's config-loader no-defect claim is consistent with the code paths checked. Branch (b): hunted `reviewer/src/utils/parseArgv.js` (least-referenced shared util); prototype-key lookup guarded by hasOwnProperty, missing values and unknown/`--x=v` args fail loudly. No defect, no code change.
 **Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, sample-app app/routes/models/controllers)
+
+**Done:** Baseline green (reviewer 518, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `sample-app/src/{app,routes,models,controllers/authController,controllers/usersController,middleware/asyncHandler}.js` (not hunted since the 2026-07-19 bug-hunts). Auth routes skip `asyncHandler` but both handlers wrap every stage in try/catch, so guideline 1 holds; users update 409/409-vs-500 path and error middleware checked. No reproducible defect; no code change.
+
+**Decisions:** No new task or guideline. Noted but not actioned (design call, not a bug): `DELETE /api/users/:id` leaves that user's tasks orphaned and the JWT stays valid for up to a day, so the deleted user's token can still create tasks.
+
+**Open questions for Vijay:** Should deleting a user cascade-delete their tasks and/or should auth middleware reject tokens for deleted users? Also unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

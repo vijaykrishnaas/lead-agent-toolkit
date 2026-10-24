@@ -52,18 +52,21 @@ function routeKey(route) {
 // Returns every concrete path an optional-param route answers, so a route is
 // matched against the spec per form instead of never matching either.
 function expandOptionalParams(routePath) {
-  const m = /\/:([A-Za-z_$][\w$]*)\?/.exec(routePath);
+  // Runs on the brace form so a constrained param (':id(\d+)?') -- whose '?'
+  // follows the constraint, not the name -- is recognized once replaceParams
+  // has dropped the constraint.
+  const m = /\/\{([^}]*)\}\?/.exec(routePath);
   if (!m) return [routePath];
   const before = routePath.slice(0, m.index);
   const after = routePath.slice(m.index + m[0].length);
   return [
-    ...expandOptionalParams(`${before}/:${m[1]}${after}`),
+    ...expandOptionalParams(`${before}/{${m[1]}}${after}`),
     ...expandOptionalParams(`${before}${after}` || '/'),
   ];
 }
 
 function routeKeys(route) {
-  return expandOptionalParams(route.path).map((p) => routeKey({ ...route, path: p }));
+  return expandOptionalParams(replaceParams(route.path)).map((p) => routeKey({ ...route, path: p }));
 }
 
 // Compares the routes actually defined in code against the routes documented

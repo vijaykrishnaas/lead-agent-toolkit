@@ -2346,3 +2346,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No action beyond logging.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, docDrift/compareRoutes)
+
+**Done:** Baseline green (reviewer 524, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `docDrift/compareRoutes.js` and `parseOpenApi.js` (last touched 2026-07-18, oldest unhunted). Defect: an Express optional param with a regex constraint (`/users/:id(\d+)?`) was not expanded into its two forms, because the `?` follows the constraint; a fully documented route was reported as drift on both sides. Fixed test-first: `expandOptionalParams` now runs on the constraint-stripped brace form. Reviewer 535 tests green.
+
+**Decisions:** No new task or guideline (single-module fix). `parseOpenApi` had no defect.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

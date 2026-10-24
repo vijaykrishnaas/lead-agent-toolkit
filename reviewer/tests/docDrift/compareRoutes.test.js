@@ -146,4 +146,13 @@ describe('compareRoutes optional params', () => {
     expect(result.missingFromSpec).toEqual([{ method: 'GET', path: '/users/:id?' }]);
     expect(result.missingFromCode).toEqual([]);
   });
+
+  it('treats an optional param with a regex constraint (":id(\\d+)?") as covering both forms', () => {
+    const result = compareRoutes(
+      [{ method: 'GET', path: '/users/:id(\\d+)?' }],
+      [{ method: 'GET', path: '/users' }, { method: 'GET', path: '/users/{id}' }]
+    );
+    expect(result.missingFromSpec).toEqual([]);
+    expect(result.missingFromCode).toEqual([]);
+  });
 });

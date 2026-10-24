@@ -2223,3 +2223,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline. Noted but not actioned (design call, not a bug): `DELETE /api/users/:id` leaves that user's tasks orphaned and the JWT stays valid for up to a day, so the deleted user's token can still create tasks.
 
 **Open questions for Vijay:** Should deleting a user cascade-delete their tasks and/or should auth middleware reject tokens for deleted users? Also unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 — Reviewer run (log-only review, parseAst/parseGitHubRemote hunt)
+**Done:** Baseline green (reviewer + sample-app 68), idle-streak 0. Reviewed eb695bb..42bd178: only PROGRESS.md/runs.jsonl changed (no code); builder's sample-app no-defect claim and the user-delete orphaning note are a design question, not a bug. Branch (b): `scripts/resolvePushRange.js` was already hunted twice, so hunted the least-mentioned utils instead: `parseAst.js` (shebang, BOM, top-level await, ESM export all parse) plus `parseGitHubRemote.js` and `isCodeFile.js` regexes. No defect, no code change.
+**Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question from the builder entry above; please disable the scheduled tasks or add work.

@@ -2199,3 +2199,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Validate with `new Date(since)` for both Date and string inputs; the original string is still passed to git unchanged. No new guideline.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 — Reviewer run (collectCommits review, runLog hunt)
+**Done:** Baseline green, idle-streak 0. Reviewed fd8a5aa..289a831: the collectCommits invalid-`since` rejection is sound (ISO documented in README/SKILL; generateStandup already validated the same way, so no real caller regresses). CLI's lone hit (PROGRESS.md prose mentioning the word eval) is a false positive. Branch (b): hunted `scripts/runLog.js` arg parsing/idle-streak; no defect found, no code change.
+**Open questions for Vijay:** none new (task 30/32 BLOCKED items unchanged).

@@ -37,7 +37,10 @@ const TRUNCATION_NOTICE = '\n\n_…report truncated to fit GitHub\'s comment siz
 
 function fitToCommentLimit(markedBody) {
   if (markedBody.length <= MAX_COMMENT_LENGTH) return markedBody;
-  return markedBody.slice(0, MAX_COMMENT_LENGTH - TRUNCATION_NOTICE.length) + TRUNCATION_NOTICE;
+  let end = MAX_COMMENT_LENGTH - TRUNCATION_NOTICE.length;
+  // Don't leave half of a surrogate pair (emoji) at the cut.
+  if (/[\ud800-\udbff]/.test(markedBody[end - 1])) end -= 1;
+  return markedBody.slice(0, end) + TRUNCATION_NOTICE;
 }
 
 const COMMENTS_PER_PAGE = 100;

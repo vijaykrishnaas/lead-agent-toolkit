@@ -51,6 +51,19 @@ describe('postReviewComment', () => {
     expect(sent).toMatch(/truncated/i);
   });
 
+  it('never cuts a surrogate pair in half when truncating', async () => {
+    const request = jest.fn();
+    // probe both parities of the cut offset
+    for (const pad of [0, 1]) {
+      request.mockReset();
+      request.mockResolvedValueOnce(noExistingComments()).mockResolvedValueOnce(makeResponse({ json: { id: 1 } }));
+      await postReviewComment({ ...baseArgs, body: 'x'.repeat(pad) + '😀'.repeat(40000) }, { request });
+      const sent = JSON.parse(request.mock.calls[1][1].body).body;
+      expect(sent).not.toMatch(/[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/);
+      expect(sent.length).toBeLessThanOrEqual(65536);
+    }
+  });
+
   it('does not truncate a body at exactly the limit', async () => {
     const request = jest.fn()
       .mockResolvedValueOnce(noExistingComments())

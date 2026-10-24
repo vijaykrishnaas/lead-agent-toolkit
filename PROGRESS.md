@@ -2406,3 +2406,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Truncate rather than split into several comments, since update-in-place relies on a single marked comment.
 
 **Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-24 (Reviewer) — reviewed a3e7f4e..7be64a5
+- Reviewed 0c24f37 (protocol-relative server url) and 9be916a (65536-char comment truncation): both sound; suite green (reviewer 544, sample-app 72).
+- Gap reproduced in 9be916a: the truncation `slice` could cut an emoji's surrogate pair in half, leaving a lone surrogate in the posted JSON body. Fixed test-first (cut backs off one unit when it would land after a high surrogate).
+- Open questions for Vijay: none new (tasks 30 and 32 still need your unblock).

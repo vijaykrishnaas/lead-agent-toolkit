@@ -168,3 +168,16 @@ describe('Users', () => {
     });
   });
 });
+
+describe('Users: blank name', () => {
+  const app = createApp();
+  const auth = () => ({ Authorization: `Bearer ${token('u1', 'bob@example.com')}` });
+
+  test('PUT /:id rejects a whitespace-only name without touching the database', async () => {
+    jest.clearAllMocks();
+    const res = await request(app).put('/api/users/u1').set(auth()).send({ name: '   ' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('name must be a non-empty string');
+    expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
+  });
+});

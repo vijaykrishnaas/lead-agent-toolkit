@@ -2362,3 +2362,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No fix, task or guideline needed; backlog stays empty.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, sample-app controllers)
+
+**Done:** Baseline green (reviewer 535, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `sample-app` `authController.js`/`usersController.js`/`app.js`/models/routes (not hunted since the sample-app rounds in July). Defect: a whitespace-only `name` was accepted by register and by `PUT /api/users/:id` (tasks already reject blank titles); both now return 400. Fixed test-first (2 new tests, now 70).
+
+**Decisions:** No new task or guideline (single-pattern fix mirroring `isValidTitle`). `name: ""` on update now 400s instead of being silently ignored.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

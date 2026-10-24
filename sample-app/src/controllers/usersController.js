@@ -29,6 +29,9 @@ async function update(req, res) {
   if (name !== undefined && typeof name !== 'string') {
     return res.status(400).json({ error: 'name must be a string' });
   }
+  if (name !== undefined && name.trim().length === 0) {
+    return res.status(400).json({ error: 'name must be a non-empty string' });
+  }
   if (email !== undefined && typeof email !== 'string') {
     return res.status(400).json({ error: 'email must be a string' });
   }

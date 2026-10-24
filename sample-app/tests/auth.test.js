@@ -244,3 +244,13 @@ describe('Auth', () => {
     });
   });
 });
+
+describe('Auth: blank name', () => {
+  test('register rejects a whitespace-only name before any DB work', async () => {
+    jest.clearAllMocks();
+    const User = require('../src/models/User');
+    const res = await request(createApp()).post('/api/auth/register').send({ name: '   ', email: 'a@x.com', password: 'pw12345' });
+    expect(res.status).toBe(400);
+    expect(User.create).not.toHaveBeenCalled();
+  });
+});

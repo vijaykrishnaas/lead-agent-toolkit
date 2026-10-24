@@ -48,7 +48,7 @@ const DUMMY_PASSWORD_HASH = bcrypt.hashSync('lead-agent-toolkit-timing-safety-du
 async function register(req, res) {
   try {
     const { name, email, password } = req.body;
-    if (!isNonEmptyString(name) || !isNonEmptyString(email) || !isNonEmptyString(password)) {
+    if (!isNonEmptyString(name) || name.trim().length === 0 || !isNonEmptyString(email) || !isNonEmptyString(password)) {
       return res.status(400).json({ error: 'name, email and password are required' });
     }
     if (!isValidPassword(password)) {

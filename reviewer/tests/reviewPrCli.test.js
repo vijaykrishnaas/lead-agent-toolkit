@@ -91,6 +91,10 @@ describe('parseReviewPrArgs', () => {
     expect(() => parseReviewPrArgs(['--owner', 'o', '--gh-repo', 'r', '--pr', '1'])).toThrow(/Missing.*range/);
   });
 
+  it.each(['-O/etc/passwd..HEAD', 'main..-p'])('rejects option-shaped range side in "%s"', (range) => {
+    expect(() => parseReviewPrArgs(['--owner', 'o', '--gh-repo', 'r', '--pr', '1', range])).toThrow(/Invalid range/);
+  });
+
   it('throws when the range has no ".."', () => {
     expect(() => parseReviewPrArgs(['--owner', 'o', '--gh-repo', 'r', '--pr', '1', 'abc123'])).toThrow(/Invalid range/);
   });

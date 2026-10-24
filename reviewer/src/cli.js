@@ -6,7 +6,8 @@ const { formatMarkdownReport } = require('./format/markdownReport');
 const { parseArgv } = require('./utils/parseArgv');
 
 const USAGE = 'Usage: review -- <base>..<head> [--repo <path>] [--config <path>] [--out <file>]';
-const RANGE_PATTERN = /^(.+?)\.{2,3}(.+)$/;
+// Neither side may start with "-": the range is passed to git as an argument.
+const RANGE_PATTERN = /^([^-].*?)\.{2,3}([^-].*)$/;
 
 // Value-taking flags error loudly when their value is absent (shared parseArgv,
 // see the CLAUDE.md guideline on value-taking CLI flags).

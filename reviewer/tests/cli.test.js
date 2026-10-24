@@ -41,6 +41,10 @@ describe('parseArgs', () => {
     expect(() => parseArgs(['abc123'])).toThrow(/Invalid range/);
   });
 
+  it.each(['-O/etc/passwd..HEAD', 'main..-p', '-p...HEAD'])('rejects option-shaped range side in "%s"', (range) => {
+    expect(() => parseArgs([range])).toThrow(/Invalid range/);
+  });
+
   it('throws on an unrecognized flag', () => {
     expect(() => parseArgs(['a..b', '--bogus'])).toThrow(/Unrecognized argument/);
   });

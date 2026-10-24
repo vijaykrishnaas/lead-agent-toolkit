@@ -9,7 +9,8 @@ const { parseGitHubRemote } = require('./utils/parseGitHubRemote');
 
 const USAGE = 'Usage: review-pr -- [--owner <owner>] [--gh-repo <name>] --pr <number> <base>..<head> '
   + '[--repo <path>] [--config <path>] [--token <token>] [--out <file>] [--no-post]';
-const RANGE_PATTERN = /^(.+?)\.\.(.+)$/;
+// Neither side may start with "-": the range is passed to git as an argument.
+const RANGE_PATTERN = /^([^-].*?)\.\.([^-].*)$/;
 
 // Value-taking flags error loudly when their value is absent (shared parseArgv,
 // see the CLAUDE.md guideline on value-taking CLI flags).

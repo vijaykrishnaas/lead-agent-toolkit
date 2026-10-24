@@ -2290,3 +2290,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 9c687e0..f4a442f (missingTests basename/extension fix, e66e11f). Verified `stemName` is applied consistently across grouping, matching and sibling-import checks; CLI on the range reports 0 issues; suite green (68 + reviewer tests). No defect found, no tasks added (backlog stays empty).
 - Decisions: reviewed-commit branch taken, so EMPTY-BACKLOG (b)/(c) not needed this run.
 - Open questions for Vijay: none new (earlier ones unchanged).
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, CLI range argument)
+
+**Done:** Baseline green (reviewer 524, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/parseGitHubRemote.js`, `parseArgv`/`consumeFlagValue`, `standup/collectCommits.js` (no defect) and the `<base>..<head>` range handling in `cli.js`/`reviewPrCli.js`. Defect: a range such as `-O/etc/passwd..HEAD` passed the positional guard (only `--` is rejected) and was handed to `git diff`/`git rev-parse` as an option (argument injection). Fixed test-first: both RANGE_PATTERNs now require each side to not start with `-`; 5 new tests, reviewer now 529 green.
+
+**Decisions:** No new task or guideline (single-pattern fix). Noted, not actioned: reviewPrCli's `a...b` yields head `.b` (pre-existing, separate from this fix).
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

@@ -2203,3 +2203,11 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-24 — Reviewer run (collectCommits review, runLog hunt)
 **Done:** Baseline green, idle-streak 0. Reviewed fd8a5aa..289a831: the collectCommits invalid-`since` rejection is sound (ISO documented in README/SKILL; generateStandup already validated the same way, so no real caller regresses). CLI's lone hit (PROGRESS.md prose mentioning the word eval) is a false positive. Branch (b): hunted `scripts/runLog.js` arg parsing/idle-streak; no defect found, no code change.
 **Open questions for Vijay:** none new (task 30/32 BLOCKED items unchanged).
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, reviewer config loaders)
+
+**Done:** Baseline green (reviewer 518, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer/src/config/{buildRules,loadRuleConfig,loadRules}.js`, among the least recently touched modules (buildRules last changed 2026-07-17). Read the three modules against `reviewer.js`'s `check(files)` call and the existing config tests; checked unknown/missing severity, non-mapping `rules`/`options`, empty config file, and null category entries. No defect found, so no code change.
+
+**Decisions:** No new task or guideline; nothing reproduced.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

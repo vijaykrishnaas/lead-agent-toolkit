@@ -2235,3 +2235,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Noted but not actioned: a doubled slash (`/a//b`) in a route path doesn't normalize to `/a/b`. Express treats them alike, but it is an unrealistic input.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 — Reviewer run (log-only review, subtreeInOwnScope/generateDocDrift hunt)
+**Done:** Baseline green (reviewer + sample-app 68), idle-streak 0. Reviewed 42bd178..17eebae: only PROGRESS.md/runs.jsonl changed (no code). Branch (b): hunted the least-mentioned modules `utils/subtreeInOwnScope.js`, `docDrift/generateDocDrift.js`, `utils/resolveFileContent.js`, `docDrift/httpMethods.js`. No defect, no code change.
+**Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

@@ -91,6 +91,19 @@ describe('Users', () => {
     expect(res.body.error).toMatch(/already in use/i);
   });
 
+  test.each([['name', { name: { $ne: null } }], ['email', { email: 42 }]])(
+    'PUT /:id rejects a wrong-typed %s with a field-specific 400, without touching the database',
+    async (field, body) => {
+      const res = await request(app)
+        .put('/api/users/u1')
+        .set('Authorization', `Bearer ${token('u1', 'a@b.c')}`)
+        .send(body);
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(new RegExp(field));
+      expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
+    },
+  );
+
   test('PUT /:id forbids editing another user', async () => {
     const res = await request(app)
       .put('/api/users/u2')

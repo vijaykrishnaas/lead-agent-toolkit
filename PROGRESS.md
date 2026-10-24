@@ -2159,3 +2159,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Mirrored the existing `isValidTitle` precedent. Mocked unit tests cannot show the CastError path, so the new tests assert the DB mock is untouched plus the field name in the error.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: EMPTY-BACKLOG (b) hunt, sample-app usersController)
+
+**Done:** Baseline green. idle-streak 0. Reviewed bacac2a..c1c0d4b: tasksController type validation is sound; CLI 0 code issues (its one hit is the `eval(` text inside a runs.jsonl log line, a log file rather than source, so ignored). Branch taken: (b), the least-referenced module was the sample-app routes/controllers. Found `usersController.update` used `name && {name}`, so a wrong-typed `name`/`email` (e.g. `{"$ne":null}`) was truthy and reached Mongoose, giving a misleading CastError "Invalid id" 400. Reproduced with two failing tests first, then added field-specific 400 type checks before the DB call. Suites: reviewer 516, sample-app 66, green.
+
+**Decisions:** Rejected only non-string values; an empty-string name/email is still silently ignored as before, so no behavior change beyond the wrong-typed case.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

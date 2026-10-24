@@ -24,6 +24,14 @@ async function update(req, res) {
     return res.status(403).json({ error: 'Cannot modify another user' });
   }
   const { name, email } = req.body;
+  // Wrong-typed JSON values are truthy and would reach Mongoose, surfacing as
+  // a misleading CastError "Invalid id" 400 instead of a field-specific one.
+  if (name !== undefined && typeof name !== 'string') {
+    return res.status(400).json({ error: 'name must be a string' });
+  }
+  if (email !== undefined && typeof email !== 'string') {
+    return res.status(400).json({ error: 'email must be a string' });
+  }
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,

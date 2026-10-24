@@ -2306,3 +2306,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline (single-module fix).
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: review f2a3bab..8340142)
+
+**Done:** Baseline green (68 sample-app). idle-streak 0. Reviewed the buildRules partial-config fix (40ea321) plus `node reviewer/src/cli.js` (0 issues). Verified manually: explicit `enabled: undefined`/missing `minSeverity`/missing `options` all fall back to defaults; `null` entry falls to the default config. No defect, no new task.
+
+**Decisions:** No fix, task, or feature added this run.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

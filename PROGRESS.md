@@ -2227,3 +2227,11 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-24 — Reviewer run (log-only review, parseAst/parseGitHubRemote hunt)
 **Done:** Baseline green (reviewer + sample-app 68), idle-streak 0. Reviewed eb695bb..42bd178: only PROGRESS.md/runs.jsonl changed (no code); builder's sample-app no-defect claim and the user-delete orphaning note are a design question, not a bug. Branch (b): `scripts/resolvePushRange.js` was already hunted twice, so hunted the least-mentioned utils instead: `parseAst.js` (shebang, BOM, top-level await, ESM export all parse) plus `parseGitHubRemote.js` and `isCodeFile.js` regexes. No defect, no code change.
 **Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question from the builder entry above; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, docDrift compare/parse/format)
+
+**Done:** Baseline green (reviewer 519, sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer/src/docDrift/{parseOpenApi,compareRoutes,formatDocDrift}.js` (not hunted in the recent 2026-10 rounds). Probed multiple optional params, `:name.:ext` segments, null/string/duplicate-case path items. All matched expectations. No defect; no code change.
+
+**Decisions:** Noted but not actioned: a doubled slash (`/a//b`) in a route path doesn't normalize to `/a/b`. Express treats them alike, but it is an unrealistic input.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

@@ -254,3 +254,13 @@ describe('Auth: blank name', () => {
     expect(User.create).not.toHaveBeenCalled();
   });
 });
+
+describe('Auth: blank email', () => {
+  test('register rejects a whitespace-only email with 400 before any DB work', async () => {
+    jest.clearAllMocks();
+    const User = require('../src/models/User');
+    const res = await request(createApp()).post('/api/auth/register').send({ name: 'A', email: '   ', password: 'pw12345' });
+    expect(res.status).toBe(400);
+    expect(User.create).not.toHaveBeenCalled();
+  });
+});

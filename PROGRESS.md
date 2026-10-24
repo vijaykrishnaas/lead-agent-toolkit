@@ -2370,3 +2370,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline (single-pattern fix mirroring `isValidTitle`). `name: ""` on update now 400s instead of being silently ignored.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: review 8263580..87846c2, sample-app blank fields)
+
+**Done:** Baseline green. idle-streak 0. Reviewed the whitespace-only name fix (13c7719). The name fix is correct, but the same gap remained for `email`: a whitespace-only email passes `isNonEmptyString`, is trimmed to empty by the schema, and fails Mongoose `required` validation (reproduced with `validateSync`). On register that surfaces as a 500 after bcrypt work; on update it throws out of the handler. Fixed test-first: register and `PUT /:id` now return 400 for a blank email before any DB call. Note `email: ""` on update now 400s instead of being silently ignored (same as the name change).
+
+**Decisions:** Small fix, no new task or guideline. This is a sibling-sink miss of the kind guideline 15 describes, but it is too narrow for a new guideline.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

@@ -35,6 +35,9 @@ async function update(req, res) {
   if (email !== undefined && typeof email !== 'string') {
     return res.status(400).json({ error: 'email must be a string' });
   }
+  if (email !== undefined && email.trim().length === 0) {
+    return res.status(400).json({ error: 'email must be a non-empty string' });
+  }
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,

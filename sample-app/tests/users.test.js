@@ -181,3 +181,13 @@ describe('Users: blank name', () => {
     expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
   });
 });
+
+describe('Users: blank email', () => {
+  test('PUT /:id rejects a whitespace-only email without touching the database', async () => {
+    jest.clearAllMocks();
+    const res = await request(createApp()).put('/api/users/u1')
+      .set({ Authorization: `Bearer ${token('u1', 'bob@example.com')}` }).send({ email: '   ' });
+    expect(res.status).toBe(400);
+    expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
+  });
+});

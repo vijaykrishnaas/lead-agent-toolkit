@@ -107,6 +107,27 @@ describe('Auth', () => {
     expect(res.body.token).toBeDefined();
   });
 
+  test('login looks up the trimmed, lowercased email (matches the schema setters)', async () => {
+    User.findOne.mockResolvedValue(null);
+
+    await request(app)
+      .post('/api/auth/login')
+      .send({ email: '  Alice@Example.com ', password: 'secret123' });
+
+    expect(User.findOne).toHaveBeenCalledWith({ email: 'alice@example.com' });
+  });
+
+  test('register duplicate check uses the trimmed, lowercased email', async () => {
+    User.findOne.mockResolvedValue({ _id: 'existing' });
+
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Alice', email: ' Alice@Example.com ', password: 'secret123' });
+
+    expect(User.findOne).toHaveBeenCalledWith({ email: 'alice@example.com' });
+    expect(res.status).toBe(409);
+  });
+
   test('login rejects a wrong password', async () => {
     const hashed = await bcrypt.hash('secret123', 10);
     User.findOne.mockResolvedValue({ _id: 'user1', name: 'Alice', email: 'alice@example.com', password: hashed });

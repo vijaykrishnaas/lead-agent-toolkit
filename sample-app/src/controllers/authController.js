@@ -25,6 +25,13 @@ function isNonEmptyString(value) {
 // "the password that actually authenticates" the same thing.
 const MAX_PASSWORD_BYTES = 72;
 
+// The User schema stores email trimmed and lowercased; lookups must apply the
+// same normalization or an email registered as " A@x.com" can never log in
+// with that same string.
+function normalizeEmail(email) {
+  return email.trim().toLowerCase();
+}
+
 function isValidPassword(value) {
   return isNonEmptyString(value) && Buffer.byteLength(value, 'utf8') <= MAX_PASSWORD_BYTES;
 }
@@ -52,7 +59,7 @@ async function register(req, res) {
     // never hand a token back for, and re-registering it just returns 409
     // forever until the secret is fixed.
     resolveJwtSecret();
-    const existing = await User.findOne({ email: email.toLowerCase() });
+    const existing = await User.findOne({ email: normalizeEmail(email) });
     if (existing) {
       return res.status(409).json({ error: 'Email already registered' });
     }
@@ -74,7 +81,7 @@ async function login(req, res) {
     if (!isNonEmptyString(email) || !isNonEmptyString(password)) {
       return res.status(400).json({ error: 'email and password are required' });
     }
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: normalizeEmail(email) });
     // Always run bcrypt.compare, even for an unknown email (against a fixed
     // dummy hash) — see DUMMY_PASSWORD_HASH above for why an early return
     // here would leak account existence via response timing.

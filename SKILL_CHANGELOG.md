@@ -282,3 +282,7 @@
 ## 2026-10-22 (Reviewer: backlog addition, task 33)
 **Change:** Added TASKS.md task 33 (file-type gating for code-pattern rules). No code change this run.
 **Evidence:** PROGRESS.md 2026-10-22 Reviewer 10:3x entry — reviewer CLI on `0c1d485..HEAD` reported two errorHandling findings on PROGRESS.md prose lines; rules have no extension gating.
+
+## 2026-10-24 (Reviewer: EMPTY-BACKLOG (b) hunt, rules/security.js)
+**Change:** No skill/CLAUDE.md change. Code fix: `security.js` EVAL_PATTERN now runs on comment-masked line content (guidelines 18/19/22 class); regression test added.
+**Evidence:** PROGRESS.md 2026-10-24 Reviewer entry — `// never call eval(x)` and `/* eval(a) */` were flagged as high-severity eval use.

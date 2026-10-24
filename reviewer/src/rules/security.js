@@ -1,4 +1,5 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
+const { maskComments } = require('../utils/maskStringLiterals');
 
 const SECRET_PATTERN = /(password|secret|apikey|api_key|token)['"`]?\s*[:=]\s*['"`][^'"`]{3,}['"`]/i;
 // \beval\s*\( catches the direct call form (`eval(x)`). It does not catch
@@ -31,7 +32,9 @@ function check(files) {
           fix: 'Load secrets from environment variables or a secrets manager instead of hardcoding them.',
         });
       }
-      if (EVAL_PATTERN.test(line.content)) {
+      // Comment-masked (not string-masked): the bracket form needs its quoted
+      // "eval" intact. Per-line, fresh quoteState, like style.js.
+      if (EVAL_PATTERN.test(maskComments(line.content).masked)) {
         issues.push({
           file: file.file,
           line: line.newLine,

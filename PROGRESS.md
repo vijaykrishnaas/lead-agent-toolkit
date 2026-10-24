@@ -2143,3 +2143,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Disabling "lead-agent Builder" and "lead-agent Reviewer" requires list_triggers/update_trigger, which are not available in this session, so the triggers were NOT disabled.
 
 **Open questions for Vijay:** Same as the last several runs: the loop keeps running on an empty backlog and no run can disable it. Please disable both scheduled tasks, or add backlog items / unblock 30 and 32.
+
+## 2026-10-24 (Reviewer run: review of fc21401..HEAD + EMPTY-BACKLOG (b) hunt, security.js)
+
+**Done:** Baseline green (sample-app 61, reviewer 516). idle-streak 0. Commits since last reviewer entry touch only runs.jsonl/PROGRESS.md; CLI: 0 issues. Branch taken: (b) — `rules/security.js` has had no hunt entry. Reproduced: `eval(` inside a line/block comment was flagged high-severity. Fixed test-first with comment-masking (string content kept for the bracket form). Noted, not changed: `obj.eval(x)` (e.g. redis.eval) is still flagged — arguably intended for a security rule.
+
+**Decisions:** Per-line masking only; a multi-line block comment's inner lines remain a known per-line limitation shared by all rules.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

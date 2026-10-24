@@ -117,4 +117,19 @@ describe('security rule', () => {
     const issues = securityRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1, 2]);
   });
+
+  it('does not flag eval( that appears only in a comment, but still flags code before a trailing comment', () => {
+    const diff = [
+      'diff --git a/src/c.js b/src/c.js',
+      '--- a/src/c.js',
+      '+++ b/src/c.js',
+      '@@ -0,0 +1,3 @@',
+      '+// never call eval(x) here',
+      '+const a = 1; /* eval(a) */',
+      '+const b = eval(input); // risky',
+      '',
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([3]);
+  });
 });

@@ -2239,3 +2239,11 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-24 — Reviewer run (log-only review, subtreeInOwnScope/generateDocDrift hunt)
 **Done:** Baseline green (reviewer + sample-app 68), idle-streak 0. Reviewed 42bd178..17eebae: only PROGRESS.md/runs.jsonl changed (no code). Branch (b): hunted the least-mentioned modules `utils/subtreeInOwnScope.js`, `docDrift/generateDocDrift.js`, `utils/resolveFileContent.js`, `docDrift/httpMethods.js`. No defect, no code change.
 **Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, statementWalk/syncPlugin/groupByAuthor)
+
+**Done:** Baseline green (reviewer + sample-app 68). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer/src/utils/statementWalk.js`, `scripts/syncPlugin.js`, `standup/groupByAuthor.js`, `utils/collectAddedLines.js`, `utils/memberCallLine.js` (no runs.jsonl hunt entries for syncPlugin/statementWalk). Checked walk end-of-statement ordering, startColumn slicing, type-mismatch removal and stale-entry pruning in mirrorDir, blank/non-string author bucketing. No defect; no code change.
+
+**Decisions:** No new task or guideline. Noted, not actioned: mirrorDir skips symlink source entries (neither file nor directory) without removing a stale same-named dest; unrealistic for `.claude/skills`.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

@@ -2135,3 +2135,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Nothing to fix; backlog stays empty (30, 32 BLOCKED).
 
 **Open questions for Vijay:** Unchanged: the scheduled loop is still live (trigger tools unavailable to the Reviewer); please disable or confirm intent.
+
+## 2026-10-24 (Builder run: idle-backoff pause)
+
+**Done:** Baseline green (sample-app 61). `idle-streak` was 3, so per the SCHEDULED LOOP protocol this run logs `paused` and stops without implementing anything. Backlog is empty (30, 32 BLOCKED). Branch taken: idle backoff (step 2), not EMPTY-BACKLOG.
+
+**Decisions:** Disabling "lead-agent Builder" and "lead-agent Reviewer" requires list_triggers/update_trigger, which are not available in this session, so the triggers were NOT disabled.
+
+**Open questions for Vijay:** Same as the last several runs: the loop keeps running on an empty backlog and no run can disable it. Please disable both scheduled tasks, or add backlog items / unblock 30 and 32.

@@ -2338,3 +2338,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline (same single-pattern fix as the CLI range guard).
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: review of invariantLint splitRange guard)
+
+**Done:** Baseline green, idle-streak 0. Reviewed 780266e..c831aa9: `splitRange` now rejects empty or `-`-prefixed sides. Verified the only caller (`lintInvariants`) and CI's range sources (full SHAs from `resolvePushRange`/PR events) never produce such sides, so no regression; new test covers three option shapes. `reviewer/src/cli.js` on the range: 0 issues. No defect, fix, task, or feature.
+
+**Decisions:** No action beyond logging.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

@@ -47,6 +47,25 @@ function routeKey(route) {
   return `${route.method.toUpperCase()} ${normalizeRoutePath(route.path).replace(/\{[^}]*\}/g, '{}')}`;
 }
 
+// Express 4 optional params (':id?') register both '/users' and '/users/:id'
+// from one call, and OpenAPI can only document those as two separate paths.
+// Returns every concrete path an optional-param route answers, so a route is
+// matched against the spec per form instead of never matching either.
+function expandOptionalParams(routePath) {
+  const m = /\/:([A-Za-z_$][\w$]*)\?/.exec(routePath);
+  if (!m) return [routePath];
+  const before = routePath.slice(0, m.index);
+  const after = routePath.slice(m.index + m[0].length);
+  return [
+    ...expandOptionalParams(`${before}/:${m[1]}${after}`),
+    ...expandOptionalParams(`${before}${after}` || '/'),
+  ];
+}
+
+function routeKeys(route) {
+  return expandOptionalParams(route.path).map((p) => routeKey({ ...route, path: p }));
+}
+
 // Compares the routes actually defined in code against the routes documented
 // in an OpenAPI spec, returning:
 // - missingFromSpec: routes present in code but not documented in the spec
@@ -54,11 +73,11 @@ function routeKey(route) {
 // Each list holds the original (non-normalized) route as it appeared on its
 // own side, so the report reads naturally in either style.
 function compareRoutes(codeRoutes, specRoutes) {
-  const specKeys = new Set(specRoutes.map(routeKey));
-  const codeKeys = new Set(codeRoutes.map(routeKey));
+  const specKeys = new Set(specRoutes.flatMap(routeKeys));
+  const codeKeys = new Set(codeRoutes.flatMap(routeKeys));
 
-  const missingFromSpecAll = codeRoutes.filter((route) => !specKeys.has(routeKey(route)));
-  const missingFromCodeAll = specRoutes.filter((route) => !codeKeys.has(routeKey(route)));
+  const missingFromSpecAll = codeRoutes.filter((route) => !routeKeys(route).every((key) => specKeys.has(key)));
+  const missingFromCodeAll = specRoutes.filter((route) => !routeKeys(route).every((key) => codeKeys.has(key)));
 
   // One entry per logical route: a route registered twice (e.g. middleware
   // then handler) or as '/a' and '/a/' is a single piece of drift.

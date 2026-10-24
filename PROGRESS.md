@@ -2175,3 +2175,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Small fix, no new task. Whitespace-only email normalizes to "" and simply finds no user.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, reviewer docDrift compareRoutes)
+
+**Done:** Baseline green, idle-streak 0. Branch (b): backlog has no open item (30, 32 BLOCKED); (a) skipped because the only unresolved questions are Vijay-only. Picked docDrift (`compareRoutes.js`, `parseOpenApi.js`, `httpMethods.js`, `generateDocDrift.js`) as least recently audited per PROGRESS.md mention counts. Found: an Express 4 optional-param route (`/users/:id?`) serves both `/users` and `/users/{id}`, but OpenAPI can only document two paths, so a fully documented route was reported as drift on both sides (same shape as the already-fixed regex-constraint false positive). Fixed test-first: `compareRoutes` expands optional params into their concrete forms; a code route counts as documented only if every form is in the spec, and a spec path counts as implemented if any code form covers it.
+
+**Decisions:** Handles `/:name?` only (no constraint-plus-optional combos, no `*`/`+` modifiers); no new guideline since this is not a recurrence of a numbered pattern.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

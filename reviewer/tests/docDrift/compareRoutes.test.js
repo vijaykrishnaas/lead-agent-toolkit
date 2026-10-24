@@ -127,3 +127,23 @@ describe('compareRoutes param-name independence', () => {
     expect(result.missingFromCode).toEqual([{ method: 'GET', path: '/c' }]);
   });
 });
+
+describe('compareRoutes optional params', () => {
+  it('treats an Express optional param (":id?") as covering both documented forms', () => {
+    const result = compareRoutes(
+      [{ method: 'GET', path: '/users/:id?' }],
+      [{ method: 'GET', path: '/users' }, { method: 'GET', path: '/users/{id}' }]
+    );
+    expect(result.missingFromSpec).toEqual([]);
+    expect(result.missingFromCode).toEqual([]);
+  });
+
+  it('still reports an optional-param route when only one form is documented', () => {
+    const result = compareRoutes(
+      [{ method: 'GET', path: '/users/:id?' }],
+      [{ method: 'GET', path: '/users' }]
+    );
+    expect(result.missingFromSpec).toEqual([{ method: 'GET', path: '/users/:id?' }]);
+    expect(result.missingFromCode).toEqual([]);
+  });
+});

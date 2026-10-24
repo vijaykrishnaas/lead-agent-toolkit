@@ -2272,3 +2272,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline. Noted, not actioned: `eval(` inside a string literal is flagged (comment-masked only, by design so the bracket form works); low-impact false positive.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 — Reviewer run (log-only review, runLog/docDrift hunt)
+**Done:** Baseline green (68), idle-streak 0. Reviewed 6c37141..HEAD: only PROGRESS.md/runs.jsonl changed (no code). Branch (b): hunted `scripts/runLog.js` (arg parsing, streak, missing-newline append) and `docDrift/parseOpenApi.js`, `docDrift/compareRoutes.js` (null/scalar path items, optional-param expansion incl. `/:id?` at root, param-name erasure): no defect.
+**Decisions:** No new task, guideline, or [FEATURE].
+**Open questions for Vijay:** Unchanged: loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

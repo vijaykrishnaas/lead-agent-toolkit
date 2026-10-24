@@ -11,6 +11,23 @@ function joinPath(prefix, routePath) {
   return trimmedPrefix + (routePath.startsWith('/') ? routePath : `/${routePath}`);
 }
 
+// Mirrors Node's require resolution for a relative router path: the exact
+// file, then <path>.js, then <path>/index.js (a directory require). Falls
+// back to the <path>.js guess when nothing is readable so the original
+// ENOENT still surfaces for a genuinely missing router.
+function resolveRouterPath(base, readFile) {
+  const candidates = base.endsWith('.js') ? [base] : [`${base}.js`, path.join(base, 'index.js')];
+  for (const candidate of candidates) {
+    try {
+      readFile(candidate);
+      return candidate;
+    } catch (err) {
+      if (err && err.code !== 'ENOENT') throw err;
+    }
+  }
+  return candidates[0];
+}
+
 // Recursively walks a source file's own direct routes and mounts, resolving
 // each mount to its required file and recursing into *that* file too — a
 // router file can itself mount a nested sub-router (router.use(prefix,
@@ -43,7 +60,7 @@ function collectFromFile(filePath, prefix, readFile, ancestors) {
     // A bare specifier (e.g. 'swagger-ui-express') is an npm package, not a
     // router file in this repo; resolving it as a path would throw ENOENT.
     if (!requirePath.startsWith('.')) continue;
-    const routerPath = path.resolve(fileDir, requirePath.endsWith('.js') ? requirePath : `${requirePath}.js`);
+    const routerPath = resolveRouterPath(path.resolve(fileDir, requirePath), readFile);
     const nested = collectFromFile(routerPath, joinPath(prefix, mountPrefix), readFile, nextAncestors);
     routes.push(...nested.routes);
     unparsedRoutes.push(...nested.unparsedRoutes);

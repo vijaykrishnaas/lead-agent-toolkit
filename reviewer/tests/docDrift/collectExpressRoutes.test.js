@@ -213,4 +213,16 @@ describe('collectExpressRoutes', () => {
     expect(routes).toEqual([{ method: 'GET', path: '/health' }]);
     expect(readFile).toHaveBeenCalledTimes(1);
   });
+  it('falls back to <dir>/index.js when a mounted require resolves to a directory', () => {
+    const files = {
+      [appEntryPath]: "const r = require('./routes');\napp.use('/x', r);",
+      [require('path').resolve(require('path').dirname(appEntryPath), 'routes/index.js')]: "router.get('/y', h);",
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
+    expect(routes).toEqual([{ method: 'GET', path: '/x/y' }]);
+  });
 });

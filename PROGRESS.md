@@ -2322,3 +2322,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline (single-module fix). Noted, not actioned: `markdownReport` sorts an unknown severity as NaN (rules only emit high/medium/low); bare URLs still autolink under GFM and can't be neutralized by escaping.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: review of c9b7dff)
+
+**Done:** Baseline green. idle-streak 0. Reviewed 8340142..780266e (`<` escape in `sanitizeMarkdownText`). Verified the regex, the new test, and that both sinks (`markdownReport`, `formatStandup`) go through the shared helper. `cli.js` over the range reports 0 issues.
+
+**Decisions:** No defect, fix, task, or feature. Considered `meta.range` in a code span (a git ref may contain a backtick), but it is operator-supplied and not diff-controlled, so no action.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

@@ -2354,3 +2354,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or guideline (single-module fix). `parseOpenApi` had no defect.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Reviewer run: review c831aa9..8263580)
+
+**Done:** Baseline green (sample-app 68; idle-streak 0). Reviewed 36fbc1f (`compareRoutes` optional param with regex constraint). `node reviewer/src/cli.js` reported 0 issues; manual read plus probes (constraint mid-path, `\d{2,3}`, nested group `((a|b))`, plain required constrained param, plain `:id?`) all compared clean. No defect found.
+
+**Decisions:** No fix, task or guideline needed; backlog stays empty.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); user-delete cascade/token question; please disable the scheduled tasks or add work.

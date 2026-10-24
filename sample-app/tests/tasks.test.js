@@ -65,6 +65,26 @@ describe('Tasks', () => {
     },
   );
 
+  test.each([['description', { description: { $ne: null } }], ['completed', { completed: 'yes' }]])(
+    'rejects a wrong-typed %s on update with a field-specific 400, without touching the database',
+    async (field, body) => {
+      const res = await request(app).put('/api/tasks/t1').set('Authorization', auth).send(body);
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(new RegExp(field));
+      expect(Task.findOneAndUpdate).not.toHaveBeenCalled();
+    },
+  );
+
+  test('rejects a non-string description on create without touching the database', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .set('Authorization', auth)
+      .send({ title: 'x', description: { $ne: null } });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/description/);
+    expect(Task.create).not.toHaveBeenCalled();
+  });
+
   test('lists tasks scoped to the owner', async () => {
     Task.find.mockResolvedValue([{ _id: 't1', title: 'A' }, { _id: 't2', title: 'B' }]);
     const res = await request(app).get('/api/tasks').set('Authorization', auth);

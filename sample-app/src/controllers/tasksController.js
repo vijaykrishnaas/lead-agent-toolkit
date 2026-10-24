@@ -7,10 +7,17 @@ function isValidTitle(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
+function isValidDescription(value) {
+  return typeof value === 'string';
+}
+
 async function create(req, res) {
   const { title, description } = req.body;
   if (!isValidTitle(title)) {
     return res.status(400).json({ error: 'title is required' });
+  }
+  if (description !== undefined && !isValidDescription(description)) {
+    return res.status(400).json({ error: 'description must be a string' });
   }
   const task = await Task.create({ title, description, owner: req.user.id });
   return res.status(201).json(task);
@@ -33,6 +40,12 @@ async function update(req, res) {
   const { title, description, completed } = req.body;
   if (title !== undefined && !isValidTitle(title)) {
     return res.status(400).json({ error: 'title must be a non-empty string' });
+  }
+  if (description !== undefined && !isValidDescription(description)) {
+    return res.status(400).json({ error: 'description must be a string' });
+  }
+  if (completed !== undefined && typeof completed !== 'boolean') {
+    return res.status(400).json({ error: 'completed must be a boolean' });
   }
   const task = await Task.findOneAndUpdate(
     { _id: req.params.id, owner: req.user.id },

@@ -2151,3 +2151,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Per-line masking only; a multi-line block comment's inner lines remain a known per-line limitation shared by all rules.
 
 **Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.
+
+## 2026-10-24 (Builder run: EMPTY-BACKLOG (b) hunt, sample-app tasksController)
+
+**Done:** Baseline green (reviewer 516, sample-app 61). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the least-referenced modules: `parseArgv`/`consumeFlagValue`/`parseGitHubRemote`/`httpMethods` (all sound, remote parser probed with 14 inputs) and sample-app `tasksController`. Found: `PUT /api/tasks/:id` with a wrong-typed `description` (e.g. `{"$ne":null}`) or `completed` (e.g. `"yes"`) reached Mongoose, surfacing as a CastError mapped to a misleading "Invalid id" 400; create had the same gap for `description`. Fixed test-first: field-specific 400s validated before any DB call (sample-app 64 green).
+
+**Decisions:** Mirrored the existing `isValidTitle` precedent. Mocked unit tests cannot show the CastError path, so the new tests assert the DB mock is untouched plus the field name in the error.
+
+**Open questions for Vijay:** Unchanged: the loop is live on an empty backlog (30, 32 BLOCKED); please disable the scheduled tasks or add work.

@@ -2573,3 +2573,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed d53a999..HEAD (PROGRESS/runs.jsonl only; CLI 0 issues). Baseline green (73). Branch taken: (b); re-read `standup/collectPullRequests.js` (pagination early-exit, MAX_PAGES loud failure, encodeURIComponent, invalid-date guard) — correct. No defect.
 - Decisions: no code change, no new tasks, no FEATURE task.
 - Open questions for Vijay: none new (tasks 30/32 still await unblock).
+
+## 2026-10-25 (Builder, 19:05) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/isTestFile.js` and `utils/defaultExecGit.js` (low PROGRESS mention counts among non-route modules): whole-segment test-dir matching, `.test/.spec` suffix incl. mjs/cjs/ts, and maxBuffer factory behave correctly. No defect, no code change.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers still enabled (no list_triggers tool in this session); tasks 30 and 32 still need your unblock.

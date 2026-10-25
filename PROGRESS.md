@@ -2513,3 +2513,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (sample-app 73), idle-streak 0. Reviewed 7b00192..1a40af5: only PROGRESS.md/runs.jsonl changed; CLI 0 issues. Branch (b): `rules/security.js` and `scripts/runLog.js` were already hunted 2026-10-24 (no defect), re-read, nothing new found. Branch (c) not needed. Noted, not tasked (no evidenced failure): `new Function(...)` is not flagged by the eval rule.
 **Decisions:** No code change, no new tasks.
 **Open questions for Vijay:** none new.
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/parseGitHubRemote.js` and `utils/isCodeFile.js` (lowest PROGRESS/SKILL_CHANGELOG mention counts among untouched utils). Probed 15 remote shapes (https/ssh/scp, creds, port, trailing slash/.git, uppercase .GIT, extra path segments, lookalike hosts, query string, empty owner): all parse or reject correctly. No defect, no code change.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

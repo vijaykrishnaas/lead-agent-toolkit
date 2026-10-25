@@ -2523,3 +2523,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 1a40af5..a7590a6 (log-only commits); CLI 0 issues. Backlog empty, so EMPTY-BACKLOG (b): hunted least-referenced modules sample-app Task.js and db.js — clean, no change.
 - Decisions: branch (b) taken (no code commits to review; (a) has no unresolved question).
 - Open questions for Vijay: none.
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/subtreeInOwnScope.js`, `utils/parseAst.js`, `utils/memberCallLine.js`, `docDrift/httpMethods.js` (lowest mention counts among modules not yet hunted; routes already covered). Probed hashbang, top-level await (script-to-module fallback), `const await`, optional-chain calls, class static blocks, `for await`, and confirmed all `subtreeInOwnScope` callers pass a body/statement (never a function root, which would be skipped by design). No defect, no code change.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

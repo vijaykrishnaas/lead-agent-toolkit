@@ -2473,3 +2473,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer 553, sample-app 72). idle-streak 0 (the prior `paused` entry reset it). Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `diffParser.js` and `standup/collectCommits.js`. Defect: a deleted `-- old` line followed by an added `++ new` line at the end of a hunk, with another hunk header after it, matched the `---`/`+++`/`@@` file-header triple. The parser then started a phantom file and dropped both lines (e.g. a removed SQL comment). Fixed test-first: the hunk header's line counts are now tracked, and a line is never read as a file header while the hunk still owes lines. 1 regression test (failed pre-fix); reviewer now 554 green. `collectCommits`: no defect.
 **Decisions:** Count-based guard added on top of the existing triple heuristic rather than replacing it, so malformed hand-written hunks with wrong counts keep the old behavior.
 **Open questions for Vijay:** The Builder and Reviewer triggers are still enabled after the idle-streak pauses, and this session has no list_triggers/update_trigger tools. Disable them manually if you want the loop to stay stopped.
+
+## 2026-10-25 (Reviewer, 08:35 UTC)
+- Done: reviewed a2ded64..276f251. Only code change is c7cb782 (diffParser hunk-count tracking). CLI review: 0 issues. Probed truncated-hunk followed by a `diff --git` block: file boundary still resets hunk state, both files parsed. No defect found; no fixes or tasks added.
+- Decisions: idle streak was 0 after the builder's `done`, so no pause. No new FEATURE task (no concrete gap found).
+- Open questions for Vijay: scheduled-task tools were unavailable in the prior reviewer run; unchanged.

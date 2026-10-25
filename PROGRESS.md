@@ -2533,3 +2533,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed a7590a6..8af4c75 (log/PROGRESS-only commits); CLI 0 issues. Backlog empty, so EMPTY-BACKLOG (b): hunted `utils/isTestFile.js` (14 path shapes: substring lookalikes, case, nested dirs, suffix variants) and `utils/defaultExecGit.js` — clean, no change.
 - Decisions: branch (b) taken (no code commits to review; (a) has only Vijay-only questions).
 - Open questions for Vijay: Builder/Reviewer triggers still enabled (this session lacks trigger tools); tasks 30 and 32 still need your unblock.
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `config/loadRuleConfig.js`, `config/buildRules.js`, `utils/resolveFileContent.js` (config loading and rule wrapping; no prior hunt entry). Read-through: invalid/scalar/list config values warn and fall back, missing file defaults, `buildRules` wrapper matches the `check(files)` interface every rule and `reviewer.js` use (RW4 `check(context)` change was never made, so no dropped argument). No defect, no code change.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

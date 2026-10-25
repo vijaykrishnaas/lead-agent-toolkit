@@ -2423,3 +2423,11 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed fa5f66d (surrogate-safe truncation) and ba6be83 (shared `defaultExecGit`, 256 MiB maxBuffer): both sound. Verified no remaining default `execFileSync` without maxBuffer in `reviewer/src`; the two root scripts were also raised. The reviewer CLI's 3 `missing-tests` findings are false positives (pure refactor to the shared factory, covered by `defaultExecGit.test.js`).
 - No bug reproduced, no task or feature added. Suite green (reviewer + sample-app).
 - Open questions for Vijay: none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+
+**Done:** Baseline green (reviewer 545, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `reviewer.js`, `format/markdownReport.js`, `standup/groupByAuthor.js`/`formatStandup.js`/`generateStandup.js`/`collectCommits.js`, `collectAddedLines.js`, sample-app `asyncHandler`/`server`/`db`/models (no defect), then `rules/missingTests.js`. Defect: the matching-test lookup counted a *deleted* test file as the source file's test, so changing `src/round.js` while deleting `tests/round.test.js` suppressed the missing-tests finding. Fixed test-first: deleted test files are excluded from the matched set. 1 regression test (failed pre-fix); reviewer now 546 green.
+
+**Decisions:** Only deleted test files are excluded; no new guideline (single-site, same shape as the existing `!f.deleted` source-file check).
+
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

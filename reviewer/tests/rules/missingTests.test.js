@@ -146,6 +146,26 @@ describe('missing-tests rule', () => {
     expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
   });
 
+  it('does not let a deleted test file count as the source file\'s test', () => {
+    const diff = [
+      'diff --git a/src/round.js b/src/round.js',
+      '--- a/src/round.js',
+      '+++ b/src/round.js',
+      '@@ -1,1 +1,2 @@',
+      ' a',
+      '+b',
+      'diff --git a/tests/round.test.js b/tests/round.test.js',
+      'deleted file mode 100644',
+      '--- a/tests/round.test.js',
+      '+++ /dev/null',
+      '@@ -1,1 +0,0 @@',
+      "-test('x', () => {});",
+    ].join('\n');
+    const issues = missingTestsRule.check(parseDiff(diff));
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({ file: 'src/round.js', severity: 'medium' });
+  });
+
   describe('malformed sourceDirs entries from config', () => {
     const files = parseDiff([
       'diff --git a/app/x.js b/app/x.js',

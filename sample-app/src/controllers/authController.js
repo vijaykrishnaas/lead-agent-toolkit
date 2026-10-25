@@ -81,6 +81,12 @@ async function login(req, res) {
     if (!isNonEmptyString(email) || !isNonEmptyString(password)) {
       return res.status(400).json({ error: 'email and password are required' });
     }
+    // Registration caps passwords at MAX_PASSWORD_BYTES, so no account can
+    // have a longer one; bcrypt would truncate and accept any string sharing
+    // the real password's first 72 bytes.
+    if (!isValidPassword(password)) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
     const user = await User.findOne({ email: normalizeEmail(email) });
     // Always run bcrypt.compare, even for an unknown email (against a fixed
     // dummy hash) — see DUMMY_PASSWORD_HASH above for why an early return

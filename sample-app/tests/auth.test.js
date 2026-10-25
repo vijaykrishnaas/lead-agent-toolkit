@@ -264,3 +264,20 @@ describe('Auth: blank email', () => {
     expect(User.create).not.toHaveBeenCalled();
   });
 });
+
+describe('Auth: login over-length password', () => {
+  test('login rejects a password sharing its first 72 bytes with the real one', async () => {
+    // Regression: bcrypt truncates at 72 bytes, so a longer string with the
+    // same 72-byte prefix as the registered password used to authenticate.
+    const app = createApp();
+    const real = 'a'.repeat(72);
+    User.findOne.mockResolvedValue({ _id: 'u1', name: 'A', email: 'a@b.com', password: await bcrypt.hash(real, 4) });
+
+    const ok = await request(app).post('/api/auth/login').send({ email: 'a@b.com', password: real });
+    expect(ok.status).toBe(200);
+
+    const res = await request(app).post('/api/auth/login').send({ email: 'a@b.com', password: real + 'extra' });
+    expect(res.status).toBe(401);
+    expect(res.body.token).toBeUndefined();
+  });
+});

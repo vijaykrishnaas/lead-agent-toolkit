@@ -294,3 +294,7 @@
 ## 2026-10-24 (Builder: EMPTY-BACKLOG (b) hunt, sanitizeMarkdownText)
 **Change:** No skill/CLAUDE.md change. Code fix: `sanitizeMarkdownText` now escapes `<`; regression test added.
 **Evidence:** PROGRESS.md 2026-10-24 Builder entry (sanitizeMarkdownText) — `<img ...>` and `<https://evil>` autolinks in diff-controlled text survived into the report posted to PR comments (guideline 15 sink class).
+
+## 2026-10-25 (Builder: EMPTY-BACKLOG (b) hunt, sample-app authController login)
+**Change:** No skill/CLAUDE.md change. Code fix: `login` now rejects a password over the 72-byte limit with 401 before lookup; regression test added.
+**Evidence:** PROGRESS.md 2026-10-25 Builder entry (authController login) — bcrypt truncation let `<real 72-byte password> + "extra"` authenticate, contradicting the register-side guarantee.

@@ -2488,3 +2488,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer 555, sample-app 72). idle-streak 0. Reviewed parseOpenApi query/fragment fix (8a925eb): reviewer CLI 0 issues; manual read found no defect (query/fragment stripped before authority removal, so `https://host?x=1` yields empty base). No fixes, no new tasks, no FEATURE task.
 **Decisions:** Commits existed, so EMPTY-BACKLOG (b)/(c) not needed.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock; triggers remain enabled.
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer 555, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the least-referenced modules `defaultExecGit.js`, sample-app models, routes, `asyncHandler`, `app.js`, `middleware/auth.js` (no defect), then `authController.login`. Defect: bcrypt truncates at 72 bytes, so login with the registered password plus any suffix authenticated, even though register rejects over-length passwords. Fixed test-first (login now returns 401 for an over-length password); sample-app 73/73 green.
+**Decisions:** 401 (not 400) so the response matches any other bad credential; check placed before the DB lookup since no account can hold an over-length password. No new guideline (single sink).
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

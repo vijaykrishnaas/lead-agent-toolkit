@@ -1,13 +1,10 @@
+const { isTestFile } = require('../utils/isTestFile');
 const { isCodeFile } = require('../utils/isCodeFile');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
 
 const VAR_DECLARATION = /(?:^|[;{}()])\s*var\s+/;
 const CONSOLE_LOG = /console\.log\s*\(/;
-
-function isTestFile(path) {
-  return /(^|\/)tests\//.test(path) || /\.(?:test|spec)\.[mc]?[jt]sx?$/.test(path);
-}
 
 // Matched against the line's string/comment-masked content, not the raw
 // text -- a string literal that merely *mentions* "console.log(" (e.g. a log

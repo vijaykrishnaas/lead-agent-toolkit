@@ -37,6 +37,20 @@ describe('missing-tests rule', () => {
     expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
   });
 
+  it('treats files under __tests__/ and test/ dirs as tests, not as untested source', () => {
+    for (const name of ['src/__tests__/helper.js', 'src/test/helper.js']) {
+      const diff = [
+        `diff --git a/${name} b/${name}`,
+        `--- a/${name}`,
+        `+++ b/${name}`,
+        '@@ -1,1 +1,2 @@',
+        ' module.exports = {};',
+        '+exports.noop = () => {};',
+      ].join('\n');
+      expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
+    }
+  });
+
   it('uses the default src/lib pattern when no sourceDirs option is given', () => {
     const diff = [
       'diff --git a/sample-app/src/controllers/widgetsController.js b/sample-app/src/controllers/widgetsController.js',

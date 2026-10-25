@@ -2431,3 +2431,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Only deleted test files are excluded; no new guideline (single-site, same shape as the existing `!f.deleted` source-file check).
 
 **Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+
+**Done:** Baseline green (reviewer 545, sample-app 72). idle-streak 1. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `sample-app` tasksController/auth middleware/app error handler (no defect) and `reviewer/src/rules/style.js`, `rules/index.js`, `utils/isCodeFile.js`, `docDrift/httpMethods.js`. Defect: `missingTests` and `style` each carried a private `isTestFile` that only recognized a `tests/` directory, so files under `__tests__/` or `test/` (jest/mocha layouts) were flagged for console.log and, under `src/`, treated as untested source. Fixed test-first with one shared `utils/isTestFile.js` (whole-segment `tests`/`test`/`__tests__` plus `.test`/`.spec` suffix) used by both rules; lookalike dirs (`latest/`, `contest/`) stay non-test.
+
+**Decisions:** Extracted a shared helper rather than patching two copies, since the duplicated pattern is what let them stay in step on the same gap. No new guideline (single-site).
+
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

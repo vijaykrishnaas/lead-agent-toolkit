@@ -50,6 +50,20 @@ describe('style rule', () => {
     }
   });
 
+  it('does not flag console.log in __tests__/ or test/ directories', () => {
+    for (const name of ['src/__tests__/a.js', 'test/a.js']) {
+      const diff = [
+        `diff --git a/${name} b/${name}`,
+        `--- a/${name}`,
+        `+++ b/${name}`,
+        '@@ -1,1 +1,2 @@',
+        " test('x', () => {",
+        '+  console.log("debugging");',
+      ].join('\n');
+      expect(styleRule.check(parseDiff(diff))).toHaveLength(0);
+    }
+  });
+
   it('does not flag a string literal that merely mentions "console.log(" as leftover debug code', () => {
     // Regression: CONSOLE_LOG matched raw line content, so a log/error
     // message string quoted verbatim into an added line (no actual

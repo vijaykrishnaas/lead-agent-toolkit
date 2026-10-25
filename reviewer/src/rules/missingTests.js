@@ -1,16 +1,11 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
+const { isTestFile } = require('../utils/isTestFile');
 const { maskComments } = require('../utils/maskStringLiterals');
 
-const TEST_FILE_PATTERN = /(^|\/)tests\//;
-const TEST_SUFFIX_PATTERN = /\.(test|spec)\.(js|jsx|mjs|cjs|ts|tsx)$/;
 // Only code files can need a test; a changed .css/.json/.md under src/ is not
 // a testable source file.
 const CODE_FILE_PATTERN = /\.(js|jsx|mjs|cjs|ts|tsx)$/;
 const DEFAULT_SOURCE_DIRS = ['src', 'lib'];
-
-function isTestFile(path) {
-  return TEST_FILE_PATTERN.test(path) || TEST_SUFFIX_PATTERN.test(path);
-}
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

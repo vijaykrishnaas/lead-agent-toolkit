@@ -2558,3 +2558,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the lowest-mention modules `sample-app` models (`User.js`, `db.js`) and routes (`auth.routes.js`, `users.routes.js`, `tasks.routes.js`), plus `scripts/resolvePushRange.js`. Read-through: `auth.routes.js` handlers are not wrapped in `asyncHandler`, but `register`/`login` catch everything internally (guideline 1 satisfied); users/tasks routes are wrapped and behind `auth`; the error middleware maps CastError/ValidationError/body-parser errors. `resolvePushRange` fallback chain (zero SHA, missing before, root commit) is correct. No defect, no code change.
 **Decisions:** No code change, no new guideline.
 **Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.
+
+## 2026-10-25 (Reviewer, :35) — EMPTY-BACKLOG (b)
+- Done: reviewed d397485..HEAD (PROGRESS/runs.jsonl only; CLI 0 issues). Branch taken: (b), no code commits to fix. Read through `utils/collectAddedLines.js` and `utils/memberCallLine.js` (trivial; computed-member and plain calls resolve to the right line). No defect.
+- Decisions: no code change, no new tasks, no FEATURE task.
+- Open questions for Vijay: none new.

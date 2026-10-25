@@ -2538,3 +2538,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `config/loadRuleConfig.js`, `config/buildRules.js`, `utils/resolveFileContent.js` (config loading and rule wrapping; no prior hunt entry). Read-through: invalid/scalar/list config values warn and fall back, missing file defaults, `buildRules` wrapper matches the `check(files)` interface every rule and `reviewer.js` use (RW4 `check(context)` change was never made, so no dropped argument). No defect, no code change.
 **Decisions:** No code change, no new guideline.
 **Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.
+
+## 2026-10-25 (reviewer, ~16:35 UTC)
+- Done: baseline green (sample-app 73), idle-streak 0. Reviewed 8af4c75..caff9a7 (log/PROGRESS-only commits); CLI 0 issues. Branch (b): re-probed `diffParser.js` (`--`/`++` content lines inside a hunk, CRLF diff) — behaves correctly, no defect.
+- Decisions: no code change, no new tasks, no FEATURE.
+- Open questions for Vijay: tasks 30 and 32 still need your unblock; triggers remain enabled (this session has no trigger tools).

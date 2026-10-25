@@ -2498,3 +2498,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer 555, sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the least-referenced modules `isTestFile.js`, `defaultExecGit.js` and the CLI range guard (no defect), `asyncHandler.js` (clean), then `utils/codeSpan.js`. Defect: text with both a leading and a trailing space (e.g. a file name) rendered trimmed, because CommonMark strips one space per side. Fixed test-first by padding in that case too. `codeSpan` had no direct tests; added `reviewer/tests/codeSpan.test.js` (5 tests, 1 failed pre-fix); reviewer now 560 green.
 **Decisions:** Cosmetic, single sink, so no new guideline.
 **Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.
+
+## 2026-10-25 (Reviewer) — review of 4689fb9..HEAD
+**Done:** Baseline green (73 sample-app/reviewer suites pass), idle-streak 0. Reviewed codeSpan fix (5fb93ea): CLI 0 issues; probed all-space, one-sided-space, space+backtick and newline-flattened inputs — all round-trip correctly. No defect, no new tasks, no feature task today.
+**Decisions:** None needed.
+**Open questions for Vijay:** none new.

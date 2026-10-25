@@ -2553,3 +2553,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed caff9a7..d397485 (log/PROGRESS only; CLI 0 issues). Branch taken: (b), no new code commits to fix. Hunted sanitizeMarkdownText.js (least recently hunted of the report utilities): backslash/bracket/paren/backtick/< escapes and newline collapse hold; no table sinks (so `|` is safe), CommonMark treats only \n/\r as line breaks. No defect.
 - Decisions: no code change, no new tasks, no FEATURE task.
 - Open questions for Vijay: none new.
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the lowest-mention modules `sample-app` models (`User.js`, `db.js`) and routes (`auth.routes.js`, `users.routes.js`, `tasks.routes.js`), plus `scripts/resolvePushRange.js`. Read-through: `auth.routes.js` handlers are not wrapped in `asyncHandler`, but `register`/`login` catch everything internally (guideline 1 satisfied); users/tasks routes are wrapped and behind `auth`; the error middleware maps CastError/ValidationError/body-parser errors. `resolvePushRange` fallback chain (zero SHA, missing before, root commit) is correct. No defect, no code change.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

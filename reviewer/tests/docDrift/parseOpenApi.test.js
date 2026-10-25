@@ -75,4 +75,11 @@ paths:
     const text = 'servers:\n  - url: //api.example.com/v1\npaths:\n  /users:\n    get: {}\n';
     expect(parseOpenApiSpec(text)).toEqual([{ method: 'GET', path: '/v1/users' }]);
   });
+
+  it('ignores a query string or fragment on the server url', () => {
+    for (const url of ['https://x.example.com/v1?key=1', 'https://x.example.com/v1/?a=b#top', '/v1#frag']) {
+      const text = `servers:\n  - url: "${url}"\npaths:\n  /users:\n    get: {}\n`;
+      expect(parseOpenApiSpec(text)).toEqual([{ method: 'GET', path: '/v1/users' }]);
+    }
+  });
 });

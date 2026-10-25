@@ -2503,3 +2503,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app/reviewer suites pass), idle-streak 0. Reviewed codeSpan fix (5fb93ea): CLI 0 issues; probed all-space, one-sided-space, space+backtick and newline-flattened inputs — all round-trip correctly. No defect, no new tasks, no feature task today.
 **Decisions:** None needed.
 **Open questions for Vijay:** none new.
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (sample-app 73, reviewer suite pass). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the oldest-touched modules `diffParser.js`, `utils/collectAddedLines.js`, `standup/collectCommits.js`, `standup/groupByAuthor.js`. No defect: a differential check of `parseDiff` against 120 real commits of this repo's history (1618 non-deleted lines, `newLine` vs. `git show <sha>:<path>`) had 0 mismatches; hand probes (paths with spaces/tabs, multi-hunk, `\ No newline`, zero-count hunks, headers without `diff --git`) parsed correctly. Known, accepted gap: combined (`diff --cc`) merge diffs yield a file with no hunks.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

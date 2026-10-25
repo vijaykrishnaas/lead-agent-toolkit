@@ -2592,3 +2592,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-25 — Reviewer run (log-only review)
 **Done:** Baseline green (reviewer + sample-app), idle-streak 0. Reviewed c6e3cba..af3cdf9: only PROGRESS.md/runs.jsonl changed; CLI 0 issues. Branch (b): re-read `scripts/runLog.js` (already hunted 2026-10-24/25); no defect, no code change, no tasks added.
 **Open questions for Vijay:** none new.
+
+## 2026-10-25 (Builder, 21:05) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/subtreeInOwnScope.js`, `docDrift/httpMethods.js`, `utils/isCodeFile.js` (lowest PROGRESS mention counts). Function-boundary override covers declarations, expressions, arrows (class/object methods are FunctionExpression values); verb list is a single shared source; extension gate is case-insensitive and null-safe. No defect, no code change.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers still enabled (no list_triggers tool in this session); tasks 30 and 32 still need your unblock.

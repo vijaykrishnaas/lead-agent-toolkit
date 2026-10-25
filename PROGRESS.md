@@ -2455,3 +2455,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Small fix, no new task or guideline (guideline 15 covers it). No `[FEATURE]` added. Remaining raw sinks (`**${file}**` bold in markdownReport) are already sanitized by `sanitizeMarkdownText`.
 
 **Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-25 (Reviewer) — idle backoff pause
+
+**Done:** Baseline green (72 sample-app tests). `idle-streak` printed 3, so per SCHEDULED LOOP step 2 appended a `paused` entry to runs.jsonl and stopped without review work (only log commits since the last reviewed code).
+
+**Decisions:** Pause rather than hunt further; the last three runs were noops.
+
+**Open questions for Vijay:** (1) The `list_triggers`/`update_trigger` tools were not available in this session, so I could NOT disable "lead-agent Builder" and "lead-agent Reviewer" — please disable them (or re-enable after adding work). (2) Tasks 30 and 32 still need your unblock; the backlog is empty otherwise.

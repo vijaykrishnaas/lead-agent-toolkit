@@ -2543,3 +2543,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (sample-app 73), idle-streak 0. Reviewed 8af4c75..caff9a7 (log/PROGRESS-only commits); CLI 0 issues. Branch (b): re-probed `diffParser.js` (`--`/`++` content lines inside a hunk, CRLF diff) — behaves correctly, no defect.
 - Decisions: no code change, no new tasks, no FEATURE.
 - Open questions for Vijay: tasks 30 and 32 still need your unblock; triggers remain enabled (this session has no trigger tools).
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/codeSpan.js`, `utils/parseArgv.js`, `utils/consumeFlagValue.js` (lowest PROGRESS mention counts after the already-hunted isTestFile/defaultExecGit). Probed codeSpan with backtick runs at start/end/middle, space-padded, whitespace-only, newline, and non-string inputs: all output matches CommonMark. parseArgv: prototype-name flags (`--toString`, `--__proto__`), `--a=1`, `-` positional, boolean flags, required checks all behave correctly. Only nit: `codeSpan('')` yields "``", which renders as literal backticks; no caller can pass an empty value, so not changed.
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

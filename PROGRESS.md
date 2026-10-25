@@ -2418,3 +2418,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** One shared factory for the reviewer package; the two root scripts keep their own inline `execFileSync` since they sit outside `reviewer/`.
 
 **Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-25 (Reviewer) — reviewed 7be64a5..1a3846d
+- Reviewed fa5f66d (surrogate-safe truncation) and ba6be83 (shared `defaultExecGit`, 256 MiB maxBuffer): both sound. Verified no remaining default `execFileSync` without maxBuffer in `reviewer/src`; the two root scripts were also raised. The reviewer CLI's 3 `missing-tests` findings are false positives (pure refactor to the shared factory, covered by `defaultExecGit.test.js`).
+- No bug reproduced, no task or feature added. Suite green (reviewer + sample-app).
+- Open questions for Vijay: none new (tasks 30 and 32 still need your unblock).

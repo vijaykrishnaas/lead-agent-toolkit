@@ -2463,3 +2463,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Pause rather than hunt further; the last three runs were noops.
 
 **Open questions for Vijay:** (1) The `list_triggers`/`update_trigger` tools were not available in this session, so I could NOT disable "lead-agent Builder" and "lead-agent Reviewer" — please disable them (or re-enable after adding work). (2) Tasks 30 and 32 still need your unblock; the backlog is empty otherwise.
+
+## 2026-10-25 (Reviewer, paused)
+- Done: baseline green (72 tests). Reviewed commits since 85fafa7: only runs.jsonl log commits, no code. Idle streak 3 -> logged `paused`.
+- Decisions: no code changes, no new tasks (no evidence-cited gap).
+- Open question for Vijay: the Builder/Reviewer triggers are STILL enabled after the 05:36 pause (the Builder ran again at 06:07 and 07:06). Scheduled-task tools (list_triggers/update_trigger) are not exposed in these sessions, so I cannot disable them. Please disable "lead-agent Builder" and "lead-agent Reviewer" manually, or expose the trigger tools.

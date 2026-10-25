@@ -2518,3 +2518,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/parseGitHubRemote.js` and `utils/isCodeFile.js` (lowest PROGRESS/SKILL_CHANGELOG mention counts among untouched utils). Probed 15 remote shapes (https/ssh/scp, creds, port, trailing slash/.git, uppercase .GIT, extra path segments, lookalike hosts, query string, empty owner): all parse or reject correctly. No defect, no code change.
 **Decisions:** No code change, no new guideline.
 **Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.
+
+## 2026-10-25 (reviewer, ~14:35 UTC)
+- Done: reviewed 1a40af5..a7590a6 (log-only commits); CLI 0 issues. Backlog empty, so EMPTY-BACKLOG (b): hunted least-referenced modules sample-app Task.js and db.js — clean, no change.
+- Decisions: branch (b) taken (no code commits to review; (a) has no unresolved question).
+- Open questions for Vijay: none.

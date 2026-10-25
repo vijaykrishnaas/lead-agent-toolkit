@@ -2563,3 +2563,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed d397485..HEAD (PROGRESS/runs.jsonl only; CLI 0 issues). Branch taken: (b), no code commits to fix. Read through `utils/collectAddedLines.js` and `utils/memberCallLine.js` (trivial; computed-member and plain calls resolve to the right line). No defect.
 - Decisions: no code change, no new tasks, no FEATURE task.
 - Open questions for Vijay: none new.
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `standup/collectCommits.js`, `standup/groupByAuthor.js`, `docDrift/compareRoutes.js` (constrained/optional params, trailing slashes, positional param names, CRLF/separator in subjects) — all behave correctly; only oddity is `/a//` normalizing to `/a/` (unrealistic route, not worth code).
+**Decisions:** No code change, no new guideline.
+**Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.

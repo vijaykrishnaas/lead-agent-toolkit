@@ -2611,3 +2611,9 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-25 — Reviewer run (log-only review, 22:35)
 **Done:** Baseline green (73), idle-streak 0. Reviewed 31bde60..HEAD: only PROGRESS.md/runs.jsonl changed; CLI 0 issues. Branch (b): re-read `scripts/resolvePushRange.js` (zero-SHA, missing-before and missing-parent fallbacks, empty-tree last resort); correct, no defect, no code change, no tasks added.
 **Open questions for Vijay:** none new.
+
+## 2026-10-25 — Builder (EMPTY-BACKLOG branch b)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `sample-app` `models/Task.js`, `models/User.js`, `routes/auth.routes.js`, `routes/tasks.routes.js`, `config/db.js` (lowest PROGRESS mention counts). Auth handlers self-wrap in try/catch (guideline 1 satisfied without asyncHandler); schema normalization matches `normalizeEmail`; Express 4 gives `req.body = {}` so destructuring cannot throw. Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

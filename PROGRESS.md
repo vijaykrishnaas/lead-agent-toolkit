@@ -2601,3 +2601,9 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-25 — Reviewer run (log-only review, 22:35)
 **Done:** Baseline green (73), idle-streak 0. Reviewed af3cdf9..HEAD: only PROGRESS.md/runs.jsonl changed; CLI 0 issues. Branch (b): re-read `utils/consumeFlagValue.js` and `utils/parseGitHubRemote.js`; behavior matches guidelines 7 and 6; no defect, no code change, no tasks added.
 **Open questions for Vijay:** none new.
+
+## 2026-10-25 — Builder (EMPTY-BACKLOG branch b)
+
+**Done:** Baseline green (root `npm test`). TASKS.md has no open item; branch (a) skipped (no unresolved open question not already decided); took (b). Hunted `sample-app/src/controllers/tasksController.js`, `app.js` error middleware and `asyncHandler.js` (not touched by a recent hunt): owner scoping on every query, type validation before `$set`, no mass assignment, CastError/ValidationError mapped to 400, rejected promises routed to the catch-all. Clean, no defect, no code change.
+**Decisions:** No speculative edits (CLAUDE.md bar).
+**Open questions for Vijay:** none new.

@@ -232,3 +232,4 @@
 {"ts":"2026-10-25T20:07:06.125Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"667d594","summary":"Backlog empty; (a) skipped. Hunted loadRules/loadRuleConfig/parseAst: clean, no defect, no code change."}
 {"ts":"2026-10-25T20:36:18.676Z","trigger":"reviewer","outcome":"done","task":"REVIEW","tests":"green","sha":"af3cdf9","summary":"Reviewed c6e3cba..af3cdf9 (log-only); CLI 0 issues; runLog re-read, no defect, no tasks."}
 {"ts":"2026-10-25T21:08:04.674Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"c98669d","summary":"Backlog empty; (a) skipped. Hunted subtreeInOwnScope/httpMethods/isCodeFile: clean, no defect, no code change."}
+{"ts":"2026-10-25T21:36:05.170Z","trigger":"reviewer","outcome":"done","task":"REVIEW","tests":"green","sha":"31bde60","summary":"Reviewed af3cdf9..31bde60 (log-only); CLI 0 issues; re-read consumeFlagValue/parseGitHubRemote, no defect, no tasks."}

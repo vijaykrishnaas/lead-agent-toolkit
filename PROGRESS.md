@@ -2528,3 +2528,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer + sample-app 73). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `utils/subtreeInOwnScope.js`, `utils/parseAst.js`, `utils/memberCallLine.js`, `docDrift/httpMethods.js` (lowest mention counts among modules not yet hunted; routes already covered). Probed hashbang, top-level await (script-to-module fallback), `const await`, optional-chain calls, class static blocks, `for await`, and confirmed all `subtreeInOwnScope` callers pass a body/statement (never a function root, which would be skipped by design). No defect, no code change.
 **Decisions:** No code change, no new guideline.
 **Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.
+
+## 2026-10-25 (reviewer, ~15:35 UTC)
+- Done: reviewed a7590a6..8af4c75 (log/PROGRESS-only commits); CLI 0 issues. Backlog empty, so EMPTY-BACKLOG (b): hunted `utils/isTestFile.js` (14 path shapes: substring lookalikes, case, nested dirs, suffix variants) and `utils/defaultExecGit.js` — clean, no change.
+- Decisions: branch (b) taken (no code commits to review; (a) has only Vijay-only questions).
+- Open questions for Vijay: Builder/Reviewer triggers still enabled (this session lacks trigger tools); tasks 30 and 32 still need your unblock.

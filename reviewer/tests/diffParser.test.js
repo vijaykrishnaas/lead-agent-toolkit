@@ -158,4 +158,24 @@ describe('parseDiff', () => {
     expect(lines[2]).toMatchObject({ newLine: 3 });
     expect(lines[3]).toMatchObject({ newLine: 4, oldLine: 3 });
   });
+
+  it('keeps a deleted "-- x" / added "++ y" pair at a hunk end as content, not a file header', () => {
+    const diff = [
+      'diff --git a/x.js b/x.js',
+      '--- a/x.js',
+      '+++ b/x.js',
+      '@@ -1,2 +1,2 @@',
+      ' a',
+      '--- old',
+      '+++ new',
+      '@@ -10,1 +10,2 @@',
+      ' b',
+      '+c',
+      '',
+    ].join('\n');
+    const files = parseDiff(diff);
+    expect(files.map((f) => f.file)).toEqual(['x.js']);
+    expect(files[0].hunks).toHaveLength(2);
+    expect(files[0].hunks[0].lines.map((l) => l.type)).toEqual(['context', 'del', 'add']);
+  });
 });

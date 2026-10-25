@@ -3,6 +3,8 @@ function parseHunkHeader(line) {
   if (!match) return null;
   return {
     oldStart: parseInt(match[1], 10),
+    oldCount: match[2] === undefined ? 1 : parseInt(match[2], 10),
+    newCount: match[4] === undefined ? 1 : parseInt(match[4], 10),
     newStart: parseInt(match[3], 10),
   };
 }
@@ -41,10 +43,15 @@ function parseDiff(diffText) {
   let currentHunk = null;
   let oldLine = 0;
   let newLine = 0;
+  // Lines the current hunk header still promises; while any remain, a line is
+  // hunk content even if it looks like a `--- `/`+++ ` file header.
+  let oldLeft = 0;
+  let newLeft = 0;
 
   // A `--- `/`+++ ` line is a file header only as a `---`,`+++`,`@@` triple;
   // inside a hunk it is a deleted `-- x` / added `++ x` content line.
   const isFileHeaderStart = (i) =>
+    !(currentHunk && (oldLeft > 0 || newLeft > 0)) &&
     lines[i].startsWith('--- ') && lines[i + 1] !== undefined && lines[i + 1].startsWith('+++ ') &&
     (lines[i + 2] === undefined || lines[i + 2].startsWith('@@') || !currentHunk);
 
@@ -75,6 +82,8 @@ function parseDiff(diffText) {
       if (!header || !currentFile) continue;
       oldLine = header.oldStart;
       newLine = header.newStart;
+      oldLeft = header.oldCount;
+      newLeft = header.newCount;
       currentHunk = { header: rawLine, lines: [] };
       currentFile.hunks.push(currentHunk);
       continue;
@@ -88,16 +97,22 @@ function parseDiff(diffText) {
       currentHunk.lines.push({ type: 'context', content: '', newLine, oldLine });
       newLine += 1;
       oldLine += 1;
+      oldLeft -= 1;
+      newLeft -= 1;
     } else if (rawLine.startsWith('+')) {
       currentHunk.lines.push({ type: 'add', content: rawLine.slice(1), newLine, oldLine: null });
       newLine += 1;
+      newLeft -= 1;
     } else if (rawLine.startsWith('-')) {
       currentHunk.lines.push({ type: 'del', content: rawLine.slice(1), newLine: null, oldLine });
       oldLine += 1;
+      oldLeft -= 1;
     } else if (rawLine.startsWith(' ')) {
       currentHunk.lines.push({ type: 'context', content: rawLine.slice(1), newLine, oldLine });
       newLine += 1;
       oldLine += 1;
+      oldLeft -= 1;
+      newLeft -= 1;
     }
   }
 

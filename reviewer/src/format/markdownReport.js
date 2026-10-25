@@ -1,4 +1,5 @@
 const { sanitizeMarkdownText } = require('../utils/sanitizeMarkdownText');
+const { codeSpan } = require('../utils/codeSpan');
 
 const SEVERITY_ORDER = { high: 0, medium: 1, low: 2 };
 
@@ -30,7 +31,7 @@ function formatMarkdownReport(result, meta = {}) {
   const { risk, issues } = result;
   const lines = ['# Code Review Report', ''];
 
-  if (meta.range) lines.push(`**Range:** \`${meta.range}\``);
+  if (meta.range) lines.push(`**Range:** ${codeSpan(meta.range)}`);
   lines.push(`**Risk:** ${risk}`, `**Issues found:** ${issues.length}`, '');
 
   if (issues.length === 0) {

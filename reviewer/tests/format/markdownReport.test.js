@@ -85,4 +85,9 @@ describe('formatMarkdownReport', () => {
     const report = formatMarkdownReport(result);
     expect(report).toContain('\\*\\*injected\\*\\*.js');
   });
+
+  it('code-span-escapes the range so a backtick cannot break out of the header span', () => {
+    const report = formatMarkdownReport({ issues: [] }, { range: 'a`b..c' });
+    expect(report).toContain('**Range:** ``a`b..c``');
+  });
 });

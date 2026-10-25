@@ -2447,3 +2447,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Reused the existing `codeSpan` helper; no new guideline (guideline 15 already covers it).
 
 **Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-25 (Reviewer) — review 68cf4b0..4c6a06a
+
+**Done:** Baseline green (reviewer 552, sample-app 72); idle-streak 0. Reviewed `4c6a06a` (docDrift header paths via `codeSpan`): sound. Skeptical sibling-sink check (guideline 15): `markdownReport.js` still interpolated `meta.range` in raw backticks, and git ref names may contain backticks, so a crafted range could break out of the span. Fixed test-first: extracted `codeSpan` to `reviewer/src/utils/codeSpan.js`, used in both formatters; 1 regression test; reviewer now 553 green.
+
+**Decisions:** Small fix, no new task or guideline (guideline 15 covers it). No `[FEATURE]` added. Remaining raw sinks (`**${file}**` bold in markdownReport) are already sanitized by `sanitizeMarkdownText`.
+
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

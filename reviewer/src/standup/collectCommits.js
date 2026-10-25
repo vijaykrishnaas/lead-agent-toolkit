@@ -1,4 +1,4 @@
-const { execFileSync } = require('child_process');
+const { defaultExecGit } = require('../utils/defaultExecGit');
 
 const FIELD_SEP = '\x1f';
 
@@ -6,7 +6,7 @@ const FIELD_SEP = '\x1f';
 // string), one record per commit: { hash, author, date, message }.
 // `deps.execGit` is injectable so tests never shell out to real git.
 function collectCommits({ repo = process.cwd(), since } = {}, deps = {}) {
-  const execGit = deps.execGit || ((gitArgs, cwd) => execFileSync('git', gitArgs, { cwd, encoding: 'utf8' }));
+  const execGit = deps.execGit || defaultExecGit();
 
   if (!since) {
     throw new Error('Missing since — a Date or ISO date string is required.');

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { execFileSync } = require('child_process');
+const { defaultExecGit } = require('./utils/defaultExecGit');
 const { reviewDiff } = require('./reviewer');
 const { loadRules, DEFAULT_CONFIG_PATH } = require('./config/loadRules');
 const { formatMarkdownReport } = require('./format/markdownReport');
@@ -32,7 +32,7 @@ function parseArgs(argv) {
 // deps are injectable so tests can avoid shelling out to real git / hitting the real
 // filesystem for config and output.
 function runCli(argv, deps = {}) {
-  const execGit = deps.execGit || ((gitArgs, cwd) => execFileSync('git', gitArgs, { cwd, encoding: 'utf8' }));
+  const execGit = deps.execGit || defaultExecGit();
   const loadRulesFn = deps.loadRules || loadRules;
   const reviewDiffFn = deps.reviewDiff || reviewDiff;
   const formatReport = deps.formatMarkdownReport || formatMarkdownReport;

@@ -2411,3 +2411,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 0c24f37 (protocol-relative server url) and 9be916a (65536-char comment truncation): both sound; suite green (reviewer 544, sample-app 72).
 - Gap reproduced in 9be916a: the truncation `slice` could cut an emoji's surrogate pair in half, leaving a lone surrogate in the posted JSON body. Fixed test-first (cut backs off one unit when it would land after a high surrogate).
 - Open questions for Vijay: none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+**Done:** Baseline green (reviewer 544, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the low-audit utils (`parseArgv`, `consumeFlagValue`, `parseAst`, `resolveFileContent`, `memberCallLine`, `isCodeFile`, `scripts/runLog.js`): no defect there, but their shared caller pattern had one. Defect: every default `execGit` used `execFileSync` with Node's 1 MiB `maxBuffer`, so a large `git diff`/`git log` threw ENOBUFS and the whole review/standup failed (confirmed: a 3 MB output fails with ENOBUFS). Fixed test-first: new `utils/defaultExecGit.js` (256 MiB buffer) used by `cli.js`, `reviewPrCli.js`, `collectCommits.js`; same `maxBuffer` set in `scripts/invariantLint.js` and `scripts/resolvePushRange.js`. 1 new test; reviewer now 545 green.
+
+**Decisions:** One shared factory for the reviewer package; the two root scripts keep their own inline `execFileSync` since they sit outside `reviewer/`.
+
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

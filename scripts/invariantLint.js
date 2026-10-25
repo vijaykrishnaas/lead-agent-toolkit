@@ -211,7 +211,7 @@ function main() {
     console.error('Usage: node scripts/invariantLint.js <base>..<head>');
     process.exit(2);
   }
-  const execGit = (gitArgs) => execFileSync('git', gitArgs, { encoding: 'utf8' });
+  const execGit = (gitArgs) => execFileSync('git', gitArgs, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
 
   let violations;
   try {

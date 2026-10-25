@@ -30,7 +30,7 @@ function resolvePushRange({ before, after, execGit }) {
 }
 
 function main() {
-  const execGit = (gitArgs) => execFileSync('git', gitArgs, { encoding: 'utf8' });
+  const execGit = (gitArgs) => execFileSync('git', gitArgs, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
   const range = resolvePushRange({
     before: process.env.PUSH_BEFORE_SHA || '',
     after: process.env.PUSH_AFTER_SHA || '',

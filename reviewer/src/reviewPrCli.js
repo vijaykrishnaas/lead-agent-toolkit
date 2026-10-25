@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { execFileSync } = require('child_process');
+const { defaultExecGit } = require('./utils/defaultExecGit');
 const { reviewDiff } = require('./reviewer');
 const { loadRules, DEFAULT_CONFIG_PATH } = require('./config/loadRules');
 const { formatMarkdownReport } = require('./format/markdownReport');
@@ -61,7 +61,7 @@ function parseReviewPrArgs(argv, inferRepo) {
 // guarded (per CLAUDE.md's runCli-style-entry-point guideline) so an unexpected
 // throw from any stage still returns a clean exit code plus a stderr message.
 async function runReviewPrCli(argv, deps = {}) {
-  const execGit = deps.execGit || ((gitArgs, cwd) => execFileSync('git', gitArgs, { cwd, encoding: 'utf8' }));
+  const execGit = deps.execGit || defaultExecGit();
   const loadRulesFn = deps.loadRules || loadRules;
   const reviewDiffFn = deps.reviewDiff || reviewDiff;
   const formatReport = deps.formatMarkdownReport || formatMarkdownReport;

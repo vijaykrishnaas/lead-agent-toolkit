@@ -33,8 +33,8 @@ function formatDocDriftReport(result, meta = {}) {
   const { missingFromSpec, missingFromCode, unparsedRoutes = [] } = result;
   const lines = ['# Doc Drift Report', ''];
 
-  if (meta.app) lines.push(`**Routes source:** \`${meta.app}\``);
-  if (meta.openapi) lines.push(`**OpenAPI spec:** \`${meta.openapi}\``);
+  if (meta.app) lines.push(`**Routes source:** ${codeSpan(meta.app)}`);
+  if (meta.openapi) lines.push(`**OpenAPI spec:** ${codeSpan(meta.openapi)}`);
   if (meta.app || meta.openapi) lines.push('');
 
   if (missingFromSpec.length === 0 && missingFromCode.length === 0 && unparsedRoutes.length === 0) {

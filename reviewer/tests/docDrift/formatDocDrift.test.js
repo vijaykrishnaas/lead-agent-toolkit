@@ -118,4 +118,14 @@ describe('formatDocDriftReport', () => {
     expect(out).toContain('- ``GET /a` ## Forged``');
     expect(out).toContain('- ``x`y.js:3`` (r)');
   });
+
+  it('code-span-escapes the header meta paths so a backtick/newline cannot forge report lines', () => {
+    const report = formatDocDriftReport(
+      { missingFromSpec: [], missingFromCode: [] },
+      { app: 'a`b\n## Forged', openapi: 'x`y.yaml' },
+    );
+    expect(report).toContain('**Routes source:** ``a`b ## Forged``');
+    expect(report).toContain('**OpenAPI spec:** ``x`y.yaml``');
+    expect(report.split('\n').some((l) => l.startsWith('## Forged'))).toBe(false);
+  });
 });

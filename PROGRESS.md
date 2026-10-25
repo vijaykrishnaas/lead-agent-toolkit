@@ -2439,3 +2439,11 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Extracted a shared helper rather than patching two copies, since the duplicated pattern is what let them stay in step on the same gap. No new guideline (single-site).
 
 **Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-25 (Builder) — EMPTY-BACKLOG (b)
+
+**Done:** Baseline green (reviewer 551, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted `docDriftCli.js`, `standupCli.js`, `standup/collectCommits.js`, `collectPullRequests.js` (no defect) and `docDrift/formatDocDrift.js`. Defect: the report header interpolated `--app`/`--openapi` paths in raw backticks, so a path containing a backtick or newline could break out of the span and forge report lines; the route lines already used `codeSpan` (guideline 15, same sink class). Fixed test-first: header paths now go through `codeSpan`. 1 regression test (failed pre-fix); reviewer now 552 green.
+
+**Decisions:** Reused the existing `codeSpan` helper; no new guideline (guideline 15 already covers it).
+
+**Open questions for Vijay:** none new (tasks 30 and 32 still need your unblock).

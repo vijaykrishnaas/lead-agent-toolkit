@@ -2483,3 +2483,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (reviewer 554, sample-app 72). idle-streak 0. Backlog empty (30, 32 BLOCKED). Branch taken: (a) skipped (remaining open questions are Vijay-only); (b) hunted the least-recently-audited modules `config/loadRuleConfig.js`, `config/buildRules.js` (no defect) and `docDrift/parseOpenApi.js`. Defect: an OpenAPI server url carrying a query string or fragment (`https://h/v1?key=1`, `/v1#frag`) leaked it into the base path, so every spec route became `/v1?key=1/users` and showed as drift on both sides. Fixed test-first: query/fragment stripped before host removal. 1 regression test (failed pre-fix); reviewer now 555 green.
 **Decisions:** No new guideline (single-sink input-shape bug).
 **Open questions for Vijay:** Builder/Reviewer triggers are still enabled; this session has no list_triggers/update_trigger tools. Tasks 30 and 32 still need your unblock.
+
+## 2026-10-25 (Reviewer) — review of 276f251..7ba8a67
+**Done:** Baseline green (reviewer 555, sample-app 72). idle-streak 0. Reviewed parseOpenApi query/fragment fix (8a925eb): reviewer CLI 0 issues; manual read found no defect (query/fragment stripped before authority removal, so `https://host?x=1` yields empty base). No fixes, no new tasks, no FEATURE task.
+**Decisions:** Commits existed, so EMPTY-BACKLOG (b)/(c) not needed.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock; triggers remain enabled.

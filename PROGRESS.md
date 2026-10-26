@@ -2816,3 +2816,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (566 reviewer / 73 sample-app), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `reviewer/src/rules/style.js` and `utils/collectAddedLines.js` (least recently hunted). `VAR_DECLARATION` missed `var` after a `case x:`/`default:` label or a braceless `else`/`do` (e.g. `case 1: var x = 1;`), so those were never flagged. Fixed test-first (reproduced failing test), regex now also accepts `:`, `else`, `do` before `var`. `collectAddedLines.js` clean.
 **Decisions:** Fix kept to the one regex; `{ var: 1 }`/`exports.var` still not flagged (asserted in test).
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Reviewer (EMPTY-BACKLOG branch b, 18:35)
+
+**Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Reviewed fc672b7..5c57128 (bbedd47 style.js `VAR_DECLARATION` fix re-read manually: `:`/`else`/`do` prefixes don't false-positive on `{ var: 1 }`, `variable`, or `undo var`; CLI 0 issues). Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `utils/consumeFlagValue.js`, `parseArgv.js`, `memberCallLine.js` (least recent PROGRESS mentions): clean, no change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

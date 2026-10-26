@@ -2799,3 +2799,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (565 reviewer / 73 sample-app), idle-streak 0. Reviewed 1260eb5..c8991a7 (log/PROGRESS-only; CLI 0 issues). Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `missingTests.js` vs `utils/isCodeFile.js`: missingTests kept a private `CODE_FILE_PATTERN` lacking `.mts`/`.cts`, so an untested `src/a.mts` was never flagged. Fixed test-first (reproduced 2 failing cases), now shares `isCodeFile`. `security.js` read: clean.
 **Decisions:** Small local fix, no TASKS.md item, no skill/CLAUDE.md change so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 17:05)
+
+**Done:** Baseline green (73 sample-app), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted the least-recently-hunted modules by last PROGRESS.md mention: `reviewer/src/utils/statementWalk.js` (last 2690; check-before-scan ordering, `startColumn` slicing and quote-state threading all consistent) and `utils/parseAst.js` (last 2696; hashbang, BOM, CRLF, HTML-comment, top-level await and ESM-fallback inputs all parse). Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

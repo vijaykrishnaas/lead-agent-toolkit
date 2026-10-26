@@ -147,4 +147,22 @@ describe('style rule', () => {
     const issues = styleRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1, 2, 3]);
   });
+
+  it('matches console.log as a whole token, including spaced and optional-chained forms', () => {
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -0,0 +1,6 @@',
+      '+mockconsole.log(x);',
+      '+const $console = { log() {} }; $console.log(x);',
+      '+console . log(x);',
+      '+console?.log(x);',
+      '+window.console.log(x);',
+      '+console.log(x);',
+      '',
+    ].join('\n');
+    const issues = styleRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([3, 4, 5, 6]);
+  });
 });

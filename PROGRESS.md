@@ -2853,3 +2853,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 720ca94..8f3ab63 (missingTests comment-masking, errorHandling try/finally fix): clean, CLI reports 0 issues, baseline green. Hunted (EMPTY-BACKLOG b) parseArgv/consumeFlagValue/resolvePushRange/collectAddedLines: clean, no change.
 - Decisions: no new tasks or FEATURE (no concrete gap found); branch (b) taken because backlog has only BLOCKED items 30/32.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED (invariantLint approval; fastdl.mongodb.org allowlist).
+
+## 2026-10-26 (Builder, ~22:10 UTC)
+**Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `reviewer/src/rules/style.js` (least recently mentioned rule module, last in SKILL_CHANGELOG line 56). Found and fixed (test-first, red then green): `CONSOLE_LOG` had no left word boundary, so `mockconsole.log(`/`$console.log(` were flagged, and it missed `console . log(` and `console?.log(`. Now `(?<![\w$])console\s*\??\.\s*log\s*\(`. 1 new regression test. Noted but not fixed: `x /* c */ var y` is missed by VAR_DECLARATION (rare).
+**Decisions:** invariantLint.js and scripts/syncPlugin.js are older mentions but are not rule modules; style.js chosen as the diff-scanning code with open guideline-13 risk.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

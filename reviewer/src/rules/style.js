@@ -4,7 +4,7 @@ const { collectAddedLines } = require('../utils/collectAddedLines');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
 
 const VAR_DECLARATION = /(?:^|[;{}():]|\b(?:export|else|do))\s*var\s+/;
-const CONSOLE_LOG = /console\.log\s*\(/;
+const CONSOLE_LOG = /(?<![\w$])console\s*\??\.\s*log\s*\(/;
 
 // Matched against the line's string/comment-masked content, not the raw
 // text -- a string literal that merely *mentions* "console.log(" (e.g. a log

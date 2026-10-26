@@ -115,4 +115,19 @@ describe('style rule', () => {
     const issues = styleRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1, 2]);
   });
+
+  it('flags `export var` declarations but not `var` as a property or substring', () => {
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -0,0 +1,3 @@',
+      '+export var counter = 0;',
+      '+exports.var = 1;',
+      '+// export var in a comment',
+      '',
+    ].join('\n');
+    const issues = styleRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1]);
+  });
 });

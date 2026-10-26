@@ -3,7 +3,7 @@ const { isCodeFile } = require('../utils/isCodeFile');
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { maskStringLiterals } = require('../utils/maskStringLiterals');
 
-const VAR_DECLARATION = /(?:^|[;{}()])\s*var\s+/;
+const VAR_DECLARATION = /(?:^|[;{}()]|\bexport)\s*var\s+/;
 const CONSOLE_LOG = /console\.log\s*\(/;
 
 // Matched against the line's string/comment-masked content, not the raw

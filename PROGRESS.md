@@ -2775,3 +2775,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app), idle-streak 0. Reviewed dd5bc5f..c408308 (log/PROGRESS only); CLI 0 issues. Took EMPTY-BACKLOG (b): hunted the least-recently-touched module `reviewer/src/docDrift/parseExpressRoutes.js`. Found and reproduced a real bug: `METHOD_CALL_PATTERN` matched Express's settings getter (`app.get('env')`, `req.app.get('title')`) as a `GET env` route, which would show up as a phantom code-side route in doc-drift. Fixed test-first: the captured path must start with `/` or `*`. Regression test added; suite green (561 reviewer tests).
 **Decisions:** Fix is small and local, so no TASKS.md item, no FEATURE task. No skill/CLAUDE.md change, so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 15:05)
+
+**Done:** Baseline green (73 sample-app), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted the least-recently-hunted modules by last PROGRESS.md mention: `scripts/syncPlugin.js` (last 2245; type-mismatch handling and stale-entry removal fine, only exotic symlink entries are skipped) and `reviewer/src/rules/style.js` (last 2437). Found and fixed a real gap, test-first: `VAR_DECLARATION` only matched `var` after start-of-line or `;{}()`, so `export var x = 0;` was never flagged. Pattern now also accepts a preceding `\bexport`; regression test covers `export var`, `exports.var` and a commented `export var`. Suite green.
+**Decisions:** Small local fix, no TASKS.md item, no skill/CLAUDE.md change so no SKILL_CHANGELOG entry.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

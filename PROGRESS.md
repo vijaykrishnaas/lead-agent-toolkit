@@ -2751,3 +2751,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `reviewer/src/standup/collectPullRequests.js` (paging stops on first older PR or short page, MAX_PAGES overflow fails loudly, owner/repo encoded, since validated), `docDrift/parseOpenApi.js` (basePath/servers prefix handling, own-property verb lookup, null/scalar spec tolerated), `docDrift/formatDocDrift.js` (unparsed routes keep the report from claiming "no drift") and `httpMethods.js`. Clean, no defect, no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 13:05)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `sample-app/src/config/jwtSecret.js` (production rejects unset/placeholder/dev secret; non-production falls back to dev), `sample-app/src/models/{User,Task}.js` (email lowercase/trim/unique, owner required), `reviewer/src/config/{loadRuleConfig,buildRules}.js` (bad values warn and fall back to permissive defaults, missing file tolerated, severity filter applied per category) and `standup/collectCommits.js` (since validated before git, `--since=` is one argv element so no flag injection). Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

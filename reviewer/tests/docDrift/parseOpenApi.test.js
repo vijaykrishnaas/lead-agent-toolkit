@@ -82,4 +82,9 @@ paths:
       expect(parseOpenApiSpec(text)).toEqual([{ method: 'GET', path: '/v1/users' }]);
     }
   });
+
+  it('ignores x- specification extensions in the paths map', () => {
+    const text = 'servers:\n  - url: /v1\npaths:\n  x-internal:\n    post: {}\n  /users:\n    get: {}\n';
+    expect(parseOpenApiSpec(text)).toEqual([{ method: 'GET', path: '/v1/users' }]);
+  });
 });

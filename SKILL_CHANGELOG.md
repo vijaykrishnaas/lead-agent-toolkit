@@ -298,3 +298,6 @@
 ## 2026-10-25 (Builder: EMPTY-BACKLOG (b) hunt, sample-app authController login)
 **Change:** No skill/CLAUDE.md change. Code fix: `login` now rejects a password over the 72-byte limit with 401 before lookup; regression test added.
 **Evidence:** PROGRESS.md 2026-10-25 Builder entry (authController login) — bcrypt truncation let `<real 72-byte password> + "extra"` authenticate, contradicting the register-side guarantee.
+## 2026-10-26 (Reviewer: EMPTY-BACKLOG (b) hunt, docDrift parseOpenApi)
+**Change:** No skill/CLAUDE.md change. Code fix: `parseOpenApiSpec` skips `paths` keys not starting with `/` (OpenAPI `x-` extensions); regression test added.
+**Evidence:** PROGRESS.md 2026-10-26 Reviewer 19:35 entry — `x-internal: {post: {}}` under `paths` produced a phantom `POST /v1x-internal` route and false drift.

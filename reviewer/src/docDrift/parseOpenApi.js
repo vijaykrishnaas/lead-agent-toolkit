@@ -30,6 +30,8 @@ function parseOpenApiSpec(yamlText) {
   const basePath = basePathOf(spec);
   const routes = [];
   for (const [pathKey, pathItem] of Object.entries(paths)) {
+    // Real path keys start with '/'; anything else (e.g. `x-` extensions) is not a route.
+    if (!pathKey.startsWith('/')) continue;
     for (const method of HTTP_METHODS) {
       if (pathItem && Object.prototype.hasOwnProperty.call(pathItem, method)) {
         routes.push({ method: method.toUpperCase(), path: pathKey === '/' && basePath ? basePath : `${basePath}${pathKey}` });

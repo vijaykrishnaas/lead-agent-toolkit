@@ -2729,3 +2729,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `scripts/runLog.js` (arg parsing rejects unknown/missing/flag-like values, append adds a newline if the file lacks one, idle-streak counts only trailing noops, parseLog fails loudly on bad lines) and `scripts/resolvePushRange.js` (zero/unknown `before` falls back to `after^`, then the empty tree; root commit handled). Clean, no defect.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Reviewer run (10:35)
+- Done: reviewed 79fa2b4..ae8b349 (PROGRESS.md/runs.jsonl only; no code). CLI 0 issues; npm test green (73). Idle-streak 0. Took EMPTY-BACKLOG (b): hunted `reviewer/src/utils/defaultExecGit.js` and `subtreeInOwnScope.js` (lowest mention counts). All three call sites pass a body/statement node, and an expression-bodied arrow's root await is still visited; maxBuffer covers large diffs. No defect.
+- Decisions: no code change, no tasks, no [FEATURE] today.
+- Open questions for Vijay: Tasks 30 and 32 still need your unblock.

@@ -2629,3 +2629,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Reviewed c7a4d91..2b38042 (PROGRESS.md and runs.jsonl only; no code). Reviewer CLI: 0 issues. Manual read of the builder's hunt claim found nothing to contradict. No fixes, no new tasks, no FEATURE task today.
 **Decisions:** Log-only range, so no EMPTY-BACKLOG branch was needed.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 01:05)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `reviewer/src/utils/defaultExecGit.js`, `parseAst.js`, `memberCallLine.js` (lowest PROGRESS/SKILL_CHANGELOG mention counts, 8-13). maxBuffer raised for large diffs; parseAst retries as module and rethrows the script-mode error; memberCallLine uses the callee property line for multi-line chains. Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

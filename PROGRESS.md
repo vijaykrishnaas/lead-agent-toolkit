@@ -2723,3 +2723,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 7292dee..79fa2b4 (PROGRESS.md/runs.jsonl only; no code). CLI 0 issues; npm test green (73). Idle-streak 0. Took EMPTY-BACKLOG (b): hunted `scripts/invariantLint.js` (not named in recent hunt entries). Removed-line counting is multiset-based, status-tag stripping is bracket-balanced, range sides starting with `-` are rejected; a three-dot range would fail loudly (exit 2), not pass silently. Clean, no defect.
 - Decisions: no code change, no tasks, no [FEATURE] today.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 10:05)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `scripts/runLog.js` (arg parsing rejects unknown/missing/flag-like values, append adds a newline if the file lacks one, idle-streak counts only trailing noops, parseLog fails loudly on bad lines) and `scripts/resolvePushRange.js` (zero/unknown `before` falls back to `after^`, then the empty tree; root commit handled). Clean, no defect.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

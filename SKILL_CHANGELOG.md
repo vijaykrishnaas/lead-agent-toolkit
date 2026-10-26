@@ -301,3 +301,7 @@
 ## 2026-10-26 (Reviewer: EMPTY-BACKLOG (b) hunt, docDrift parseOpenApi)
 **Change:** No skill/CLAUDE.md change. Code fix: `parseOpenApiSpec` skips `paths` keys not starting with `/` (OpenAPI `x-` extensions); regression test added.
 **Evidence:** PROGRESS.md 2026-10-26 Reviewer 19:35 entry — `x-internal: {post: {}}` under `paths` produced a phantom `POST /v1x-internal` route and false drift.
+
+## 2026-10-26 — missingTests.js: mask comments in test text for rejection check
+- Change: `lacksRejectionCase` now runs REJECTION_PATTERN on comment-masked test additions.
+- Evidence: PROGRESS.md 2026-10-26 (Reviewer 20:35) — reproduced failing test; sibling-check gap per guidelines 20/22.

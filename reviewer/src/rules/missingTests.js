@@ -75,10 +75,11 @@ function addedText(file) {
 }
 
 // Source adds async code (comments masked, so "async" in a comment doesn't
-// count) but none of its matching test diffs add a rejection-path case.
+// count) but none of its matching test diffs add a rejection-path case
+// (test comments masked too, so a "// TODO reject case" note does not count).
 function lacksRejectionCase(sourceFile, matchedTests) {
   if (!ASYNC_PATTERN.test(maskComments(addedText(sourceFile)).masked)) return false;
-  return !matchedTests.some((testFile) => REJECTION_PATTERN.test(addedText(testFile)));
+  return !matchedTests.some((testFile) => REJECTION_PATTERN.test(maskComments(addedText(testFile)).masked));
 }
 
 // `options.sourceDirs` lets config (review-rules.yaml, via the rule loader)

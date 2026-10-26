@@ -272,6 +272,13 @@ describe('missing-tests rule', () => {
       expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
     });
 
+    it('still flags when "reject" appears only in a test comment', () => {
+      const diff = diffWith('+async function load() { return 1; }', ['+// TODO: add a reject case', "+test('loads', async () => { expect(await load()).toBe(1); });"]);
+      const issues = missingTestsRule.check(parseDiff(diff));
+      expect(issues).toHaveLength(1);
+      expect(issues[0].message).toMatch(/rejected-promise/);
+    });
+
     it('does not flag when "async" appears only in a comment', () => {
       const diff = diffWith('+// async note', ["+test('loads', () => {});"]);
       expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);

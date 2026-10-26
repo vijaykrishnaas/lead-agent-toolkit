@@ -2781,3 +2781,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted the least-recently-hunted modules by last PROGRESS.md mention: `scripts/syncPlugin.js` (last 2245; type-mismatch handling and stale-entry removal fine, only exotic symlink entries are skipped) and `reviewer/src/rules/style.js` (last 2437). Found and fixed a real gap, test-first: `VAR_DECLARATION` only matched `var` after start-of-line or `;{}()`, so `export var x = 0;` was never flagged. Pattern now also accepts a preceding `\bexport`; regression test covers `export var`, `exports.var` and a commented `export var`. Suite green.
 **Decisions:** Small local fix, no TASKS.md item, no skill/CLAUDE.md change so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Reviewer (15:35)
+
+**Done:** Baseline green (73 sample-app), idle-streak 0. Reviewed c408308..1260eb5 (settings-getter route fix, `export var` style fix, log entries); CLI 0 issues; manual read of both diffs and their tests. Verified `\bexport\s*var\s+` only over-matches the invalid `exportvar x`, and the `[/*]` path requirement drops no valid Express route string. Took EMPTY-BACKLOG (b): hunted `docDrift/compareRoutes.js` and `docDrift/parseOpenApi.js` (param/constraint normalization, optional-param expansion, basePath handling, dedupe). Clean, no reproduced defect, no code change, no tasks, no FEATURE task.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

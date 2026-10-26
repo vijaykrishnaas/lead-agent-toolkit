@@ -2848,3 +2848,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `reviewer/src/rules/errorHandling.js` (oldest PROGRESS.md mention, line ~1939; AST path only, regex path untouched). Found and fixed (test-first, red then green): the AST path's `subtreeHasTryStatement` accepted any `TryStatement`, so an async handler whose only `try` had a `finally` and no `catch` was treated as protected and not flagged. It now requires a catch clause (consistent with `isAwaitedInTryCatch`). 1 new regression test.
 **Decisions:** Fix limited to the AST path; the regex fallback's `TRY_BLOCK` text check is unchanged (no observed failure there).
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 (Reviewer, ~21:35 UTC)
+- Done: reviewed 720ca94..8f3ab63 (missingTests comment-masking, errorHandling try/finally fix): clean, CLI reports 0 issues, baseline green. Hunted (EMPTY-BACKLOG b) parseArgv/consumeFlagValue/resolvePushRange/collectAddedLines: clean, no change.
+- Decisions: no new tasks or FEATURE (no concrete gap found); branch (b) taken because backlog has only BLOCKED items 30/32.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED (invariantLint approval; fastdl.mongodb.org allowlist).

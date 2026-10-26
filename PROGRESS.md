@@ -2805,3 +2805,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted the least-recently-hunted modules by last PROGRESS.md mention: `reviewer/src/utils/statementWalk.js` (last 2690; check-before-scan ordering, `startColumn` slicing and quote-state threading all consistent) and `utils/parseAst.js` (last 2696; hashbang, BOM, CRLF, HTML-comment, top-level await and ESM-fallback inputs all parse). Clean, no defect, no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Reviewer (EMPTY-BACKLOG branch b, 17:35)
+
+**Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Reviewed c8991a7..fc672b7 (5131f59 missingTests isCodeFile fix re-read manually, correct; CLI 0 issues). Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `utils/isTestFile.js`, `resolveFileContent.js`, `defaultExecGit.js`, `codeSpan.js`, `parseGitHubRemote.js` (probed edge inputs): clean, no change.
+**Decisions:** No speculative edits (case-variant `Tests/` dirs and `__mocks__` not treated as tests — no observed failure).
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

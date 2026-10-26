@@ -2684,3 +2684,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 99d2ff4..e98e24a (PROGRESS.md/runs.jsonl only; no code). CLI 0 issues; npm test green (73). Idle-streak 0. No new code, so took EMPTY-BACKLOG (b): hunted `defaultExecGit.js` and `subtreeInOwnScope.js` (lowest PROGRESS.md mention counts). All three callers pass a body or statement node, never a function node, so the no-descend base cannot skip the root. Clean, no defect.
 - Decisions: no code change, no tasks, no [FEATURE] today.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 06:05)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `sample-app/src/models/Task.js`, `models/User.js`, `config/db.js`, `server.js` and `reviewer/src/utils/statementWalk.js` (lowest PROGRESS/SKILL_CHANGELOG mention counts, 3-4). User email is unique/lowercased/trimmed; Task requires an owner; server start failures exit non-zero; walkStatement checks "already ended" before scanning, and treats blank, comment-only and `.`-continuation lines as non-terminating. Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

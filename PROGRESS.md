@@ -2763,3 +2763,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Reviewed 026ec60..dd5bc5f (log/PROGRESS only); CLI 0 issues. No new commits of code, so took EMPTY-BACKLOG (b): hunted `reviewer/src/utils/codeSpan.js` (fence longer than any backtick run, newlines collapsed, CommonMark space padding handled). Clean, no defect, no tasks added, no FEATURE task.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 14:05)
+
+**Done:** Baseline green (47 reviewer suites/560 tests, 6 sample-app suites/73 tests), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Chose the least-recently-hunted modules by last PROGRESS.md mention: `reviewer/src/utils/maskStringLiterals.js` (last 1593), `standup/generateStandup.js` and `standup/formatStandup.js` (last 2429). Findings: masking preserves length and `\n` count in both `maskStringLiterals` and `maskComments`, trailing-backslash and unterminated block-comment state thread correctly; `generateStandup` validates `since` before collection and builds the window from the actual value; `formatStandup` sanitizes author/message/title, sorts by parsed Date, and the empty-state wording uses the real `since`. Known limitation only: regex literals containing quote characters can open a false string state in the masker, already superseded on the AST path (RW1). Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

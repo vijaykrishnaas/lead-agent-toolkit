@@ -2679,3 +2679,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `reviewer/src/docDrift/parseOpenApi.js`, `formatDocDrift.js`, `standup/collectCommits.js` (not hunted in recent runs). basePath handling covers Swagger 2/OpenAPI 3, templated server URLs, query/fragment stripping and the `/` root path; the report always renders a section for unparsed routes so it never claims "in sync" falsely; collectCommits validates `since` before shelling out and rejoins subjects containing the field separator. Clean, no defect, no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Reviewer run (05:35)
+- Done: reviewed 99d2ff4..e98e24a (PROGRESS.md/runs.jsonl only; no code). CLI 0 issues; npm test green (73). Idle-streak 0. No new code, so took EMPTY-BACKLOG (b): hunted `defaultExecGit.js` and `subtreeInOwnScope.js` (lowest PROGRESS.md mention counts). All three callers pass a body or statement node, never a function node, so the no-descend base cannot skip the root. Clean, no defect.
+- Decisions: no code change, no tasks, no [FEATURE] today.
+- Open questions for Vijay: Tasks 30 and 32 still need your unblock.

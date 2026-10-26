@@ -2617,3 +2617,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `sample-app` `models/Task.js`, `models/User.js`, `routes/auth.routes.js`, `routes/tasks.routes.js`, `config/db.js` (lowest PROGRESS mention counts). Auth handlers self-wrap in try/catch (guideline 1 satisfied without asyncHandler); schema normalization matches `normalizeEmail`; Express 4 gives `req.body = {}` so destructuring cannot throw. Clean, no defect, no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `reviewer/src/utils/codeSpan.js`, `statementWalk.js`, `isTestFile.js` (lowest PROGRESS mention counts, 3-4). Fence length exceeds longest backtick run, newlines collapsed, padding rules match CommonMark; walkStatement checks end-of-statement before scanning and honors startColumn; isTestFile matches whole path segments. Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

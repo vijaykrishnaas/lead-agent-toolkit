@@ -2745,3 +2745,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed ae8b349..c157f23 (PROGRESS.md/runs.jsonl only; no code). CLI 0 issues; npm test green (73). Idle-streak 0. Took EMPTY-BACKLOG (b): hunted `reviewer/src/diffParser.js` (hunk-count-guarded header detection, deleted-file naming, octal path decoding) and `standup/groupByAuthor.js` (Map-keyed, so no prototype-key issue). No defect.
 - Decisions: no code change, no tasks, no [FEATURE] today.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 12:05)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `reviewer/src/standup/collectPullRequests.js` (paging stops on first older PR or short page, MAX_PAGES overflow fails loudly, owner/repo encoded, since validated), `docDrift/parseOpenApi.js` (basePath/servers prefix handling, own-property verb lookup, null/scalar spec tolerated), `docDrift/formatDocDrift.js` (unparsed routes keep the report from claiming "no drift") and `httpMethods.js`. Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

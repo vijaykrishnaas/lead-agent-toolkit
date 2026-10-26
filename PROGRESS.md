@@ -2833,3 +2833,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green, idle-streak 0. Reviewed 5c57128..7be8d84 (PROGRESS/runs only; CLI 0 issues). Branch (a) skipped (open questions are Vijay-only); took (b): hunted least-recently-touched `reviewer/src/docDrift/parseOpenApi.js`/`compareRoutes.js`. Found and fixed (test-first, red then green): an `x-` specification extension key under `paths` that contains an HTTP verb was emitted as a route (`/v1x-foo` with a basePath). Non-`/` path keys are now skipped. `compareRoutes` probes (optional params, constraints, empty spec) clean.
 **Decisions:** Small reproduced bug fixed directly; no new tasks.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder run (EMPTY-BACKLOG b, 20:05)
+**Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted the least-recently-mentioned modules by PROGRESS.md position: `reviewer/src/docDrift/collectExpressRoutes.js` (last 2389; `joinPath` slash handling, ancestor-scoped cycle guard, bare-specifier skip, `resolveRouterPath` all consistent) and `sample-app/src/controllers/authController.js` + `middleware/auth.js` (last 2493; validation-before-side-effect order, 72-byte cap, dummy-hash timing path, 11000 race, case-insensitive bearer all consistent). Clean, no change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

@@ -1,10 +1,12 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { isTestFile } = require('../utils/isTestFile');
+const { isCodeFile } = require('../utils/isCodeFile');
 const { maskComments } = require('../utils/maskStringLiterals');
 
 // Only code files can need a test; a changed .css/.json/.md under src/ is not
 // a testable source file.
-const CODE_FILE_PATTERN = /\.(js|jsx|mjs|cjs|ts|tsx)$/;
+// Same extension set as utils/isCodeFile (incl. .mts/.cts); used to strip the extension.
+const CODE_FILE_PATTERN = /\.(?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$/i;
 const DEFAULT_SOURCE_DIRS = ['src', 'lib'];
 
 function escapeRegExp(value) {
@@ -95,7 +97,7 @@ function check(files, options = {}) {
   const sourceDirs = configured.length > 0 ? configured : DEFAULT_SOURCE_DIRS;
   const sourceDirPattern = buildSourceDirPattern(sourceDirs);
 
-  const sourceFiles = files.filter((f) => sourceDirPattern.test(f.file) && CODE_FILE_PATTERN.test(f.file) && !isTestFile(f.file) && !f.deleted);
+  const sourceFiles = files.filter((f) => sourceDirPattern.test(f.file) && isCodeFile(f.file) && !isTestFile(f.file) && !f.deleted);
   const testFiles = files.filter((f) => isTestFile(f.file) && !f.deleted);
 
   if (sourceFiles.length === 0) return [];

@@ -212,6 +212,14 @@ describe('missing-tests rule', () => {
       expect(missingTestsRule.check([file(source), file(test)])).toEqual([]);
     });
 
+    it.each(['src/a.mts', 'src/a.cts'])('flags an untested %s source like any other code extension', (source) => {
+      expect(missingTestsRule.check([file(source)])).toHaveLength(1);
+    });
+
+    it('treats src/a.mts as covered by tests/a.test.mts', () => {
+      expect(missingTestsRule.check([file('src/a.mts'), file('tests/a.test.mts')])).toEqual([]);
+    });
+
     it('still flags a source whose test has a different basename', () => {
       expect(missingTestsRule.check([file('src/a.ts'), file('tests/b.test.ts')])).toHaveLength(1);
     });

@@ -2858,3 +2858,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `reviewer/src/rules/style.js` (least recently mentioned rule module, last in SKILL_CHANGELOG line 56). Found and fixed (test-first, red then green): `CONSOLE_LOG` had no left word boundary, so `mockconsole.log(`/`$console.log(` were flagged, and it missed `console . log(` and `console?.log(`. Now `(?<![\w$])console\s*\??\.\s*log\s*\(`. 1 new regression test. Noted but not fixed: `x /* c */ var y` is missed by VAR_DECLARATION (rare).
 **Decisions:** invariantLint.js and scripts/syncPlugin.js are older mentions but are not rule modules; style.js chosen as the diff-scanning code with open guideline-13 risk.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 (Reviewer, 22:35 UTC)
+- Done: reviewed 8f3ab63..dd0b9ae (style.js CONSOLE_LOG whole-token fix) — reviewer CLI 0 issues, manual probe of regex edge cases (mockconsole, $console, window.console, spaced/?. forms) correct. EMPTY-BACKLOG branch (b): hunted isCodeFile, isTestFile, parseGitHubRemote (least-touched utils); clean, no change.
+- Decisions: no new tasks/features. Idle streak 0.
+- Open questions for Vijay: none new.

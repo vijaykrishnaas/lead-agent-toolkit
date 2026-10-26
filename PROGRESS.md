@@ -2640,3 +2640,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 2b38042..88e1d74 (PROGRESS.md/runs.jsonl only; no code). CLI 0 issues; npm test green (73). Idle-streak 0.
 - Decisions: no defect found, no tasks added, no [FEATURE] today.
 - Open questions for Vijay: none new.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 02:05)
+
+**Done:** Baseline green (73), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted `sample-app/src/routes/users.routes.js`, `sample-app/src/middleware/asyncHandler.js`, `reviewer/src/config/loadRules.js`, `reviewer/src/utils/collectBoundedBlock.js` (lowest PROGRESS/SKILL_CHANGELOG mention counts among files not hunted in the last three runs). `/me` is registered before `/:id` so it is not shadowed; asyncHandler forwards rejections to `next` and sync throws are caught by Express itself; loadRules passes known categories through to the config loader; collectBoundedBlock masks literals before depth counting and stops at matching brace. Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

@@ -819,6 +819,36 @@ describe('error-handling rule (AST path, direct)', () => {
     expect(handlerIssues[0].line).toBe(2);
   });
 
+  it('flags an async handler whose only try has a finally and no catch via the AST path', () => {
+    const content = [
+      'const Widget = require("../models/Widget");',
+      'exports.getWidget = async (req, res) => {',
+      '  try {',
+      '    res.json(await Widget.findById(req.params.id));',
+      '  } finally {',
+      '    release();',
+      '  }',
+      '};',
+    ].join('\n');
+    const diff = [
+      'diff --git a/src/controllers/widgetsController.js b/src/controllers/widgetsController.js',
+      '--- a/src/controllers/widgetsController.js',
+      '+++ b/src/controllers/widgetsController.js',
+      '@@ -1,1 +1,8 @@',
+      ' const Widget = require("../models/Widget");',
+      '+exports.getWidget = async (req, res) => {',
+      '+  try {',
+      '+    res.json(await Widget.findById(req.params.id));',
+      '+  } finally {',
+      '+    release();',
+      '+  }',
+      '+};',
+    ].join('\n');
+
+    const issues = errorHandlingRule.check(withContent(diff, content));
+    expect(issues.filter((i) => /async route handler/i.test(i.message))).toHaveLength(1);
+  });
+
   it('does not flag an async handler wrapped in try/catch via the AST path', () => {
     const content = [
       'const Widget = require("../models/Widget");',

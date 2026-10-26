@@ -2843,3 +2843,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 7be8d84..720ca94: only the already-reviewed x- OpenAPI fix and a clean builder hunt; CLI 0 issues. Branch (a) skipped (no unresolved questions), branch (b) taken: backlog empty.
 - Hunted `missingTests.js` (not named in a recent hunt): `lacksRejectionCase` masked comments on the source side but tested raw test text, so a `// TODO: add a reject case` comment suppressed the warning (guideline 20/22 sibling-check gap). Fixed test-first with `maskComments`.
 - Open questions for Vijay: none.
+
+## 2026-10-26 — Builder run (EMPTY-BACKLOG b, 21:05)
+**Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `reviewer/src/rules/errorHandling.js` (oldest PROGRESS.md mention, line ~1939; AST path only, regex path untouched). Found and fixed (test-first, red then green): the AST path's `subtreeHasTryStatement` accepted any `TryStatement`, so an async handler whose only `try` had a `finally` and no `catch` was treated as protected and not flagged. It now requires a catch clause (consistent with `isAwaitedInTryCatch`). 1 new regression test.
+**Decisions:** Fix limited to the AST path; the regex fallback's `TRY_BLOCK` text check is unchanged (no observed failure there).
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

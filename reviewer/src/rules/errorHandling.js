@@ -263,9 +263,11 @@ function isWrappedByAsyncHandler(ancestors) {
 // Searches the handler body's own subtree for a try/catch, at any nesting
 // depth of blocks/statements, but never descending into a nested function
 // defined within the handler -- that inner function's own try/catch belongs
-// to its own execution, not the outer handler's (see subtreeInOwnScope).
+// to its own execution, not the outer handler's (see subtreeInOwnScope). A
+// try/finally with no catch clause doesn't catch anything, so it doesn't
+// count.
 function subtreeHasTryStatement(node) {
-  return subtreeInOwnScope(node, (n) => n.type === 'TryStatement');
+  return subtreeInOwnScope(node, (n) => n.type === 'TryStatement' && !!n.handler);
 }
 
 function isCatchCall(node) {

@@ -130,4 +130,21 @@ describe('style rule', () => {
     const issues = styleRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1]);
   });
+
+  it('flags "var" after a case/default label or a braceless else/do', () => {
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -0,0 +1,5 @@',
+      '+case 1: var x = 1;',
+      '+default: var y;',
+      '+else var z = 2;',
+      '+const variable = 1;',
+      '+const o = { var: 1 };',
+      '',
+    ].join('\n');
+    const issues = styleRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1, 2, 3]);
+  });
 });

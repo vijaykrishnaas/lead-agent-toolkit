@@ -2811,3 +2811,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Reviewed c8991a7..fc672b7 (5131f59 missingTests isCodeFile fix re-read manually, correct; CLI 0 issues). Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `utils/isTestFile.js`, `resolveFileContent.js`, `defaultExecGit.js`, `codeSpan.js`, `parseGitHubRemote.js` (probed edge inputs): clean, no change.
 **Decisions:** No speculative edits (case-variant `Tests/` dirs and `__mocks__` not treated as tests — no observed failure).
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder run (EMPTY-BACKLOG b)
+**Done:** Baseline green (566 reviewer / 73 sample-app), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only); took (b). Hunted `reviewer/src/rules/style.js` and `utils/collectAddedLines.js` (least recently hunted). `VAR_DECLARATION` missed `var` after a `case x:`/`default:` label or a braceless `else`/`do` (e.g. `case 1: var x = 1;`), so those were never flagged. Fixed test-first (reproduced failing test), regex now also accepts `:`, `else`, `do` before `var`. `collectAddedLines.js` clean.
+**Decisions:** Fix kept to the one regex; `{ var: 1 }`/`exports.var` still not flagged (asserted in test).
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

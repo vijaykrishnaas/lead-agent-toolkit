@@ -2787,3 +2787,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app), idle-streak 0. Reviewed c408308..1260eb5 (settings-getter route fix, `export var` style fix, log entries); CLI 0 issues; manual read of both diffs and their tests. Verified `\bexport\s*var\s+` only over-matches the invalid `exportvar x`, and the `[/*]` path requirement drops no valid Express route string. Took EMPTY-BACKLOG (b): hunted `docDrift/compareRoutes.js` and `docDrift/parseOpenApi.js` (param/constraint normalization, optional-param expansion, basePath handling, dedupe). Clean, no reproduced defect, no code change, no tasks, no FEATURE task.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Builder (EMPTY-BACKLOG branch b, 16:05)
+
+**Done:** Baseline green (73 sample-app), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Hunted the least-recently-hunted modules by last PROGRESS.md mention: `reviewer/src/docDrift/generateDocDrift.js` (last 2383; all collaborators injected, unparsed routes passed through to the report), `config/loadRules.js` (thin wrapper, known categories derived from the base rules) and `sample-app/src/middleware/asyncHandler.js` (rejected promises routed to `next`; sync throws are caught by Express itself). Clean, no defect, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

@@ -2769,3 +2769,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (47 reviewer suites/560 tests, 6 sample-app suites/73 tests), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b). Chose the least-recently-hunted modules by last PROGRESS.md mention: `reviewer/src/utils/maskStringLiterals.js` (last 1593), `standup/generateStandup.js` and `standup/formatStandup.js` (last 2429). Findings: masking preserves length and `\n` count in both `maskStringLiterals` and `maskComments`, trailing-backslash and unterminated block-comment state thread correctly; `generateStandup` validates `since` before collection and builds the window from the actual value; `formatStandup` sanitizes author/message/title, sorts by parsed Date, and the empty-state wording uses the real `since`. Known limitation only: regex literals containing quote characters can open a false string state in the masker, already superseded on the AST path (RW1). Clean, no defect, no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-26 — Reviewer (14:35)
+
+**Done:** Baseline green (73 sample-app), idle-streak 0. Reviewed dd5bc5f..c408308 (log/PROGRESS only); CLI 0 issues. Took EMPTY-BACKLOG (b): hunted the least-recently-touched module `reviewer/src/docDrift/parseExpressRoutes.js`. Found and reproduced a real bug: `METHOD_CALL_PATTERN` matched Express's settings getter (`app.get('env')`, `req.app.get('title')`) as a `GET env` route, which would show up as a phantom code-side route in doc-drift. Fixed test-first: the captured path must start with `/` or `*`. Regression test added; suite green (561 reviewer tests).
+**Decisions:** Fix is small and local, so no TASKS.md item, no FEATURE task. No skill/CLAUDE.md change, so no SKILL_CHANGELOG entry.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

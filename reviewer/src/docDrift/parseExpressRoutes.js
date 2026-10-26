@@ -1,7 +1,9 @@
 const { maskStringLiterals, maskComments } = require('../utils/maskStringLiterals');
 const { HTTP_METHODS } = require('./httpMethods');
 const VERB_ALTERNATION = HTTP_METHODS.join('|');
-const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*(['"])(.*?)\\2`, 'g');
+// The path must start with "/" or "*": app.get('env') / req.app.get('title')
+// is Express's settings getter (same receiver, same verb name), not a route.
+const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*(['"])([/*].*?)\\2`, 'g');
 // Matches both app.use(prefix, router) (in the app entry file) and
 // router.use(prefix, subRouter) (a router file mounting a *nested* router
 // under a sub-prefix) — the same mount syntax, just on a different receiver

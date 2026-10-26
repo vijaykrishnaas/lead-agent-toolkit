@@ -366,3 +366,18 @@ describe('findUnparsedRoutes', () => {
     ]);
   });
 });
+
+describe('parseRouterSource settings getter', () => {
+  it("does not read app.get('env') / req.app.get('title') (Express settings getter) as a route", () => {
+    const source = `
+      if (app.get('env') === 'production') {}
+      const title = req.app.get('title');
+      router.get('/a', h);
+      app.get('*', fallback);
+    `;
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'GET', path: '*' },
+    ]);
+  });
+});

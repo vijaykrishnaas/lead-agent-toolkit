@@ -2978,3 +2978,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted the least-mentioned sample-app files (`models/Task.js`, `models/User.js`, `config/db.js`, `server.js`, `users.routes.js`, `auth.routes.js`, `asyncHandler.js`) plus `authController.js`. Auth routes are unwrapped but both handlers carry their own try/catch (guideline 1/3 satisfied); schemas, validation order and error mapping all consistent. No defect reproduced, no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 (Reviewer run, ~10:35 UTC) — review + EMPTY-BACKLOG branch (b)
+- Done: reviewed 2bd7c95..65d6111 (reviewer's own postfix-++/-- fix, builder hunt log, run logs). CLI report clean; manual read found no defects. Branch (b): hunted `diffParser.js`, `collectAddedLines.js`, `standup/collectCommits.js`, `groupByAuthor.js`, `collectPullRequests.js` (stand-ins for least-recently hunted); clean, no code change.
+- Decisions: no new tasks or features. Only nit: a PR with a missing/invalid `updated_at` is silently treated as older than the window; judged unrealistic for the GitHub API, not worth code.
+- Open questions for Vijay: tasks 30 and 32 still need your unblock.

@@ -3070,3 +3070,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-27 (Reviewer, ~19:35 UTC)
 **Done:** Baseline green (73 tests), idle-streak 0. Reviewed 771bff3..d1d8ce9: log-only commits, reviewer CLI 0 issues. Backlog empty; branch (a) skipped (open questions Vijay-only); took (b): hunted `docDrift/compareRoutes.js` and `formatDocDrift.js` (multi-optional-param expansion, double-slash paths) -- no defect reproduced, no code change.
 **Open questions for Vijay:** none new.
+
+## 2026-10-27 (Builder, ~20:07 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `reviewer/src/rules/missingTests.js` (not hunted since 2026-07). Probed top-level src file with async + non-rejecting test, same-stem siblings in two dirs with a test referencing only one, `.spec.mjs` test pairing, and case-differing stems. All behave correctly, no defects.
+**Decisions:** No code change, no new tasks.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

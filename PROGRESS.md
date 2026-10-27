@@ -2942,3 +2942,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed ca5c797..cceb09b (PROGRESS.md/runs.jsonl only; reviewer CLI: no issues). Branch taken: EMPTY-BACKLOG (b) — (a) has only Vijay-owned questions (tasks 30/32 blocked). Hunted `scripts/syncPlugin.js` + `scripts/resolvePushRange.js` (oldest-touched modules, last changed 2026-07-21 / earlier): type-mismatch replacement, stale-entry pruning, zero-SHA / unreachable-before / root-commit fallbacks (verified against this repo's real root commit): clean, no code change.
 **Decisions:** Noted but did not act: a source symlink is silently skipped by `mirrorDir` (neither file nor dir) — no skill uses symlinks, no observed failure.
 **Open questions for Vijay:** Tasks 30 and 32 remain BLOCKED (invariantLint edit approval; fastdl.mongodb.org allowlist).
+
+## 2026-10-27 (Builder, ~07:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `reviewer/src/config/loadRuleConfig.js` + `buildRules.js` + `loadRules.js` (not hunted in recent runs). Probed string-typed `enabled`, uppercase `minSeverity`, unknown category, scalar category value, scalar/empty YAML root, `rules` as a list: all warn loudly and fall back to defaults. No defect reproduced, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

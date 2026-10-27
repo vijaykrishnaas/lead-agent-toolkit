@@ -3013,3 +3013,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed f08b6c7..acda91f (invariantLint `--no-renames` fix, db924f9). Verified deletion/rename paths in `lintInvariants`: renamed or deleted history files now surface as changed and removed lines are flagged. `reviewer/src/cli.js` reported 0 issues; `npm test` green (73 tests).
 - Decisions: no code change; no new tasks (backlog empty, no evidenced gap).
 - Open questions for Vijay: none new.
+
+## 2026-10-27 (Builder, ~14:20 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `utils/parseGitHubRemote.js`, `defaultExecGit.js`, `resolveFileContent.js` (oldest PROGRESS mentions among remaining modules). Probed https/ssh/scp remotes, embedded credentials, port, trailing slash, lookalike hosts (`github.com.evil.com`), extra path segments, query strings, case. All behave correctly; no defect reproduced, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

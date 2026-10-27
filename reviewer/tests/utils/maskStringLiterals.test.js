@@ -1,6 +1,12 @@
 const { maskStringLiterals, maskComments } = require('../../src/utils/maskStringLiterals');
 
 describe('regex literals', () => {
+  it('treats a slash after a postfix ++/-- as division, keeping later braces visible', () => {
+    const line = 'n++ / 2; run(function () { return 1 / 2; });';
+    expect(maskStringLiterals(line).masked).toBe(line);
+    expect(maskComments('n-- / 2; if (a) { b / 3; }').masked).toBe('n-- / 2; if (a) { b / 3; }');
+  });
+
   it('masks a brace or quote inside a regex literal, preserving length', () => {
     const a = 'if (/\\{/.test(x)) go();';
     expect(maskStringLiterals(a).masked).toBe('if (    .test(x)) go();');

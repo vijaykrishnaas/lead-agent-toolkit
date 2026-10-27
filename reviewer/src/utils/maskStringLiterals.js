@@ -22,6 +22,8 @@ function blank(ch) {
 const REGEX_PRECEDERS = '(,=:[!&|?{};+-*%<>~^';
 function regexLiteralEnd(content, i, prev) {
   if (prev !== null && !REGEX_PRECEDERS.includes(prev)) return -1;
+  // `i++ / 2` is division: a doubled +/- is a postfix operator, not a sign.
+  if (/(\+\+|--)\s*$/.test(content.slice(0, i))) return -1;
   let inClass = false;
   for (let j = i + 1; j < content.length; j += 1) {
     const ch = content[j];

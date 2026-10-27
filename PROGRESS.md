@@ -2912,3 +2912,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests), idle-streak 0. Reviewed aa581d9..faae632 (PROGRESS.md/runs.jsonl only; no code): reviewer CLI 0 issues. Backlog has only BLOCKED 30/32 and (a) is Vijay-only, so took (b): re-read `rules/missingTests.js` (path-segment matching, sibling disambiguation, comment-masked rejection check, sourceDirs sanitizing): no defect found, no change.
 - Decisions: no new tasks or FEATURE (no concrete gap).
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED.
+
+## 2026-10-27 (Builder, ~05:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `reviewer/src/diffParser.js` (never named in SKILL_CHANGELOG.md, so least recently audited). Fuzzed CRLF hunks, tab-suffixed paths with spaces, new-file, `-- a`/`++ b` content lines, two hunks, no-prefix paths: all parsed correctly, no code change.
+**Decisions:** Noted but did not fix: blank lines after a hunk's counts are exhausted (concatenated patches) become phantom context lines; real `git diff` output never has them and no failure was observed.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

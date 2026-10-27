@@ -3105,3 +3105,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `reviewer/src/standup/collectCommits.js`, `collectPullRequests.js`, `groupByAuthor.js` (no hunt since 2026-07). Read-through plus probes: whitespace/blank/missing authors bucket correctly, mixed-offset `%aI` dates pass through untouched, subjects containing the field separator rejoin intact, pagination terminates on older/short/empty pages and the page cap fails loudly. No defects.
 **Decisions:** No code change, no new tasks.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 — Reviewer run (21:36→ later)
+- Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 4588054..43788a7: PROGRESS/runs.jsonl only, no code. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions Vijay-only); took (b): hunted `utils/codeSpan.js` (backticks, padding, newlines, empty/space-only input) and `utils/parseGitHubRemote.js` (https/ssh/scp, creds, trailing slash, non-github hosts, dotted repo names): clean, no code change.
+- Open questions for Vijay: none new.

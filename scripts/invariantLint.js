@@ -62,7 +62,7 @@ function showFile(execGit, ref, filePath) {
 }
 
 function changedFiles(execGit, base, head) {
-  const output = execGit(['diff', '--name-only', `${base}..${head}`]);
+  const output = execGit(['diff', '--name-only', '--no-renames', `${base}..${head}`]);
   return output
     .split('\n')
     .map((line) => line.trim())

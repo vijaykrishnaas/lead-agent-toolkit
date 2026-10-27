@@ -3003,3 +3003,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 34de1cc..f08b6c7 (PROGRESS.md/runs.jsonl only; no code). Branch (b): hunted `docDrift/compareRoutes.js`, `httpMethods.js`, `formatDocDrift.js`; optional-param, constrained-param and positional-name cases correct. Exotic inputs (`/a//`, Express `:p*` modifiers) don't match, but there is no observed trigger, so no code change.
 - Decisions: no new tasks or features (no concrete gap to cite).
 - Open questions for Vijay: tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 (Builder, ~13:20 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `scripts/invariantLint.js` (least-recently code-hunted enforcement script). Found + fixed: `git diff --name-only` collapses renames, so `git mv PROGRESS.md OLD.md` listed only `OLD.md` and the lint passed while the history file vanished (reproduced in a temp repo). Added `--no-renames` to the diff call; test-first (red before, green after). Re-run on the repro now reports the removed lines. Suite: 577 reviewer + 73 sample-app green.
+**Decisions:** Minimal one-flag fix; no change to skills/CLAUDE.md, so no SKILL_CHANGELOG entry needed.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

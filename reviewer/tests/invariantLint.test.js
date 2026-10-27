@@ -2,7 +2,7 @@ const { lintInvariants, splitRange, tasksChangedSubstantively } = require('../..
 
 function fakeExecGit({ files, contents }) {
   return jest.fn((gitArgs) => {
-    if (gitArgs[0] === 'diff' && gitArgs[1] === '--name-only') {
+    if (gitArgs[0] === 'diff' && gitArgs.includes('--name-only')) {
       return files.join('\n');
     }
     if (gitArgs[0] === 'show') {
@@ -21,6 +21,21 @@ function fakeExecGit({ files, contents }) {
 }
 
 describe('lintInvariants', () => {
+  it('disables rename detection so a renamed history file still lists its old path', () => {
+    // Real git collapses `git mv PROGRESS.md OLD.md` to only "OLD.md" in --name-only
+    // unless --no-renames is passed, hiding the deleted history file from the lint.
+    const execGit = jest.fn((gitArgs) => {
+      if (gitArgs[0] === 'diff') {
+        return gitArgs.includes('--no-renames') ? 'PROGRESS.md\nOLD.md' : 'OLD.md';
+      }
+      const [ref, filePath] = [gitArgs[1].split(':')[0], gitArgs[1].split(':')[1]];
+      if (ref === 'base' && filePath === 'PROGRESS.md') return 'a\nb\n';
+      throw new Error('missing');
+    });
+    const violations = lintInvariants({ range: 'base..head', execGit });
+    expect(violations.some((v) => v.includes('PROGRESS.md'))).toBe(true);
+  });
+
   it('passes cleanly when no relevant files changed', () => {
     const execGit = fakeExecGit({ files: ['reviewer/src/index.js'], contents: {} });
     expect(lintInvariants({ range: 'base..head', execGit })).toEqual([]);

@@ -2973,3 +2973,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 666e012..2bd7c95 (regex-literal masking in `maskStringLiterals.js`, statementWalk fix, logs). CLI report clean; manual read found one defect: a `/` after a postfix `++`/`--` (`n++ / 2; f(function () { ... 1 / 2 })`) was read as a regex opener, blanking real braces up to the next `/` and corrupting depth counts. Fixed test-first (failed before, green after) in `regexLiteralEnd`.
 - Decisions: EMPTY-BACKLOG not needed (review produced a fix). No new tasks/features. Known residual: a line-leading `/` continuation (`prev` resets per line) is still treated as a regex opener if a closing `/` follows on the same line; judged too rare to act on.
 - Open questions for Vijay: none.
+
+## 2026-10-27 (Builder, ~10:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted the least-mentioned sample-app files (`models/Task.js`, `models/User.js`, `config/db.js`, `server.js`, `users.routes.js`, `auth.routes.js`, `asyncHandler.js`) plus `authController.js`. Auth routes are unwrapped but both handlers carry their own try/catch (guideline 1/3 satisfied); schemas, validation order and error mapping all consistent. No defect reproduced, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

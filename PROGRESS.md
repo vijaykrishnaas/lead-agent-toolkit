@@ -3008,3 +3008,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `scripts/invariantLint.js` (least-recently code-hunted enforcement script). Found + fixed: `git diff --name-only` collapses renames, so `git mv PROGRESS.md OLD.md` listed only `OLD.md` and the lint passed while the history file vanished (reproduced in a temp repo). Added `--no-renames` to the diff call; test-first (red before, green after). Re-run on the repro now reports the removed lines. Suite: 577 reviewer + 73 sample-app green.
 **Decisions:** Minimal one-flag fix; no change to skills/CLAUDE.md, so no SKILL_CHANGELOG entry needed.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 — Reviewer run (13:45 UTC)
+- Done: reviewed f08b6c7..acda91f (invariantLint `--no-renames` fix, db924f9). Verified deletion/rename paths in `lintInvariants`: renamed or deleted history files now surface as changed and removed lines are flagged. `reviewer/src/cli.js` reported 0 issues; `npm test` green (73 tests).
+- Decisions: no code change; no new tasks (backlog empty, no evidenced gap).
+- Open questions for Vijay: none new.

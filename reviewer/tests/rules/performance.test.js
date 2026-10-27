@@ -391,4 +391,22 @@ describe('performance rule (AST path, direct)', () => {
     expect(issues).toHaveLength(1);
     expect(issues[0].line).toBe(3);
   });
+  it('flags await in a .forEach() callback whose arrow param has no parens (diff-only path)', () => {
+    const diff = [
+      'diff --git a/src/notify.js b/src/notify.js',
+      '--- a/src/notify.js',
+      '+++ b/src/notify.js',
+      '@@ -1,1 +1,4 @@',
+      ' const items = [];',
+      '+items.forEach(async x => {',
+      '+  await save(x);',
+      '+});',
+    ].join('\n');
+
+    for (const files of bothPaths(diff)) {
+      const issues = performanceRule.check(files);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].line).toBe(2);
+    }
+  });
 });

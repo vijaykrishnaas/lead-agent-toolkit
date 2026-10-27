@@ -12,7 +12,7 @@ const { subtreeInOwnScope } = require('../utils/subtreeInOwnScope');
 // doesn't stop the match at that inner `)` -- the lazy quantifier keeps
 // expanding until it finds a `)` immediately followed by `=> {`, which is
 // necessarily the callback's own closing paren.
-const FOREACH_START = /\.forEach\(\s*(async\s+)?\(.*?\)\s*=>\s*{/;
+const FOREACH_START = /\.forEach\(\s*(async\s+)?(?:\(.*?\)|[\w$]+)\s*=>\s*{/;
 const AWAIT_PATTERN = /\bawait\b/;
 const DEEP_CLONE_ANTIPATTERN = /JSON\.parse\(\s*JSON\.stringify\(/;
 

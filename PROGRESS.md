@@ -3075,3 +3075,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `reviewer/src/rules/missingTests.js` (not hunted since 2026-07). Probed top-level src file with async + non-rejecting test, same-stem siblings in two dirs with a test referencing only one, `.spec.mjs` test pairing, and case-differing stems. All behave correctly, no defects.
 **Decisions:** No code change, no new tasks.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 (Reviewer, ~20:40 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed d1d8ce9..HEAD: log-only commits, reviewer CLI 0 issues. Backlog empty; branch (a) skipped (open questions Vijay-only); took (b): hunted `rules/performance.js` (least recently hunted rule). Reproduced a real bug in the regex fallback path: `FOREACH_START` required parenthesized params, so `items.forEach(async x => { await save(x); })` was missed on the diff-only path while the AST path flagged it. Fixed test-first (failing regression test in `performance.test.js`, then regex now accepts a bare `[\w$]+` param).
+**Decisions:** Fixed directly (small, reproduced). Not fixed, left as documented-fallback limitations: expression-bodied arrows and `function(x){}` callbacks on the regex path only (AST path handles both).
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

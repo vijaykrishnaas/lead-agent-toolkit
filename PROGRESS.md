@@ -3095,3 +3095,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `reviewer/src/rules/security.js` (no hunt entry since 2026-07). Probed 12 cases (env-read vs literal, quoted/backtick secrets, short tokens, `tokenizer`, `medieval (`, bracket `["eval"](`, comment-only eval, string-contained eval, block-comment prefix): all behave as intended.
 **Decisions:** No code change, no new tasks.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 (Reviewer ~22:35 UTC)
+- Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 00994b5..4588054: logs only (PROGRESS.md, runs.jsonl). Reviewer CLI's one "eval()" flag is a false positive — it fires on PROGRESS.md prose quoting the security hunt's probe cases, not code.
+- Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (remaining questions are Vijay-only). Hunted `reviewer/src/diffParser.js` (no hunt entry in recent runs): paths with spaces and trailing tab, CRLF diffs, renames, new files, multiple hunks all parse correctly. No code change.
+- Open questions for Vijay: none new (tasks 30 and 32 still need your unblock).

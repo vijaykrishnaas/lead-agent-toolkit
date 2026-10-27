@@ -3051,3 +3051,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests). Reviewed c65363e..24aacaa (PROGRESS/runs.jsonl only, clean). Backlog empty, so EMPTY-BACKLOG (b): hunted config/loadRuleConfig, buildRules, loadRules (least recent in PROGRESS.md, entry ~2947); probed missing file, null options, unknown severity, real review-rules.yaml: clean, no code change.
 - Decisions: branch (b) taken because no commits with code to review and no new gap to cite for a [FEATURE].
 - Open questions for Vijay: none new.
+
+## 2026-10-27 (Builder, ~19:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `format/markdownReport.js`, `reviewer.js` (`computeRisk`, issue mapping, opt-in content resolution) and re-read `sanitizeMarkdownText.js` (not hunted in recent runs). Checked sort comparator with known severities, empty-issues path, per-field sanitization of file/message/fix, newline collapse, backslash-parity escaping. Only residual is bare-URL/@mention autolinking in quoted text, which is notification/clickable-text noise rather than markup injection; no defect worth a change.
+**Decisions:** No code change, no new tasks.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

@@ -2958,3 +2958,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `reviewer/src/docDrift/parseOpenApi.js` + `compareRoutes.js` + `httpMethods.js` (oldest PROGRESS.md mention, line ~2445). Probed non-verb keys, root path with server base, null/empty/array YAML, case-differing params, null path item: all correct. Noted, not acted on: `/a//b` vs `/a/b` compare as drift (double slash, no observed failure). No code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 (Reviewer, ~09:35 UTC: review + EMPTY-BACKLOG (b) hunt)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 4f6ffae..666e012 (PROGRESS.md/runs.jsonl only; reviewer CLI: no issues). Branch taken: EMPTY-BACKLOG (b) — (a) has only Vijay-owned questions (tasks 30/32 blocked). Hunted `utils/statementWalk.js` (oldest-touched, 2026-07-21) and `memberCallLine.js`. Found + fixed: a line that began inside a still-open multi-line template literal was masked to just its tail (e.g. `` ` + suffix.then(done); ``) and tripped the "statement already ended" check, truncating the collected statement. Regression test written first (failed), then fix (`startsInsideLiteral` guard). Suite green (572 reviewer tests).
+**Decisions:** `memberCallLine.js` clean. No tasks added.
+**Open questions for Vijay:** Tasks 30 and 32 remain BLOCKED (invariantLint edit approval; fastdl.mongodb.org allowlist).

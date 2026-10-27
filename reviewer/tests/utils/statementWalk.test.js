@@ -140,4 +140,10 @@ describe('walkStatement', () => {
     expect(result.found).toBe('stopped-here');
     expect(seen).toEqual(['a', '(', 'b', '(', 'c']);
   });
+
+  it('does not treat a line that continues an open template literal as a new statement', () => {
+    const addedLines = linesFrom(['const s = `abc', '` + suffix.then(done);', 'const unrelated = 2;']);
+    const result = walkStatement(addedLines, 0);
+    expect(joinedContent(result)).toBe(['const s = `abc', '` + suffix.then(done);'].join('\n'));
+  });
 });

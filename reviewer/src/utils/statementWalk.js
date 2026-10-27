@@ -9,7 +9,9 @@ const { maskStringLiterals } = require('./maskStringLiterals');
 // between the two copies).
 //
 // A line is treated as "the statement already ended" once paren depth is
-// back to <= 0, the line is non-blank/non-comment-only, and it isn't a
+// back to <= 0, the line doesn't begin inside a still-open multi-line
+// literal (its masked text is then just the tail after the closing quote,
+// not a fresh statement), the line is non-blank/non-comment-only, and it isn't a
 // `.`-chain continuation -- checked *before* that line is added to `lines`
 // or scanned character-by-character, so an unrelated following
 // statement/handler is never swept into the walk. `exemptLeadingBrace`
@@ -45,12 +47,14 @@ function walkStatement(addedLines, startIdx, { startColumn = 0, exemptLeadingBra
   const lines = [];
   for (let i = startIdx; i < addedLines.length; i += 1) {
     const content = i === startIdx ? addedLines[i].content.slice(startColumn) : addedLines[i].content;
+    const startsInsideLiteral = quoteState !== null;
     const { masked, quoteState: nextQuoteState } = maskStringLiterals(content, quoteState);
     quoteState = nextQuoteState;
     const trimmed = masked.trim();
 
     const alreadyEnded =
       i > startIdx &&
+      !startsInsideLiteral &&
       depth <= 0 &&
       trimmed !== '' &&
       !trimmed.startsWith('.') &&

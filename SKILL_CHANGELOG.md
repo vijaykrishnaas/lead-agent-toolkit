@@ -305,3 +305,7 @@
 ## 2026-10-26 — missingTests.js: mask comments in test text for rejection check
 - Change: `lacksRejectionCase` now runs REJECTION_PATTERN on comment-masked test additions.
 - Evidence: PROGRESS.md 2026-10-26 (Reviewer 20:35) — reproduced failing test; sibling-check gap per guidelines 20/22.
+
+## 2026-10-27 (Reviewer: EMPTY-BACKLOG (b) hunt, statementWalk)
+**Change:** No skill/CLAUDE.md change. Code fix: `walkStatement` no longer applies the "already ended" check to a line that starts inside an open multi-line literal; regression test added.
+**Evidence:** PROGRESS.md 2026-10-27 Reviewer 09:35 entry — reproduced truncated statement for a template literal continuation line at depth 0 (guideline 10/17 class).

@@ -3085,3 +3085,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `reviewer/src/rules/style.js` (VAR_DECLARATION, CONSOLE_LOG; no hunt entry since the 2026-07 masking fixes). Probed 16 cases: comment-only lines, block-comment prefix, `for (var ...)`, `if (a) var`, `export var`, tab after `var`, `console?.log`, spaced `console.log (x)`, `variable` identifier. All correct. Only miss: `console.log` inside a template-literal `${...}` interpolation is masked with the rest of the template (false negative); too narrow and inherent to the masker's design, not worth a change.
 **Decisions:** No code change, no new tasks.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 (Reviewer ~21:35 UTC)
+- Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed fcd17a5..00994b5: 36c6dab (performance regex-fallback fix, test-first, re-read: correct), plus log-only commits. Reviewer CLI's single missing-tests flag (no rejected-promise test for performance.js) is a false positive — the change is sync regex code.
+- Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped. Hunted `scripts/resolvePushRange.js` (zero/absent `before`, absent `after^`, empty `after`): fallback chain is sound; a deleted-branch push (`after` all-zero) would yield an unusable range, but push workflows don't fire on branch deletion, so no change made.
+- Open questions for Vijay: none new.

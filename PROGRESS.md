@@ -3032,3 +3032,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-27 (Reviewer, 15:50 UTC)
 - Done: reviewed fd0c352..a282872 (PROGRESS/runs logs only, clean). EMPTY-BACKLOG branch (b) taken (no new code to review): hunted docDrift `generateDocDrift`, `httpMethods`, `parseOpenApi`, `compareRoutes` (fewest PROGRESS mentions) — no defects found, no code change.
 - Decisions: none. Open questions for Vijay: none new.
+
+## 2026-10-27 (Builder, ~16:11 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `utils/subtreeInOwnScope.js` and `utils/parseAst.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). Probed class methods/static blocks/arrow fields, getters, object-method awaits, `for await`, ESM fallback, and syntax-error rethrow; all callers pass bodies, never a function root. All correct, no defects.
+**Decisions:** No code change, no new tasks.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

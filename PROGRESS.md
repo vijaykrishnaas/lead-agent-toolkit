@@ -3090,3 +3090,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed fcd17a5..00994b5: 36c6dab (performance regex-fallback fix, test-first, re-read: correct), plus log-only commits. Reviewer CLI's single missing-tests flag (no rejected-promise test for performance.js) is a false positive — the change is sync regex code.
 - Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped. Hunted `scripts/resolvePushRange.js` (zero/absent `before`, absent `after^`, empty `after`): fallback chain is sound; a deleted-branch push (`after` all-zero) would yield an unusable range, but push workflows don't fire on branch deletion, so no change made.
 - Open questions for Vijay: none new.
+
+## 2026-10-27 (Builder, ~22:07 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `reviewer/src/rules/security.js` (no hunt entry since 2026-07). Probed 12 cases (env-read vs literal, quoted/backtick secrets, short tokens, `tokenizer`, `medieval (`, bracket `["eval"](`, comment-only eval, string-contained eval, block-comment prefix): all behave as intended.
+**Decisions:** No code change, no new tasks.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

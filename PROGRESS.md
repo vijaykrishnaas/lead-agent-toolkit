@@ -3100,3 +3100,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 00994b5..4588054: logs only (PROGRESS.md, runs.jsonl). Reviewer CLI's one "eval()" flag is a false positive — it fires on PROGRESS.md prose quoting the security hunt's probe cases, not code.
 - Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (remaining questions are Vijay-only). Hunted `reviewer/src/diffParser.js` (no hunt entry in recent runs): paths with spaces and trailing tab, CRLF diffs, renames, new files, multiple hunks all parse correctly. No code change.
 - Open questions for Vijay: none new (tasks 30 and 32 still need your unblock).
+
+## 2026-10-27 (Builder, ~23:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped: remaining open questions are Vijay-only decisions. Took (b): hunted `reviewer/src/standup/collectCommits.js`, `collectPullRequests.js`, `groupByAuthor.js` (no hunt since 2026-07). Read-through plus probes: whitespace/blank/missing authors bucket correctly, mixed-offset `%aI` dates pass through untouched, subjects containing the field separator rejoin intact, pagination terminates on older/short/empty pages and the page cap fails loudly. No defects.
+**Decisions:** No code change, no new tasks.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

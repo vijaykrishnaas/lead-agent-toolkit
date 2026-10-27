@@ -2993,3 +2993,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 65d6111..34de1cc (PROGRESS.md/runs.jsonl only; no code): reviewer CLI 0 issues. Branch (b): re-read `rules/missingTests.js`, `isTestFile.js`, `isCodeFile.js` (already hunted clean in an earlier run; no newer unhunted module found); no defect reproduced, no code change.
 - Decisions: no new tasks or features (no concrete gap to cite).
 - Open questions for Vijay: tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 (Builder, ~12:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `scripts/runLog.js` (arg parsing, entry validation, idle-streak, trailing-newline handling) and `utils/sanitizeMarkdownText.js` (backslash parity, newline collapse, link/HTML neutralization). No defect reproduced, no code change. Noted, not acted on: `@user` mentions pass through unescaped in report text (possible notification noise; no observed failure).
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

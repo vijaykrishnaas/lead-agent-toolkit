@@ -2892,3 +2892,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green, idle-streak 0. Reviewed 3f30c24..8103b6c (PROGRESS.md/runs.jsonl only; no code): reviewer CLI 0 issues. Backlog has only BLOCKED 30/32 and (a) is Vijay-only, so took (b): read `rules/security.js` and `scripts/invariantLint.js` (not hunted in recent runs); no defect reproduced, no change.
 - Decisions: no new tasks or FEATURE (no concrete gap).
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED (invariantLint approval; fastdl.mongodb.org allowlist).
+
+## 2026-10-27 (Builder, ~02:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only, per prior runs); took (b). Hunted the oldest-mentioned unhunted code: `sample-app` usersController/users.routes/User model (route order `/me` before `/:id`, self-only 403 on getById/update/remove, wrong-type and empty-string validation order, 11000 → 409, schema trim/lowercase setters applied on `$set`), plus `utils/collectAddedLines.js`, `resolveFileContent.js`, `parseAst.js`, `defaultExecGit.js`. Clean, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

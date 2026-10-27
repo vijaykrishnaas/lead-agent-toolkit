@@ -2878,3 +2878,7 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app; reviewer 570), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only, per prior runs); took (b). Hunted the oldest-mentioned modules: `utils/parseArgv.js`, `consumeFlagValue.js` (last mention ~line 1789) and the four CLIs. Found and fixed (test-first, red then green): `reviewPrCli.js`'s `RANGE_PATTERN` accepted only `..`, while `cli.js` accepts `..`/`...`. For `base...head` it parsed the head as `.head`, so `git rev-parse` failed and the AST post-image path was silently dropped. Pattern is now `\.{2,3}`. 1 new regression test.
 **Decisions:** Fix kept to the one pattern; did not factor the shared range regex into a util (no second failure observed).
 **Open questions for Vijay:** none new.
+
+## 2026-10-27 (Reviewer, EMPTY-BACKLOG branch b)
+- Done: reviewed 4d6e453..3f30c24 (reviewPrCli RANGE_PATTERN three-dot fix + regression test): correct, reviewer CLI reports 0 issues. Backlog empty and no open questions, so took (b): least-recently-hunted modules were config/{loadRuleConfig,buildRules,loadRules}, reviewer.js, diffParser.js (none in SKILL_CHANGELOG). Read them; fuzzed parseDiff against `git diff --numstat` over the last 60 commits (added-line counts matched on all). No bugs found, no code change.
+- Open questions for Vijay: none.

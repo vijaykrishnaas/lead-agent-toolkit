@@ -2922,3 +2922,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Reviewed faae632..1e21f9d (PROGRESS.md/runs.jsonl only; CLI reports 0 issues): clean. Backlog empty (30, 32 BLOCKED); took EMPTY-BACKLOG (b) — hunted `github/postReviewComment.js` (HMAC marker, oldest-match-wins search, pagination cap, truncation/surrogate cut, URL encoding, PATCH-vs-POST) — least recently hunted per PROGRESS.md (last mention line ~2873 of review only; findExistingBotComment last hunted ~line 1058). Clean, no code change.
 **Decisions:** No new tasks or FEATURE (no concrete evidenced gap today).
 **Open questions for Vijay:** Tasks 30 and 32 remain BLOCKED (invariantLint.js edit approval; allowlist fastdl.mongodb.org).
+
+## 2026-10-27 (Builder, ~05:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `reviewer/src/standup/collectPullRequests.js` (pagination early-exit, MAX_PAGES loud failure, Date/ISO `since` validation, URL encoding, merged/state mapping, missing `user`). No defect reproduced, no code change.
+**Decisions:** Noted but did not fix: a PR with a missing/invalid `updated_at` is treated as older-than-window and ends pagination; GitHub always supplies it, no observed failure.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

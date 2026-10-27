@@ -2947,3 +2947,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `reviewer/src/config/loadRuleConfig.js` + `buildRules.js` + `loadRules.js` (not hunted in recent runs). Probed string-typed `enabled`, uppercase `minSeverity`, unknown category, scalar category value, scalar/empty YAML root, `rules` as a list: all warn loudly and fall back to defaults. No defect reproduced, no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 — Reviewer run (hourly :35)
+
+- Done: baseline green (73 sample-app tests + reviewer suites); idle-streak 0. Reviewed cceb09b..4f6ffae (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues).
+- Decisions: backlog empty, no unresolved open question taken → EMPTY-BACKLOG (b). Hunted `utils/isCodeFile.js` and `utils/codeSpan.js` (newest utilities, not yet hunted): extension gate and fence/pad logic match CommonMark; call sites consistent (guideline 22). Clean, no code change. No [FEATURE] added (no new evidenced gap).
+- Open questions for Vijay: none new.

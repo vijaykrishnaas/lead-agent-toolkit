@@ -2953,3 +2953,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites); idle-streak 0. Reviewed cceb09b..4f6ffae (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues).
 - Decisions: backlog empty, no unresolved open question taken → EMPTY-BACKLOG (b). Hunted `utils/isCodeFile.js` and `utils/codeSpan.js` (newest utilities, not yet hunted): extension gate and fence/pad logic match CommonMark; call sites consistent (guideline 22). Clean, no code change. No [FEATURE] added (no new evidenced gap).
 - Open questions for Vijay: none new.
+
+## 2026-10-27 (Builder, ~08:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `reviewer/src/docDrift/parseOpenApi.js` + `compareRoutes.js` + `httpMethods.js` (oldest PROGRESS.md mention, line ~2445). Probed non-verb keys, root path with server base, null/empty/array YAML, case-differing params, null path item: all correct. Noted, not acted on: `/a//b` vs `/a/b` compare as drift (double slash, no observed failure). No code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

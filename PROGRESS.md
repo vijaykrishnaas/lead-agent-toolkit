@@ -2887,3 +2887,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only, per prior runs); took (b). Hunted the least-recently-mentioned modules: `sample-app` tasksController/Task/routes/error middleware (last mention line ~2607), `scripts/runLog.js` (~2729) and `docDrift/parseOpenApi.js` + `compareRoutes.js`. Probed validation, owner scoping, CastError mapping, runLog arg parsing and streak logic, optional/constrained params, base-path handling. Clean, no code change.
 **Decisions:** Noted but did not fix (design choices, no observed failure): compareRoutes is case-sensitive while Express matches case-insensitively by default; `//` in a route path is not collapsed; Express `:x*`/`:x+` modifiers do not map to `{x}`.
 **Open questions for Vijay:** none new.
+
+## 2026-10-27 (Reviewer, ~02:35 UTC) — EMPTY-BACKLOG branch (b)
+- Done: baseline green, idle-streak 0. Reviewed 3f30c24..8103b6c (PROGRESS.md/runs.jsonl only; no code): reviewer CLI 0 issues. Backlog has only BLOCKED 30/32 and (a) is Vijay-only, so took (b): read `rules/security.js` and `scripts/invariantLint.js` (not hunted in recent runs); no defect reproduced, no change.
+- Decisions: no new tasks or FEATURE (no concrete gap).
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED (invariantLint approval; fastdl.mongodb.org allowlist).

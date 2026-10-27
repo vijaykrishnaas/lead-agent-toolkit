@@ -2882,3 +2882,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-27 (Reviewer, EMPTY-BACKLOG branch b)
 - Done: reviewed 4d6e453..3f30c24 (reviewPrCli RANGE_PATTERN three-dot fix + regression test): correct, reviewer CLI reports 0 issues. Backlog empty and no open questions, so took (b): least-recently-hunted modules were config/{loadRuleConfig,buildRules,loadRules}, reviewer.js, diffParser.js (none in SKILL_CHANGELOG). Read them; fuzzed parseDiff against `git diff --numstat` over the last 60 commits (added-line counts matched on all). No bugs found, no code change.
 - Open questions for Vijay: none.
+
+## 2026-10-27 (Builder, ~01:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only, per prior runs); took (b). Hunted the least-recently-mentioned modules: `sample-app` tasksController/Task/routes/error middleware (last mention line ~2607), `scripts/runLog.js` (~2729) and `docDrift/parseOpenApi.js` + `compareRoutes.js`. Probed validation, owner scoping, CastError mapping, runLog arg parsing and streak logic, optional/constrained params, base-path handling. Clean, no code change.
+**Decisions:** Noted but did not fix (design choices, no observed failure): compareRoutes is case-sensitive while Express matches case-insensitively by default; `//` in a route path is not collapsed; Express `:x*`/`:x+` modifiers do not map to `{x}`.
+**Open questions for Vijay:** none new.

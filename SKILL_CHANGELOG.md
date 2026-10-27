@@ -309,3 +309,7 @@
 ## 2026-10-27 (Reviewer: EMPTY-BACKLOG (b) hunt, statementWalk)
 **Change:** No skill/CLAUDE.md change. Code fix: `walkStatement` no longer applies the "already ended" check to a line that starts inside an open multi-line literal; regression test added.
 **Evidence:** PROGRESS.md 2026-10-27 Reviewer 09:35 entry — reproduced truncated statement for a template literal continuation line at depth 0 (guideline 10/17 class).
+
+## 2026-10-27 (Builder: EMPTY-BACKLOG (b) hunt, collectBoundedBlock/maskStringLiterals)
+**Change:** No skill/CLAUDE.md change. Code fix: `maskStringLiterals`/`maskComments` now recognize single-line regex literals (operand-position `/`), so a `{`, `}` or quote inside one is no longer read as block structure or a string start; regression tests added.
+**Evidence:** PROGRESS.md 2026-10-27 Builder (~09:05 UTC) entry — reproduced `collectBoundedBlock` sweeping `other();` and a stray `}` into a forEach block when the body contained `/\{/` (guideline 10 class, regex category).

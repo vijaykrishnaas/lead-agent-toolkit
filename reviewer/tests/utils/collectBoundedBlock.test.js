@@ -5,6 +5,11 @@ function linesFrom(contents) {
 }
 
 describe('collectBoundedBlock', () => {
+  it('ignores a brace inside a regex literal when finding the block end', () => {
+    const addedLines = linesFrom(['items.forEach(x => {', '  if (/\\{/.test(x)) go();', '});', 'other();', '}']);
+    expect(collectBoundedBlock(addedLines, 0)).toBe('items.forEach(x => {\n  if (/\\{/.test(x)) go();\n});');
+  });
+
   it('collects a single-line block from its own opening to closing brace', () => {
     const addedLines = linesFrom(['function f() { return 1; }']);
     expect(collectBoundedBlock(addedLines, 0)).toBe('function f() { return 1; }');

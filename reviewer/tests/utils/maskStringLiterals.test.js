@@ -1,5 +1,23 @@
 const { maskStringLiterals, maskComments } = require('../../src/utils/maskStringLiterals');
 
+describe('regex literals', () => {
+  it('masks a brace or quote inside a regex literal, preserving length', () => {
+    const a = 'if (/\\{/.test(x)) go();';
+    expect(maskStringLiterals(a).masked).toBe('if (    .test(x)) go();');
+    const b = "const re = /'[}]/g; run();";
+    const { masked, quoteState } = maskStringLiterals(b);
+    expect(masked).toBe('const re =        ; run();');
+    expect(quoteState).toBeNull();
+    expect(maskComments(b).masked).toBe("const re = /'[}]/g; run();");
+    expect(maskComments(b).quoteState).toBeNull();
+  });
+
+  it('still treats division as division', () => {
+    const c = 'const r = a / b; const s = x / 2 + "}" / 3;';
+    expect(maskStringLiterals(c).masked).toBe('const r = a / b; const s = x / 2 +     / 3;');
+  });
+});
+
 describe('maskStringLiterals', () => {
   it('masks a double-quoted string, preserving length and non-string characters', () => {
     const content = 'res.json({ note: "unexpected {" });';

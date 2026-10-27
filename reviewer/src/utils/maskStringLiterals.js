@@ -14,6 +14,29 @@ function blank(ch) {
   return ch === '\n' ? '\n' : ' ';
 }
 
+// A `/` starts a regex literal (not division) when the previous significant
+// character cannot end an operand. Returns the index just past the closing
+// `/` and flags, or -1 when this `/` is division or the literal does not
+// close on this line. A brace or quote inside a regex (`/\{/`, `/'/`) would
+// otherwise be read as real block structure or the start of a string.
+const REGEX_PRECEDERS = '(,=:[!&|?{};+-*%<>~^';
+function regexLiteralEnd(content, i, prev) {
+  if (prev !== null && !REGEX_PRECEDERS.includes(prev)) return -1;
+  let inClass = false;
+  for (let j = i + 1; j < content.length; j += 1) {
+    const ch = content[j];
+    if (ch === '\\') j += 1;
+    else if (ch === '[') inClass = true;
+    else if (ch === ']') inClass = false;
+    else if (ch === '/' && !inClass) {
+      let end = j + 1;
+      while (end < content.length && /[a-z]/.test(content[end])) end += 1;
+      return end;
+    }
+  }
+  return -1;
+}
+
 // Replaces the contents of single/double-quoted and template-literal
 // strings, `//` line comments, and `/* */` block comments in `content` with
 // spaces (same length, so column positions and non-string/non-comment
@@ -41,6 +64,7 @@ function blank(ch) {
 function maskStringLiterals(content, quoteState = null) {
   let masked = '';
   let state = quoteState;
+  let prev = null;
   let i = 0;
   while (i < content.length) {
     if (state === '/*') {
@@ -80,7 +104,10 @@ function maskStringLiterals(content, quoteState = null) {
         i += 2;
         continue;
       }
-      if (ch === state) state = null;
+      if (ch === state) {
+        state = null;
+        prev = ch;
+      }
       masked += blank(ch);
       i += 1;
       continue;
@@ -98,6 +125,15 @@ function maskStringLiterals(content, quoteState = null) {
       state = '/*';
       continue;
     }
+    if (ch === '/') {
+      const end = regexLiteralEnd(content, i, prev);
+      if (end !== -1) {
+        masked += ' '.repeat(end - i);
+        i = end;
+        prev = '/';
+        continue;
+      }
+    }
     if (ch === '"' || ch === "'" || ch === '`') {
       state = ch;
       masked += ' ';
@@ -105,6 +141,7 @@ function maskStringLiterals(content, quoteState = null) {
       continue;
     }
     masked += ch;
+    if (ch.trim() !== '') prev = ch;
     i += 1;
   }
   return { masked, quoteState: state };
@@ -123,6 +160,7 @@ function maskStringLiterals(content, quoteState = null) {
 function maskComments(content, quoteState = null) {
   let masked = '';
   let state = quoteState;
+  let prev = null;
   let i = 0;
   while (i < content.length) {
     if (state === '/*') {
@@ -148,7 +186,10 @@ function maskComments(content, quoteState = null) {
         i += 2;
         continue;
       }
-      if (ch === state) state = null;
+      if (ch === state) {
+        state = null;
+        prev = ch;
+      }
       masked += ch;
       i += 1;
       continue;
@@ -166,6 +207,15 @@ function maskComments(content, quoteState = null) {
       state = '/*';
       continue;
     }
+    if (ch === '/') {
+      const end = regexLiteralEnd(content, i, prev);
+      if (end !== -1) {
+        masked += content.slice(i, end);
+        i = end;
+        prev = '/';
+        continue;
+      }
+    }
     if (ch === '"' || ch === "'" || ch === '`') {
       state = ch;
       masked += ch;
@@ -173,6 +223,7 @@ function maskComments(content, quoteState = null) {
       continue;
     }
     masked += ch;
+    if (ch.trim() !== '') prev = ch;
     i += 1;
   }
   return { masked, quoteState: state };

@@ -2873,3 +2873,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed dd0b9ae..4d6e453 (docs/log-only commits) — reviewer CLI 0 issues. Baseline green. EMPTY-BACKLOG branch (b) (tasks 30, 32 BLOCKED; (a) is Vijay-only): hunted `github/postReviewComment.js` and `format/markdownReport.js` (oldest hunt mention, 11:12 UTC) — truncation surrogate handling, first-match marker, URL encoding, sanitization all correct; clean, no change.
 - Decisions: no new tasks/features. Idle streak 0.
 - Open questions for Vijay: tasks 30 and 32 still need your unblock.
+
+## 2026-10-27 — Builder run (EMPTY-BACKLOG branch b)
+**Done:** Baseline green (73 sample-app; reviewer 570), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only, per prior runs); took (b). Hunted the oldest-mentioned modules: `utils/parseArgv.js`, `consumeFlagValue.js` (last mention ~line 1789) and the four CLIs. Found and fixed (test-first, red then green): `reviewPrCli.js`'s `RANGE_PATTERN` accepted only `..`, while `cli.js` accepts `..`/`...`. For `base...head` it parsed the head as `.head`, so `git rev-parse` failed and the AST post-image path was silently dropped. Pattern is now `\.{2,3}`. 1 new regression test.
+**Decisions:** Fix kept to the one pattern; did not factor the shared range regex into a util (no second failure observed).
+**Open questions for Vijay:** none new.

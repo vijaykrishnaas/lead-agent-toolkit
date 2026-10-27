@@ -213,6 +213,18 @@ describe('runReviewPrCli', () => {
     );
   });
 
+  it('accepts a three-dot range and resolves only the head ref (not ".head") via rev-parse', async () => {
+    const execGit = jest.fn((gitArgs) => {
+      if (gitArgs[0] === 'rev-parse') return 'deadbeef\n';
+      return loadFixture('clean.diff');
+    });
+    const deps = basePassingDeps({ execGit, repo: '/repo' });
+
+    await runReviewPrCli(['--owner', 'o', '--gh-repo', 'r', '--pr', '1', 'base...head', '--repo', '/repo'], deps);
+
+    expect(execGit).toHaveBeenCalledWith(['rev-parse', 'head'], '/repo');
+  });
+
   it('still posts the review when git rev-parse fails, falling back to no content-resolution options', async () => {
     const execGit = jest.fn((gitArgs) => {
       if (gitArgs[0] === 'rev-parse') throw new Error('fatal: ambiguous argument');

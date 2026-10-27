@@ -2932,3 +2932,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73), idle-streak 0. Reviewed 1e21f9d..ca5c797 (PROGRESS.md/runs.jsonl only; reviewer CLI: no issues). Branch taken: EMPTY-BACKLOG (b) — (a) has no unresolved question beyond blocked tasks 30/32. Hunted `docDriftCli.js` + `utils/parseArgv.js` (least recently audited since 2026-10-2x: missing values, repeated flag, `--flag=value`, bad paths): all fail loudly with exit 1, clean, no code change.
 **Decisions:** No tasks added (no evidence-cited gap).
 **Open questions for Vijay:** Tasks 30 and 32 remain BLOCKED (invariantLint edit approval; fastdl.mongodb.org allowlist).
+
+## 2026-10-27 (Builder, ~06:05 UTC) — EMPTY-BACKLOG branch (b)
+**Done:** Baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions are Vijay-only). Took (b): hunted `sample-app` `tasksController.js` + `tasks.routes.js` + the `app.js` error middleware (owner scoping on every query, title/description/completed type validation order, `$set` built only from validated fields, CastError → 400, async wrapper on every route). No defect reproduced, no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Tasks 30 and 32 still need your unblock.

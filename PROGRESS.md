@@ -3113,3 +3113,7 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-28 — Builder (EMPTY-BACKLOG-b)
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions Vijay-only); took (b): hunted `sample-app/src/routes/*`, `config/jwtSecret.js`, `middleware/auth.js` (fewest PROGRESS mentions). Read-through: all async handlers wrapped, auth applied via router.use, secret resolved outside try/catch so misconfig is a 500 not 401, sync throw is caught by Express, HS256 pinned, case-insensitive bearer scheme. No defect, no code change.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (UTC :35)
+- Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 43788a7..658a055: PROGRESS/runs.jsonl only, reviewer CLI 0 issues.
+- Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (open questions Vijay-only). Hunted `utils/isTestFile.js` and `utils/defaultExecGit.js` (fewest PROGRESS mentions): whole-segment dir match (`latest.js`, `protests/`, `contest.js` correctly rejected), `.spec/.test` with mjs/cjs/ts/jsx, `tests.js` rejected; maxBuffer raised for large diffs. Backslash paths are not matched, but git always emits forward slashes, so not a defect. No code change.

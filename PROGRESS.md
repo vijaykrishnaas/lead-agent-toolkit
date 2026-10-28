@@ -3185,3 +3185,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed ac63397..a2185a0: PROGRESS.md/runs.jsonl only, no code. Baseline green, idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty; hunted `utils/parseGitHubRemote.js` (13 remote shapes: https/ssh/scp, creds, port, trailing slash, `.git.git`, dot-only names, lookalike hosts) and `standup/collectPullRequests.js` (pagination exit, window cap, encoding) by reading + execution: clean, no code change.
 - Open questions for Vijay: none new.
+
+## 2026-10-28 — Builder (EMPTY-BACKLOG b)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b): hunted `scripts/syncPlugin.js` (last hunted earliest in PROGRESS.md, ~line 2942). Re-read `mirrorDir`: type-mismatch removal (file<->dir, dest symlink via lstat) correct, stale-dest pruning correct, recursion correct. Only nit is a source symlink being skipped without pruning a stale dest copy; `.claude/skills` contains no symlinks, so no realistic path — not worth code.
+- Decisions: no code change, no new tasks; none evidenced.
+- Open questions for Vijay: Tasks 30 and 32 still need your unblock.

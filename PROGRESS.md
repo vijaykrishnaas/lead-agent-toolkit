@@ -3234,3 +3234,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/format/markdownReport.js` + `reviewer/src/utils/sanitizeMarkdownText.js` (oldest by last PROGRESS.md mention, ~line 3056): newline collapse and escape set (incl. backslash, parity-safe) correct; file/message/fix all sanitized; line/severity/category are not attacker-controlled. Bare GFM autolinks and `@mentions` inside quoted text remain live but are low impact and unobserved. Clean, no code change.
 - Open questions for Vijay: unchanged — approve the `scripts/invariantLint.js` change for task 30, and allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32.
+
+## 2026-10-28 — Reviewer run (EMPTY-BACKLOG b)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 61e1a9f..HEAD (a90b69e): PROGRESS.md/runs.jsonl only, sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/diffParser.js` (+ `collectAddedLines`, `isTestFile`): probed new-file, trailing-tab headers, spaces in paths, blank context lines with `\ No newline`, CRLF headers — line numbers and paths all correct. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

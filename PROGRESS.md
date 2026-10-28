@@ -3160,3 +3160,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-28 — Builder (EMPTY-BACKLOG b)
 - Done: baseline green, idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions Vijay-only); took (b): hunted `reviewer/src/utils/memberCallLine.js` and its callers in `errorHandling.js` (last hunted earliest in PROGRESS.md, ~line 2963). Computed-access (`p['then']`, `p[then]`) is guarded by `callee.computed` checks at both call sites; chain-continuation line logic correct. Clean, no code change.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (hourly :35)
+- Done: reviewed 61bd21f..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues). Baseline green (73 sample-app tests + reviewer suites). Branch taken: EMPTY-BACKLOG (b) — (a) skipped (remaining blockers 30/32 need Vijay's action, already raised); hunted least-recently-hunted docDrift/httpMethods.js, parseOpenApi.js, parseAst.js (verb case, `x-` keys, basePath, ESM fallback): clean, no code change.
+- Decisions: no new tasks/features; none evidenced.
+- Open questions for Vijay: unchanged (tasks 30 and 32 still BLOCKED awaiting approval/allowlist).

@@ -191,6 +191,21 @@ describe('parseRouterSource', () => {
 });
 
 describe('parseAppEntrySource', () => {
+  it('keeps mounts whose router is an inline require(), mixed with identifier mounts', () => {
+    const source = [
+      "const usersRouter = require('./users.routes');",
+      "app.use('/users', usersRouter);",
+      "app.use('/x', require('./y'));",
+      "app.use(\"/z\", requireAuth(), require(\"./z.routes\"));",
+      "app.use(express.json());",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/users', requirePath: './users.routes' },
+      { prefix: '/x', requirePath: './y' },
+      { prefix: '/z', requirePath: './z.routes' },
+    ]);
+  });
+
   it('keeps a mount whose middleware is a call expression, e.g. authorize("admin")', () => {
     const source = [
       "const adminRouter = require('./admin.routes');",

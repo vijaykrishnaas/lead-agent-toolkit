@@ -9,7 +9,7 @@ const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION}
 // under a sub-prefix) — the same mount syntax, just on a different receiver
 // — so a nested router's own routes aren't dropped when this same parser is
 // run recursively against router files, not just the app entry file.
-const MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(['"])(.*?)\1\s*,\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*([A-Za-z_$][\w$]*)\s*\)/g;
+const MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(['"])(.*?)\1\s*,\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\3\s*\)|([A-Za-z_$][\w$]*))\s*\)/g;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
@@ -136,8 +136,8 @@ function parseAppEntrySource(source) {
 
   const mounts = [];
   for (const match of commentMasked.matchAll(MOUNT_PATTERN)) {
-    const [, , prefix, varName] = match;
-    const requirePath = requiresByVarName.get(varName);
+    const [, , prefix, , inlineRequirePath, varName] = match;
+    const requirePath = inlineRequirePath || requiresByVarName.get(varName);
     if (requirePath) mounts.push({ prefix, requirePath });
   }
 

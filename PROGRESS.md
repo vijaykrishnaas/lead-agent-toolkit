@@ -3195,3 +3195,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed a2185a0..HEAD: PROGRESS.md/runs.jsonl only, reviewer CLI: 0 issues. Baseline green, idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `docDrift/parseExpressRoutes.js` (least recently audited real module, last mention ~line 2775). Chains, string/regex parens in handlers, comments, quotes, multi-line args: clean. Found and fixed (test-first): `app.use(prefix, authorize('x'), router)` dropped the mount because middleware had to be a bare identifier. Added task 34 for inline `require()` mounts (larger).
 - Open questions for Vijay: none new (30 and 32 still need your unblock).
+
+## 2026-10-28 — Builder (task 34)
+- Done: baseline green (73 sample-app + 580 reviewer tests), idle-streak 0. Task 34: `MOUNT_PATTERN` in `docDrift/parseExpressRoutes.js` now accepts an inline `require('./x')` as the final mounted router (alongside identifier routers); `parseAppEntrySource` prefers the inline path, else resolves the identifier. Test covers mixed inline/identifier mounts, double quotes, and middleware before an inline require. Suites green after.
+- Decisions: single combined regex rather than a second pattern, so mount order in the output stays source order.
+- Open questions for Vijay: tasks 30 and 32 still need your unblock.

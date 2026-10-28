@@ -3127,3 +3127,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 658a055..HEAD: PROGRESS/runs.jsonl only, reviewer CLI 0 issues.
 - Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (open questions Vijay-only). Hunted `docDrift/generateDocDrift.js` (fewest mentions: 19): thin synchronous pipeline, sync end-to-end with `docDriftCli` (no await anywhere), so guideline 5 does not apply. Clean, no code change.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Builder (EMPTY-BACKLOG-b)
+- Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions Vijay-only); took (b): hunted `reviewer/src/config/loadRuleConfig.js`, `buildRules.js`, `loadRules.js` (no hunt entry in recent runs). Probed empty/scalar/list YAML, `style: false`, bad/uppercase minSeverity, string `"false"`, misspelled category, severity-less issues, undefined rule output: all warn or fall back as documented; rules receive `file.content` via the files array, so the `check(files)` wrapper loses nothing. Clean, no code change.
+- Open questions for Vijay: Tasks 30 and 32 still need your unblock.

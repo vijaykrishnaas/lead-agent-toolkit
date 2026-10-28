@@ -3170,3 +3170,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b): hunted `reviewer/src/standup/formatStandup.js` (last hunted earliest in PROGRESS.md, ~line 2868). Checked empty-window wording, author/commit/PR sanitization, sort stability, `meta.since` and `pr.state` interpolation (CLI-supplied / GitHub enum, not attacker text). Clean, no code change.
 - Decisions: no new tasks; none evidenced.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (hourly :35)
+- Done: reviewed e067b65..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues). Baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Branch taken: EMPTY-BACKLOG (b) — (a) skipped (remaining blockers 30/32 need Vijay's action); hunted `reviewer/src/standup/groupByAuthor.js` and `collectCommits.js` (blank/non-string authors, invalid/absent `since`, subject containing the field separator, empty output): clean, no code change.
+- Decisions: no new tasks/features; none evidenced.
+- Open questions for Vijay: unchanged (tasks 30 and 32 still BLOCKED).

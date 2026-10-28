@@ -3141,3 +3141,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (reviewer + sample-app suites), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only decisions); took (b): hunted `reviewer/src/utils/subtreeInOwnScope.js`, `docDrift/formatDocDrift.js`, `sample-app/src/config/db.js` (fewest mentions among modules not hunted earlier today). Probed `subtreeInOwnScope` with a function node as root: returns false (the OWN_SCOPE_BASE override enumerates no children for it), but all three callers (`errorHandling.js` x2, `performance.js`) pass `.body`/statement nodes, so it is a latent footgun only, not a defect. `formatDocDriftReport` routes file/method/path through `codeSpan` and its empty-state branch counts unparsed routes. Clean, no code change.
 - Decisions: no speculative edit for the latent footgun (no observed failure).
 - Open questions for Vijay: none new.
+
+## 2026-10-28 — Reviewer run (UTC :35, fourth)
+- Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed b83ed7e..4d98dff: PROGRESS/runs.jsonl only, no code.
+- Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (open questions Vijay-only). Hunted `reviewPrCli.js` and `docDriftCli.js` (no recent hunt entry): range regex, `--repo` pre-scan, stage try/catch guards, post-result wording derived from return value — clean, no code change.
+- Open questions for Vijay: Tasks 30 and 32 still need your unblock.

@@ -3229,3 +3229,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app + reviewer suites), idle-streak 0. Commits since the last reviewer entry touch only PROGRESS.md/runs.jsonl; reviewer CLI on the range reports 0 issues.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted sample-app `authController.js`, `usersController.js`, `auth` middleware, `User` model (oldest by last PROGRESS.md mention): token scheme handling, wrong-typed bodies, 72-byte cap, timing-safe login, id ownership checks, 11000 handling: all clean. No code change.
 - Open questions for Vijay: tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Builder run (EMPTY-BACKLOG b)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/format/markdownReport.js` + `reviewer/src/utils/sanitizeMarkdownText.js` (oldest by last PROGRESS.md mention, ~line 3056): newline collapse and escape set (incl. backslash, parity-safe) correct; file/message/fix all sanitized; line/severity/category are not attacker-controlled. Bare GFM autolinks and `@mentions` inside quoted text remain live but are low impact and unobserved. Clean, no code change.
+- Open questions for Vijay: unchanged — approve the `scripts/invariantLint.js` change for task 30, and allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32.

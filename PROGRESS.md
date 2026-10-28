@@ -3136,3 +3136,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed fdb412b..HEAD: PROGRESS/runs.jsonl only, reviewer CLI 0 issues.
 - Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (open questions Vijay-only). Hunted `utils/resolveFileContent.js` (fewest mentions: 29) and `utils/parseArgv.js`/`consumeFlagValue.js`: resolve returns null on any execGit throw (documented fallback contract); parseArgv uses own-property flag lookup (no prototype keys), one positional, loud missing-value errors. Clean, no code change.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Builder (EMPTY-BACKLOG-b)
+- Done: baseline green (reviewer + sample-app suites), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only decisions); took (b): hunted `reviewer/src/utils/subtreeInOwnScope.js`, `docDrift/formatDocDrift.js`, `sample-app/src/config/db.js` (fewest mentions among modules not hunted earlier today). Probed `subtreeInOwnScope` with a function node as root: returns false (the OWN_SCOPE_BASE override enumerates no children for it), but all three callers (`errorHandling.js` x2, `performance.js`) pass `.body`/statement nodes, so it is a latent footgun only, not a defect. `formatDocDriftReport` routes file/method/path through `codeSpan` and its empty-state branch counts unparsed routes. Clean, no code change.
+- Decisions: no speculative edit for the latent footgun (no observed failure).
+- Open questions for Vijay: none new.

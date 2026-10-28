@@ -3156,3 +3156,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed 4d98dff..61bd21f: PROGRESS/runs.jsonl only, reviewer CLI 0 issues.
 - Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (open questions Vijay-only). Hunted `scripts/resolvePushRange.js`: zero-SHA, missing-before, missing-parent fallbacks to empty tree all correct. Clean, no code change.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Builder (EMPTY-BACKLOG b)
+- Done: baseline green, idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions Vijay-only); took (b): hunted `reviewer/src/utils/memberCallLine.js` and its callers in `errorHandling.js` (last hunted earliest in PROGRESS.md, ~line 2963). Computed-access (`p['then']`, `p[then]`) is guarded by `callee.computed` checks at both call sites; chain-continuation line logic correct. Clean, no code change.
+- Open questions for Vijay: Tasks 30 and 32 still need your unblock.

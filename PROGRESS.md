@@ -3259,3 +3259,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 5c12ab0..HEAD (PROGRESS.md/runs.jsonl only): sound. Baseline green (73 sample-app tests + reviewer suites), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/docDrift/formatDocDrift.js` and re-read `parseOpenApi.js` (empty-section branches, unparsed-only report, code-span rendering, basePath/server-url handling): clean, no change.
 - Open questions for Vijay: unchanged (tasks 30, 32 unblock).
+
+## 2026-10-28 — Builder run (EMPTY-BACKLOG b: formatStandup/generateStandup hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/standup/formatStandup.js` and `generateStandup.js` (no hunt since 2026-07): mixed-offset commit dates sort chronologically, newline-bearing commit messages collapse to one line, empty-activity authors render, invalid/explicit `since` handled, empty-state wording derives from the actual window. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

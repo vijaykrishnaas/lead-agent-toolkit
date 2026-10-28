@@ -3131,3 +3131,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-10-28 — Builder (EMPTY-BACKLOG-b)
 - Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (open questions Vijay-only); took (b): hunted `reviewer/src/config/loadRuleConfig.js`, `buildRules.js`, `loadRules.js` (no hunt entry in recent runs). Probed empty/scalar/list YAML, `style: false`, bad/uppercase minSeverity, string `"false"`, misspelled category, severity-less issues, undefined rule output: all warn or fall back as documented; rules receive `file.content` via the files array, so the `check(files)` wrapper loses nothing. Clean, no code change.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (UTC :35, third)
+- Done: baseline green (73 sample-app tests; full suite green), idle-streak 0. Reviewed fdb412b..HEAD: PROGRESS/runs.jsonl only, reviewer CLI 0 issues.
+- Branch: EMPTY-BACKLOG (b), backlog empty and (a) skipped (open questions Vijay-only). Hunted `utils/resolveFileContent.js` (fewest mentions: 29) and `utils/parseArgv.js`/`consumeFlagValue.js`: resolve returns null on any execGit throw (documented fallback contract); parseArgv uses own-property flag lookup (no prototype keys), one positional, loud missing-value errors. Clean, no code change.
+- Open questions for Vijay: Tasks 30 and 32 still need your unblock.

@@ -3200,3 +3200,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app + 580 reviewer tests), idle-streak 0. Task 34: `MOUNT_PATTERN` in `docDrift/parseExpressRoutes.js` now accepts an inline `require('./x')` as the final mounted router (alongside identifier routers); `parseAppEntrySource` prefers the inline path, else resolves the identifier. Test covers mixed inline/identifier mounts, double quotes, and middleware before an inline require. Suites green after.
 - Decisions: single combined regex rather than a second pattern, so mount order in the output stays source order.
 - Open questions for Vijay: tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (b4ac0da review; EMPTY-BACKLOG branch b)
+- Reviewed b3f0a37..b4ac0da (task 34 inline-require mounts): sound; reviewer CLI reports 0 issues.
+- Branch taken: EMPTY-BACKLOG (b), continued hunting `docDrift/parseExpressRoutes.js` mount pattern (task 34 follow-up probing). Reproduced `app.use('/a', require('./a').router)` -> mounts [] ; fixed test-first (optional property access after inline require).
+- Not fixed (rare, no evidence of real use): array-of-middleware mounts, `mw('x)')` string with paren inside middleware call args.
+- Open questions for Vijay: none new.

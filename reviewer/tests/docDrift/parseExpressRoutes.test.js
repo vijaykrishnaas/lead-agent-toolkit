@@ -191,6 +191,13 @@ describe('parseRouterSource', () => {
 });
 
 describe('parseAppEntrySource', () => {
+  it('keeps a mount whose router is an inline require() with a property access', () => {
+    const source = "app.use('/a', require('./a').router);";
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/a', requirePath: './a' },
+    ]);
+  });
+
   it('keeps mounts whose router is an inline require(), mixed with identifier mounts', () => {
     const source = [
       "const usersRouter = require('./users.routes');",

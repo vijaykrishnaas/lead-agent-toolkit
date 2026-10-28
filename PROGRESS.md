@@ -3254,3 +3254,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/compareRoutes.js` (oldest by last PROGRESS.md mention, ~line 3071): probed optional params mid-path and multiple in a row, constrained optional params, repeated/trailing slashes, `:name.:ext`, empty path, and a code `/:id?` vs spec `/` + `/{id}`: all normalize and match correctly. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-28 — Reviewer run (14:35 UTC)
+- Done: reviewed 5c12ab0..HEAD (PROGRESS.md/runs.jsonl only): sound. Baseline green (73 sample-app tests + reviewer suites), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/docDrift/formatDocDrift.js` and re-read `parseOpenApi.js` (empty-section branches, unparsed-only report, code-span rendering, basePath/server-url handling): clean, no change.
+- Open questions for Vijay: unchanged (tasks 30, 32 unblock).

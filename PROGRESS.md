@@ -3218,3 +3218,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app + reviewer suites). Reviewed d831527/46e6b5f/52834bb: `.cjs/.mjs` explicit router require resolution and `require(...).prop` mount suffix are correct and test-covered; reviewer CLI on the range reports no issues.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) skipped as in prior runs. Hunted `reviewer/src/utils/statementWalk.js` (last touched by a hunt at PROGRESS.md line ~2973, oldest among utils): operator-continuation lines are only reachable on the regex fallback path (AST is primary since task 23), no realistic reproduction found; clean, no code change.
 - Open questions for Vijay: none new.
+
+## 2026-10-28 — Builder (EMPTY-BACKLOG b: tasks routes/controller hunt)
+- Done: baseline green (73 sample-app + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/tasks.routes.js` + `controllers/tasksController.js` + `models/Task.js` (oldest by last PROGRESS.md mention, ~line 2937): owner scoping on every query, bad-id CastError -> 400 via the catch-all, wrong-typed body fields, mass-assignment (only whitelisted fields read), empty-body update, asyncHandler rejection routing: all clean (Express 4 gives `req.body = {}`, so no undefined-destructure path). No code change.
+- Decisions: no new tasks; none evidenced.
+- Open questions for Vijay: tasks 30 and 32 still need your unblock.

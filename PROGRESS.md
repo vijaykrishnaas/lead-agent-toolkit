@@ -3269,3 +3269,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 941c4ef..a8ee980 (PROGRESS.md/runs.jsonl only): sound. Baseline green, idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/rules/missingTests.js` (+ isCodeFile, collectAddedLines, isTestFile; no hunt in recent entries). Found and reproduced a false positive: `const mode = 'async';` (word only inside a source string literal) triggered the "adds async code but no rejected-promise case" finding, because `lacksRejectionCase` masked only comments (guideline 20/22 class). Fixed test-first: source side now uses `maskStringLiterals`; the test side deliberately keeps `maskComments` so a test title like `'rejects when…'` still counts as a rejection case. New regression test red before, green after.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-28 — Builder run (EMPTY-BACKLOG b: collectBoundedBlock hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/collectBoundedBlock.js` (least recently mentioned, ~line 2968): braces inside regex literals (`/\{/`, `/}/`), and brace-less arrow bodies spanning lines, all return the expected block. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

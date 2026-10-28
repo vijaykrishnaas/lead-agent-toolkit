@@ -313,3 +313,7 @@
 ## 2026-10-27 (Builder: EMPTY-BACKLOG (b) hunt, collectBoundedBlock/maskStringLiterals)
 **Change:** No skill/CLAUDE.md change. Code fix: `maskStringLiterals`/`maskComments` now recognize single-line regex literals (operand-position `/`), so a `{`, `}` or quote inside one is no longer read as block structure or a string start; regression tests added.
 **Evidence:** PROGRESS.md 2026-10-27 Builder (~09:05 UTC) entry — reproduced `collectBoundedBlock` sweeping `other();` and a stray `}` into a forEach block when the body contained `/\{/` (guideline 10 class, regex category).
+
+## 2026-10-28 (Reviewer: EMPTY-BACKLOG (b) hunt, docDrift parseExpressRoutes)
+**Change:** No skill/CLAUDE.md change. Code fix: `MOUNT_PATTERN` now tolerates call-expression middleware (`app.use('/admin', authorize('admin'), router)`); regression test added. New TASKS.md task 34 (inline `require()` mounts dropped) appended.
+**Evidence:** PROGRESS.md 2026-10-28 Reviewer 08:35 entry — reproduced `app.use('/api2', auth(), r)` yielding no mount, so the sub-router's routes were reported as documented-but-unimplemented drift.

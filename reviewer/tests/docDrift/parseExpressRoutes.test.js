@@ -191,6 +191,16 @@ describe('parseRouterSource', () => {
 });
 
 describe('parseAppEntrySource', () => {
+  it('keeps a mount whose middleware is a call expression, e.g. authorize("admin")', () => {
+    const source = [
+      "const adminRouter = require('./admin.routes');",
+      "app.use('/admin', requireAuth(), authorize('admin', 'ops'), adminRouter);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/admin', requirePath: './admin.routes' },
+    ]);
+  });
+
   it('extracts direct app routes and resolves mounts to their required file', () => {
     const source = `
       const express = require('express');

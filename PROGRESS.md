@@ -3190,3 +3190,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b): hunted `scripts/syncPlugin.js` (last hunted earliest in PROGRESS.md, ~line 2942). Re-read `mirrorDir`: type-mismatch removal (file<->dir, dest symlink via lstat) correct, stale-dest pruning correct, recursion correct. Only nit is a source symlink being skipped without pruning a stale dest copy; `.claude/skills` contains no symlinks, so no realistic path — not worth code.
 - Decisions: no code change, no new tasks; none evidenced.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (08:35 UTC slot)
+- Reviewed a2185a0..HEAD: PROGRESS.md/runs.jsonl only, reviewer CLI: 0 issues. Baseline green, idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED); hunted `docDrift/parseExpressRoutes.js` (least recently audited real module, last mention ~line 2775). Chains, string/regex parens in handlers, comments, quotes, multi-line args: clean. Found and fixed (test-first): `app.use(prefix, authorize('x'), router)` dropped the mount because middleware had to be a bare identifier. Added task 34 for inline `require()` mounts (larger).
+- Open questions for Vijay: none new (30 and 32 still need your unblock).

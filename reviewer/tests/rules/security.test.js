@@ -132,4 +132,20 @@ describe('security rule', () => {
     const issues = securityRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([3]);
   });
+
+  it('does not flag eval( that appears only inside a string literal, but still flags real calls and the bracket form', () => {
+    const diff = [
+      'diff --git a/src/d.js b/src/d.js',
+      '--- a/src/d.js',
+      '+++ b/src/d.js',
+      '@@ -0,0 +1,4 @@',
+      "+const msg = 'never call eval(x) here';",
+      '+const hint = `avoid eval(` + name + `)`;',
+      "+const out = eval('1'); const note = 'eval(y)';",
+      "+const g = global['eval'](input);",
+      '',
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([3, 4]);
+  });
 });

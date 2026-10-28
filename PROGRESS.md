@@ -3279,3 +3279,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed a8ee980..1f1e4b8 (missingTests string-literal fix, builder collectBoundedBlock hunt, logs): sound, `reviewer/src/cli.js` reports 0 issues. Baseline green, idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/config/` (loadRuleConfig, buildRules, loadRules; not mentioned in recent hunts): empty/scalar/list YAML, `__proto__`/`constructor`/`toString` category names, bad severity casing, null entries all degrade to defaults without crashing. Clean, no code change. Minor observation (not acted on): a YAML file whose top level is a scalar/list is ignored without a warning.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-28 — Builder run (EMPTY-BACKLOG b: security.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/rules/security.js` (not hunted in recent entries). Found and reproduced a false positive: `const msg = 'never call eval(x) here'` was flagged "Use of eval()" because the direct `eval(` form ran against comment-masked text (guideline 19/20/22 class). Fixed test-first: the direct form now runs against string-masked text, the bracket form (`global['eval'](x)`) stays on comment-masked text since it needs its quoted "eval". New regression test red before, green after; reviewer 585 + sample-app 73 green.
+- Observation (not acted on): `SECRET_PATTERN` requires the keyword at the end of the identifier, so `secret_key = "abcd"` / `passwd = "abcdef"` are not flagged (a false negative; widening is speculative, no observed miss).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

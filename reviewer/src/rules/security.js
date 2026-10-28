@@ -1,5 +1,5 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
-const { maskComments } = require('../utils/maskStringLiterals');
+const { maskComments, maskStringLiterals } = require('../utils/maskStringLiterals');
 
 const SECRET_PATTERN = /(password|secret|apikey|api_key|token)['"`]?\s*[:=]\s*['"`][^'"`]{3,}['"`]/i;
 // \beval\s*\( catches the direct call form (`eval(x)`). It does not catch
@@ -8,7 +8,8 @@ const SECRET_PATTERN = /(password|secret|apikey|api_key|token)['"`]?\s*[:=]\s*['
 // followed by `]`, not `(`, so the word-boundary form never matches. The
 // second alternative catches that shape directly (quoted "eval" inside
 // brackets, immediately invoked).
-const EVAL_PATTERN = /\beval\s*\(|\[\s*(['"])eval\1\s*\]\s*\(/;
+const EVAL_CALL = /\beval\s*\(/;
+const EVAL_BRACKET_CALL = /\[\s*(['"])eval\1\s*\]\s*\(/;
 
 // No process.env exemption here: SECRET_PATTERN only matches when the
 // operator is immediately followed by a quoted literal, which a genuine
@@ -32,9 +33,13 @@ function check(files) {
           fix: 'Load secrets from environment variables or a secrets manager instead of hardcoding them.',
         });
       }
-      // Comment-masked (not string-masked): the bracket form needs its quoted
-      // "eval" intact. Per-line, fresh quoteState, like style.js.
-      if (EVAL_PATTERN.test(maskComments(line.content).masked)) {
+      // Direct form: string-masked, so `'avoid eval(x)'` is not a call. Bracket
+      // form: comment-masked only, since it needs its quoted "eval" intact.
+      // Per-line, fresh quoteState, like style.js.
+      if (
+        EVAL_CALL.test(maskStringLiterals(line.content).masked) ||
+        EVAL_BRACKET_CALL.test(maskComments(line.content).masked)
+      ) {
         issues.push({
           file: file.file,
           line: line.newLine,

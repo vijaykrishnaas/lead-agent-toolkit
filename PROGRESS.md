@@ -3239,3 +3239,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 61e1a9f..HEAD (a90b69e): PROGRESS.md/runs.jsonl only, sound.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/diffParser.js` (+ `collectAddedLines`, `isTestFile`): probed new-file, trailing-tab headers, spaces in paths, blank context lines with `\ No newline`, CRLF headers — line numbers and paths all correct. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-28 — Builder run (EMPTY-BACKLOG b: postReviewComment hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/github/postReviewComment.js` (`findExistingBotComment`, marker HMAC, truncation; oldest by last PROGRESS.md mention, ~line 3066): input validation precedes marker computation, first-match-wins holds, pagination break conditions, URL encoding, and surrogate-safe truncation (marker stays at the head) all correct. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

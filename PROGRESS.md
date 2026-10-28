@@ -3224,3 +3224,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/tasks.routes.js` + `controllers/tasksController.js` + `models/Task.js` (oldest by last PROGRESS.md mention, ~line 2937): owner scoping on every query, bad-id CastError -> 400 via the catch-all, wrong-typed body fields, mass-assignment (only whitelisted fields read), empty-body update, asyncHandler rejection routing: all clean (Express 4 gives `req.body = {}`, so no undefined-destructure path). No code change.
 - Decisions: no new tasks; none evidenced.
 - Open questions for Vijay: tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (52834bb..HEAD review; EMPTY-BACKLOG branch b)
+- Done: baseline green (73 sample-app + reviewer suites), idle-streak 0. Commits since the last reviewer entry touch only PROGRESS.md/runs.jsonl; reviewer CLI on the range reports 0 issues.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted sample-app `authController.js`, `usersController.js`, `auth` middleware, `User` model (oldest by last PROGRESS.md mention): token scheme handling, wrong-typed bodies, 72-byte cap, timing-safe login, id ownership checks, 11000 handling: all clean. No code change.
+- Open questions for Vijay: tasks 30 and 32 still need your unblock.

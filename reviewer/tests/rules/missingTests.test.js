@@ -279,6 +279,11 @@ describe('missing-tests rule', () => {
       expect(issues[0].message).toMatch(/rejected-promise/);
     });
 
+    it('does not flag when "async" appears only inside a source string literal', () => {
+      const diff = diffWith("+const mode = 'async';", ["+test('loads', () => {});"]);
+      expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
+    });
+
     it('does not flag when "async" appears only in a comment', () => {
       const diff = diffWith('+// async note', ["+test('loads', () => {});"]);
       expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);

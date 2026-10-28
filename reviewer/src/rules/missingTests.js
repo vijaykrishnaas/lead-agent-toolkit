@@ -1,7 +1,7 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { isTestFile } = require('../utils/isTestFile');
 const { isCodeFile } = require('../utils/isCodeFile');
-const { maskComments } = require('../utils/maskStringLiterals');
+const { maskComments, maskStringLiterals } = require('../utils/maskStringLiterals');
 
 // Only code files can need a test; a changed .css/.json/.md under src/ is not
 // a testable source file.
@@ -74,11 +74,11 @@ function addedText(file) {
   return collectAddedLines(file).map((line) => line.content).join('\n');
 }
 
-// Source adds async code (comments masked, so "async" in a comment doesn't
-// count) but none of its matching test diffs add a rejection-path case
+// Source adds async code (comments and string literals masked, so "async" in
+// a comment or a string doesn't count) but none of its matching test diffs add a rejection-path case
 // (test comments masked too, so a "// TODO reject case" note does not count).
 function lacksRejectionCase(sourceFile, matchedTests) {
-  if (!ASYNC_PATTERN.test(maskComments(addedText(sourceFile)).masked)) return false;
+  if (!ASYNC_PATTERN.test(maskStringLiterals(addedText(sourceFile)).masked)) return false;
   return !matchedTests.some((testFile) => REJECTION_PATTERN.test(maskComments(addedText(testFile)).masked));
 }
 

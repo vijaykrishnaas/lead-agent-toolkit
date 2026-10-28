@@ -12,11 +12,11 @@ function joinPath(prefix, routePath) {
 }
 
 // Mirrors Node's require resolution for a relative router path: the exact
-// file, then <path>.js, then <path>/index.js (a directory require). Falls
+// file when it already names a .js/.cjs/.mjs file, else <path>.js, then <path>/index.js (a directory require). Falls
 // back to the <path>.js guess when nothing is readable so the original
 // ENOENT still surfaces for a genuinely missing router.
 function resolveRouterPath(base, readFile) {
-  const candidates = base.endsWith('.js') ? [base] : [`${base}.js`, path.join(base, 'index.js')];
+  const candidates = /\.[cm]?js$/.test(base) ? [base] : [`${base}.js`, path.join(base, 'index.js')];
   for (const candidate of candidates) {
     try {
       readFile(candidate);

@@ -3206,3 +3206,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b), continued hunting `docDrift/parseExpressRoutes.js` mount pattern (task 34 follow-up probing). Reproduced `app.use('/a', require('./a').router)` -> mounts [] ; fixed test-first (optional property access after inline require).
 - Not fixed (rare, no evidence of real use): array-of-middleware mounts, `mw('x)')` string with paren inside middleware call args.
 - Open questions for Vijay: none new.
+
+## 2026-10-28 (builder) — EMPTY-BACKLOG (b): collectExpressRoutes.js hunt
+- Done: baseline green (583 reviewer + 73 sample-app tests), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions are Vijay-only. Hunted `reviewer/src/docDrift/collectExpressRoutes.js` (last hunted earliest in PROGRESS.md, ~line 2838).
+- Fixed: `resolveRouterPath` only treated a `.js` suffix as an exact filename, so a mounted router with an explicit `.cjs`/`.mjs` extension was probed as `r.cjs.js` and `r.cjs/index.js` and threw ENOENT, crashing doc-drift. Now `.js`/`.cjs`/`.mjs` are exact. Test-first: 2 new tests failed pre-fix, pass after.
+- Decisions: `joinPath` edge cases (empty or slashless route path) probed and left as is, since no realistic caller produces them.
+- Open questions for Vijay: none new.

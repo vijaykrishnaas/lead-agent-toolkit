@@ -225,4 +225,17 @@ describe('collectExpressRoutes', () => {
     const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
     expect(routes).toEqual([{ method: 'GET', path: '/x/y' }]);
   });
+  it.each(['.cjs', '.mjs'])('resolves a mounted router file with an explicit %s extension exactly', (ext) => {
+    const dir = require('path').dirname(appEntryPath);
+    const files = {
+      [appEntryPath]: `app.use('/x', require('./routes/r${ext}'));`,
+      [require('path').resolve(dir, `routes/r${ext}`)]: "router.get('/y', h);",
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
+    expect(routes).toEqual([{ method: 'GET', path: '/x/y' }]);
+  });
 });

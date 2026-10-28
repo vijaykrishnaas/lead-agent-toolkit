@@ -3180,3 +3180,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED); branch (a) skipped (remaining open questions are Vijay-only); took (b): hunted `reviewer/src/utils/isCodeFile.js` and `isTestFile.js` (last hunted earliest in PROGRESS.md, ~line 2993). Probed case variants, `.map`/`.json`, `.d.ts`, dir-segment boundaries (`latest/`, `contest/`), `__tests__`, nested spec files: clean; only contrived case-mismatch (`a.spec.JS` not a test file while isCodeFile is case-insensitive) — not worth a change. No code change.
 - Decisions: no new tasks; none evidenced.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-28 — Reviewer run (07:35 UTC slot)
+- Reviewed ac63397..a2185a0: PROGRESS.md/runs.jsonl only, no code. Baseline green, idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) — backlog empty; hunted `utils/parseGitHubRemote.js` (13 remote shapes: https/ssh/scp, creds, port, trailing slash, `.git.git`, dot-only names, lookalike hosts) and `standup/collectPullRequests.js` (pagination exit, window cap, encoding) by reading + execution: clean, no code change.
+- Open questions for Vijay: none new.

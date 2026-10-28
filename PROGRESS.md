@@ -3213,3 +3213,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Fixed: `resolveRouterPath` only treated a `.js` suffix as an exact filename, so a mounted router with an explicit `.cjs`/`.mjs` extension was probed as `r.cjs.js` and `r.cjs/index.js` and threw ENOENT, crashing doc-drift. Now `.js`/`.cjs`/`.mjs` are exact. Test-first: 2 new tests failed pre-fix, pass after.
 - Decisions: `joinPath` edge cases (empty or slashless route path) probed and left as is, since no realistic caller produces them.
 - Open questions for Vijay: none new.
+
+## 2026-10-28 — Reviewer run (b4ac0da..52834bb review; EMPTY-BACKLOG branch b)
+- Done: baseline green (73 sample-app + reviewer suites). Reviewed d831527/46e6b5f/52834bb: `.cjs/.mjs` explicit router require resolution and `require(...).prop` mount suffix are correct and test-covered; reviewer CLI on the range reports no issues.
+- Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) skipped as in prior runs. Hunted `reviewer/src/utils/statementWalk.js` (last touched by a hunt at PROGRESS.md line ~2973, oldest among utils): operator-continuation lines are only reachable on the regex fallback path (AST is primary since task 23), no realistic reproduction found; clean, no code change.
+- Open questions for Vijay: none new.

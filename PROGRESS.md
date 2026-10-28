@@ -3274,3 +3274,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/collectBoundedBlock.js` (least recently mentioned, ~line 2968): braces inside regex literals (`/\{/`, `/}/`), and brace-less arrow bodies spanning lines, all return the expected block. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-28 — Reviewer run (16:35 UTC)
+- Done: reviewed a8ee980..1f1e4b8 (missingTests string-literal fix, builder collectBoundedBlock hunt, logs): sound, `reviewer/src/cli.js` reports 0 issues. Baseline green, idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/config/` (loadRuleConfig, buildRules, loadRules; not mentioned in recent hunts): empty/scalar/list YAML, `__proto__`/`constructor`/`toString` category names, bad severity casing, null entries all degrade to defaults without crashing. Clean, no code change. Minor observation (not acted on): a YAML file whose top level is a scalar/list is ignored without a warning.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -3365,3 +3365,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/tasks.routes.js` with `tasksController.js` and `middleware/auth.js` (fewest PROGRESS mentions). All handlers are asyncHandler-wrapped behind `auth` (guideline 1 holds). Probed text/plain body, JSON `null` body (POST and PUT), and `[]` body: all 400. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Reviewer run (review 9d6f52f..HEAD, EMPTY-BACKLOG b: docDrift compareRoutes/parseOpenApi hunt)
+- Done: baseline green, idle-streak 0. Reviewed 9d6f52f..HEAD (PROGRESS.md/runs.jsonl only): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/compareRoutes.js` and `parseOpenApi.js` (oldest SKILL_CHANGELOG mentions of the docDrift modules). Probed optional params, constrained params, trailing slashes, root path with basePath, non-object YAML, lower-case verb keys: all behave correctly. Only observation: path comparison is case-sensitive although Express defaults to case-insensitive; judged a conservative, non-reproduced-bug choice, not a task.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

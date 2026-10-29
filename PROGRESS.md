@@ -3307,3 +3307,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (586 reviewer + 73 sample-app tests), idle-streak 0. Reviewed d95598e (my own eval( interpolation fix, test confirms both sides) and the performance.js hunt ee66d34 (docs only, clean). No new defects.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `scripts/runLog.js` (least recently hunted, last PROGRESS mention ~line 2998): probed flag-value parsing (`--summary --tests` rejected, `--summary -x`/`--foo` accepted), duplicate flags, empty log, idle-streak across `paused`. All behave as intended. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Builder run (EMPTY-BACKLOG b: reviewPrCli.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/reviewPrCli.js` with `utils/parseArgv.js`, `consumeFlagValue.js`, `parseGitHubRemote.js` (last PROGRESS mention ~line 3147, the least recent). Probed `--pr` with 0/negative/full-width digits/trailing newline, a second positional range, `--constructor`/`--__proto__` flags, empty-side ranges, `...` ranges, and flag-order independence. All behave as intended. Clean, no code change.
+- Observation (not acted on): `--pr 0` is accepted; it would fail loudly at the GitHub API, so no change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

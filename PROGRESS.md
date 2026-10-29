@@ -3296,3 +3296,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Decisions: no new tasks; EMPTY-BACKLOG not needed since the review produced a fix.
 - Observation (not acted on): the interpolation check is a flat regex, so `${eval(` inside a plain quoted string is a rare false positive.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Builder run (EMPTY-BACKLOG b: performance.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/rules/performance.js` (AST + regex paths; not hunted in recent entries; `diffParser.js` was considered but already hunted earlier). Probed expression-bodied `async x => await f(x)` callbacks, `for await` in a callback, optional-chained `items?.forEach`, multi-line `.forEach(` chains, a nested async helper inside a sync callback, and `JSON.parse(JSON.stringify(...))` forms. All behave as intended. Clean, no code change.
+- Observation (not acted on): `JSON.parse(JSON.stringify?.(x))` is not flagged; contrived, no observed miss.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

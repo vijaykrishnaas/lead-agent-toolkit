@@ -3325,3 +3325,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `scripts/resolvePushRange.js` (last PROGRESS mention ~line 2558, the least recent module). Probed empty/zero/unknown/option-like (`-x`)/symbolic/root-commit `before`, root-commit `after`, missing `after`, and a tree SHA as `before`. All fall back as designed. Clean, no code change.
 - Observation (not acted on): a tree SHA as `before` prints a git error to stderr before falling back; harmless, CI never supplies one.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Reviewer run (review 6c224f3..HEAD, EMPTY-BACKLOG b: tasksController.js hunt)
+- Done: baseline green, idle-streak 0. Reviewed 6c224f3..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/controllers/tasksController.js` (no "tasksController" PROGRESS mention since the early IDOR pass, line ~74). Checked owner scoping on every query, field whitelisting on create/update (no mass assignment of `owner`/`completed` on create), type validation, spread-of-false in `$set`, CastError/ValidationError mapping in app.js, Express 4 body default: clean, no change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

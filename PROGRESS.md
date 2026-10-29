@@ -3302,3 +3302,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/rules/performance.js` (AST + regex paths; not hunted in recent entries; `diffParser.js` was considered but already hunted earlier). Probed expression-bodied `async x => await f(x)` callbacks, `for await` in a callback, optional-chained `items?.forEach`, multi-line `.forEach(` chains, a nested async helper inside a sync callback, and `JSON.parse(JSON.stringify(...))` forms. All behave as intended. Clean, no code change.
 - Observation (not acted on): `JSON.parse(JSON.stringify?.(x))` is not flagged; contrived, no observed miss.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Reviewer run (review 431c299..HEAD)
+- Done: baseline green (586 reviewer + 73 sample-app tests), idle-streak 0. Reviewed d95598e (my own eval( interpolation fix, test confirms both sides) and the performance.js hunt ee66d34 (docs only, clean). No new defects.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `scripts/runLog.js` (least recently hunted, last PROGRESS mention ~line 2998): probed flag-value parsing (`--summary --tests` rejected, `--summary -x`/`--foo` accepted), duplicate flags, empty log, idle-streak across `paused`. All behave as intended. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

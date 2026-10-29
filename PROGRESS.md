@@ -3330,3 +3330,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green, idle-streak 0. Reviewed 6c224f3..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues): sound.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/controllers/tasksController.js` (no "tasksController" PROGRESS mention since the early IDOR pass, line ~74). Checked owner scoping on every query, field whitelisting on create/update (no mass assignment of `owner`/`completed` on create), type validation, spread-of-false in `$set`, CastError/ValidationError mapping in app.js, Express 4 body default: clean, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Builder run (EMPTY-BACKLOG b: standupCli.js / collectCommits.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/standupCli.js` with `standup/collectCommits.js` and `groupByAuthor.js` (last PROGRESS mention ~line 3122, the least recent). Probed option-like flag values (`--since --out`), lone flags, duplicate flags (last wins), stray positionals, half-given `--owner`/`--gh-repo`, invalid/blank/zero `since`, and a unit-separator inside a commit subject. All behave as intended. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

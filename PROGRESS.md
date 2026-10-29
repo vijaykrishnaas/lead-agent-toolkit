@@ -3313,3 +3313,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/reviewPrCli.js` with `utils/parseArgv.js`, `consumeFlagValue.js`, `parseGitHubRemote.js` (last PROGRESS mention ~line 3147, the least recent). Probed `--pr` with 0/negative/full-width digits/trailing newline, a second positional range, `--constructor`/`--__proto__` flags, empty-side ranges, `...` ranges, and flag-order independence. All behave as intended. Clean, no code change.
 - Observation (not acted on): `--pr 0` is accepted; it would fail loudly at the GitHub API, so no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Reviewer run (review ee66d34..HEAD)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed ee66d34..HEAD: PROGRESS.md/runs.jsonl only. The CLI's one "high" finding (`eval(` in PROGRESS.md prose at line ~3307) is a false positive on markdown text; docs are not code, no change.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/utils/maskStringLiterals.js` (last PROGRESS mention ~line 2973, the least recent). Probed line-continuation in strings, division vs regex, regex containing quotes/classes, CRLF comments, `${ '}' }` in templates, `y++ / 2`; same-length and `\n`-count invariants hold. Clean, no code change.
+- Observation (not acted on): `return /a/.test(x)` is not treated as a regex (keyword precedes `/`); only matters if the regex holds a quote/brace, no observed miss.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -317,3 +317,7 @@
 ## 2026-10-28 (Reviewer: EMPTY-BACKLOG (b) hunt, docDrift parseExpressRoutes)
 **Change:** No skill/CLAUDE.md change. Code fix: `MOUNT_PATTERN` now tolerates call-expression middleware (`app.use('/admin', authorize('admin'), router)`); regression test added. New TASKS.md task 34 (inline `require()` mounts dropped) appended.
 **Evidence:** PROGRESS.md 2026-10-28 Reviewer 08:35 entry — reproduced `app.use('/api2', auth(), r)` yielding no mount, so the sub-router's routes were reported as documented-but-unimplemented drift.
+
+## 2026-10-29 (Reviewer: review of security.js eval( fix)
+**Change:** No skill/CLAUDE.md change. Code fix: `security.js` also flags `eval(` inside template-literal `${...}` interpolations; regression test added.
+**Evidence:** PROGRESS.md 2026-10-29 Reviewer entry — reproduced `` `x ${eval(input)}` `` going unflagged after the string-masking change in bb7a33e.

@@ -3290,3 +3290,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/rules/style.js` (last touched by the console.log whole-token fix; no recent hunt): probed `var` in for-headers, after labels, after block comments, inside line comments and template literals, and spaced/optional-chained/prefixed `console.log` forms. All behave as intended (`window.console.log(` is correctly still flagged). Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Reviewer run (review 1f1e4b8..HEAD)
+- Done: baseline green, idle-streak 0. Reviewed the security.js eval( string-literal fix (bb7a33e) and the style.js hunt (clean). Found and reproduced a regression in bb7a33e: the direct `eval(` form now runs on string-masked text, and the masker blanks template-literal `${...}` bodies too, so `` `x ${eval(input)}` `` stopped being flagged (a real false negative). Fixed test-first: added an `EVAL_IN_INTERPOLATION` check on comment-masked text; `` `plain eval(x) text` `` stays unflagged. Reviewer + sample-app suites green.
+- Decisions: no new tasks; EMPTY-BACKLOG not needed since the review produced a fix.
+- Observation (not acted on): the interpolation check is a flat regex, so `${eval(` inside a plain quoted string is a rare false positive.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

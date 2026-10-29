@@ -148,4 +148,18 @@ describe('security rule', () => {
     const issues = securityRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([3, 4]);
   });
+
+  it('flags eval( inside a template-literal ${} interpolation', () => {
+    const diff = [
+      'diff --git a/src/e.js b/src/e.js',
+      '--- a/src/e.js',
+      '+++ b/src/e.js',
+      '@@ -0,0 +1,2 @@',
+      '+const a = `x ${eval(input)}`;',
+      "+const b = `plain eval(x) text`;",
+      '',
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1]);
+  });
 });

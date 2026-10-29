@@ -3360,3 +3360,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 0daabbd..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues): sound.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/models/{User,Task}.js` and `config/db.js` (fewest PROGRESS mentions). Schemas: required fields, unique+lowercase+trim email (Mongoose casts query values through setters, so login lookups match), owner ref required; connectDB sets strictQuery and propagates connect rejection to its caller. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Builder run (EMPTY-BACKLOG b: tasks.routes.js / tasksController.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/tasks.routes.js` with `tasksController.js` and `middleware/auth.js` (fewest PROGRESS mentions). All handlers are asyncHandler-wrapped behind `auth` (guideline 1 holds). Probed text/plain body, JSON `null` body (POST and PUT), and `[]` body: all 400. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

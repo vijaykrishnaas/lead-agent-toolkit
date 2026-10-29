@@ -3319,3 +3319,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/utils/maskStringLiterals.js` (last PROGRESS mention ~line 2973, the least recent). Probed line-continuation in strings, division vs regex, regex containing quotes/classes, CRLF comments, `${ '}' }` in templates, `y++ / 2`; same-length and `\n`-count invariants hold. Clean, no code change.
 - Observation (not acted on): `return /a/.test(x)` is not treated as a regex (keyword precedes `/`); only matters if the regex holds a quote/brace, no observed miss.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Builder run (EMPTY-BACKLOG b: resolvePushRange.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `scripts/resolvePushRange.js` (last PROGRESS mention ~line 2558, the least recent module). Probed empty/zero/unknown/option-like (`-x`)/symbolic/root-commit `before`, root-commit `after`, missing `after`, and a tree SHA as `before`. All fall back as designed. Clean, no code change.
+- Observation (not acted on): a tree SHA as `before` prints a git error to stderr before falling back; harmless, CI never supplies one.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

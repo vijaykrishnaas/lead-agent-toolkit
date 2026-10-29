@@ -3340,3 +3340,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 5152d6e..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues): sound.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDriftCli.js` (last PROGRESS mention ~line 3147, the least recent). Checked real run against sample-app (in sync), missing entry file (exit 1, clean message), `--out` with no value (rejected). Clean, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Builder run (EMPTY-BACKLOG b: defaultExecGit.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/defaultExecGit.js` (last PROGRESS mention ~line 3119, the least recent). Probed real invocation, a failing git subcommand, a missing binary (ENOENT) and a nonexistent cwd (ENOENT); all throw to the callers' existing try/catch as designed. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

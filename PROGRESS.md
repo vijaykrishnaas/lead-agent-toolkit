@@ -3335,3 +3335,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/standupCli.js` with `standup/collectCommits.js` and `groupByAuthor.js` (last PROGRESS mention ~line 3122, the least recent). Probed option-like flag values (`--since --out`), lone flags, duplicate flags (last wins), stray positionals, half-given `--owner`/`--gh-repo`, invalid/blank/zero `since`, and a unit-separator inside a commit subject. All behave as intended. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-29 — Reviewer run (review 5152d6e..HEAD, EMPTY-BACKLOG b: docDriftCli.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 5152d6e..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDriftCli.js` (last PROGRESS mention ~line 3147, the least recent). Checked real run against sample-app (in sync), missing entry file (exit 1, clean message), `--out` with no value (rejected). Clean, no change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

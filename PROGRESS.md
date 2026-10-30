@@ -3515,3 +3515,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `utils/subtreeInOwnScope.js` (stops at all three function node types, matches guideline 23) and `utils/parseArgv.js` (own-property flag lookup, duplicate positional rejected, required checked after parse): no reproducible bug; no code change.
 - Decisions: no new tasks, no [FEATURE] task (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: httpMethods/generateDocDrift hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/httpMethods.js` and `generateDocDrift.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). The shared verb list is the single source for both parsers; generateDocDrift's DI wiring passes `unparsedRoutes` through to the formatter. No reproducible bug; no code change.
+- Decisions: no new tasks (Reviewer's job).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -413,3 +413,31 @@ describe('parseRouterSource settings getter', () => {
     ]);
   });
 });
+
+describe('route-shaped text inside a string/template literal', () => {
+  it('does not read a call quoted inside a string or template literal as a live route', () => {
+    const source = [
+      "const msg = \"router.get('/ghost', h)\";",
+      'const tpl = `app.post(\'/ghost2\', h)`;',
+      "router.get('/real', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/real' }]);
+  });
+
+  it('does not read a quoted app.use mount, require, or .route chain as live', () => {
+    const source = [
+      "const doc = \"app.use('/ghost', require('./ghost'))\";",
+      "const doc2 = \"router.route('/ghost2').get(h)\";",
+      "app.use('/real', require('./real'));",
+    ].join('\n');
+    expect(parseAppEntrySource(source)).toEqual({
+      directRoutes: [],
+      mounts: [{ prefix: '/real', requirePath: './real' }],
+    });
+  });
+
+  it('does not report a quoted template-literal route as unparsed', () => {
+    const source = 'const doc = "router.get(`/x/${v}`, h)";';
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+});

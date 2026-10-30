@@ -3613,3 +3613,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/middleware/auth.js` and `asyncHandler.js` (lowest mention counts of unhunted modules): case-insensitive bearer scheme, HS256 pin, secret resolved outside try/catch (500 not 401), sync-throw handling left to Express. No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (EMPTY-BACKLOG b: parseExpressRoutes.js hunt)
+- Reviewed ab88d59..HEAD (PROGRESS.md/runs.jsonl only): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/docDrift/parseExpressRoutes.js` string-literal handling. Reproduced: route-shaped text inside a string/template literal (e.g. `"router.get('/ghost', h)"`) was parsed as a live route, mount, require, or unparsed-route finding, because the detection regexes run on comment-masked source with string content intact. Fixed test-first: `matchIsLive` checks the match start against the fully string-masked copy (3 regression tests, 589 reviewer tests green).
+- Decisions: skipped a new guideline; this is guideline 18/22's sibling-check class, already covered.
+- Open questions for Vijay: none new.

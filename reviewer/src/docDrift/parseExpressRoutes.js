@@ -31,6 +31,15 @@ const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALT
 const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*`/g;
 const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*`/g;
 
+// A match whose first character was blanked by the full string-and-comment
+// mask starts inside a string/template literal (e.g. a log message quoting
+// "router.get('/x', h)"), so it's text, not a live call. `commentMasked`
+// keeps string content intact for the capture groups, so liveness is checked
+// against the fully masked copy at the match's start.
+function matchIsLive(match, masked) {
+  return masked[match.index] === match[0][0];
+}
+
 function lineNumberAt(text, index) {
   return text.slice(0, index).split('\n').length;
 }
@@ -92,8 +101,10 @@ function collectChainedVerbs(commentMasked, masked, chainStart) {
 // rely on.
 function parseRouterSource(source) {
   const { masked: commentMasked } = maskComments(source);
+  const { masked } = maskStringLiterals(source);
   const routes = [];
   for (const match of commentMasked.matchAll(METHOD_CALL_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
     routes.push({ method: match[1].toUpperCase(), path: match[3] });
   }
 
@@ -101,8 +112,8 @@ function parseRouterSource(source) {
   // calls directly chained onto it (see collectChainedVerbs) — not "whatever
   // appears before the next .route() call," which would misattribute an
   // unrelated router.<verb>(...) statement sitting between two chains.
-  const { masked } = maskStringLiterals(source);
   for (const routeMatch of commentMasked.matchAll(ROUTE_CALL_PATTERN)) {
+    if (!matchIsLive(routeMatch, masked)) continue;
     const path = routeMatch[2];
     const chainStart = routeMatch.index + routeMatch[0].length;
     for (const method of collectChainedVerbs(commentMasked, masked, chainStart)) {
@@ -128,14 +139,17 @@ function parseRouterSource(source) {
 function parseAppEntrySource(source) {
   const directRoutes = parseRouterSource(source);
   const { masked: commentMasked } = maskComments(source);
+  const { masked } = maskStringLiterals(source);
 
   const requiresByVarName = new Map();
   for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
     requiresByVarName.set(match[1], match[3]);
   }
 
   const mounts = [];
   for (const match of commentMasked.matchAll(MOUNT_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
     const [, , prefix, , inlineRequirePath, varName] = match;
     const requirePath = inlineRequirePath || requiresByVarName.get(varName);
     if (requirePath) mounts.push({ prefix, requirePath });
@@ -155,9 +169,11 @@ function parseAppEntrySource(source) {
 // reported as a real, live one.
 function findUnparsedRoutes(source) {
   const { masked: commentMasked } = maskComments(source);
+  const { masked } = maskStringLiterals(source);
   const findings = [];
 
   for (const match of commentMasked.matchAll(UNPARSED_METHOD_CALL_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
     findings.push({
       type: 'unparsed-route',
       method: match[1].toUpperCase(),
@@ -166,6 +182,7 @@ function findUnparsedRoutes(source) {
     });
   }
   for (const match of commentMasked.matchAll(UNPARSED_ROUTE_CALL_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
     findings.push({
       type: 'unparsed-route',
       method: null,
@@ -174,6 +191,7 @@ function findUnparsedRoutes(source) {
     });
   }
   for (const match of commentMasked.matchAll(UNPARSED_MOUNT_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
     findings.push({
       type: 'unparsed-route',
       method: 'MOUNT',

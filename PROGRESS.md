@@ -3395,3 +3395,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/memberCallLine.js` and `defaultExecGit.js` (zero SKILL_CHANGELOG mentions). Member calls, computed callees and optional-chain calls all resolve to the callee property's line; the exec factory sets a large maxBuffer and passes cwd/encoding correctly. Clean, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 (Reviewer, 4f787a5..09e0c6e)
+- Done: reviewed 2 commits (PROGRESS.md/runs.jsonl only): sound. Baseline `npm test` green (73 sample-app tests), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) — backlog empty; hunted least-mentioned modules `sample-app/src/routes/{users,auth}.routes.js` and their controllers. Auth handlers are not asyncHandler-wrapped but each has a full try/catch (guideline 1 satisfied); users routes are wrapped. Clean, no change.
+- Open questions for Vijay: none new.

@@ -3544,3 +3544,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/diffParser.js` (new-file, no-newline marker, tab-suffixed quoted-space paths, CRLF headers, binary-file section followed by a normal file) and `utils/parseGitHubRemote.js` (read only). No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice (modules with no SKILL_CHANGELOG mentions).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 2475a4c..HEAD; EMPTY-BACKLOG b: buildRules/loadRuleConfig hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 2475a4c..HEAD (PROGRESS.md/runs.jsonl only): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `config/buildRules.js` and `config/loadRuleConfig.js` (no SKILL_CHANGELOG mentions): severity filter, non-boolean `enabled`, null `options`, missing config file probed by hand — clean, no change.
+- Decisions: no new tasks, no [FEATURE] task (no evidenced gap).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

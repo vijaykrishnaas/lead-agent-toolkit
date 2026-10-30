@@ -3591,3 +3591,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `utils/resolveFileContent.js`, `utils/defaultExecGit.js` and `standup/collectCommits.js` (read only; null-on-failure contract, maxBuffer, since validation, field-separator subject rejoin). No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice (lowest PROGRESS mention counts among reviewer utils).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (EMPTY-BACKLOG b: diffParser hunt)
+- Reviewed d5993ff..HEAD: PROGRESS.md/runs.jsonl only; reviewer CLI reports 0 issues. Baseline green, idle-streak 0, backlog has no open item.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `diffParser.js` + `collectAddedLines.js`: new/deleted files, spaced paths with tab suffix, CRLF, deleted `--- x` content lines, mnemonic prefixes. Only oddity (`w/x.js` for worktree diffs under `diff.mnemonicPrefix`) cannot occur for the commit-range diffs the CLIs run; not a reproduced bug, no code change.
+- Open questions for Vijay: none new.

@@ -3390,3 +3390,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 2 commits (PROGRESS.md/runs.jsonl only): sound. Baseline `npm test` green (73 sample-app tests).
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty; hunted the least-recently-touched module, `sample-app/src/config/jwtSecret.js` (+ callers authController/auth middleware): production guard rejects unset/empty/default/placeholder; non-prod fallback intended. Clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: memberCallLine/defaultExecGit hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/memberCallLine.js` and `defaultExecGit.js` (zero SKILL_CHANGELOG mentions). Member calls, computed callees and optional-chain calls all resolve to the callee property's line; the exec factory sets a large maxBuffer and passes cwd/encoding correctly. Clean, no change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

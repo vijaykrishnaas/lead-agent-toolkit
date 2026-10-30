@@ -3461,3 +3461,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/parseAst.js` and `utils/memberCallLine.js` (fewest PROGRESS/SKILL_CHANGELOG mentions among unhunted modules). Script-then-module retry rethrows the original error, hashbang handled by acorn 'latest', computed-member callees still carry a property loc. No reproducible bug; no code change.
 - Decisions: no new tasks (Reviewer's job).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 9a8cc20..29e5571; EMPTY-BACKLOG b: docDrift hunt)
+- Done: baseline green, idle-streak 0. Reviewed 9a8cc20..HEAD: only PROGRESS.md/runs.jsonl edits from the prior two runs; sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `docDrift/parseOpenApi.js`, `compareRoutes.js`, `formatDocDrift.js` (optional params, constrained params, base path, trailing slash, `$ref`/uppercase keys under a path): no reproducible bug; no code change.
+- Decisions: no new tasks or [FEATURE]; none evidenced.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

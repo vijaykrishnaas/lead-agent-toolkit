@@ -3509,3 +3509,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/resolveFileContent.js` and `utils/codeSpan.js` (fewest PROGRESS/SKILL_CHANGELOG mentions among unhunted modules). resolveFileContent returns null on any git failure and `reviewDiff` only sets `content` when non-null (empty-file content '' stays valid); codeSpan's fence/pad logic handles backtick runs, newlines, and space-padded text per CommonMark. No reproducible bug; no code change.
 - Decisions: no new tasks (Reviewer's job).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 42634f5..HEAD; EMPTY-BACKLOG b: subtreeInOwnScope/parseArgv hunt)
+- Done: baseline green, idle-streak 0. Reviewed 42634f5..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `utils/subtreeInOwnScope.js` (stops at all three function node types, matches guideline 23) and `utils/parseArgv.js` (own-property flag lookup, duplicate positional rejected, required checked after parse): no reproducible bug; no code change.
+- Decisions: no new tasks, no [FEATURE] task (no evidenced gap).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

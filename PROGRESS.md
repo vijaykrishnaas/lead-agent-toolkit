@@ -3426,3 +3426,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/generateDocDrift.js`, `docDrift/httpMethods.js` and `utils/resolveFileContent.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). DI defaults are consistent, the verb list is shared by both parsers, and resolveFileContent returns null on any git failure as documented. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 9f17a7d..HEAD, EMPTY-BACKLOG b: parseGitHubRemote/isTestFile/isCodeFile/defaultExecGit hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 9f17a7d..HEAD (0cab78a, fd0d13b): PROGRESS.md/runs.jsonl only; sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `utils/parseGitHubRemote.js` (probed https/ssh/scp/credentialed/lookalike-host/`..` repo inputs), `isTestFile.js`, `isCodeFile.js`, `defaultExecGit.js` (fewest mentions). Clean, no change.
+- Decisions: no new tasks or [FEATURE]; none evidenced.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -3596,3 +3596,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed d5993ff..HEAD: PROGRESS.md/runs.jsonl only; reviewer CLI reports 0 issues. Baseline green, idle-streak 0, backlog has no open item.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `diffParser.js` + `collectAddedLines.js`: new/deleted files, spaced paths with tab suffix, CRLF, deleted `--- x` content lines, mnemonic prefixes. Only oddity (`w/x.js` for worktree diffs under `diff.mnemonicPrefix`) cannot occur for the commit-range diffs the CLIs run; not a reproduced bug, no code change.
 - Open questions for Vijay: none new.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: auth/users routes + controllers hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/users.routes.js`, `auth.routes.js`, `controllers/usersController.js`, `authController.js` (lowest PROGRESS/SKILL_CHANGELOG mention counts): self-only 403 ordering, type validation, 11000→409 mapping, bcrypt 72-byte cap, timing-safe login, try/catch in unwrapped auth handlers. No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

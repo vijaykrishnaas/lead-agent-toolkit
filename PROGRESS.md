@@ -3503,3 +3503,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `sample-app/src/routes/tasks.routes.js` and `controllers/tasksController.js` (fewest mentions): all handlers asyncHandler-wrapped, owner-scoped queries, type validation precedes writes, CastError/ValidationError mapped to 400 in app.js. No reproducible bug; no code change.
 - Decisions: no new tasks, no [FEATURE] task today (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: resolveFileContent/codeSpan hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/resolveFileContent.js` and `utils/codeSpan.js` (fewest PROGRESS/SKILL_CHANGELOG mentions among unhunted modules). resolveFileContent returns null on any git failure and `reviewDiff` only sets `content` when non-null (empty-file content '' stays valid); codeSpan's fence/pad logic handles backtick runs, newlines, and space-padded text per CommonMark. No reproducible bug; no code change.
+- Decisions: no new tasks (Reviewer's job).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

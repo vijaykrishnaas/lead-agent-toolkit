@@ -3568,3 +3568,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/config/jwtSecret.js`, `middleware/auth.js`, `controllers/authController.js` and the users/auth route files (read only; production-secret guard, sync throw reaching error middleware, self-contained try/catch in register/login, wrong-typed body fields). No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice (fewest PROGRESS/SKILL_CHANGELOG mentions: sample-app routes/config).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (EMPTY-BACKLOG b: compareRoutes hunt)
+
+- Reviewed f9cbed5..HEAD: PROGRESS.md/runs.jsonl only; sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `docDrift/compareRoutes.js` (param/constraint normalization, optional-param expansion, trailing slashes). Probed `:a?/:b?`, `:name.:ext`, constrained optional params: all compared correctly. No reproducible bug; no code change.
+- Open questions for Vijay: none new.

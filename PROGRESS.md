@@ -3485,3 +3485,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/auth.routes.js`, `users.routes.js` and `reviewer/src/config/loadRules.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). `auth.routes.js` mounts register/login without `asyncHandler`, but both controllers wrap their entire body (including the `req.body` destructure) in try/catch, so no rejection can escape (guideline 1 satisfied). users routes are auth-gated and wrapped; loadRules is a thin composition. No reproducible bug; no code change.
 - Decisions: no new tasks (Reviewer's job).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 21f6c70..HEAD; EMPTY-BACKLOG b: standup collect/group, parseGitHubRemote hunt)
+- Done: baseline green, idle-streak 0. Reviewed 21f6c70..HEAD (PROGRESS.md/runs.jsonl only): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `standup/groupByAuthor.js`, `standup/collectCommits.js`, `utils/defaultExecGit.js`, `utils/parseGitHubRemote.js` (11 remote shapes incl. token auth, trailing slash/.git, lookalike host, query string): no reproducible bug; no code change.
+- Decisions: no new tasks, no [FEATURE] task today (no evidenced gap).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

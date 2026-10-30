@@ -3437,3 +3437,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/*.routes.js` (fewest PROGRESS/SKILL_CHANGELOG mentions), plus `authController.js`, `app.js` error middleware and `middleware/auth.js`. `/me` is registered before `/:id`; auth routes skip `asyncHandler` but both handlers wrap their whole body in try/catch (guideline 1 satisfied); Express 4.22 always sets `req.body` to `{}`, so destructuring cannot throw. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review fd0d13b..HEAD, EMPTY-BACKLOG b: tasksController/usersController/models hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed fd0d13b..HEAD (eea4eed, 1ce4009): PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues; sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `tasksController.js`, `usersController.js`, `models/Task.js`, `models/User.js` (last hunted 2026-07-17): owner-scoped queries, type/blank validation, 11000 mapping, id-mismatch 403s all consistent. No reproducible bug; real-query semantics (e.g. empty `$set`) can only be confirmed by task 32's integration layer.
+- Decisions: no new tasks or [FEATURE]; none evidenced.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

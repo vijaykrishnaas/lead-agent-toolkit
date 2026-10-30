@@ -3619,3 +3619,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `reviewer/src/docDrift/parseExpressRoutes.js` string-literal handling. Reproduced: route-shaped text inside a string/template literal (e.g. `"router.get('/ghost', h)"`) was parsed as a live route, mount, require, or unparsed-route finding, because the detection regexes run on comment-masked source with string content intact. Fixed test-first: `matchIsLive` checks the match start against the fully string-masked copy (3 regression tests, 589 reviewer tests green).
 - Decisions: skipped a new guideline; this is guideline 18/22's sibling-check class, already covered.
 - Open questions for Vijay: none new.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: tasks routes/controller + app error handler hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/tasks.routes.js`, `controllers/tasksController.js`, `app.js` error middleware (lowest mention counts among unhunted modules): owner-scoped queries on every op, title/description/completed type validation, `$set` built only from validated fields, CastError→400, body-parser errors→4xx, auth+asyncHandler on all routes. No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

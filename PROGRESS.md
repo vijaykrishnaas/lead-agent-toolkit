@@ -3580,3 +3580,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/tasks.routes.js` + `controllers/tasksController.js` (owner scoping on every query, body type validation, CastError for malformed `:id` routed through the app error middleware) and read `reviewer/src/utils/subtreeInOwnScope.js`. No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice (lowest PROGRESS/SKILL_CHANGELOG mention counts).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (EMPTY-BACKLOG b: markdownReport/sanitizeMarkdownText hunt)
+- Reviewed 09112870..HEAD: PROGRESS.md/runs.jsonl only; sound. Baseline green, idle-streak 0, backlog has no open item.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `format/markdownReport.js` + `utils/sanitizeMarkdownText.js` (not in any prior hunt log): U+2028 separators, pre-escaped backslashes, link/heading forging, HTML in message/file/fix. No reproducible bug; no code change.
+- Open questions for Vijay: none new.

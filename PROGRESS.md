@@ -3380,3 +3380,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 142b599..HEAD (PROGRESS.md/runs.jsonl only, commit 80ecff1): sound.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/generateDocDrift.js` and `formatDocDrift.js` (+ `utils/codeSpan.js`; generateDocDrift had the oldest PROGRESS mention). DI defaults, the unparsed-only report branch, and code-span fencing of hostile paths all read correct; no reproducible bug, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: parseAst/isTestFile hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/parseAst.js` and `isTestFile.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). Probed shebang, ESM-with-await, empty source, `return` outside function, optional chaining/private fields/static blocks: all parse. JSX throws, which callers already catch and fall back to the regex path. isTestFile correctly rejects `latest/`, `contest/`, `test.js`, `.test.json`. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

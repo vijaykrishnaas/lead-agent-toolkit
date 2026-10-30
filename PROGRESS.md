@@ -3455,3 +3455,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `reviewer/src/config/buildRules.js`, `loadRuleConfig.js` and `standup/collectCommits.js`/`groupByAuthor.js` (zero SKILL_CHANGELOG hunt mentions for config/). Checked partial/invalid category entries, severity filtering fallback, unknown-category warnings, field-separator parsing: no reproducible bug; no code change.
 - Decisions: no new tasks or [FEATURE]; none evidenced.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: parseAst/memberCallLine hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/parseAst.js` and `utils/memberCallLine.js` (fewest PROGRESS/SKILL_CHANGELOG mentions among unhunted modules). Script-then-module retry rethrows the original error, hashbang handled by acorn 'latest', computed-member callees still carry a property loc. No reproducible bug; no code change.
+- Decisions: no new tasks (Reviewer's job).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

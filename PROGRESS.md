@@ -3625,3 +3625,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/tasks.routes.js`, `controllers/tasksController.js`, `app.js` error middleware (lowest mention counts among unhunted modules): owner-scoped queries on every op, title/description/completed type validation, `$set` built only from validated fields, CastError→400, body-parser errors→4xx, auth+asyncHandler on all routes. No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 6fd7bf3..HEAD + EMPTY-BACKLOG b: docDrift formatter hunt)
+- Done: baseline green, idle-streak 0. Reviewed 32efd29 (`matchIsLive` string-literal guard in parseExpressRoutes: applied at every presence check in the module, consistent with guideline 22) and 715f168 (docs/logs only): sound; `reviewer/src/cli.js` reports 0 issues.
+- Branch taken: EMPTY-BACKLOG (b); backlog has no open item. Hunted `docDrift/formatDocDrift.js`, `generateDocDrift.js`, `utils/codeSpan.js` (no SKILL_CHANGELOG mention): all interpolated values go through `codeSpan`, `reason` strings are constants, empty-state wording is count-derived. No reproducible bug; no code change.
+- Decisions: none.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

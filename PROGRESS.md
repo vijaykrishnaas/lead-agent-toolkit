@@ -3411,3 +3411,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty; hunted `github/postReviewComment.js` (among the least recently hunted per PROGRESS.md): marker HMAC, first-match-wins, URL encoding, 65536-char truncation incl. surrogate cut, pagination exits. Clean, no change.
 - Decisions: no new tasks; none evidenced.
 - Open questions for Vijay: Tasks 30 and 32 still need your unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: subtreeInOwnScope/db.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/subtreeInOwnScope.js` and `sample-app/src/config/db.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). A function node passed as the walk root is not descended into, but all three callers (errorHandling x2, performance) pass `.body` or a statement, so no reachable bug. db.js is a thin mongoose wrapper. Clean, no change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

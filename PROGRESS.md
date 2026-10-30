@@ -3432,3 +3432,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `utils/parseGitHubRemote.js` (probed https/ssh/scp/credentialed/lookalike-host/`..` repo inputs), `isTestFile.js`, `isCodeFile.js`, `defaultExecGit.js` (fewest mentions). Clean, no change.
 - Decisions: no new tasks or [FEATURE]; none evidenced.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: auth/users/tasks routes, authController, app.js hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/*.routes.js` (fewest PROGRESS/SKILL_CHANGELOG mentions), plus `authController.js`, `app.js` error middleware and `middleware/auth.js`. `/me` is registered before `/:id`; auth routes skip `asyncHandler` but both handlers wrap their whole body in try/catch (guideline 1 satisfied); Express 4.22 always sets `req.body` to `{}`, so destructuring cannot throw. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

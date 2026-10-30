@@ -3400,3 +3400,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 2 commits (PROGRESS.md/runs.jsonl only): sound. Baseline `npm test` green (73 sample-app tests), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty; hunted least-mentioned modules `sample-app/src/routes/{users,auth}.routes.js` and their controllers. Auth handlers are not asyncHandler-wrapped but each has a full try/catch (guideline 1 satisfied); users routes are wrapped. Clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: asyncHandler/models/statementWalk hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/middleware/asyncHandler.js`, `models/Task.js`, `models/User.js` and `reviewer/src/utils/statementWalk.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). asyncHandler routes async and rejected-promise errors to `next`; a purely synchronous throw propagates out of `wrapped`, which Express's own layer catches, so no gap. Schemas and the walk loop read correct. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

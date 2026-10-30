@@ -3637,3 +3637,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/diffParser.js` (zero SKILL_CHANGELOG mentions, core input stage). Bug: after a hunk's promised line counts were consumed, any following blank line or ` `-indented text (e.g. commit messages in concatenated `git log -p`-style diffs) was still appended as context lines, inventing phantom lines. Fixed by ending the hunk once both counters reach 0; regression test added (confirmed failing pre-fix). Full suite green.
 - Decisions: fix kept to `parseDiff` only; `git diff` itself never emits such text, so this is hardening for `reviewDiff`'s public input.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review b752568..HEAD + EMPTY-BACKLOG b: utils hunt)
+- Done: baseline green, idle-streak 0. Reviewed 080044f (`parseDiff` ends a hunk once both header counts are consumed): sound — `\ No newline` still handled before the cutoff, omitted counts default to 1, `reviewer/src/cli.js` reports 0 issues.
+- Branch taken: EMPTY-BACKLOG (b); backlog has no open item. Hunted `utils/parseArgv.js`, `isTestFile.js`, `isCodeFile.js`, `memberCallLine.js` (lowest mention counts): own-property flag lookup, loud missing-value, whole-segment test-dir match, case-insensitive extension gate all correct. No reproducible bug; no code change.
+- Decisions: none.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -3562,3 +3562,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 8447d16..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `utils/codeSpan.js` (low PROGRESS mention count): fence sizing, newline collapse, padding. No reproducible bug; no code change.
 - Open questions for Vijay: none new.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: jwtSecret/auth middleware/authController hunt)
+- Done: baseline green, idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/config/jwtSecret.js`, `middleware/auth.js`, `controllers/authController.js` and the users/auth route files (read only; production-secret guard, sync throw reaching error middleware, self-contained try/catch in register/login, wrong-typed body fields). No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice (fewest PROGRESS/SKILL_CHANGELOG mentions: sample-app routes/config).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

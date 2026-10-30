@@ -3539,3 +3539,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `utils/statementWalk.js` (end-of-statement check precedes scan, literal-continuation and leading-brace exemptions match guidelines 2/10/17). No reproducible bug; no code change.
 - Decisions: no new tasks, no [FEATURE] task (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: diffParser/parseGitHubRemote hunt)
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/diffParser.js` (new-file, no-newline marker, tab-suffixed quoted-space paths, CRLF headers, binary-file section followed by a normal file) and `utils/parseGitHubRemote.js` (read only). No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice (modules with no SKILL_CHANGELOG mentions).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

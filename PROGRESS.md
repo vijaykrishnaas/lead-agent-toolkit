@@ -3550,3 +3550,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `config/buildRules.js` and `config/loadRuleConfig.js` (no SKILL_CHANGELOG mentions): severity filter, non-boolean `enabled`, null `options`, missing config file probed by hand — clean, no change.
 - Decisions: no new tasks, no [FEATURE] task (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: groupByAuthor/collectPullRequests hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `standup/groupByAuthor.js` and `standup/collectPullRequests.js` (read only; pagination termination, MAX_PAGES guard, encodeURIComponent, blank-author bucketing). No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice (standup modules least recently audited).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

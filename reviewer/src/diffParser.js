@@ -90,6 +90,10 @@ function parseDiff(diffText) {
     }
     if (!currentHunk) continue;
     if (rawLine.startsWith('\\ No newline')) continue;
+    // Once the header's promised line counts are consumed the hunk is over;
+    // anything else before the next header (blank lines, commit messages from
+    // concatenated diffs) is not hunk content.
+    if (oldLeft <= 0 && newLeft <= 0) continue;
 
     // A blank line mid-hunk is a context line whose leading space was stripped;
     // the split's trailing '' is just the diff's final newline.

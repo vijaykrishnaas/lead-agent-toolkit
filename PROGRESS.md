@@ -3631,3 +3631,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); backlog has no open item. Hunted `docDrift/formatDocDrift.js`, `generateDocDrift.js`, `utils/codeSpan.js` (no SKILL_CHANGELOG mention): all interpolated values go through `codeSpan`, `reason` strings are constants, empty-state wording is count-derived. No reproducible bug; no code change.
 - Decisions: none.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: diffParser.js hunt)
+- Done: baseline green (590 reviewer + 73 sample-app), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/diffParser.js` (zero SKILL_CHANGELOG mentions, core input stage). Bug: after a hunk's promised line counts were consumed, any following blank line or ` `-indented text (e.g. commit messages in concatenated `git log -p`-style diffs) was still appended as context lines, inventing phantom lines. Fixed by ending the hunk once both counters reach 0; regression test added (confirmed failing pre-fix). Full suite green.
+- Decisions: fix kept to `parseDiff` only; `git diff` itself never emits such text, so this is hardening for `reviewDiff`'s public input.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

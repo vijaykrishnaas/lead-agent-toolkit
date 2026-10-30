@@ -321,3 +321,7 @@
 ## 2026-10-29 (Reviewer: review of security.js eval( fix)
 **Change:** No skill/CLAUDE.md change. Code fix: `security.js` also flags `eval(` inside template-literal `${...}` interpolations; regression test added.
 **Evidence:** PROGRESS.md 2026-10-29 Reviewer entry — reproduced `` `x ${eval(input)}` `` going unflagged after the string-masking change in bb7a33e.
+
+## 2026-10-30 (Builder: EMPTY-BACKLOG (b) hunt, diffParser)
+**Change:** No skill/CLAUDE.md change. Code fix in `diffParser.js`: stop consuming hunk content once the header's line counts are exhausted; regression test added.
+**Evidence:** PROGRESS.md 2026-10-30 Builder diffParser entry — reproduced blank/indented text after a complete hunk becoming phantom context lines.

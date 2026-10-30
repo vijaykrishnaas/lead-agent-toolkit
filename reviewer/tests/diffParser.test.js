@@ -178,4 +178,22 @@ describe('parseDiff', () => {
     expect(files[0].hunks).toHaveLength(2);
     expect(files[0].hunks[0].lines.map((l) => l.type)).toEqual(['context', 'del', 'add']);
   });
+
+  it('ignores text after a completed hunk (blank/commit-message lines between concatenated diffs)', () => {
+    const diff = [
+      'diff --git a/a.js b/a.js',
+      '--- a/a.js',
+      '+++ b/a.js',
+      '@@ -1,1 +1,2 @@',
+      ' x',
+      '+y',
+      '',
+      'commit abc',
+      '    msg text',
+      '+not a hunk line',
+      '',
+    ].join('\n');
+    const [file] = parseDiff(diff);
+    expect(file.hunks[0].lines.map((l) => l.content)).toEqual(['x', 'y']);
+  });
 });

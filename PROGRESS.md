@@ -3473,3 +3473,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/config/jwtSecret.js`, `reviewer/src/docDrift/generateDocDrift.js`, `docDrift/httpMethods.js` (fewest PROGRESS/SKILL_CHANGELOG mentions not recently hunted). Production check rejects unset/placeholder/dev secrets, non-production falls back to the dev secret; generateDocDrift's DI defaults and unparsedRoutes passthrough are consistent; the verb list is shared by both sides. No reproducible bug; no code change.
 - Decisions: no new tasks (Reviewer's job).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 29e5571..HEAD; EMPTY-BACKLOG b: runLog/resolvePushRange hunt)
+- Done: baseline green, idle-streak 0. Reviewed 29e5571..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `scripts/runLog.js` and `scripts/resolvePushRange.js` (fewest mentions among unhunted modules): arg parsing, idle-streak counting, append newline handling, zero-SHA/shallow-history fallbacks all consistent. No reproducible bug; no code change.
+- Decisions: no new tasks, no [FEATURE] task today (no evidenced gap).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

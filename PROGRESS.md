@@ -3602,3 +3602,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/users.routes.js`, `auth.routes.js`, `controllers/usersController.js`, `authController.js` (lowest PROGRESS/SKILL_CHANGELOG mention counts): self-only 403 ordering, type validation, 11000→409 mapping, bcrypt 72-byte cap, timing-safe login, try/catch in unwrapped auth handlers. No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (EMPTY-BACKLOG b: scripts/runLog.js hunt)
+- Reviewed 6519fcd..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `scripts/runLog.js` (lowest SKILL_CHANGELOG/PROGRESS mention counts outside already-hunted modules): arg parsing, flag-as-value guard, trailing-newline handling, idle-streak counting, malformed-line errors — clean, no change.
+- Open questions for Vijay: none new.

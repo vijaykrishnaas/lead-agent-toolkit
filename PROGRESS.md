@@ -3527,3 +3527,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted the small `utils/` helpers above: whole-segment test-dir match, extension gate, add-line filter, callee-property line, flag-value guard. No reproducible bug; no code change.
 - Decisions: no new tasks, no [FEATURE] task (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: defaultExecGit/parseAst hunt)
+- Done: baseline green (73 sample-app tests + 586 reviewer tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `utils/defaultExecGit.js` (maxBuffer raised, shared factory) and `utils/parseAst.js` (probed shebang, ESM, ESM top-level await: all parse; script-error rethrow preserved). No reproducible bug; no code change.
+- Decisions: no new tasks (Reviewer's job).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

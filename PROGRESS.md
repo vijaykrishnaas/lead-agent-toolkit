@@ -3443,3 +3443,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `tasksController.js`, `usersController.js`, `models/Task.js`, `models/User.js` (last hunted 2026-07-17): owner-scoped queries, type/blank validation, 11000 mapping, id-mismatch 403s all consistent. No reproducible bug; real-query semantics (e.g. empty `$set`) can only be confirmed by task 32's integration layer.
 - Decisions: no new tasks or [FEATURE]; none evidenced.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: subtreeInOwnScope/codeSpan hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/subtreeInOwnScope.js` and `utils/codeSpan.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). Checked that all three callers (`errorHandling.js` x2, `performance.js`) pass a function body or statement, never a function node, so the "function boundaries enumerate no children" base cannot blind the root; codeSpan fence/pad logic is consistent with CommonMark. No reproducible bug; no code change.
+- Decisions: no new tasks (Reviewer's job).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

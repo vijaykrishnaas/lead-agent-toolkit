@@ -3521,3 +3521,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/httpMethods.js` and `generateDocDrift.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). The shared verb list is the single source for both parsers; generateDocDrift's DI wiring passes `unparsedRoutes` through to the formatter. No reproducible bug; no code change.
 - Decisions: no new tasks (Reviewer's job).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review 6bea5af..HEAD; EMPTY-BACKLOG b: isTestFile/isCodeFile/collectAddedLines/memberCallLine/consumeFlagValue hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 6bea5af..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted the small `utils/` helpers above: whole-segment test-dir match, extension gate, add-line filter, callee-property line, flag-value guard. No reproducible bug; no code change.
+- Decisions: no new tasks, no [FEATURE] task (no evidenced gap).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

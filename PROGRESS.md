@@ -3375,3 +3375,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `scripts/syncPlugin.js` (last PROGRESS mention ~line 3190, the least recent). Real sync is a no-op on the current tree. Probed a symlink entry in the source: skipped (neither file nor dir), and a same-named stale dest file is left behind; skills contain no symlinks, so judged not worth a task. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (EMPTY-BACKLOG b: generateDocDrift/formatDocDrift/codeSpan hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 142b599..HEAD (PROGRESS.md/runs.jsonl only, commit 80ecff1): sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/generateDocDrift.js` and `formatDocDrift.js` (+ `utils/codeSpan.js`; generateDocDrift had the oldest PROGRESS mention). DI defaults, the unparsed-only report branch, and code-span fencing of hostile paths all read correct; no reproducible bug, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

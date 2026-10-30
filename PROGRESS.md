@@ -3491,3 +3491,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `standup/groupByAuthor.js`, `standup/collectCommits.js`, `utils/defaultExecGit.js`, `utils/parseGitHubRemote.js` (11 remote shapes incl. token auth, trailing slash/.git, lookalike host, query string): no reproducible bug; no code change.
 - Decisions: no new tasks, no [FEATURE] task today (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: models/asyncHandler/buildRules hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/models/Task.js`, `models/User.js`, `middleware/asyncHandler.js`, `reviewer/src/config/buildRules.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). asyncHandler converts async rejections to `next` and sync throws are caught by Express itself; buildRules' partial/undefined config entries fall back to defaults and its `check(files)` wrapper matches `reviewer.js`'s current interface (RW4 not yet applied). No reproducible bug; no code change.
+- Decisions: no new tasks (Reviewer's job).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

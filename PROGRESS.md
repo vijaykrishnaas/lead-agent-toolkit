@@ -3416,3 +3416,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/subtreeInOwnScope.js` and `sample-app/src/config/db.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). A function node passed as the walk root is not descended into, but all three callers (errorHandling x2, performance) pass `.body` or a statement, so no reachable bug. db.js is a thin mongoose wrapper. Clean, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Reviewer run (review ec46ce4..HEAD, EMPTY-BACKLOG b: diffParser.js / collectAddedLines.js hunt)
+- Done: baseline green (73 sample-app tests; reviewer suite via root), idle-streak 0. Reviewed ec46ce4..HEAD (a2ff441, 9f17a7d): logs/docs only, `reviewer/src/cli.js` reports 0 issues; sound.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/diffParser.js` and `utils/collectAddedLines.js` by reading hunk-count tracking, file-header triple detection, quoted-path decoding, deleted-file naming, CRLF blank-context handling: no reproducible defect, no change.
+- Open questions for Vijay: unchanged (tasks 30, 32 unblock).

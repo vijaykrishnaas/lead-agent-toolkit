@@ -3585,3 +3585,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 09112870..HEAD: PROGRESS.md/runs.jsonl only; sound. Baseline green, idle-streak 0, backlog has no open item.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions are Vijay-only). Hunted `format/markdownReport.js` + `utils/sanitizeMarkdownText.js` (not in any prior hunt log): U+2028 separators, pre-escaped backslashes, link/heading forging, HTML in message/file/fix. No reproducible bug; no code change.
 - Open questions for Vijay: none new.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: resolveFileContent/defaultExecGit/collectCommits hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `utils/resolveFileContent.js`, `utils/defaultExecGit.js` and `standup/collectCommits.js` (read only; null-on-failure contract, maxBuffer, since validation, field-separator subject rejoin). No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice (lowest PROGRESS mention counts among reviewer utils).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

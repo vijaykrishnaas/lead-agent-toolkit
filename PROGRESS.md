@@ -3479,3 +3479,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions are Vijay-only). Hunted `scripts/runLog.js` and `scripts/resolvePushRange.js` (fewest mentions among unhunted modules): arg parsing, idle-streak counting, append newline handling, zero-SHA/shallow-history fallbacks all consistent. No reproducible bug; no code change.
 - Decisions: no new tasks, no [FEATURE] task today (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: auth.routes/users.routes/loadRules hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `sample-app/src/routes/auth.routes.js`, `users.routes.js` and `reviewer/src/config/loadRules.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). `auth.routes.js` mounts register/login without `asyncHandler`, but both controllers wrap their entire body (including the `req.body` destructure) in try/catch, so no rejection can escape (guideline 1 satisfied). users routes are auth-gated and wrapped; loadRules is a thin composition. No reproducible bug; no code change.
+- Decisions: no new tasks (Reviewer's job).
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -3421,3 +3421,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests; reviewer suite via root), idle-streak 0. Reviewed ec46ce4..HEAD (a2ff441, 9f17a7d): logs/docs only, `reviewer/src/cli.js` reports 0 issues; sound.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/diffParser.js` and `utils/collectAddedLines.js` by reading hunk-count tracking, file-header triple detection, quoted-path decoding, deleted-file naming, CRLF blank-context handling: no reproducible defect, no change.
 - Open questions for Vijay: unchanged (tasks 30, 32 unblock).
+
+## 2026-10-30 — Builder run (EMPTY-BACKLOG b: generateDocDrift/httpMethods/resolveFileContent hunt)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Backlog empty (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/generateDocDrift.js`, `docDrift/httpMethods.js` and `utils/resolveFileContent.js` (fewest PROGRESS/SKILL_CHANGELOG mentions). DI defaults are consistent, the verb list is shared by both parsers, and resolveFileContent returns null on any git failure as documented. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

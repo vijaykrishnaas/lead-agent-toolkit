@@ -3709,3 +3709,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `scripts/runLog.js` (no hunt entry in SKILL_CHANGELOG): arg parsing rejects unknown/missing-value flags, buildEntry validates enums and summary, append adds a newline prefix when the file lacks a trailing one, idleStreak stops at the first non-noop, and parseLog rejects non-object lines. No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: parseOpenApi hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 1. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/docDrift/parseOpenApi.js` + `httpMethods.js` (fewest recent mentions): probed scalar/array/garbage YAML roots, non-object `paths`/path items, null operations, uppercase verb keys (correctly ignored per spec), `basePath` without leading slash, trailing-slash server urls, root path with basePath, empty `servers`. No throws, correct output. No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

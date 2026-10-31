@@ -3834,3 +3834,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests), idle-streak 0. Reviewed 669d09f..HEAD: docs/logs only, reviewer CLI reports 0 issues.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted modules with zero SKILL_CHANGELOG mentions: `utils/codeSpan.js` (fence length, CommonMark space-strip padding, newline flattening), `docDrift/formatDocDrift.js` (unparsed-route `reason` is a constant string; sink uses codeSpan), `isCodeFile`, `isTestFile` (whole-segment match), `defaultExecGit` (maxBuffer): clean, no change.
 - Decisions: none. Open questions for Vijay: none new.
+
+## 2026-10-31 (Builder: EMPTY-BACKLOG (b) hunt, jwtSecret + subtreeInOwnScope)
+- Done: no TASKS.md item open (only 30/32, BLOCKED). Baseline green (73 sample-app tests; install:all ok). Idle streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted the least-mentioned unhunted modules `sample-app/src/config/jwtSecret.js` (prod rejects unset/placeholder/dev secrets; non-prod fallback) and `reviewer/src/utils/subtreeInOwnScope.js` (root-is-function returns false by design, but all three call sites pass bodies/statements, so no live bug; class static blocks and methods behave). Clean, no change.
+- Decisions: none. Open questions for Vijay: none new.

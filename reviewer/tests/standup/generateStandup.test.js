@@ -75,4 +75,12 @@ describe('generateStandup', () => {
       .rejects.toThrow(/Invalid since.*garbage/);
     expect(collectCommits).not.toHaveBeenCalled();
   });
+
+  it('treats a numeric since of 0 (the epoch) as a real date, not as unset', async () => {
+    const seen = [];
+    await generateStandup({ since: 0, repo: '.' }, {
+      collectCommits: async (args) => { seen.push(args.since.toISOString()); return []; },
+    });
+    expect(seen).toEqual(['1970-01-01T00:00:00.000Z']);
+  });
 });

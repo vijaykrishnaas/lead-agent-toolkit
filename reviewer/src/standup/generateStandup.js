@@ -13,7 +13,7 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 // GitHub API.
 async function generateStandup(options = {}, deps = {}) {
   const { repo = process.cwd(), owner, ghRepo } = options;
-  const since = options.since instanceof Date ? options.since : new Date(options.since || Date.now() - ONE_DAY_MS);
+  const since = options.since instanceof Date ? options.since : new Date(options.since === undefined || options.since === null || options.since === '' ? Date.now() - ONE_DAY_MS : options.since);
 
   if (Number.isNaN(since.getTime())) {
     throw new Error(`Invalid since — could not parse "${options.since}" as a date.`);

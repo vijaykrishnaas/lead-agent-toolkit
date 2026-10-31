@@ -3751,3 +3751,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 are Vijay-only). Hunted `standup/collectPullRequests.js` (pagination termination, hitOlder break, cap-exhaustion error, invalid since) and `github/postReviewComment.js` (HMAC marker, first-match canonical, truncation + surrogate cut, URL encoding, PATCH/POST selection): no reproducible bug, no code change.
 - Decisions: none. Next least-audited candidates: `scripts/syncPlugin.js`, `standup/generateStandup.js`.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: generateStandup/syncPlugin hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 are Vijay-only). Hunted `standup/generateStandup.js` and `scripts/syncPlugin.js`. Reproduced a bug: `since: 0` (epoch) was swallowed by `||` and replaced with "24h ago". Fixed test-first (explicit undefined/null/'' check). syncPlugin type-mismatch handling (guideline 26) verified clean.
+- Decisions: script/src-only fix; no SKILL_CHANGELOG entry needed.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

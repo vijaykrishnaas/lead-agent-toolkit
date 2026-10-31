@@ -3661,3 +3661,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Target: `collectBoundedBlock.js` (lowest mention count, 9, of all reviewer/scripts modules). The AST path already handles this shape; only the documented regex fallback was affected.
 - Decisions: fix kept inside the shared helper (not per caller), so errorHandling's use is covered too.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Reviewer run (review 3aa01f7..HEAD + EMPTY-BACKLOG b: security.js hunt, 1 fix)
+- Done: baseline green, idle-streak 0. Reviewed 70814b4 (`collectBoundedBlock` ignores closers until the block's first opener): sound; `reviewer/src/cli.js` reports 0 issues, regression tests present.
+- Branch taken: EMPTY-BACKLOG (b); backlog has no open item. Hunted `reviewer/src/rules/security.js` (no hunt entry in runs.jsonl). Gap reproduced: `const password = process.env.PASSWORD || 'hunter22'` (and `??`) produced zero issues, because `SECRET_PATTERN` needs a quote right after the operator, so the common "env with hardcoded default" idiom shipped a literal credential unflagged. Added `SECRET_ENV_FALLBACK` for `process.env.X`/`process.env[...]` followed by `||`/`??` and a >=3-char literal; empty/short fallbacks and env-or-env chains stay clean. Tests added first (failed pre-fix); suite green (594 + 73).
+- Noted, not changed: `['eval'](` inside a plain string literal is flagged (bracket check is comment-masked only); `obj.eval(x)` is flagged. Both judged intentional/low-value, no observed failure.
+- Decisions: no new guideline; the fix is a rule pattern, not a recurring class.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -53,6 +53,39 @@ describe('security rule', () => {
     expect(issues[0].message).toMatch(/hardcoded credential/i);
   });
 
+  it('flags a hardcoded literal used as the fallback of a process.env read', () => {
+    // `password = process.env.X || 'literal'` is the common idiom for
+    // shipping a default secret; the quote is not immediately after the
+    // operator, but the literal is still a hardcoded credential.
+    const diff = [
+      'diff --git a/src/config/thirdParty.js b/src/config/thirdParty.js',
+      '--- a/src/config/thirdParty.js',
+      '+++ b/src/config/thirdParty.js',
+      '@@ -1,1 +1,3 @@',
+      ' const axios = require("axios");',
+      "+const password = process.env.PASSWORD || 'hunter22';",
+      '+const apiKey = process.env.API_KEY ?? "abcdef";',
+    ].join('\n');
+
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues).toHaveLength(2);
+    expect(issues[0].message).toMatch(/hardcoded credential/i);
+  });
+
+  it('does not flag a process.env read with an empty or short fallback', () => {
+    const diff = [
+      'diff --git a/src/config/thirdParty.js b/src/config/thirdParty.js',
+      '--- a/src/config/thirdParty.js',
+      '+++ b/src/config/thirdParty.js',
+      '@@ -1,1 +1,3 @@',
+      ' const axios = require("axios");',
+      "+const password = process.env.PASSWORD || '';",
+      '+const apiKey = process.env.API_KEY || process.env.OTHER_KEY;',
+    ].join('\n');
+
+    expect(securityRule.check(parseDiff(diff))).toHaveLength(0);
+  });
+
   it('flags eval() usage', () => {
     const diff = [
       'diff --git a/src/utils/parse.js b/src/utils/parse.js',

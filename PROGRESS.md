@@ -3788,3 +3788,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted the lowest doc-mention-count modules: `utils/isCodeFile.js` (case, `.d.ts`, dotted dirs, trailing space, null/undefined), `utils/subtreeInOwnScope.js` (class methods, arrows, `for await`; a `try` inside a class `static {}` block is still walked, which is harmless since that block runs at class-definition time and `await` is illegal there), `utils/parseAst.js`, `utils/memberCallLine.js`, `docDrift/generateDocDrift.js`. No reproducible bug; no code change.
 - Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.
+
+## 2026-10-31 Reviewer (UTC ~16:35)
+- Reviewed 16cc081..bf3e481: docs/logs only, `reviewer/src/cli.js` reports 0 issues. Baseline green (73 sample-app tests; reviewer suite via root `npm test`).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted `scripts/runLog.js` (arg parsing, buildEntry validation, parseLog, idleStreak, append newline handling): no reproducible bug, no code change. Only quirk: a `--summary` value that is literally `--<flagname>` is rejected as a missing value; harmless.
+- Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.

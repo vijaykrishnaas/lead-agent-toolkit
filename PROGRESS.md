@@ -3798,3 +3798,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted `standup/collectCommits.js`, `standup/collectPullRequests.js`, `standup/groupByAuthor.js`, `utils/parseGitHubRemote.js`, `utils/resolveFileContent.js`. Observed that both collectors reject a raw numeric `since: 0` via `!since`, but `generateStandup` always passes a `Date` (truthy even at epoch), so it is unreachable; no code change.
 - Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.
+
+## 2026-10-31 Reviewer (UTC ~17:35)
+- Reviewed bf3e481..e719fce: docs/logs only, `reviewer/src/cli.js` reports 0 issues. Baseline green (73 sample-app tests; reviewer suite via root `npm test`), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Least recently hunted module by PROGRESS.md: `docDriftCli.js` (last 3341). Hunted it plus `utils/parseArgv.js`: missing value, unknown flag, required flags, write/generate failure paths all behave per guidelines 3 and 7; no reproducible bug, no code change.
+- Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.

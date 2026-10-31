@@ -3668,3 +3668,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Noted, not changed: `['eval'](` inside a plain string literal is flagged (bracket check is comment-masked only); `obj.eval(x)` is flagged. Both judged intentional/low-value, no observed failure.
 - Decisions: no new guideline; the fix is a rule pattern, not a recurring class.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: standup collectors hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/standup/collectCommits.js`, `collectPullRequests.js`, `groupByAuthor.js`, `generateStandup.js` (no hunt/task mention in SKILL_CHANGELOG since the 2026-07 rounds): since-validation, pagination/early-exit/cap, author bucketing and trimming, DI awaiting all correct. No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -3783,3 +3783,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Reviewed 30a25c9..HEAD (docs/log-only commits): reviewer CLI 0 issues, manual read clean.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted the least-mentioned modules by doc-mention count: `sample-app/src/server.js`, `models/Task.js`, `models/User.js`, `config/db.js`, `controllers/tasksController.js` (type validation, owner-scoped queries, empty `$set`, 404 paths): no reproducible bug, no code change.
 - Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: isCodeFile/subtreeInOwnScope/parseAst/generateDocDrift hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted the lowest doc-mention-count modules: `utils/isCodeFile.js` (case, `.d.ts`, dotted dirs, trailing space, null/undefined), `utils/subtreeInOwnScope.js` (class methods, arrows, `for await`; a `try` inside a class `static {}` block is still walked, which is harmless since that block runs at class-definition time and `await` is illegal there), `utils/parseAst.js`, `utils/memberCallLine.js`, `docDrift/generateDocDrift.js`. No reproducible bug; no code change.
+- Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.

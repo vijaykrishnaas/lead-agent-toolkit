@@ -3691,3 +3691,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted the lowest-mention sample-app files: `server.js`, `models/User.js`, `models/Task.js`, `routes/auth.routes.js`, `routes/users.routes.js`, plus `authController.js`/`app.js` error paths. `auth.routes.js` registers `register`/`login` without `asyncHandler`, but both handlers wrap their whole body in try/catch, and Express 4.22 always sets `req.body`, so no rejection can escape. No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice. Next least-audited: `reviewer/src/docDrift/index.js`, `rules/index.js`, `standup/index.js`.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: docDrift format/generate hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 1. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `docDrift/formatDocDrift.js`, `generateDocDrift.js`, `docDrift/index.js`, `rules/index.js`, `standup/index.js`, and `utils/codeSpan.js`: unparsed-only reports still get their own section, code spans fence backticks/newlines/padding correctly, DI defaults and barrel re-exports have no name collisions. No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

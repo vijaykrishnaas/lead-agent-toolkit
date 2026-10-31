@@ -3839,3 +3839,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: no TASKS.md item open (only 30/32, BLOCKED). Baseline green (73 sample-app tests; install:all ok). Idle streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted the least-mentioned unhunted modules `sample-app/src/config/jwtSecret.js` (prod rejects unset/placeholder/dev secrets; non-prod fallback) and `reviewer/src/utils/subtreeInOwnScope.js` (root-is-function returns false by design, but all three call sites pass bodies/statements, so no live bug; class static blocks and methods behave). Clean, no change.
 - Decisions: none. Open questions for Vijay: none new.
+
+## 2026-10-31 (Reviewer: review + EMPTY-BACKLOG (b) hunt, compareRoutes + parseOpenApi)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed 664743e..dcb8e0d: PROGRESS.md/runs.jsonl only, clean.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted `docDrift/compareRoutes.js` and `parseOpenApi.js`: multiple optional params expand to all 4 forms and match; duplicate-case verbs/null path items/non-object specs handled; trailing-slash server url and `/` root path map to base path. Clean, no change.
+- Decisions: none. Open questions for Vijay: none new.

@@ -3773,3 +3773,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green, idle-streak 0. Reviewed b90231d..HEAD (docs/log-only commits): reviewer CLI 0 issues; verified the builder's open question (`new Date("0")` is 2000-01-01, `new Date("-5")` is 2001-05-01).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining questions need Vijay). Hunted `scripts/resolvePushRange.js` (zero-SHA, missing before, root commit fallbacks): clean, no change.
 - Decisions: none. Open questions for Vijay: the bare-numeric `--since` question above still stands.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: sample-app auth/users hunt)
+- Done: baseline green, idle-streak 0. Backlog has no open item (30 and 32 BLOCKED), so EMPTY-BACKLOG.
+- Branch taken: (b); (a) skipped because the oldest unresolved open questions (tasks 30, 32 unblock; bare-numeric `--since`) are Vijay-only. Hunted `sample-app/src/middleware/auth.js`, `middleware/asyncHandler.js`, `config/jwtSecret.js`, `controllers/usersController.js`, `app.js` error middleware (zero or near-zero prior hunt mentions): bearer parsing (empty/space-padded token), secret resolution outside the try, ownership checks before side effects, wrong-typed update fields, duplicate-email 409, CastError/body-parser mapping. Read-through found no reproducible bug; no code change.
+- Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.

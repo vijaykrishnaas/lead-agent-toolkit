@@ -276,4 +276,8 @@ describe('splitRange', () => {
   it.each(['--output=x..HEAD', 'main..-p', '-O/etc/passwd..HEAD'])('rejects option-shaped range side in "%s"', (range) => {
     expect(() => splitRange(range)).toThrow(/Invalid range/);
   });
+
+  it('rejects a three-dot range instead of treating ".head" as a ref', () => {
+    expect(() => splitRange('abc...def')).toThrow(/three-dot|Invalid range/);
+  });
 });

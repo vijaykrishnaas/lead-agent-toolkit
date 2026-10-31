@@ -43,6 +43,9 @@ function splitRange(range) {
   if (sepIndex === -1) {
     throw new Error(`Invalid range "${range}": expected "<base>..<head>".`);
   }
+  if (range.startsWith('...', sepIndex)) {
+    throw new Error(`Invalid range "${range}": three-dot ranges are not supported; use "<base>..<head>".`);
+  }
   const base = range.slice(0, sepIndex);
   const head = range.slice(sepIndex + 2);
   // Both sides reach git as arguments ("diff --name-only <base>..<head>"), so a

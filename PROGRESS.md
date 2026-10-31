@@ -3757,3 +3757,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 are Vijay-only). Hunted `standup/generateStandup.js` and `scripts/syncPlugin.js`. Reproduced a bug: `since: 0` (epoch) was swallowed by `||` and replaced with "24h ago". Fixed test-first (explicit undefined/null/'' check). syncPlugin type-mismatch handling (guideline 26) verified clean.
 - Decisions: script/src-only fix; no SKILL_CHANGELOG entry needed.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Reviewer run (EMPTY-BACKLOG b: compareRoutes/loadRules hunt)
+- Done: baseline green (73 tests in sample-app + reviewer suites). Reviewed 44398c8..HEAD (generateStandup since=0 fix + log commits): reviewer CLI 0 issues; manual read of the fix and its regression test found no problems.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 are Vijay-only). Hunted `docDrift/compareRoutes.js` (optional/constrained params, trailing slash, multi-optional, dotted params, nested constraint groups) and `config/loadRules.js`: clean, no change. Observed but not changed: route comparison is case-sensitive and `//` is not collapsed; both are ambiguous vs. Express/OpenAPI semantics, so not treated as bugs.
+- Decisions: none. Open questions for Vijay: none new.

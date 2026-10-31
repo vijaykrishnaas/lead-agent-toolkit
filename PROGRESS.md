@@ -3829,3 +3829,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: no TASKS.md item open (only 30/32, BLOCKED). Baseline green (73 sample-app tests; install:all ok). Idle streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted `reviewer/src/docDrift/collectExpressRoutes.js` (last mentioned ~line 3212, the oldest), plus `standup/collectCommits.js` and `groupByAuthor.js`: joinPath edge cases (trailing-slash prefix, empty prefix, missing leading slash), ancestor-path cycle guard, bare-specifier skip, since validation, author whitespace bucketing. No reproducible bug, no code change. Observed only: joinPath does not collapse doubled slashes in a prefix like '/a//' (unlikely input, not changed).
 - Decisions: none. Open questions for Vijay: none new.
+
+## 2026-10-31 (Reviewer: EMPTY-BACKLOG (b) hunt, codeSpan/formatDocDrift/isCodeFile/isTestFile/defaultExecGit)
+- Done: baseline green (73 sample-app tests), idle-streak 0. Reviewed 669d09f..HEAD: docs/logs only, reviewer CLI reports 0 issues.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted modules with zero SKILL_CHANGELOG mentions: `utils/codeSpan.js` (fence length, CommonMark space-strip padding, newline flattening), `docDrift/formatDocDrift.js` (unparsed-route `reason` is a constant string; sink uses codeSpan), `isCodeFile`, `isTestFile` (whole-segment match), `defaultExecGit` (maxBuffer): clean, no change.
+- Decisions: none. Open questions for Vijay: none new.

@@ -3778,3 +3778,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green, idle-streak 0. Backlog has no open item (30 and 32 BLOCKED), so EMPTY-BACKLOG.
 - Branch taken: (b); (a) skipped because the oldest unresolved open questions (tasks 30, 32 unblock; bare-numeric `--since`) are Vijay-only. Hunted `sample-app/src/middleware/auth.js`, `middleware/asyncHandler.js`, `config/jwtSecret.js`, `controllers/usersController.js`, `app.js` error middleware (zero or near-zero prior hunt mentions): bearer parsing (empty/space-padded token), secret resolution outside the try, ownership checks before side effects, wrong-typed update fields, duplicate-email 409, CastError/body-parser mapping. Read-through found no reproducible bug; no code change.
 - Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.
+
+## 2026-10-31 — Reviewer run (EMPTY-BACKLOG b: sample-app server/models/tasksController hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Reviewed 30a25c9..HEAD (docs/log-only commits): reviewer CLI 0 issues, manual read clean.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted the least-mentioned modules by doc-mention count: `sample-app/src/server.js`, `models/Task.js`, `models/User.js`, `config/db.js`, `controllers/tasksController.js` (type validation, owner-scoped queries, empty `$set`, 404 paths): no reproducible bug, no code change.
+- Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.

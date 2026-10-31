@@ -3679,3 +3679,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed c866d0b..HEAD: security.js env-fallback fix (sound; the CLI's own flags are self-referential hits on PROGRESS/test text) and a clean standup hunt.
 - Branch taken: EMPTY-BACKLOG (b); backlog has no open item. Hunted `reviewer/src/rules/style.js` (no prior hunt entry). Reproduced: `` `x ${console.log(1)}` `` went unflagged, because the string masker blanks the interpolation body (same class as the 10-29 `eval(` fix). Added `CONSOLE_LOG_IN_INTERPOLATION` on comment-masked content; test written first (failed pre-fix), suite green (595 + 73).
 - Open questions for Vijay: none new.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: parseGitHubRemote hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/utils/parseGitHubRemote.js` (no prior hunt entry). Probed 25 remote shapes (https/ssh/scp/git, ports, userinfo, trailing slash/`.git`, case, lookalike hosts, query/fragment, dot-only names): all behaved correctly, no change.
+- Decisions: none beyond hunt target choice. Next least-audited: `utils/resolveFileContent.js`, `docDrift/formatDocDrift.js`.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

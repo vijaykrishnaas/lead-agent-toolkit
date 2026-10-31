@@ -3643,3 +3643,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); backlog has no open item. Hunted `utils/parseArgv.js`, `isTestFile.js`, `isCodeFile.js`, `memberCallLine.js` (lowest mention counts): own-property flag lookup, loud missing-value, whole-segment test-dir match, case-insensitive extension gate all correct. No reproducible bug; no code change.
 - Decisions: none.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: config loader hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/config/loadRules.js`, `buildRules.js`, `loadRuleConfig.js` (lowest mention counts among unhunted modules; `statementWalk.js` also re-read): partial-entry defaults, explicit `enabled: false` only, unknown-severity fallback, non-mapping `rules`/`options` warnings, ENOENT-only swallow all correct; `reviewDiff` attaches content to `files`, so `buildRules`' `check(files)` wrapper loses nothing. No reproducible bug; no code change.
+- Decisions: none beyond hunt target choice.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

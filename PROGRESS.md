@@ -3745,3 +3745,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `format/markdownReport.js`, `docDrift/formatDocDrift.js`, `utils/codeSpan.js`, `utils/sanitizeMarkdownText.js`: probed backtick runs/lone backticks in route paths and meta, newline-forged `## fake` headings in paths, ` ` in file names, hostile range strings. Fences, padding and newline collapsing all correct; category/severity are rule-controlled (not attacker input). No reproducible bug, no code change.
 - Decisions: none beyond hunt target choice. Next least-audited: `standup/collectPullRequests.js`, `github/postReviewComment.js`.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Reviewer run (EMPTY-BACKLOG b: collectPullRequests/postReviewComment hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Reviewed 4413a70..HEAD (invariantLint three-dot fix + builder log/PROGRESS commits): reviewer CLI 0 issues, manual read clean.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 are Vijay-only). Hunted `standup/collectPullRequests.js` (pagination termination, hitOlder break, cap-exhaustion error, invalid since) and `github/postReviewComment.js` (HMAC marker, first-match canonical, truncation + surrogate cut, URL encoding, PATCH/POST selection): no reproducible bug, no code change.
+- Decisions: none. Next least-audited candidates: `scripts/syncPlugin.js`, `standup/generateStandup.js`.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

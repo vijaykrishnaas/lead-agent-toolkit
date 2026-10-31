@@ -3768,3 +3768,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Done:** Probed value-taking flags, boolean flags, positional handling and `--since` edge inputs. No bug found, so no code change. Baseline `npm test` green.
 - **Decisions:** Logged a clean hunt rather than changing behavior speculatively.
 - **Open question for Vijay:** `standup --since` accepts bare numeric strings via `new Date(string)`. `--since 0` becomes year 2000 and `--since -5` becomes year 2001, which is a silent reinterpretation. Should the CLI reject bare-numeric `--since` values or keep this?
+
+## 2026-10-31 — Reviewer run (EMPTY-BACKLOG b: resolvePushRange hunt)
+- Done: baseline green, idle-streak 0. Reviewed b90231d..HEAD (docs/log-only commits): reviewer CLI 0 issues; verified the builder's open question (`new Date("0")` is 2000-01-01, `new Date("-5")` is 2001-05-01).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining questions need Vijay). Hunted `scripts/resolvePushRange.js` (zero-SHA, missing before, root commit fallbacks): clean, no change.
+- Decisions: none. Open questions for Vijay: the bare-numeric `--since` question above still stands.

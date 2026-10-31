@@ -3854,3 +3854,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed dcb8e0d..HEAD (docs/logs only, clean). Baseline green (73 tests). EMPTY-BACKLOG (b): backlog empty, (a) skipped; hunted least-audited standupCli.js, formatStandup.js, since-window validation in collectCommits/generateStandup — clean, no change.
 - Decisions: no code or task changes; no feature added.
 - Open questions for Vijay: none new.
+
+## 2026-10-31 (builder, EMPTY-BACKLOG)
+
+**Done:** Baseline green (73 sample-app + reviewer suites via `npm test`). TASKS.md has no open item (30 and 32 BLOCKED, rest DONE), so EMPTY-BACKLOG applied.
+**Branch taken:** (a) skipped — every earlier open question is either promoted to a task, resolved, or lacks an observed trigger; no new information. (b) taken: hunted `reviewer/src/utils/parseGitHubRemote.js` and `resolveFileContent.js` (fewest SKILL_CHANGELOG/PROGRESS mentions among non-trivial modules). Probed 13 remote-URL shapes (https/ssh/scp, userinfo, ports, trailing slash/.git, lookalike hosts, extra path segments, query strings, uppercase): all behave correctly. `resolveFileContent` never throws by design. Clean, no change.
+**Decisions:** No code change; nothing reproduced.
+**Open questions for Vijay:** Tasks 30 (needs invariantLint.js edit approval) and 32 (allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

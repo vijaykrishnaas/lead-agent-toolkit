@@ -3721,3 +3721,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `standup/collectCommits.js`, `standup/groupByAuthor.js`, `utils/isTestFile.js`, `utils/parseGitHubRemote.js`: probed https/ssh/scp/token-in-URL/trailing-slash/uppercase/extra-path remotes, directory-segment vs substring test paths (`mytests/`, `latest/`), padded/blank authors. All correct. No reproducible bug; no code change.
 - Decisions: none beyond hunt target choice.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: diffParser hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 1. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `reviewer/src/diffParser.js` + `utils/collectAddedLines.js`: probed new-file, trailing-tab headers, multi-hunk, rename-with-edit, no-newline marker, `-- `/`++ ` content lines inside a hunk, binary-file followed by another file: all parsed with correct types and line numbers, no change.
+- Decisions: none beyond hunt target choice. Next least-audited: `format/markdownReport.js` sibling paths, `config/loadRules.js`.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

@@ -409,4 +409,23 @@ describe('performance rule (AST path, direct)', () => {
       expect(issues[0].line).toBe(2);
     }
   });
+
+  it('flags await in a .forEach() chained after a closing brace on the same line (diff-only path)', () => {
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -0,0 +1,5 @@',
+      '+list.map(x => {',
+      '+  return x;',
+      '+}).forEach(async y => {',
+      '+  await save(y);',
+      '+});',
+      '',
+    ].join('\n');
+    const issues = performanceRule.check(parseDiff(diff));
+
+    expect(issues).toHaveLength(1);
+    expect(issues[0].line).toBe(3);
+  });
 });

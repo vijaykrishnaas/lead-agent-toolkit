@@ -32,7 +32,11 @@ function collectBoundedBlock(addedLines, startIdx) {
       if (ch === '{') {
         depth += 1;
         opened = true;
-      } else if (ch === '}') {
+      } else if (ch === '}' && opened) {
+        // A closer before this block's own first opener (the start line of a
+        // chained call, e.g. `}).forEach(async y => {`) closes the previous
+        // construct, not this one; counting it would end the block at its own
+        // opening brace.
         depth -= 1;
       }
     }

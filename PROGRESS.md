@@ -3655,3 +3655,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b); backlog has no open item. Hunted `scripts/resolvePushRange.js` and `scripts/syncPlugin.js` (lowest mention counts): zero-SHA/missing-ref fallbacks and the type-mismatch removal (guideline 26) are correct. No reproducible bug; no code change.
 - Decisions: none.
 - Open questions for Vijay: unchanged — tasks 30 and 32 unblock.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: collectBoundedBlock hunt, 1 fix)
+- Done: baseline green, idle-streak 0. Fixed `reviewer/src/utils/collectBoundedBlock.js`: a closing brace before the start line's own first opening brace (chained call such as `}).forEach(async y => {`) drove depth to -1 then 0 at the opener, ending the block at its own first line, so the `await` in the callback body was missed (performance rule, regex path: 0 issues, expected 1). Closers are now ignored until the block's first opener is seen. Regression tests added first (failed before the fix) in `tests/utils/collectBoundedBlock.test.js` and `tests/rules/performance.test.js`; suite green (592 + 73).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Target: `collectBoundedBlock.js` (lowest mention count, 9, of all reviewer/scripts modules). The AST path already handles this shape; only the documented regex fallback was affected.
+- Decisions: fix kept inside the shared helper (not per caller), so errorHandling's use is covered too.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

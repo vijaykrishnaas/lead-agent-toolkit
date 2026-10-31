@@ -115,4 +115,16 @@ describe('collectBoundedBlock', () => {
     expect(block).toContain('try { doX(); } catch (err) { log(err); }');
     expect(block).toContain('};');
   });
+
+  it('ignores a closing brace that precedes the start line\'s own opening brace (chained call)', () => {
+    const addedLines = linesFrom([
+      '}).forEach(async y => {',
+      '  await save(y);',
+      '});',
+    ]);
+
+    expect(collectBoundedBlock(addedLines, 0)).toBe(
+      '}).forEach(async y => {\n  await save(y);\n});'
+    );
+  });
 });

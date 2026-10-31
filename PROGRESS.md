@@ -3818,3 +3818,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: no TASKS.md item open (only 30/32, BLOCKED). Baseline green (73 sample-app tests; install:all ok). Idle streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted the least-recently-mentioned modules `reviewer/src/standup/formatStandup.js` and `reviewer/src/rules/missingTests.js` (+ `isTestFile`, `collectAddedLines`): mixed-case author sort, multi-line commit message sanitizing, invalid commit dates in the sort comparator (NaN, no crash), sibling-basename handling, `.test`/`.spec` source skipping, async rejection-case detection. No reproducible bug, no code change. Observed only: `.d.ts` files under src/ are flagged as needing a test (ambiguous policy, not changed).
 - Decisions: none. Open questions for Vijay: should `.d.ts` files be exempt from the missing-tests rule? Otherwise unchanged (tasks 30/32 unblock; bare-numeric `--since`).
+
+## 2026-10-31 — Reviewer run (EMPTY-BACKLOG b: invariantLint hunt)
+
+- Done: baseline green (73 sample-app tests), idle-streak 0. Reviewed dadea4e..HEAD: docs/logs only, clean.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted `scripts/invariantLint.js` (status-tag stripping, nested-bracket BLOCKED reason, range parsing): clean, no change.
+- Open questions for Vijay: none new.

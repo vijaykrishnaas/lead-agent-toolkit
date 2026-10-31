@@ -3739,3 +3739,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green. Reviewed 3558530..HEAD (log/PROGRESS-only commits; reviewer CLI: 0 issues). Backlog empty, no open-question work → EMPTY-BACKLOG (b) taken: hunted `scripts/invariantLint.js` (least recently audited; last PROGRESS mention ~line 3236). Reproduced a bug: `splitRange('a...b')` yielded head `.b`, `showFile` swallowed the git error, and the lint printed hundreds of bogus "history content removed" violations. Fixed test-first: three-dot ranges now throw a clear error (CI uses two-dot, so no behavior change there).
 **Decisions:** Script-only fix; no skill/CLAUDE.md/TASKS change, so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** none new.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG b: markdownReport/formatDocDrift hunt)
+- Done: baseline green (reviewer + 73 sample-app tests), idle-streak 0. Backlog has no open item (30, 32 BLOCKED).
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped because the remaining open questions (tasks 30, 32 unblock) are Vijay-only. Hunted `format/markdownReport.js`, `docDrift/formatDocDrift.js`, `utils/codeSpan.js`, `utils/sanitizeMarkdownText.js`: probed backtick runs/lone backticks in route paths and meta, newline-forged `## fake` headings in paths, ` ` in file names, hostile range strings. Fences, padding and newline collapsing all correct; category/severity are rule-controlled (not attacker input). No reproducible bug, no code change.
+- Decisions: none beyond hunt target choice. Next least-audited: `standup/collectPullRequests.js`, `github/postReviewComment.js`.
+- Open questions for Vijay: unchanged — tasks 30 and 32 unblock.

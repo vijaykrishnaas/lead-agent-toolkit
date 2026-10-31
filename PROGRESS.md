@@ -3803,3 +3803,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed bf3e481..e719fce: docs/logs only, `reviewer/src/cli.js` reports 0 issues. Baseline green (73 sample-app tests; reviewer suite via root `npm test`), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Least recently hunted module by PROGRESS.md: `docDriftCli.js` (last 3341). Hunted it plus `utils/parseArgv.js`: missing value, unknown flag, required flags, write/generate failure paths all behave per guidelines 3 and 7; no reproducible bug, no code change.
 - Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.
+
+## 2026-10-31 — Builder (EMPTY-BACKLOG (b) hunt, sample-app routes/controllers)
+- Done: no TASKS.md item open. Baseline green (73 sample-app tests; install:all ok). Idle streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Least recently hunted by PROGRESS.md mention count: sample-app `auth.routes.js`/`users.routes.js`/`tasks.routes.js`. Hunted them plus `authController`, `usersController`, `tasksController`, `middleware/auth.js`, `app.js`, `models/User.js`: wrong-typed fields, express 4 empty-body (`req.body` always `{}`), email normalization on update (schema setters apply), auth routes lacking asyncHandler (controllers catch internally), owner scoping on tasks — no reproducible bug, no change.
+- Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.

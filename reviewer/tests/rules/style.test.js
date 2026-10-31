@@ -165,4 +165,17 @@ describe('style rule', () => {
     const issues = styleRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([3, 4, 5, 6]);
   });
+
+  it('flags a console.log call inside a template-literal ${...} interpolation', () => {
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -0,0 +1,2 @@',
+      '+const s = `x ${console.log(1)}`;',
+      '+const m = `plain console.log(1) text`;',
+    ].join('\n');
+    const issues = styleRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1]);
+  });
 });

@@ -325,3 +325,7 @@
 ## 2026-10-30 (Builder: EMPTY-BACKLOG (b) hunt, diffParser)
 **Change:** No skill/CLAUDE.md change. Code fix in `diffParser.js`: stop consuming hunk content once the header's line counts are exhausted; regression test added.
 **Evidence:** PROGRESS.md 2026-10-30 Builder diffParser entry — reproduced blank/indented text after a complete hunk becoming phantom context lines.
+
+## 2026-10-31 (Reviewer: EMPTY-BACKLOG (b) hunt, style.js)
+**Change:** No skill/CLAUDE.md change. Code fix: `style.js` also flags `console.log(` inside template-literal `${...}` interpolations; regression test added.
+**Evidence:** PROGRESS.md 2026-10-31 Reviewer (02:35 UTC) entry — reproduced `` `x ${console.log(1)}` `` going unflagged (guideline 22 sibling-check class).

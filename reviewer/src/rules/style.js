@@ -1,10 +1,14 @@
 const { isTestFile } = require('../utils/isTestFile');
 const { isCodeFile } = require('../utils/isCodeFile');
 const { collectAddedLines } = require('../utils/collectAddedLines');
-const { maskStringLiterals } = require('../utils/maskStringLiterals');
+const { maskComments, maskStringLiterals } = require('../utils/maskStringLiterals');
 
 const VAR_DECLARATION = /(?:^|[;{}():]|\b(?:export|else|do))\s*var\s+/;
 const CONSOLE_LOG = /(?<![\w$])console\s*\??\.\s*log\s*\(/;
+
+// Template interpolation bodies are code, but the masker blanks them with the
+// rest of the template, so the call is also checked inside `${...}`.
+const CONSOLE_LOG_IN_INTERPOLATION = /\$\{[^}]*(?<![\w$])console\s*\??\.\s*log\s*\(/;
 
 // Matched against the line's string/comment-masked content, not the raw
 // text -- a string literal that merely *mentions* "console.log(" (e.g. a log
@@ -31,7 +35,7 @@ function check(files) {
           fix: 'Use "let" or "const" instead of "var".',
         });
       }
-      if (CONSOLE_LOG.test(masked)) {
+      if (CONSOLE_LOG.test(masked) || CONSOLE_LOG_IN_INTERPOLATION.test(maskComments(line.content).masked)) {
         issues.push({
           file: file.file,
           line: line.newLine,

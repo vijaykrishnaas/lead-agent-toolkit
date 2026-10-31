@@ -3813,3 +3813,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed e719fce..dadea4e: PROGRESS.md/runs.jsonl only, clean.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (no actionable open question). Hunted `reviewer/src/config/loadRuleConfig.js` + `buildRules.js` (not previously hunted): invalid enabled/minSeverity/options values all warn and fall back; unknown severity ranks as low. Only quirk: a literal `__proto__:` category in review-rules.yaml sets the prototype of the normalized rules map instead of an own key — unreachable by real rule categories and the file is owner-controlled, so no change.
 - Open questions for Vijay: none new.
+
+## 2026-10-31 (Builder: EMPTY-BACKLOG (b) hunt, formatStandup + missingTests)
+- Done: no TASKS.md item open (only 30/32, BLOCKED). Baseline green (73 sample-app tests; install:all ok). Idle streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Hunted the least-recently-mentioned modules `reviewer/src/standup/formatStandup.js` and `reviewer/src/rules/missingTests.js` (+ `isTestFile`, `collectAddedLines`): mixed-case author sort, multi-line commit message sanitizing, invalid commit dates in the sort comparator (NaN, no crash), sibling-basename handling, `.test`/`.spec` source skipping, async rejection-case detection. No reproducible bug, no code change. Observed only: `.d.ts` files under src/ are flagged as needing a test (ambiguous policy, not changed).
+- Decisions: none. Open questions for Vijay: should `.d.ts` files be exempt from the missing-tests rule? Otherwise unchanged (tasks 30/32 unblock; bare-numeric `--since`).

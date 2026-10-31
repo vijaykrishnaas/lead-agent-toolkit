@@ -3808,3 +3808,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: no TASKS.md item open. Baseline green (73 sample-app tests; install:all ok). Idle streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 and bare-numeric `--since` are Vijay-only). Least recently hunted by PROGRESS.md mention count: sample-app `auth.routes.js`/`users.routes.js`/`tasks.routes.js`. Hunted them plus `authController`, `usersController`, `tasksController`, `middleware/auth.js`, `app.js`, `models/User.js`: wrong-typed fields, express 4 empty-body (`req.body` always `{}`), email normalization on update (schema setters apply), auth routes lacking asyncHandler (controllers catch internally), owner scoping on tasks — no reproducible bug, no change.
 - Decisions: none. Open questions for Vijay: unchanged — tasks 30 and 32 unblock; bare-numeric `--since` question stands.
+
+## 2026-10-31 (Reviewer: review + EMPTY-BACKLOG (b) hunt, config loaders)
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. Reviewed e719fce..dadea4e: PROGRESS.md/runs.jsonl only, clean.
+- Branch taken: EMPTY-BACKLOG (b); (a) skipped (no actionable open question). Hunted `reviewer/src/config/loadRuleConfig.js` + `buildRules.js` (not previously hunted): invalid enabled/minSeverity/options values all warn and fall back; unknown severity ranks as low. Only quirk: a literal `__proto__:` category in review-rules.yaml sets the prototype of the normalized rules map instead of an own key — unreachable by real rule categories and the file is owner-controlled, so no change.
+- Open questions for Vijay: none new.

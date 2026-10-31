@@ -3762,3 +3762,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 tests in sample-app + reviewer suites). Reviewed 44398c8..HEAD (generateStandup since=0 fix + log commits): reviewer CLI 0 issues; manual read of the fix and its regression test found no problems.
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (open questions on tasks 30/32 are Vijay-only). Hunted `docDrift/compareRoutes.js` (optional/constrained params, trailing slash, multi-optional, dotted params, nested constraint groups) and `config/loadRules.js`: clean, no change. Observed but not changed: route comparison is case-sensitive and `//` is not collapsed; both are ambiguous vs. Express/OpenAPI semantics, so not treated as bugs.
 - Decisions: none. Open questions for Vijay: none new.
+
+## 2026-10-31 — Builder run (EMPTY-BACKLOG branch b)
+- **Branch taken:** TASKS.md has no open item (all DONE/BLOCKED), so EMPTY-BACKLOG. (a) skipped again: no unresolved open question that needs no Vijay input. (b) took the least-recently-hunted area: `utils/parseArgv.js`, `utils/consumeFlagValue.js`, and the argument parsing in `reviewPrCli.js` and `standupCli.js`.
+- **Done:** Probed value-taking flags, boolean flags, positional handling and `--since` edge inputs. No bug found, so no code change. Baseline `npm test` green.
+- **Decisions:** Logged a clean hunt rather than changing behavior speculatively.
+- **Open question for Vijay:** `standup --since` accepts bare numeric strings via `new Date(string)`. `--since 0` becomes year 2000 and `--since -5` becomes year 2001, which is a silent reinterpretation. Should the CLI reject bare-numeric `--since` values or keep this?

@@ -4015,3 +4015,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 tests), idle-streak 0. Bearer scheme case-insensitivity, empty-token 401, HS256 pin, secret resolution outside try/catch all behave correctly. No reproducible defect; no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.
+
+## 2026-11-01 (Reviewer run, EMPTY-BACKLOG b: isCodeFile/isTestFile hunt)
+- Reviewed 733998f..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues. Baseline green (73 tests), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Probed `utils/isCodeFile.js` and `utils/isTestFile.js` on 19 paths (case, .min.js, node_modules, `latest.js`/`contest.js` whole-segment, .d.ts, .map): all behave as designed. Only asymmetry: `isTestFile` suffix match is case-sensitive while `isCodeFile` is not (`A.TEST.JS`) — niche, left unchanged.
+- Decisions: no code change, no new task, no FEATURE (no evidenced gap).
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.

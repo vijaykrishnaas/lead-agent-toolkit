@@ -3971,3 +3971,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 7488fad..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues. Baseline green (73 tests), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted `config/loadRuleConfig.js` + `config/buildRules.js` (not hunted since 10-xx): scalar/null/array YAML, bad enabled/minSeverity/options, unknown severity, `__proto__` category key — all handled or harmless. Clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: docDrift parseOpenApi / compareRoutes / formatDocDrift hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `docDrift/parseOpenApi.js`, `compareRoutes.js`, `formatDocDrift.js` (not hunted in recent run entries).
+**Done:** Baseline green (73 sample-app tests), idle-streak 0. Read base-path derivation, non-verb key filtering, param/constraint normalization, optional-param expansion, dedupe/sort, unparsed-routes section. No reproducible defect; no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

@@ -3891,3 +3891,10 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Chose always-neutralize (including emails; renders identically) over a mention-shape regex for simplicity and safety; bare `@` untouched. Asserted in test.
 
 **Open questions for Vijay:** none new.
+
+## 2026-11-01 Reviewer: review 6932b51..HEAD, EMPTY-BACKLOG (b) hunt of sample-app users/auth
+**Done:** Reviewed 6932b51..HEAD: only code change is task 35 (`sanitizeMarkdownText` @mention neutralization) — correct, regression test present, all three sinks (markdownReport, formatStandup x2) go through the shared util (guideline 15 satisfied); `reviewer/src/cli.js` range report: 0 issues. Backlog empty and (a) has nothing unresolved, so took branch (b): hunted the least-referenced module group, sample-app `users.routes.js`/`auth.routes.js`/`usersController.js`/`authController.js`/`User.js`/`jwtSecret.js`. Auth routes skip asyncHandler but both handlers wrap their whole body in try/catch (guideline 1 holds); `update`'s lowercase/trim relies on Mongoose applying setters to update queries (true by default). No reproducible bug; no change.
+
+**Decisions:** No new task or [FEATURE] — no evidenced gap. Baseline green (73 sample-app tests).
+
+**Open questions for Vijay:** none new.

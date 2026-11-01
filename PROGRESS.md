@@ -4003,3 +4003,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 tests), idle-streak 0. Production secret guard, owner-scoped queries, body validation and CastError->400 mapping all behave correctly. No reproducible defect; no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.
+
+## 2026-11-01 (Reviewer run, EMPTY-BACKLOG b: diffParser re-read)
+- Reviewed ebc457e..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues. Baseline green (73 tests), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Re-read `reviewer/src/diffParser.js` (hunk-count tracking, header triple detection, quoted paths, deleted files): no reproducible defect; no change, no new task.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.

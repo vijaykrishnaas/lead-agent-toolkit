@@ -3990,3 +3990,9 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests), idle-streak 0. Probed var/console.log detection across comments, strings, template interpolation, property names, whitespace variants, member-chained `window.console.log`: all behave correctly. Only miss is `console["log"](x)` computed access — niche, not worth a rule change. No code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.
+
+## 2026-11-01 (Reviewer)
+**Done:** Reviewed ebc457e..ed5f1fb: log-only commits (PROGRESS.md, runs.jsonl); `reviewer/src/cli.js` reports 0 issues.
+**Branch taken:** TASKS.md has no open item; EMPTY-BACKLOG (b), (a) remaining questions are Vijay-only. Hunted `rules/security.js` (oldest hunt entry). Probed 13 inputs (quoted keys, template, trailing comments, `eval (x)`, `authToken`, `clientSecret`): behaviour matches design. Judgment calls, not bugs, left unchanged: commented-out secrets still flag; `x.eval()` flags; bare `private_key` is not in the keyword list.
+**Decisions:** No code change, no new task (no reproduced defect; no FEATURE evidence).
+**Open questions for Vijay:** Unchanged.

@@ -4145,3 +4145,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 6b957d9..HEAD (log/PROGRESS-only commits; reviewer CLI: 0 issues). Baseline green (73 tests), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `scripts/runLog.js` (arg parsing, entry validation, idle-streak) by reading: no defects, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: parseOpenApi.js hunt)
+- **Branch taken:** no open TASKS.md item (30 and 32 BLOCKED on Vijay). (a) is Vijay-only, so (b): hunted `docDrift/parseOpenApi.js` (among the less-recently-mentioned modules).
+- **Done:** Probed non-object specs, array `paths`, null path items, duplicate-case verbs, scheme-relative and trailing-slash server URLs: all handled. Only oddity: a relative server URL (`./api`) yields `/./api/...`; not a realistic Express mount, so no change.
+- **Decisions:** No code change.
+- **Open questions for Vijay:** unchanged (tasks 30 and 32 still need your unblock).

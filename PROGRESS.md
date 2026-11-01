@@ -4101,3 +4101,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Done:** Reviewed 67ff0d5..HEAD (log-only commits, clean); baseline green (73 sample-app tests + suites).
 - **Branch taken:** EMPTY-BACKLOG (b) ((a) is Vijay-only): hunted `utils/parseGitHubRemote.js` and `standup/collectPullRequests.js` — no defects found, no change.
 - **Open questions for Vijay:** Unchanged — tasks 30 (invariantLint archive-aware PROGRESS check) and 32 (allowlist fastdl.mongodb.org) remain BLOCKED.
+
+## 2026-11-01 — Builder run (19:05 UTC): EMPTY-BACKLOG (b), parseOpenApi.js
+- **Branch taken:** no open TASKS.md item (30 and 32 BLOCKED on Vijay). (a) is Vijay-only, so (b): probed `docDrift/parseOpenApi.js` with empty, scalar, array, null-paths, null-verb, trailing-slash server url, and root-path specs. All behave sensibly; no defect, no code change.
+- **Done:** Baseline green (73 sample-app tests plus reviewer suite), idle-streak 0.
+- **Decisions:** No speculative edits.
+- **Open questions for Vijay:** Unchanged — task 30 (approve `invariantLint.js` change) and task 32 (allowlist `fastdl.mongodb.org` or `MONGOMS_SYSTEM_BINARY`) remain BLOCKED; consider pausing the loop while the backlog is empty.

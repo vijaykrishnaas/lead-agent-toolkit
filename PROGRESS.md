@@ -3996,3 +3996,10 @@ Marked TASKS.md item 29 `[DONE]`.
 **Branch taken:** TASKS.md has no open item; EMPTY-BACKLOG (b), (a) remaining questions are Vijay-only. Hunted `rules/security.js` (oldest hunt entry). Probed 13 inputs (quoted keys, template, trailing comments, `eval (x)`, `authToken`, `clientSecret`): behaviour matches design. Judgment calls, not bugs, left unchanged: commented-out secrets still flag; `x.eval()` flags; bare `private_key` is not in the keyword list.
 **Decisions:** No code change, no new task (no reproduced defect; no FEATURE evidence).
 **Open questions for Vijay:** Unchanged.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: sample-app jwtSecret / tasksController hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `sample-app/src/config/jwtSecret.js` and `controllers/tasksController.js` (+ app.js error middleware for CastError on bad ids).
+**Done:** Baseline green (73 tests), idle-streak 0. Production secret guard, owner-scoped queries, body validation and CastError->400 mapping all behave correctly. No reproducible defect; no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

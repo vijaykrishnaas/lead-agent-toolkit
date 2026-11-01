@@ -3959,3 +3959,10 @@ Marked TASKS.md item 29 `[DONE]`.
 **Branch taken:** Reviewed 9941573..HEAD (bbd483e..HEAD): log-only commits (PROGRESS.md, runs.jsonl), nothing to fix. Backlog empty; (a) Vijay-only. (b): hunted least-recently-audited `standup/collectCommits.js`, `collectPullRequests.js`, `groupByAuthor.js`.
 **Done:** Read for date parsing, pagination termination, URL encoding, field-separator handling, blank-author bucketing; no defect reproduced, no code change. Baseline green (73 sample-app; reviewer suite green).
 **Open questions for Vijay:** none new.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: diffParser / resolveFileContent / missingTests hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `diffParser.js`, `utils/resolveFileContent.js`, `rules/missingTests.js` (not hunted in recent run entries).
+**Done:** Baseline green (73 sample-app tests). Read hunk-count tracking, quoted-path decoding, deleted-file handling, sibling-basename test matching, whole-token path match, async/rejection masking. No reproducible defect; no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

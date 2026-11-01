@@ -4032,3 +4032,10 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-01 Reviewer (12:35 UTC)
 - Done: reviewed 0550572..b644422 (log-only commits, CLI: 0 issues). EMPTY-BACKLOG branch (b): (a) is Vijay-only; hunted scripts/syncPlugin.js (fewest changelog/progress mentions) — clean (only an unreachable symlink-in-source edge, not worth a change). No code change.
 - Open questions for Vijay: none new.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: sample-app asyncHandler/db/models/users.routes hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted the least-mentioned sample-app files (`middleware/asyncHandler.js`, `config/db.js`, `models/User.js`, `models/Task.js`, `routes/users.routes.js`). A synchronous throw escapes `asyncHandler` before `Promise.resolve`, but Express catches sync handler throws itself, so it is not a defect. Routes all sit behind `auth`; schemas have required/unique/lowercase as expected. No reproducible defect.
+**Done:** Baseline green (73 tests), idle-streak 0. No code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

@@ -3983,3 +3983,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 84610dc..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues. Baseline green (73 tests), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted `scripts/runLog.js` (arg parsing, entry validation, log parsing, idle streak): clean, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: rules/style.js hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `reviewer/src/rules/style.js` (not hunted in recent run entries).
+**Done:** Baseline green (73 sample-app tests), idle-streak 0. Probed var/console.log detection across comments, strings, template interpolation, property names, whitespace variants, member-chained `window.console.log`: all behave correctly. Only miss is `console["log"](x)` computed access — niche, not worth a rule change. No code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

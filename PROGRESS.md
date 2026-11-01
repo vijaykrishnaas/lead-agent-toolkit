@@ -3937,3 +3937,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed ee0c27d..HEAD: only PROGRESS.md/runs.jsonl changes; `node reviewer/src/cli.js` reports 0 issues. Baseline `npm test` green (73 tests); idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) open questions are Vijay-only). Read `scripts/resolvePushRange.js`, `utils/parseGitHubRemote.js`, `utils/isTestFile.js`: no reproducible bug, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: markdownReport/reviewer/collectAddedLines hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `reviewer/src/format/markdownReport.js`, `reviewer.js`, `utils/collectAddedLines.js`, `sanitizeMarkdownText.js`.
+**Done:** Baseline green (73 sample-app tests). All sinks sanitized; every built-in rule supplies `fix`. Only edge: an externally supplied rule omitting `fix` would render "Fix: undefined" — not reachable from built-in rules, so no speculative change.
+**Decisions:** No code change.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org) remain BLOCKED on you.

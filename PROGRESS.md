@@ -3867,3 +3867,13 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 13b4c74..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues). Baseline green (73 tests).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted `utils/parseArgv.js` and `consumeFlagValue.js`: prototype-key flag names (`__proto__`) rejected via hasOwnProperty, `--x=v` fails loudly, empty/flag-shaped/missing values throw, extra positional rejected, required check runs after parsing. No defect reproduced; no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-01 — Builder: EMPTY-BACKLOG (b) hunt of security.js / compareRoutes.js
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a) skipped as in prior runs: the historical open questions were already promoted, decided, or are single-mention with no observed trigger. (b): hunted `security.js` and `compareRoutes.js`, neither recently audited.
+
+**Done:** `security.js` missed hardcoded credentials whose name ends in a Key suffix (`secretKey: 'abc123'`, `secret_key = '...'`, `passwordKey`) because the keyword had to sit directly before the quote/operator. Added optional `(?:_?key)?` to both SECRET_PATTERN and SECRET_ENV_FALLBACK (guideline 22: sibling check updated too). Regression test written first and confirmed failing; `keyboard = '...'` stays unflagged. `compareRoutes.js`: probes (optional params, wildcard, trailing slash) clean. npm test green (598 + 73).
+
+**Decisions:** Deliberately did not widen to arbitrary suffixes (`passwordHash`), to avoid false positives.
+
+**Open questions for Vijay:** none new.

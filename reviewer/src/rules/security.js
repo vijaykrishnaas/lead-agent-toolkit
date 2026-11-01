@@ -1,11 +1,11 @@
 const { collectAddedLines } = require('../utils/collectAddedLines');
 const { maskComments, maskStringLiterals } = require('../utils/maskStringLiterals');
 
-const SECRET_PATTERN = /(password|secret|apikey|api_key|token)['"`]?\s*[:=]\s*['"`][^'"`]{3,}['"`]/i;
+const SECRET_PATTERN = /(password|secret|apikey|api_key|token)(?:_?key)?['"`]?\s*[:=]\s*['"`][^'"`]{3,}['"`]/i;
 // A literal used as the fallback of an env read (`x = process.env.X || 'lit'`)
 // is still a hardcoded credential, but the quote is not right after the
 // operator, so SECRET_PATTERN alone misses it.
-const SECRET_ENV_FALLBACK = /(password|secret|apikey|api_key|token)['"`]?\s*[:=]\s*process\.env(?:\.\w+|\[[^\]]*\])\s*(?:\|\||\?\?)\s*['"`][^'"`]{3,}['"`]/i;
+const SECRET_ENV_FALLBACK = /(password|secret|apikey|api_key|token)(?:_?key)?['"`]?\s*[:=]\s*process\.env(?:\.\w+|\[[^\]]*\])\s*(?:\|\||\?\?)\s*['"`][^'"`]{3,}['"`]/i;
 // \beval\s*\( catches the direct call form (`eval(x)`). It does not catch
 // bracket-property access (`global['eval'](x)`, `window["eval"](x)`), a
 // trivial one-line evasion with identical runtime semantics: `eval` there is

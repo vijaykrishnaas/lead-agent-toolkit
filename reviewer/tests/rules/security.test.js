@@ -195,4 +195,19 @@ describe('security rule', () => {
     const issues = securityRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1]);
   });
+  it('flags hardcoded credentials named with a Key suffix (secretKey, secret_key, tokenKey)', () => {
+    const diff = [
+      'diff --git a/src/k.js b/src/k.js',
+      '--- a/src/k.js',
+      '+++ b/src/k.js',
+      '@@ -0,0 +1,4 @@',
+      "+const cfg = { secretKey: 'abc123' };",
+      "+const secret_key = 'abc123';",
+      "+const passwordKey = 'abc123';",
+      "+const keyboard = 'abc123';",
+      '',
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1, 2, 3]);
+  });
 });

@@ -4085,3 +4085,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Done:** Baseline green (73 sample-app tests plus reviewer suite), idle-streak 0.
 - **Decisions:** No speculative edits.
 - **Open questions for Vijay:** Unchanged — task 30 (approve `invariantLint.js` change) and task 32 (allowlist `fastdl.mongodb.org` or supply `MONGOMS_SYSTEM_BINARY`) remain BLOCKED; consider pausing the loop while the backlog is empty.
+
+## 2026-11-01 (Reviewer: review 62d3315..HEAD, EMPTY-BACKLOG (b) hunt)
+- **Branch taken:** EMPTY-BACKLOG (b) ((a) is Vijay-only; no open TASKS.md item). Reviewed 62d3315..HEAD: log-only commits (PROGRESS.md, runs.jsonl); reviewer CLI reports 0 issues.
+- **Done:** Hunted `docDrift/compareRoutes.js`, `docDrift/httpMethods.js`, `standup/groupByAuthor.js`. Probed optional params (single and nested with a required sibling), constraint-free doubled trailing slashes, method case, root path. Only oddity is `/a//` not collapsing, which is not a realistic Express route; not filed.
+- **Open questions for Vijay:** none new.

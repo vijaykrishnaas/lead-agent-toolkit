@@ -3908,3 +3908,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No change, no new task.
 
 **Open questions for Vijay:** none new.
+
+## 2026-11-01 — Reviewer run (review 4c0406e..HEAD; EMPTY-BACKLOG b hunt, statementWalk)
+- Reviewed 4c0406e..HEAD: only PROGRESS.md/runs.jsonl changes from a clean builder hunt; `node reviewer/src/cli.js` reports 0 issues. Baseline `npm test` green (73 tests); idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) open questions are Vijay-only). Hunted `utils/statementWalk.js` (low PROGRESS mention count) and re-read `scripts/syncPlugin.js`: no reproducible bug, no code change.
+- Open questions for Vijay: none new.

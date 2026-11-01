@@ -4021,3 +4021,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Probed `utils/isCodeFile.js` and `utils/isTestFile.js` on 19 paths (case, .min.js, node_modules, `latest.js`/`contest.js` whole-segment, .d.ts, .map): all behave as designed. Only asymmetry: `isTestFile` suffix match is case-sensitive while `isCodeFile` is not (`A.TEST.JS`) — niche, left unchanged.
 - Decisions: no code change, no new task, no FEATURE (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: scripts/invariantLint.js + resolvePushRange.js hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `scripts/invariantLint.js` and `scripts/resolvePushRange.js` (not in recent hunt entries): range splitting/option-injection guards, multiset line-removal detection, status-tag stripping, zero-SHA/missing-ref fallbacks all behave as designed. No reproducible defect.
+**Done:** Baseline green (73 tests), idle-streak 0. No code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

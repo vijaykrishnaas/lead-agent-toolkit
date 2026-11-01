@@ -4044,3 +4044,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 2 log-only commits (PROGRESS.md, runs.jsonl); reviewer CLI reported 0 issues. Baseline green (73 sample-app tests; idle-streak 0).
 - Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted scripts/runLog.js (parseArgs/buildEntry/parseLog/idleStreak/main): clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: groupByAuthor.js + parseGitHubRemote.js hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `standup/groupByAuthor.js` and `utils/parseGitHubRemote.js` (not in recent hunt entries): blank/non-string authors bucket to "Unknown", input order preserved, author names trimmed; remote parser rejects non-github hosts, `.`/`..` segments and bare `.git`. No reproducible defect.
+**Done:** Baseline green (73 tests), idle-streak 0. No code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

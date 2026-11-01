@@ -48,4 +48,14 @@ describe('sanitizeMarkdownText', () => {
     expect(result).toBe('see \\<https://evil.example> and \\<img src=x>');
     expect(result).not.toMatch(/(?:^|[^\\])</);
   });
+
+  it('neutralizes @mentions with a zero-width space so the bot cannot ping users/teams', () => {
+    expect(sanitizeMarkdownText('@someone')).toBe('@\u200Bsomeone');
+    expect(sanitizeMarkdownText('cc @org/team and @a')).toBe('cc @\u200Borg/team and @\u200Ba');
+    // Chosen behavior: every "@" before a word char is neutralized, including
+    // inside emails (harmless: text stays visually identical).
+    expect(sanitizeMarkdownText('a@b.com')).toBe('a@\u200Bb.com');
+    // Bare "@" not followed by a word character is left alone.
+    expect(sanitizeMarkdownText('at @ sign @')).toBe('at @ sign @');
+  });
 });

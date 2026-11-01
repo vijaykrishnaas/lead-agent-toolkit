@@ -3884,3 +3884,10 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Task rather than direct fix because the neutralization form (zero-width space vs. escaping) affects both reports' output and tests.
 
 **Open questions for Vijay:** none new.
+
+## 2026-11-01 Builder: task 35 (@mention neutralization)
+**Done:** `sanitizeMarkdownText` now inserts a zero-width space after any `@` followed by a word char (shared util, so standup and review reports both covered). Regression test written first, confirmed failing, then green (599 + 73). Task 35 marked DONE.
+
+**Decisions:** Chose always-neutralize (including emails; renders identically) over a mention-shape regex for simplicity and safety; bare `@` untouched. Asserted in test.
+
+**Open questions for Vijay:** none new.

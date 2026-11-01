@@ -26,13 +26,18 @@
 // structural character odd (so it always pairs with, and neutralizes, that
 // character) regardless of how many backslashes preceded it in the input.
 // "<" is escaped too so raw HTML and <https://...> autolinks stay inert.
+// "@" before a word character gets a zero-width space inserted so GitHub does
+// not treat it as a live @user/@org/team mention (the bot would otherwise ping
+// arbitrary accounts from a contributor-controlled line). Emails are also
+// affected; the text renders identically.
 // Shared by both the standup report and the review report — the review
 // report posts live to GitHub PR comments via postReviewComment, so it is
 // the higher-impact of the two surfaces.
 function sanitizeMarkdownText(text) {
   return String(text)
     .replace(/\r\n|\r|\n/g, ' ')
-    .replace(/[\\`*_[\]()<]/g, '\\$&');
+    .replace(/[\\`*_[\]()<]/g, '\\$&')
+    .replace(/@(?=\w)/g, '@\u200B');
 }
 
 module.exports = { sanitizeMarkdownText };

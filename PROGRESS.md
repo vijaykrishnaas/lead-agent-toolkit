@@ -3966,3 +3966,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests). Read hunk-count tracking, quoted-path decoding, deleted-file handling, sibling-basename test matching, whole-token path match, async/rejection masking. No reproducible defect; no code change.
 **Decisions:** No speculative edits.
 **Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.
+
+## 2026-11-01 (Reviewer run)
+- Reviewed 7488fad..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues. Baseline green (73 tests), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted `config/loadRuleConfig.js` + `config/buildRules.js` (not hunted since 10-xx): scalar/null/array YAML, bad enabled/minSeverity/options, unknown severity, `__proto__` category key — all handled or harmless. Clean, no change.
+- Open questions for Vijay: none new.

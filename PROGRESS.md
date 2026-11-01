@@ -3877,3 +3877,10 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** Deliberately did not widen to arbitrary suffixes (`passwordHash`), to avoid false positives.
 
 **Open questions for Vijay:** none new.
+
+## 2026-11-01 Reviewer (00:35 UTC)
+**Done:** Reviewed 155c021..HEAD: only code commit 6932b51 (security.js Key-suffix credentials) — correct, sibling pattern updated, test covers negative case; CLI report findings are self-referential (docs/test fixtures quoting the secret). EMPTY-BACKLOG branch (b): hunted `sanitizeMarkdownText.js` (lowest PROGRESS mention count); found `@mentions` pass through unescaped. Larger than a one-line fix (design choice), so added TASKS.md task 35. npm test green.
+
+**Decisions:** Task rather than direct fix because the neutralization form (zero-width space vs. escaping) affects both reports' output and tests.
+
+**Open questions for Vijay:** none new.

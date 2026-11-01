@@ -329,3 +329,7 @@
 ## 2026-10-31 (Reviewer: EMPTY-BACKLOG (b) hunt, style.js)
 **Change:** No skill/CLAUDE.md change. Code fix: `style.js` also flags `console.log(` inside template-literal `${...}` interpolations; regression test added.
 **Evidence:** PROGRESS.md 2026-10-31 Reviewer (02:35 UTC) entry — reproduced `` `x ${console.log(1)}` `` going unflagged (guideline 22 sibling-check class).
+
+## 2026-11-01 (Reviewer: backlog addition, task 35)
+**Change:** TASKS.md: appended task 35 (sanitizeMarkdownText @mention neutralization). No skill/CLAUDE.md change.
+**Evidence:** PROGRESS.md 2026-11-01 Reviewer entry — reproduced `sanitizeMarkdownText('@someone')` returning `@someone`; sink posts live to PR comments (guideline 15).

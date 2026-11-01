@@ -3954,3 +3954,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog fully DONE/BLOCKED; (a) remaining open questions are Vijay-only (tasks 30/32 BLOCKED). Hunted least-recently-audited `github/postReviewComment.js`, `reviewPrCli.js`, `docDrift/generateDocDrift.js`: clean, no code change. Baseline `npm test` green.
 - Decisions: no new task or guideline — no observed failure.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or set MONGOMS_SYSTEM_BINARY) for task 32.
+
+## 2026-11-01 — Reviewer run (EMPTY-BACKLOG b: standup collectors hunt)
+**Branch taken:** Reviewed 9941573..HEAD (bbd483e..HEAD): log-only commits (PROGRESS.md, runs.jsonl), nothing to fix. Backlog empty; (a) Vijay-only. (b): hunted least-recently-audited `standup/collectCommits.js`, `collectPullRequests.js`, `groupByAuthor.js`.
+**Done:** Read for date parsing, pagination termination, URL encoding, field-separator handling, blank-author bucketing; no defect reproduced, no code change. Baseline green (73 sample-app; reviewer suite green).
+**Open questions for Vijay:** none new.

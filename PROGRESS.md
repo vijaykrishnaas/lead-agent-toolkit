@@ -4123,3 +4123,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Reviewed:** f3c3af3..HEAD (8f789bd missingTests `.d.ts` exemption + log commits): reviewer CLI reports 0 issues; manual read confirms regex is anchored, regression test present, suite green (73 sample-app + reviewer suites).
 - **Branch taken:** EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted `github/postReviewComment.js` (marker HMAC, oldest-match, paging, URL encoding, truncation): no reproducible defect. Only niche: truncation can leave an unclosed code fence in a >64KB report; not filed.
 - **Open questions for Vijay:** none new.
+
+## 2026-11-01 — Builder run (21:05 UTC): EMPTY-BACKLOG (b), statementWalk.js
+- **Branch taken:** no open TASKS.md item (30 and 32 BLOCKED on Vijay). (a) is Vijay-only, so (b): hunted `utils/statementWalk.js` (among the least-mentioned modules in PROGRESS.md).
+- **Done:** Baseline green (73 sample-app tests plus reviewer suite), idle-streak 0. Probed `.`-chain continuation (handled) and leading-operator continuation (`&& g()` on the next line ends the walk early). The latter is only the regex fallback path that the AST path (RW1) supersedes, and no rule shape depends on it today, so not filed and no code change.
+- **Decisions:** No speculative edits.
+- **Open questions for Vijay:** Unchanged — task 30 (approve `invariantLint.js` change) and task 32 (allowlist `fastdl.mongodb.org` or `MONGOMS_SYSTEM_BINARY`) remain BLOCKED; consider pausing the loop while the backlog is empty.

@@ -4118,3 +4118,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Done:** Found and fixed a false positive: a changed `src/*.d.ts` declaration file was flagged "no test", though it has no runtime code. Added a regression test (red first, then green) and a `DECLARATION_FILE_PATTERN` exclusion. Full suite green (600 reviewer, 73 sample-app).
 - **Decisions:** Scoped the exclusion to `missingTests` only; other rules are unaffected. No guideline added (single occurrence).
 - **Open questions for Vijay:** Unchanged — task 30 (approve `invariantLint.js` change) and task 32 (allowlist `fastdl.mongodb.org` or `MONGOMS_SYSTEM_BINARY`) remain BLOCKED.
+
+## 2026-11-01 (Reviewer run, review f3c3af3..HEAD; EMPTY-BACKLOG b hunt, postReviewComment)
+- **Reviewed:** f3c3af3..HEAD (8f789bd missingTests `.d.ts` exemption + log commits): reviewer CLI reports 0 issues; manual read confirms regex is anchored, regression test present, suite green (73 sample-app + reviewer suites).
+- **Branch taken:** EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted `github/postReviewComment.js` (marker HMAC, oldest-match, paging, URL encoding, truncation): no reproducible defect. Only niche: truncation can leave an unclosed code fence in a >64KB report; not filed.
+- **Open questions for Vijay:** none new.

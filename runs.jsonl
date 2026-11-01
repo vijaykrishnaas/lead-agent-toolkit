@@ -521,3 +521,4 @@
 {"ts":"2026-11-01T19:07:56.174Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"0383ff0","summary":"Backlog empty; (a) Vijay-only. Hunted docDrift/parseOpenApi: clean, no change."}
 {"ts":"2026-11-01T19:36:44.810Z","trigger":"reviewer","outcome":"done","task":"REVIEW","tests":"green","sha":"f3c3af3","summary":"Reviewed a60c9f5..HEAD: log-only commits, clean. EMPTY-BACKLOG (b) hunted loadRuleConfig/buildRules/reviewer.js: clean, no change."}
 {"ts":"2026-11-01T20:07:49.596Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"32c226b","summary":"Backlog empty; (a) Vijay-only. Hunted missingTests.js: fixed .d.ts false positive with regression test."}
+{"ts":"2026-11-01T20:36:50.955Z","trigger":"reviewer","outcome":"done","task":"REVIEW","tests":"green","sha":"d2727ce","summary":"Reviewed f3c3af3..HEAD (.d.ts exemption): clean. EMPTY-BACKLOG (b) hunted postReviewComment: clean, no change."}

@@ -3898,3 +3898,13 @@ Marked TASKS.md item 29 `[DONE]`.
 **Decisions:** No new task or [FEATURE] — no evidenced gap. Baseline green (73 sample-app tests).
 
 **Open questions for Vijay:** none new.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: codeSpan / formatDocDrift sink hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a) skipped: no historical open question remains unresolved that doesn't need Vijay's input. (b): followed up the reviewer's @mention finding by checking the remaining markdown sinks (guideline 15) — `codeSpan.js` and `formatDocDrift.js`.
+
+**Done:** Probed `codeSpan` with backtick runs, lone backticks, newlines, surrounding spaces, empty string: fence/padding correct. `formatDocDrift` interpolates only codeSpan-wrapped values plus constant `reason` strings from `parseExpressRoutes.js`; no contributor-controlled text reaches an unsanitized sink. No defect reproduced; no code change. Baseline green (599 reviewer + 73 sample-app).
+
+**Decisions:** No change, no new task.
+
+**Open questions for Vijay:** none new.

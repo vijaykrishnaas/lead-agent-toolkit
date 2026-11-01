@@ -3949,3 +3949,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 9ebcb5f..bbd483e: log-only commits (PROGRESS.md, runs.jsonl), clean. Baseline green (73 tests).
 - Branch taken: EMPTY-BACKLOG (b); (a) skipped (remaining open questions need Vijay). Hunted `utils/parseAst.js` and `rules/index.js`: hashbang accepted, script→module retry works (top-level await in module parses), invalid source rethrows script error. Clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-01 — Builder: EMPTY-BACKLOG (b) hunt
+- Done: backlog fully DONE/BLOCKED; (a) remaining open questions are Vijay-only (tasks 30/32 BLOCKED). Hunted least-recently-audited `github/postReviewComment.js`, `reviewPrCli.js`, `docDrift/generateDocDrift.js`: clean, no code change. Baseline `npm test` green.
+- Decisions: no new task or guideline — no observed failure.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or set MONGOMS_SYSTEM_BINARY) for task 32.

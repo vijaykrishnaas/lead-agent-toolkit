@@ -3925,3 +3925,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed b6acfd7..HEAD: only PROGRESS.md/runs.jsonl changes; `node reviewer/src/cli.js` reports 0 issues. Baseline `npm test` green (73 tests); idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) open questions are Vijay-only). Read `scripts/runLog.js` (arg parsing, entry validation, idle-streak): no reproducible bug, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: sample-app server/Task/db/asyncHandler hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted the modules with the fewest PROGRESS/SKILL_CHANGELOG mentions — `sample-app/src/server.js`, `models/Task.js`, `config/db.js`, `middleware/asyncHandler.js`.
+**Done:** Baseline green (73 sample-app tests). `asyncHandler` forwards rejections to `next`; a synchronous throw is caught by Express itself. `server.js` start failure exits 1. Task schema requires owner/title. No reproducible bug; no code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org) remain BLOCKED on you.

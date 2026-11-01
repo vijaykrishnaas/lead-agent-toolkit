@@ -3913,3 +3913,10 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 4c0406e..HEAD: only PROGRESS.md/runs.jsonl changes from a clean builder hunt; `node reviewer/src/cli.js` reports 0 issues. Baseline `npm test` green (73 tests); idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) open questions are Vijay-only). Hunted `utils/statementWalk.js` (low PROGRESS mention count) and re-read `scripts/syncPlugin.js`: no reproducible bug, no code change.
 - Open questions for Vijay: none new.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: subtreeInOwnScope / memberCallLine / httpMethods hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): every remaining historical open question needs Vijay's input, so nothing to work. (b): hunted the least-referenced modules by PROGRESS.md mention count — `utils/subtreeInOwnScope.js`, `utils/memberCallLine.js`, `docDrift/httpMethods.js` — and their call sites in `errorHandling.js`/`performance.js`.
+**Done:** Baseline green (73 sample-app tests; install:all + npm test). Checked that every caller passes a body/statement node (never a bare function root, which the override would skip), that the arrow-expression-body `await` case works, and that member-call line derivation is consistent. No reproducible bug; no code change.
+**Decisions:** No speculative edits (CLAUDE.md bar).
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org) remain BLOCKED on you; the Builder/Reviewer loop is mostly idling until then.

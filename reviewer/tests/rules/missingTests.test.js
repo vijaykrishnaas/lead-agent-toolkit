@@ -289,4 +289,17 @@ describe('missing-tests rule', () => {
       expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
     });
   });
+  it('does not flag TypeScript declaration files (.d.ts has no runtime code to test)', () => {
+    const diff = [
+      'diff --git a/src/types.d.ts b/src/types.d.ts',
+      'index 1111111..2222222 100644',
+      '--- a/src/types.d.ts',
+      '+++ b/src/types.d.ts',
+      '@@ -1,1 +1,2 @@',
+      ' export type A = string;',
+      '+export type B = number;',
+      '',
+    ].join('\n');
+    expect(missingTestsRule.check(parseDiff(diff))).toEqual([]);
+  });
 });

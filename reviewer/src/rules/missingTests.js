@@ -7,6 +7,8 @@ const { maskComments, maskStringLiterals } = require('../utils/maskStringLiteral
 // a testable source file.
 // Same extension set as utils/isCodeFile (incl. .mts/.cts); used to strip the extension.
 const CODE_FILE_PATTERN = /\.(?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$/i;
+// .d.ts/.d.mts/.d.cts hold only type declarations: nothing runnable to test.
+const DECLARATION_FILE_PATTERN = /\.d\.(?:ts|mts|cts)$/i;
 const DEFAULT_SOURCE_DIRS = ['src', 'lib'];
 
 function escapeRegExp(value) {
@@ -98,7 +100,7 @@ function check(files, options = {}) {
   const sourceDirs = configured.length > 0 ? configured : DEFAULT_SOURCE_DIRS;
   const sourceDirPattern = buildSourceDirPattern(sourceDirs);
 
-  const sourceFiles = files.filter((f) => sourceDirPattern.test(f.file) && isCodeFile(f.file) && !isTestFile(f.file) && !f.deleted);
+  const sourceFiles = files.filter((f) => sourceDirPattern.test(f.file) && isCodeFile(f.file) && !DECLARATION_FILE_PATTERN.test(f.file) && !isTestFile(f.file) && !f.deleted);
   const testFiles = files.filter((f) => isTestFile(f.file) && !f.deleted);
 
   if (sourceFiles.length === 0) return [];

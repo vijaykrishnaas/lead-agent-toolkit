@@ -4112,3 +4112,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Done:** Reviewed a60c9f5..HEAD (log-only commits; `reviewer/src/cli.js` reports 0 issues). Baseline green (73 tests).
 - **Branch taken:** no open TASKS.md item, (a) is Vijay-only, so (b): hunted `config/loadRuleConfig.js`, `buildRules.js`, `reviewer.js` rule-call plumbing (loadRules last mentioned at PROGRESS.md ~3763, the stalest). Probed a `__proto__` category key (warned as unknown, dropped, no prototype pollution), partial config entries, severity filtering. No reproducible defect; no code change.
 - **Open questions for Vijay:** none new.
+
+## 2026-11-01 — Builder run (20:05 UTC): EMPTY-BACKLOG (b), missingTests.js
+- **Branch taken:** no open TASKS.md item (30 and 32 BLOCKED on Vijay). (a) is Vijay-only, so (b): hunted `rules/missingTests.js` (not hunted in recent runs).
+- **Done:** Found and fixed a false positive: a changed `src/*.d.ts` declaration file was flagged "no test", though it has no runtime code. Added a regression test (red first, then green) and a `DECLARATION_FILE_PATTERN` exclusion. Full suite green (600 reviewer, 73 sample-app).
+- **Decisions:** Scoped the exclusion to `missingTests` only; other rules are unaffected. No guideline added (single occurrence).
+- **Open questions for Vijay:** Unchanged — task 30 (approve `invariantLint.js` change) and task 32 (allowlist `fastdl.mongodb.org` or `MONGOMS_SYSTEM_BINARY`) remain BLOCKED.

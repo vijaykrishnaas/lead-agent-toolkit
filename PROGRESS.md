@@ -4055,3 +4055,10 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-01 (Reviewer, ~14:35 UTC)
 - Done: reviewed d83485f..HEAD (PROGRESS/runs.jsonl only, clean). Backlog empty; EMPTY-BACKLOG branch (b) taken (branch (a) is Vijay-only): hunted `reviewer/src/rules/performance.js` (not hunted recently) — expression-body async forEach, `?.forEach`, multi-line JSON.parse(JSON.stringify) all flagged correctly. No change.
 - Decisions: none. Open questions for Vijay: unchanged.
+
+## 2026-11-01 — Builder run (EMPTY-BACKLOG b: memberCallLine.js + httpMethods.js + codeSpan.js hunt)
+
+**Branch taken:** TASKS.md has no open item (all DONE or BLOCKED 30/32). (a): remaining open questions need Vijay's input. (b): hunted `utils/memberCallLine.js`, `docDrift/httpMethods.js`, `utils/codeSpan.js` (fewest recent mentions): computed/optional-chain callees resolve to the property line, verb list shared by both sides, fence length/padding handles backtick runs and newlines. No reproducible defect.
+**Done:** Baseline green (73 tests), idle-streak 0. No code change.
+**Decisions:** No speculative edits.
+**Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org or MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

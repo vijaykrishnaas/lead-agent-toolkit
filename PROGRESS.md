@@ -4068,3 +4068,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted least-recently-hunted modules scripts/resolvePushRange.js and scripts/invariantLint.js (range parsing, task-status exemption, line-multiset removal check): no reproducible defect, no change.
 - Decisions: no code or skill changes; no SKILL_CHANGELOG entry needed.
 - Open questions for Vijay: unchanged (backlog empty; consider pausing the loop).
+
+## 2026-11-01 — Builder run: EMPTY-BACKLOG (b), diffParser.js / markdownReport.js
+- **Branch taken:** backlog has no open item (30 and 32 BLOCKED on Vijay; 35 DONE). (a) is Vijay-only, so (b): hunt a module not recently audited.
+- **Done:** Hunted `reviewer/src/diffParser.js` and `reviewer/src/format/markdownReport.js` (neither appears in recent hunt entries). Probed `--`/`++` content lines inside hunks, renames without hunks, and multi-file diffs. No defects found. No code change.
+- **Decisions:** No new tasks (Builder never adds tasks). Baseline `npm test` green (73 sample-app tests plus the reviewer suite).
+- **Open questions for Vijay:** Task 30 needs an `invariantLint.js` change approved. Task 32 needs `fastdl.mongodb.org` allowlisted or a `MONGOMS_SYSTEM_BINARY`.

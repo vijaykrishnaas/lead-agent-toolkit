@@ -3920,3 +3920,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 sample-app tests; install:all + npm test). Checked that every caller passes a body/statement node (never a bare function root, which the override would skip), that the arrow-expression-body `await` case works, and that member-call line derivation is consistent. No reproducible bug; no code change.
 **Decisions:** No speculative edits (CLAUDE.md bar).
 **Open questions for Vijay:** Unchanged — tasks 30 (invariantLint approval) and 32 (allowlist fastdl.mongodb.org) remain BLOCKED on you; the Builder/Reviewer loop is mostly idling until then.
+
+## 2026-11-01 — Reviewer run (review b6acfd7..HEAD; EMPTY-BACKLOG b hunt, scripts/runLog.js)
+- Reviewed b6acfd7..HEAD: only PROGRESS.md/runs.jsonl changes; `node reviewer/src/cli.js` reports 0 issues. Baseline `npm test` green (73 tests); idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) open questions are Vijay-only). Read `scripts/runLog.js` (arg parsing, entry validation, idle-streak): no reproducible bug, no change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.

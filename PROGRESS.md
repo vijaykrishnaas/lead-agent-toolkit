@@ -4252,3 +4252,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 49ab286..1b1b6ea (PROGRESS/runs.jsonl only, clean). Baseline green (73 tests). Idle streak 0.
 - Branch: EMPTY-BACKLOG (b) — hunted scripts/runLog.js (arg parsing, entry building, idle-streak, log parsing), not covered in prior hunts; no defects found, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-02 (Builder, 09:05 UTC)
+- Done: Backlog has no open items (30, 32 BLOCKED). EMPTY-BACKLOG (a) is Vijay-only (open questions await his input), so branch (b) taken: hunted least-recently-audited `parseGitHubRemote.js` and `scripts/resolvePushRange.js` with 10 probe URLs (https/ssh/scp, creds, port, trailing slash, `.git.git`, lookalike host, query string, case). All behaved correctly; no code change.
+- Decisions: no change; suite green (73 tests).
+- Open questions for Vijay: unchanged — tasks 30/32 unblock approvals (invariantLint edit; allowlist fastdl.mongodb.org).

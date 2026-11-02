@@ -4262,3 +4262,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 1b1b6ea..HEAD (PROGRESS/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues). Baseline green (73 tests). Idle streak 0.
 - Branch: EMPTY-BACKLOG (b) — hunted `reviewer/src/utils/parseArgv.js` + `consumeFlagValue.js` (least-hunted per changelog counts) with 10 probes (extra positional, empty/flag-shaped values, `--__proto__`, repeated boolean, required check, single-dash positional). All behaved as designed; no change.
 - Open questions for Vijay: unchanged.
+
+## 2026-11-02 (Builder, 10:05 UTC)
+- Done: baseline green (73 sample-app tests plus reviewer suite). Branch taken: (b) — no open TASKS.md item (30, 32 BLOCKED), (a) is Vijay-only. Hunted least-recently-hunted `sample-app` tasks/users routes + controllers by reading: owner scoping on every query, type validation on all body fields, CastError -> 400 and 11000 -> 409 handling, asyncHandler on all routes. No defects; no code change.
+- Decisions: no change; no new tasks.
+- Open questions for Vijay: unchanged — tasks 30/32 unblock approvals; orphaned tasks on user delete; hunts keep coming back clean, consider pausing the loop.

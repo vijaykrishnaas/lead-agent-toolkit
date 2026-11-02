@@ -4282,3 +4282,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 5720aaf..a03a598 — log-only commits (PROGRESS.md + runs.jsonl), 0 findings from reviewer CLI. Baseline green.
 - Branch taken: backlog empty, (a) Vijay-only → EMPTY-BACKLOG (b). Hunted `standup/collectPullRequests.js`, `groupByAuthor.js`, `collectCommits.js` (pagination early-exit, MAX_PAGES guard, since validation, Unknown-author bucketing, field-separator parsing): clean, no code change.
 - Open questions for Vijay: none new.
+
+## 2026-11-02 (Builder, 12:05 UTC: EMPTY-BACKLOG (b) hunt)
+- Done: baseline green (73 sample-app tests plus reviewer suite); idle-streak 0. Branch taken: (b) — no open TASKS.md item (30, 32 BLOCKED), (a) is Vijay-only. Hunted `config/buildRules.js`, `config/loadRules.js` and `sample-app/src/config/jwtSecret.js` with probes (invalid minSeverity, disabled category, null rule result, missing severity, empty config): all handled, clean, no code change.
+- Decisions: no speculative edits; severity strings are case-sensitive by design (loadRuleConfig validates).
+- Open questions for Vijay: unchanged — tasks 30/32 need your approvals; orphaned tasks on user delete; hunts keep coming back clean, consider pausing the loop.

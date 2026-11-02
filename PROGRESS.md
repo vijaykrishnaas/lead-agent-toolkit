@@ -4217,3 +4217,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: read for owner scoping, type validation, empty-$set update, duplicate-key 409, self-only checks. Clean, no code change. Baseline `npm test` green (73 sample-app tests plus reviewer suite).
 - Decisions: no change made — no reproduced defect.
 - Open questions for Vijay: `DELETE /api/users/:id` leaves that user's tasks orphaned (no cascade). Intended, or should it delete the user's tasks too?
+
+## 2026-11-02 (Reviewer: review f11b47c..HEAD, EMPTY-BACKLOG (b) hunt)
+- Done: reviewed f11b47c..1d7ab5b (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `docDrift/formatDocDrift.js` and `config/loadRuleConfig.js` (no hunt entry in SKILL_CHANGELOG): clean, no code change.
+- Decisions: no new tasks; no FEATURE task (no evidenced gap).
+- Open questions for Vijay: none new.

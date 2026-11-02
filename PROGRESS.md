@@ -4375,3 +4375,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + suites), idle-streak 0. Reviewed 66ad2de..HEAD: PROGRESS.md/runs.jsonl only, `reviewer/src/cli.js` reports 0 issues. Branch taken: (b) ((a) is Vijay-only; no open TASKS.md item, 30/32 BLOCKED). Hunted `markdownReport.js` (fewest prior hunt mentions among reviewer modules): fed a hostile issue (backslash/backtick in file, newline + fake heading + link + @mention + `<b>` in message) and output stayed inert on one list line; grouping/sort/empty-state fine. No reproduced defect, no code change.
 - Decisions: no code touched.
 - Open questions for Vijay: unchanged — hunts keep returning clean; consider pausing the loop (only Vijay re-enables).
+
+## 2026-11-02 (Builder, 22:05 UTC) — EMPTY-BACKLOG (b) hunt: standup/collectCommits.js + collectPullRequests.js
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only). Hunted the standup collectors (not hunted since the standup modules' original tasks): since validation, pagination/early-exit/cap, Date vs string handling, URL encoding. Only oddity: a numeric `since` passes `new Date()` validation and reaches git as `--since=123`; no caller passes a number (CLI supplies strings/Dates), so not a reproduced defect, no code change.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.

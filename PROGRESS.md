@@ -4308,3 +4308,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed dc99aaf..HEAD — log-only commits, clean; baseline green (73 sample-app tests). EMPTY-BACKLOG branch (b) (backlog empty; (a) is Vijay-only): hunted sample-app/src/middleware/auth.js (fewest prior hunts: 3). Scheme case-insensitive, empty token -> 401, secret resolved outside try, algorithms pinned HS256. No bug reproduced, no change.
 - Decisions: no task or [FEATURE] added (no cited gap).
 - Open questions for Vijay: unchanged (tasks 30, 32 BLOCKED awaiting approval/allowlist).
+
+## 2026-11-02 Builder (15:36 UTC) — EMPTY-BACKLOG (b) hunt: users.routes.js / usersController.js / User.js
+- Done: baseline green (73 sample-app tests plus reviewer suite); idle-streak 0. Branch taken: (b) — no open TASKS.md item (30, 32 BLOCKED), (a) is Vijay-only. Hunted users routes/controller/model (self-only checks on get/update/remove, string-type and empty validation, 11000 -> 409, asyncHandler, auth via router.use): no defect, no code change.
+- Decisions: no speculative edits.
+- Open questions for Vijay: unchanged — tasks 30/32 need your unblock; orphaned tasks on user delete.

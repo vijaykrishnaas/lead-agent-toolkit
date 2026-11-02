@@ -4184,3 +4184,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Done:** Probed SECRET_PATTERN, SECRET_ENV_FALLBACK and the eval checks with 13 inputs (quote styles, env fallbacks, `eval (x)`, `obj.eval(x)`, short literals). No bug fix needed, no code change.
 - **Observations, no change made:** `private_key = '...'` is not flagged because the keyword list has no bare `key` or `private_key`. `obj.eval(x)` is flagged, which is a minor false positive. Both are detection-scope choices rather than reproduced bugs.
 - **Open questions for Vijay:** Should `private_key`/`privateKey` be added to the credential keywords? Tasks 30 and 32 are still waiting on you.
+
+## 2026-11-02 — Reviewer run (EMPTY-BACKLOG b)
+- Done: reviewed 18d6dd8..HEAD (55feb6a; log/PROGRESS-only commits, clean). Branch taken: (b) — backlog empty, (a) Vijay-only. Hunted `rules/missingTests.js` + `isTestFile.js` (last touched ~line 4123/4135 of PROGRESS.md): 7 probes, no reproduced bug, no change.
+- Observations, no change: `src/foo/index.js` paired with `tests/foo.test.js` is still flagged (stem match is by basename `index`); `Foo.js` vs `foo.test.js` is case-sensitive. Both are matching-convention choices, not reproduced defects.
+- Decisions: no task/feature added.
+- Open questions for Vijay: should missingTests treat `dir/index.js` as matched by `dir.test.js`? Tasks 30 and 32 remain BLOCKED.

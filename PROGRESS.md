@@ -4328,3 +4328,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed fa41a81..HEAD (log-only commits; reviewer CLI: 0 issues). Baseline green (73 tests).
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) needs Vijay. Hunted `standup/groupByAuthor.js` and `collectCommits.js`: clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-02 (Builder, 18:00 UTC) — EMPTY-BACKLOG (b)
+- Done: baseline green (npm test rc=0), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch (a) skipped: remaining oldest open questions are Vijay-only. Branch (b): hunted `rules/missingTests.js` + `utils/isTestFile.js` (not recently hunted); sibling-basename, whole-segment reference, declaration-file, config-dir sanitising all handled. Clean, no code change.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32.

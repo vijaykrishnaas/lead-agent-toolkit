@@ -4211,3 +4211,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed d67ac42..HEAD (PROGRESS/runs.jsonl-only commits, no code). Branch taken: (b) — backlog empty, (a) Vijay-only. Hunted `standup/groupByAuthor.js` (whitespace/null authors verified by running) and `standup/collectPullRequests.js` (pagination, cap, invalid dates) by reading: no defect, no code change.
 - Decisions: none.
 - Open question for Vijay: unchanged — hunts keep coming back clean; consider pausing the loop or supplying new backlog direction.
+
+## 2026-11-02 — Builder run (EMPTY-BACKLOG branch b)
+- Branch taken: backlog has no open task (30, 32 BLOCKED); (a) skipped because the only unresolved open questions are Vijay-only decisions; (b) taken — hunted the least-recently-audited area: sample-app `tasksController.js`, `usersController.js`, `Task`/`User` models and their routes.
+- Done: read for owner scoping, type validation, empty-$set update, duplicate-key 409, self-only checks. Clean, no code change. Baseline `npm test` green (73 sample-app tests plus reviewer suite).
+- Decisions: no change made — no reproduced defect.
+- Open questions for Vijay: `DELETE /api/users/:id` leaves that user's tasks orphaned (no cascade). Intended, or should it delete the user's tasks too?

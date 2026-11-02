@@ -4303,3 +4303,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Done:** Baseline green (73 tests). Read tasks routes, controller, model and the app error middleware. Checked: owner scoping on every query, field whitelisting in update (no mass assignment), type validation of title/description/completed, CastError -> 400 for bad ids, asyncHandler on all handlers, auth applied via `router.use`. No defects found; no code change.
 **Decisions:** No speculative change (needs observed failure per CLAUDE.md).
 **Open questions for Vijay:** None new; tasks 30 and 32 still need your unblock (invariantLint archive-aware change; fastdl.mongodb.org allowlist).
+
+## Reviewer 2026-11-02 14:40 UTC
+- Done: reviewed dc99aaf..HEAD — log-only commits, clean; baseline green (73 sample-app tests). EMPTY-BACKLOG branch (b) (backlog empty; (a) is Vijay-only): hunted sample-app/src/middleware/auth.js (fewest prior hunts: 3). Scheme case-insensitive, empty token -> 401, secret resolved outside try, algorithms pinned HS256. No bug reproduced, no change.
+- Decisions: no task or [FEATURE] added (no cited gap).
+- Open questions for Vijay: unchanged (tasks 30, 32 BLOCKED awaiting approval/allowlist).

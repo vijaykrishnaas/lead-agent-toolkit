@@ -4178,3 +4178,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed fb80f08..HEAD (log-only commits, clean). Branch taken: (b) — backlog empty, (a) Vijay-only questions. Hunted least-recently-audited utils `collectAddedLines.js` and `consumeFlagValue.js` (last cited SKILL_CHANGELOG lines 56/115): clean, no change.
 - Decisions: no task/feature added; no gap evidence.
 - Open questions for Vijay: unchanged (tasks 30, 32 BLOCKED).
+
+## 2026-11-02 — Builder (EMPTY-BACKLOG branch b)
+- **Branch taken:** TASKS.md has no open items (30 and 32 BLOCKED, awaiting Vijay), so EMPTY-BACKLOG. (a) was skipped because every remaining open question is Vijay-only. Took (b): `reviewer/src/rules/security.js` had not been hunted in the recent run summaries.
+- **Done:** Probed SECRET_PATTERN, SECRET_ENV_FALLBACK and the eval checks with 13 inputs (quote styles, env fallbacks, `eval (x)`, `obj.eval(x)`, short literals). No bug fix needed, no code change.
+- **Observations, no change made:** `private_key = '...'` is not flagged because the keyword list has no bare `key` or `private_key`. `obj.eval(x)` is flagged, which is a minor false positive. Both are detection-scope choices rather than reproduced bugs.
+- **Open questions for Vijay:** Should `private_key`/`privateKey` be added to the credential keywords? Tasks 30 and 32 are still waiting on you.

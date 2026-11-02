@@ -4190,3 +4190,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Observations, no change: `src/foo/index.js` paired with `tests/foo.test.js` is still flagged (stem match is by basename `index`); `Foo.js` vs `foo.test.js` is case-sensitive. Both are matching-convention choices, not reproduced defects.
 - Decisions: no task/feature added.
 - Open questions for Vijay: should missingTests treat `dir/index.js` as matched by `dir.test.js`? Tasks 30 and 32 remain BLOCKED.
+
+## 2026-11-02 — Builder run (EMPTY-BACKLOG b: parseAst/memberCallLine/resolveFileContent hunt)
+- **Branch taken:** no open TASKS.md item (30 and 32 BLOCKED on Vijay). (a) is Vijay-only, so (b): hunted `utils/parseAst.js`, `utils/memberCallLine.js`, `utils/resolveFileContent.js` (parseAst/resolveFileContent not hunted in recent entries).
+- **Done:** Probed hashbang files (acorn parses them; no fallback needed), ESM retry, null-on-failure resolve path. No defects, no code change. Baseline green (73/73 sample-app + reviewer).
+- **Decisions:** none.
+- **Open question for Vijay:** same as prior entries — hunts keep coming back clean; consider pausing the loop or supplying new backlog direction.

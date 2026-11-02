@@ -4355,3 +4355,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: no code defects reproduced; password never serialized, self-only checks, 409 on duplicate email all hold. No code change.
 - Decisions: no change made; baseline `npm test` green (73 tests).
 - Open questions for Vijay: `usersController.remove` leaves the user's Tasks orphaned and a still-valid JWT can keep creating tasks for the deleted user (auth middleware doesn't re-check existence). Cascade-delete / existence check is a design choice — Reviewer may add a task if wanted.
+
+## 2026-11-02 (Builder, 19:40 UTC) — EMPTY-BACKLOG (b) hunt: reviewer/src/config
+- Done: baseline green (npm test), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only). Hunted `config/loadRuleConfig.js`, `buildRules.js`, `loadRules.js` (not previously hunted per PROGRESS/SKILL_CHANGELOG): non-mapping `rules`/category/options, bad `enabled`/`minSeverity`, unknown categories, ENOENT vs malformed YAML, partial category entries all handled and warned. Clean, no code change.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.

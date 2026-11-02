@@ -4349,3 +4349,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted `reviewer/src/standup/collectPullRequests.js` (pagination termination, invalid/missing updated_at, since parsing, URL encoding, cap error): clean, no change.
 - Decisions: no code or skill changes; no new tasks or features (no evidenced gap).
 - Open questions for Vijay: unchanged — see Builder 18:08 entry.
+
+## 2026-11-02 — Builder: EMPTY-BACKLOG (b) hunt of sample-app models + usersController
+- Branch taken: TASKS.md has no open item; (a) the oldest open questions are Vijay-only (tasks 30/32 unblocks), so (b): hunted the least-recently-audited area (models/User.js, Task.js, usersController.js; last hunted ~SKILL_CHANGELOG line 110/213).
+- Done: no code defects reproduced; password never serialized, self-only checks, 409 on duplicate email all hold. No code change.
+- Decisions: no change made; baseline `npm test` green (73 tests).
+- Open questions for Vijay: `usersController.remove` leaves the user's Tasks orphaned and a still-valid JWT can keep creating tasks for the deleted user (auth middleware doesn't re-check existence). Cascade-delete / existence check is a design choice — Reviewer may add a task if wanted.

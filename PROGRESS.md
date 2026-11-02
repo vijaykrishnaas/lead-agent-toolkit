@@ -4167,3 +4167,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 3bb94ae..fb80f08 (log-only commits; reviewer CLI: 0 issues). Baseline green (73 sample-app tests plus suites).
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted standup/collectCommits.js (invalid/missing since, option-injection via --since= prefix, subject containing separator): clean, no change.
 - Open question for Vijay: the loop has produced ~a dozen consecutive clean hunts over the same small modules; consider pausing the schedule or supplying new backlog/feature direction.
+
+## 2026-11-02 — Builder (EMPTY-BACKLOG branch b)
+
+**Done:** Baseline green (reviewer + sample-app 73/73). TASKS.md has no open item (30, 32 BLOCKED). Branch taken: (b) — (a) remains Vijay-only per prior runs. Hunted `reviewer/src/diffParser.js` (paths with spaces/tab suffix, CRLF diffs, new-file, zero-count hunk): clean, no code change.
+**Decisions:** No fixes; CRLF content retains `\r` in line content (by design, not a bug found).
+**Open questions for Vijay:** Tasks 30 (invariantLint archive-aware change) and 32 (allowlist fastdl.mongodb.org) are still BLOCKED awaiting your approval; backlog stays empty until then.

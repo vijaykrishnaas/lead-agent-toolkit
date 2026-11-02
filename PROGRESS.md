@@ -4370,3 +4370,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (npm test), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only). Hunted `syncPlugin.js` (type-mismatch removal, stale dest pruning, symlink entries skipped) and `runLog.js` (flag parsing, enum validation, missing trailing newline, malformed-line errors, idle-streak counting): no reproduced defect, no code change.
 - Decisions: no code touched; hunt only.
 - Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.
+
+## 2026-11-02 (Reviewer, 21:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: format/markdownReport.js
+- Done: baseline green (73 sample-app tests + suites), idle-streak 0. Reviewed 66ad2de..HEAD: PROGRESS.md/runs.jsonl only, `reviewer/src/cli.js` reports 0 issues. Branch taken: (b) ((a) is Vijay-only; no open TASKS.md item, 30/32 BLOCKED). Hunted `markdownReport.js` (fewest prior hunt mentions among reviewer modules): fed a hostile issue (backslash/backtick in file, newline + fake heading + link + @mention + `<b>` in message) and output stayed inert on one list line; grouping/sort/empty-state fine. No reproduced defect, no code change.
+- Decisions: no code touched.
+- Open questions for Vijay: unchanged — hunts keep returning clean; consider pausing the loop (only Vijay re-enables).

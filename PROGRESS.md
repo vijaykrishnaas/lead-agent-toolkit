@@ -4200,3 +4200,9 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-02 — Reviewer run (EMPTY-BACKLOG b: scripts/runLog.js hunt)
 - Done: reviewed 55feb6a..HEAD (PROGRESS/runs.jsonl-only commits; `reviewer/src/cli.js` reports 0 issues). Branch taken: (b) — backlog empty, (a) Vijay-only. Hunted `scripts/runLog.js` (arg parsing, missing-value handling, trailing-newline append, idle-streak, malformed-line errors) by reading: no defect, no change.
 - Open question for Vijay: unchanged — hunts keep coming back clean; consider pausing the loop or supplying new backlog direction.
+
+## 2026-11-02 — Builder run (EMPTY-BACKLOG b: compareRoutes.js / parseOpenApi.js hunt)
+- **Branch taken:** no open TASKS.md item (30 and 32 BLOCKED on Vijay). (a) is Vijay-only, so (b): hunted `docDrift/compareRoutes.js` and `parseOpenApi.js`. Baseline green.
+- **Done:** Probed optional params (`:id?`), constrained params, positional param-name erasure, uppercase verb keys, root path. No defect, no code change.
+- **Decisions:** none.
+- **Open questions for Vijay:** unchanged — tasks 30 and 32 BLOCKED; hunts keep coming back clean, consider pausing the loop.

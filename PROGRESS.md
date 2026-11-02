@@ -4156,3 +4156,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 8c7a258..HEAD (log/PROGRESS-only commits; reviewer CLI: 0 issues). Baseline green (73 tests), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `standup/formatStandup.js`, `utils/sanitizeMarkdownText.js` and `scripts/resolvePushRange.js` by reading (all last mentioned well before the newest entries): no defects, no code change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; consider pausing the loop while the backlog is empty.
+
+## 2026-11-02 — Builder run (EMPTY-BACKLOG b: collectBoundedBlock.js hunt)
+- **Branch taken:** no open TASKS.md item (30 and 32 BLOCKED on Vijay); (a) is Vijay-only, so (b): `utils/collectBoundedBlock.js`, the least recently mentioned source module in PROGRESS.md.
+- **Done:** Probed braces inside regex literals, `//` and `/* */` comments, and a brace-less one-liner start. Braces in strings/comments are masked correctly. A brace-less start line keeps scanning into following code until a brace opens; this is the documented regex-fallback limitation (AST path is primary after RW1/task 23), so no change.
+- **Decisions:** No code change.
+- **Open questions for Vijay:** unchanged (tasks 30 and 32 need your unblock); consider pausing the loop while the backlog is empty.

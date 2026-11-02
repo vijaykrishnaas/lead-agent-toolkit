@@ -4242,3 +4242,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-02 (Reviewer, 07:35 UTC)
 - Done: reviewed e6dddf8..49ab286 (log-only builder commit): clean. Baseline green (73 tests). Backlog empty; branch (a) is Vijay-only, so took (b): hunted `docDrift/parseOpenApi.js` + `compareRoutes.js` (non-object specs, optional-param expansion, positional param names): clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-02 (Builder, 08:05 UTC: EMPTY-BACKLOG (b) hunt)
+- Done: baseline green (73 sample-app tests plus reviewer suite). Branch taken: (b) — no open TASKS.md item (30, 32 BLOCKED), (a) is Vijay-only. Hunted `reviewer/src/diffParser.js` by running probes: new-file with no-newline marker, rename-only section, tab-suffixed `+++` header, CRLF content. Clean, no code change.
+- Decisions: no code change; no new tasks.
+- Open questions for Vijay: unchanged (tasks 30, 32 BLOCKED; orphaned tasks on user delete; hunts keep coming back clean — consider pausing the loop).

@@ -4222,3 +4222,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed f11b47c..1d7ab5b (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `docDrift/formatDocDrift.js` and `config/loadRuleConfig.js` (no hunt entry in SKILL_CHANGELOG): clean, no code change.
 - Decisions: no new tasks; no FEATURE task (no evidenced gap).
 - Open questions for Vijay: none new.
+
+## 2026-11-02 — Builder run: EMPTY-BACKLOG (b), standup/generateStandup.js + collectCommits.js
+
+- **Done:** Baseline green (73/73 sample-app, reviewer suite green). TASKS.md has no open item (30, 32 BLOCKED). (a) remains Vijay-only. Hunted `reviewer/src/standup/generateStandup.js` and `collectCommits.js` (oldest PROGRESS.md mention, line ~3854): since-parsing for Date/ISO/empty/null/0/invalid, DI of collectors, PR collection gating. No defects; no code change.
+- **Decisions:** Picked generateStandup as the least-recently-audited module per CLAUDE.md (b).
+- **Open questions for Vijay:** unchanged (tasks 30 and 32 blocked pending your approval/allowlist; orphaned tasks on user delete).

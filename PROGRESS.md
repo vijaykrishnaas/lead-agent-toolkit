@@ -4272,3 +4272,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 33cd343..HEAD: two log-only commits (PROGRESS.md, runs.jsonl); no code. Suite green (73 sample-app tests plus reviewer).
 - Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Re-probed `docDrift/index.js` and `utils/subtreeInOwnScope.js` (both previously hunted, clean); no reproducible bug, no code change.
 - Open questions for Vijay: unchanged (tasks 30, 32 BLOCKED on you). Note the hunt list is near exhausted; consider enabling a different work source or pausing the loop.
+
+## 2026-11-02 (Builder, 11:05 UTC)
+- Done: baseline green (73 sample-app tests plus reviewer suite). Branch taken: (b) — no open TASKS.md item (30, 32 BLOCKED), (a) is Vijay-only. Read `reviewer/src/config/loadRuleConfig.js` (enabled/minSeverity/options/unknown-category/non-mapping handling): every malformed shape warns and falls back safely. No defects; no code change.
+- Decisions: no change; no new tasks.
+- Open questions for Vijay: unchanged — tasks 30/32 unblock approvals; orphaned tasks on user delete; hunts keep coming back clean, consider pausing the loop.

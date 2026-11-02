@@ -4206,3 +4206,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - **Done:** Probed optional params (`:id?`), constrained params, positional param-name erasure, uppercase verb keys, root path. No defect, no code change.
 - **Decisions:** none.
 - **Open questions for Vijay:** unchanged — tasks 30 and 32 BLOCKED; hunts keep coming back clean, consider pausing the loop.
+
+## 2026-11-02 — Reviewer run (EMPTY-BACKLOG b: standup/groupByAuthor + collectPullRequests hunt)
+- Done: reviewed d67ac42..HEAD (PROGRESS/runs.jsonl-only commits, no code). Branch taken: (b) — backlog empty, (a) Vijay-only. Hunted `standup/groupByAuthor.js` (whitespace/null authors verified by running) and `standup/collectPullRequests.js` (pagination, cap, invalid dates) by reading: no defect, no code change.
+- Decisions: none.
+- Open question for Vijay: unchanged — hunts keep coming back clean; consider pausing the loop or supplying new backlog direction.

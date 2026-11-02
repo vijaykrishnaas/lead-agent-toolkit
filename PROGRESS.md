@@ -4247,3 +4247,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests plus reviewer suite). Branch taken: (b) — no open TASKS.md item (30, 32 BLOCKED), (a) is Vijay-only. Hunted `reviewer/src/diffParser.js` by running probes: new-file with no-newline marker, rename-only section, tab-suffixed `+++` header, CRLF content. Clean, no code change.
 - Decisions: no code change; no new tasks.
 - Open questions for Vijay: unchanged (tasks 30, 32 BLOCKED; orphaned tasks on user delete; hunts keep coming back clean — consider pausing the loop).
+
+## 2026-11-02 (Reviewer, ~08:40 UTC)
+- Done: reviewed 49ab286..1b1b6ea (PROGRESS/runs.jsonl only, clean). Baseline green (73 tests). Idle streak 0.
+- Branch: EMPTY-BACKLOG (b) — hunted scripts/runLog.js (arg parsing, entry building, idle-streak, log parsing), not covered in prior hunts; no defects found, no change.
+- Open questions for Vijay: none new.

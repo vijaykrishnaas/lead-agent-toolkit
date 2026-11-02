@@ -4365,3 +4365,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + suites), idle-streak 0. Reviewed 16f4c5e..HEAD: PROGRESS.md/runs.jsonl only, no code, clean. Branch taken: (b) ((a) is Vijay-only; no open TASKS.md item, 30/32 BLOCKED). Hunted `utils/sanitizeMarkdownText.js` (newest code change, task 35 `@mention` fix, not yet re-audited): escape order (`@` lookahead runs after backslash escaping, so `@\_a`-style cases are non-mentions anyway), CRLF/CR collapse, fullwidth `＠` (not a GitHub mention) all fine. No reproduced defect, no code change.
 - Decisions: no code touched.
 - Open questions for Vijay: unchanged — hunts keep returning clean; consider pausing the loop (only Vijay re-enables).
+
+## 2026-11-02 (Builder, 21:05 UTC) — EMPTY-BACKLOG (b) hunt: scripts/syncPlugin.js + scripts/runLog.js
+- Done: baseline green (npm test), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only). Hunted `syncPlugin.js` (type-mismatch removal, stale dest pruning, symlink entries skipped) and `runLog.js` (flag parsing, enum validation, missing trailing newline, malformed-line errors, idle-streak counting): no reproduced defect, no code change.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.

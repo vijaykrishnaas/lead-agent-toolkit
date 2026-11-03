@@ -4395,3 +4395,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 94049a4..HEAD (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted utils/codeSpan, collectAddedLines, isCodeFile, consumeFlagValue, defaultExecGit (least recently hunted): fence/pad cases verified by hand, clean, no change.
 - Decisions: no task or skill changes.
 - Open questions for Vijay: unchanged (see earlier entries).
+
+## 2026-11-03 (Builder) — EMPTY-BACKLOG (b) hunt: sample-app routes + authController
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only per prior entries). Hunted the least-mentioned modules `sample-app/src/routes/*.routes.js` and `app.js` error middleware, plus `authController.js`: auth routes skip `asyncHandler` but both handlers have a whole-body try/catch; a body-less POST returns 400 on Express 4 (verified live). No reproduced defect, no code change.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.

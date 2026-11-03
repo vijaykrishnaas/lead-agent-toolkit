@@ -4529,3 +4529,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-03 (Builder, EMPTY-BACKLOG branch b) — sample-app tasksController / usersController hunt
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `sample-app/src/controllers/tasksController.js` and `usersController.js` (not covered by recent hunts). Read for owner-scoping, type validation, email normalization (schema setters apply on findByIdAndUpdate), 409 mapping. Clean, no code change.
 - Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-03 (Reviewer, 13:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: asyncHandler / Task model / users routes
+- Reviewed 4ff3d18..HEAD: docs-only (PROGRESS.md, runs.jsonl); `reviewer/src/cli.js` reports 0 issues. Baseline green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Hunted `middleware/asyncHandler.js`, `models/Task.js`, `routes/users.routes.js` (lowest PROGRESS.md mention counts among sample-app sources): a synchronous throw in a wrapped handler propagates to Express 4's own sync catch, rejections go to `next`; every users route is wrapped and behind `auth`. No defect, no change.
+- Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.

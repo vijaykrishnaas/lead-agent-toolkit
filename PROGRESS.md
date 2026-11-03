@@ -4597,3 +4597,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Read `utils/statementWalk.js` and `docDrift/httpMethods.js` (fewest mentions among the remaining sources): the check-before-scan ordering, startColumn slicing and shared verb list match their documented behavior. No defect, no change.
 - Decisions: no new tasks, no FEATURE task today.
 - Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-03 (Builder, 21:05 UTC) — EMPTY-BACKLOG branch b — asyncHandler / auth.routes / users.routes / Task model hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `sample-app/src/middleware/asyncHandler.js`, `routes/auth.routes.js`, `routes/users.routes.js`, `models/Task.js` (fewest PROGRESS.md mentions among unhunted sources). `auth.routes.js` registers `register`/`login` without `asyncHandler`, but both controllers wrap their entire body in try/catch (guideline 1 satisfied; a rejected promise cannot escape). users routes all wrapped. Clean, no code change.
+- Baseline `npm test` green (604 reviewer + 74 sample-app), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

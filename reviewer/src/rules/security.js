@@ -15,6 +15,10 @@ const SECRET_ENV_FALLBACK = /(password|secret|apikey|api_key|token)(?:_?key)?['"
 // Also catches the optional call `eval?.(x)` and the indirect comma form
 // `(0, eval)(x)`, both trivial evasions with the same runtime semantics.
 const EVAL_CALL = /\beval\s*(?:\?\.\s*)?\(|,\s*eval\s*\)\s*\(/;
+// `new Function(...)` / `Function(...)` compiles a string to code, same
+// injection class as eval. `.Function(` member calls and longer identifiers
+// (myFunction, Function2) are excluded by the lookbehind/word boundary.
+const FUNCTION_CTOR = /(?<![\w$.])(?:new\s+)?Function\s*\(/;
 // Template interpolation bodies are code, but the masker blanks them with the
 // rest of the template, so the direct form is also checked inside `${...}`.
 const EVAL_IN_INTERPOLATION = /\$\{[^}]*\beval\s*\(/;
@@ -47,6 +51,7 @@ function check(files) {
       // Per-line, fresh quoteState, like style.js.
       if (
         EVAL_CALL.test(maskStringLiterals(line.content).masked) ||
+        FUNCTION_CTOR.test(maskStringLiterals(line.content).masked) ||
         EVAL_BRACKET_CALL.test(maskComments(line.content).masked) ||
         EVAL_IN_INTERPOLATION.test(maskComments(line.content).masked)
       ) {
@@ -54,7 +59,7 @@ function check(files) {
           file: file.file,
           line: line.newLine,
           severity: 'high',
-          message: `Use of eval(): "${line.content.trim()}"`,
+          message: `Use of eval()/Function constructor: "${line.content.trim()}"`,
           fix: 'Avoid eval(); use a safer alternative (e.g. JSON.parse, explicit parsing) to prevent code injection.',
         });
       }

@@ -101,6 +101,23 @@ describe('security rule', () => {
     expect(issues[0].message).toMatch(/eval/i);
   });
 
+  it('flags new Function(...) / Function(...) construction as dynamic code execution, not mentions in strings', () => {
+    const mk = (line) => parseDiff([
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -1,1 +1,2 @@',
+      ' x',
+      `+${line}`,
+    ].join('\n'));
+    expect(securityRule.check(mk('const f = new Function("a", "return " + a);'))).toHaveLength(1);
+    expect(securityRule.check(mk('const f = Function("return this")();'))).toHaveLength(1);
+    expect(securityRule.check(mk('const s = "use new Function(x) rarely";'))).toHaveLength(0);
+    expect(securityRule.check(mk('// new Function(x)'))).toHaveLength(0);
+    expect(securityRule.check(mk('const g = myFunction(x);'))).toHaveLength(0);
+    expect(securityRule.check(mk('function Function2() {}'))).toHaveLength(0);
+  });
+
   it('flags eval() reached via bracket-property access (a one-line evasion of a direct eval( match)', () => {
     const diff = [
       'diff --git a/src/utils/parse.js b/src/utils/parse.js',

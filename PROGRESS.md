@@ -4574,3 +4574,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 3d29658..89282d1 — PROGRESS.md/runs.jsonl only, `reviewer/src/cli.js` 0 issues. Baseline green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `utils/parseAst.js` (fewest mentions among unhunted utils): shebang, optional chaining, private fields, static blocks, top-level await, ESM fallback all parse. No defect, no change.
 - Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-03 (Builder, 19:05 UTC) — EMPTY-BACKLOG branch b — security.js / parseArgv.js / resolveFileContent.js hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `reviewer/src/rules/security.js` (not in recent hunts), `utils/parseArgv.js`, `utils/resolveFileContent.js`. parseArgv/resolveFileContent clean.
+- Found and fixed: `security.js` flagged `eval()` but not `new Function("return " + x)` / `Function(...)` (same string-to-code injection; reproduced 0 issues). Added `FUNCTION_CTOR` (string-masked, excludes `.Function(`, `myFunction(`, `Function2`), regression test first in `tests/rules/security.test.js` (positives plus string/comment/identifier negatives). Message now "Use of eval()/Function constructor".
+- Baseline and final `npm test` green (604 reviewer + 74 sample-app), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32.

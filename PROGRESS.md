@@ -4470,3 +4470,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only per prior entries). Hunted `style.js` (VAR_DECLARATION / CONSOLE_LOG / interpolation checks): 16 probes (var after `)`, `for(var`, labels, `case:`, `export var`, string/comment mentions, optional-chain `console?.log`, `myconsole.log`, template interpolation) all behave as intended; no reproduced defect.
 - Decisions: no code touched; hunt only.
 - Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.
+
+## 2026-11-03 (Reviewer, 07:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: parseGitHubRemote/isCodeFile/isTestFile
+- Reviewed d9d2662..HEAD: only PROGRESS.md and runs.jsonl changed (docs-only), clean. Baseline green (73 tests).
+- Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Probed remote-URL parsing (scp, https trailing slash, lookalike host, port) and test-path detection (substring `contest/`, `__tests__`, `.spec.ts`): all correct, no change.
+- Open questions for Vijay: unchanged (task 30/32 BLOCKED approvals).

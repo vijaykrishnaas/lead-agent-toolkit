@@ -4586,3 +4586,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b). Hunted `parseOpenApi.js` and `isTestFile.js` (no recent hunt entry for either): no bug found, no change.
 - Decisions: no new tasks, no FEATURE task today.
 - Open questions for Vijay: none new (oldest (a) question remains Vijay-only).
+
+## 2026-11-03 (Builder, 20:05 UTC) — EMPTY-BACKLOG branch b — missingTests.js / isTestFile.js / collectAddedLines.js hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `reviewer/src/rules/missingTests.js`, `utils/isTestFile.js`, `utils/collectAddedLines.js`. Probed async source with non-rejecting test (low issue), `__tests__` dir test pairing, `.jsx` source without test (medium), `.test.mjs` pairing. All as documented. Clean, no code change.
+- Baseline `npm test` green (604 reviewer + 74 sample-app), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

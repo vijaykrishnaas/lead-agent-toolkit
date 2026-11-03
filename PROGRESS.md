@@ -4435,3 +4435,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: Reviewed 95f3f1e..HEAD (style.js `${console.log}` fix, 10d44e0): correct; suite green (602 + 73). Noted only a contrived residual FP (a backtick inside a plain string earlier on the same line) — not reproduced from real code, no change.
 - Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) is Vijay-only). Hunted `scripts/resolvePushRange.js` (fewest recent audit mentions among small modules): clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-03 (Builder) — EMPTY-BACKLOG (b) hunt: jwtSecret.js, middleware/auth.js, formatStandup.js
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only per prior entries). Hunted `sample-app/src/config/jwtSecret.js`, `middleware/auth.js` and `reviewer/src/standup/formatStandup.js` (fewest/oldest recent mentions): production default/placeholder rejection, case-insensitive Bearer scheme, HS256 pinning, secret resolved outside try/catch, numeric date sorting, custom-`since` empty-state wording all behave as documented. Only observation: `meta.since` is interpolated unsanitized, but it comes from the local CLI flag, not attacker-controlled data — not a sink under guideline 15. No change.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.

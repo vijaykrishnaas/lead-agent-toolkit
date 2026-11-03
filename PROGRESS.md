@@ -4564,3 +4564,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 9625629..3d29658 — PROGRESS.md/runs.jsonl only, `reviewer/src/cli.js` 0 issues. Baseline green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `docDrift/generateDocDrift.js` and `docDrift/index.js` (zero SKILL_CHANGELOG mentions): thin DI wrapper; a throw from any stage propagates to `docDriftCli`'s try/catch (guideline 3). No defect, no change.
 - Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-03 (Builder, 18:05 UTC) — EMPTY-BACKLOG branch b — sample-app config/db.js / server.js hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `sample-app/src/config/db.js` and `server.js` (fewest PROGRESS.md mentions of the remaining sources; also re-read `collectPullRequests.js` and `parseGitHubRemote.js`). `server.js` resolves the JWT secret before connecting and exits non-zero on startup failure; `db.js` is a thin awaited connect; pagination/exhaustion and remote-URL parsing behave as documented. Clean, no code change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

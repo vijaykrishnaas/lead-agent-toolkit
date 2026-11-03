@@ -16,7 +16,7 @@ const EVAL_CALL = /\beval\s*\(/;
 // Template interpolation bodies are code, but the masker blanks them with the
 // rest of the template, so the direct form is also checked inside `${...}`.
 const EVAL_IN_INTERPOLATION = /\$\{[^}]*\beval\s*\(/;
-const EVAL_BRACKET_CALL = /\[\s*(['"])eval\1\s*\]\s*\(/;
+const EVAL_BRACKET_CALL = /\[\s*(['"`])eval\1\s*\]\s*\(/;
 
 // No process.env exemption here: SECRET_PATTERN only matches when the
 // operator is immediately followed by a quoted literal, which a genuine

@@ -116,6 +116,21 @@ describe('security rule', () => {
     expect(issues[0].message).toMatch(/eval/i);
   });
 
+  it('flags eval() reached via backtick-quoted bracket-property access', () => {
+    const diff = [
+      'diff --git a/src/utils/parse.js b/src/utils/parse.js',
+      '--- a/src/utils/parse.js',
+      '+++ b/src/utils/parse.js',
+      '@@ -1,1 +1,2 @@',
+      ' function parse(input) {',
+      '+  return global[`eval`](input);',
+    ].join('\n');
+
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues).toHaveLength(1);
+    expect(issues[0].message).toMatch(/eval/i);
+  });
+
   it('flags eval() reached via double-quoted bracket-property access', () => {
     const diff = [
       'diff --git a/src/utils/parse.js b/src/utils/parse.js',

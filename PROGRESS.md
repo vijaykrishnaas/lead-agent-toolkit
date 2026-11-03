@@ -4415,3 +4415,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 117670d..HEAD (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Baseline green (73 tests), idle-streak 0. Branch taken: EMPTY-BACKLOG (b) — backlog empty ((a) Vijay-only). Hunted `github/postReviewComment.js` and `reviewPrCli.js` (not in recent hunt entries): marker/HMAC, first-match canonical, encodeURIComponent at every URL sink, truncation surrogate guard, per-stage try/catch. Clean, no change.
 - Decisions: no code touched.
 - Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider reducing cadence.
+
+## 2026-11-03 (Builder) — EMPTY-BACKLOG (b) hunt: rules/security.js
+- Done: baseline green, idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only); `security.js` not hunted in recent entries. Found and fixed one reproduced gap: `global[`eval`](x)` (backtick-quoted bracket access) was not flagged because `EVAL_BRACKET_CALL` accepted only `'`/`"`. Added backtick to the quote class plus a regression test; full `npm test` green.
+- Decisions: small fix in-scope (sibling of the existing bracket-eval evasion test).
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32.

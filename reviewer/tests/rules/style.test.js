@@ -178,4 +178,18 @@ describe('style rule', () => {
     const issues = styleRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1]);
   });
+
+  it('does not flag "${console.log(1)}" inside a plain quoted (non-template) string', () => {
+    const diff = [
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -0,0 +1,3 @@',
+      "+const a = '${console.log(1)}';",
+      '+const b = "${console.log(1)}";',
+      '+const c = `${console.log(1)}`;',
+    ].join('\n');
+    const issues = styleRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([3]);
+  });
 });

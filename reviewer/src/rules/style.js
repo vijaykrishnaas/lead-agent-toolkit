@@ -8,7 +8,8 @@ const CONSOLE_LOG = /(?<![\w$])console\s*\??\.\s*log\s*\(/;
 
 // Template interpolation bodies are code, but the masker blanks them with the
 // rest of the template, so the call is also checked inside `${...}`.
-const CONSOLE_LOG_IN_INTERPOLATION = /\$\{[^}]*(?<![\w$])console\s*\??\.\s*log\s*\(/;
+// Requires a preceding backtick: `${` inside a '...' or "..." string is inert text.
+const CONSOLE_LOG_IN_INTERPOLATION = /`[^`]*\$\{[^}]*(?<![\w$])console\s*\??\.\s*log\s*\(/;
 
 // Matched against the line's string/comment-masked content, not the raw
 // text -- a string literal that merely *mentions* "console.log(" (e.g. a log

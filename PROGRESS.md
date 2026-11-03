@@ -4544,3 +4544,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed fa2b02e..944479c — docs/log-only, clean. Baseline green (74 tests).
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `reviewer/src/diffParser.js` and `reviewer.js` (not in any prior hunt entry): probed mid-hunk `\ No newline`, `---`/`+++` content lines, multi-hunk counts — all parse correctly. No change.
 - Open questions for Vijay: none new.
+
+## 2026-11-03 (Builder, 15:05 UTC) — EMPTY-BACKLOG branch b — compareRoutes.js / buildRules.js / groupByAuthor.js hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `reviewer/src/docDrift/compareRoutes.js`, `config/buildRules.js`, `standup/groupByAuthor.js` (not named in recent hunt entries). Read param/constraint stripping, optional-param expansion, severity filtering, and author bucketing (`trim()` result is the key, blank -> Unknown). Clean, no code change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

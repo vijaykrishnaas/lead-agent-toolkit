@@ -4410,3 +4410,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only per prior entries). Hunted `reviewer/src/diffParser.js` (not hunted in recent entries): CRLF diffs, rename headers, paths with spaces/tabs, `---`/`+++` content lines inside hunks, hunk-count termination. No reproduced defect, no code change.
 - Decisions: no code touched; hunt only.
 - Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.
+
+## 2026-11-03 — Reviewer run (review 117670d..HEAD; EMPTY-BACKLOG b hunt)
+- Done: reviewed 117670d..HEAD (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Baseline green (73 tests), idle-streak 0. Branch taken: EMPTY-BACKLOG (b) — backlog empty ((a) Vijay-only). Hunted `github/postReviewComment.js` and `reviewPrCli.js` (not in recent hunt entries): marker/HMAC, first-match canonical, encodeURIComponent at every URL sink, truncation surrogate guard, per-stage try/catch. Clean, no change.
+- Decisions: no code touched.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider reducing cadence.

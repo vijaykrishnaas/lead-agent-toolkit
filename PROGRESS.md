@@ -4515,3 +4515,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 2f14226..HEAD: `server.js` start() now calls `resolveJwtSecret()` before `connectDB`; test asserts rejection and no DB connect. Verified against jwtSecret.js (production-only throw; dev unchanged). Clean.
 - Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Read docDriftCli.js (arg parsing, stage try/catch per guideline 3): no defect, no change.
 - Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning mostly clean, consider pausing the loop.
+
+## 2026-11-03 (Builder, EMPTY-BACKLOG branch b) — codeSpan.js / runLog.js hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `reviewer/src/utils/codeSpan.js` and `scripts/runLog.js`, whose last hunt mentions are the oldest among the small modules. Probed empty string, all-space, backtick-run, edge-space, and multi-line inputs for codeSpan; argv edge cases and idle-streak ordering for runLog. Clean, no code change (only cosmetic: `codeSpan('')` yields ``` `` ```, which renders literally and is not an injection vector).
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite).
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

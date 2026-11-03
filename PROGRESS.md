@@ -4475,3 +4475,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed d9d2662..HEAD: only PROGRESS.md and runs.jsonl changed (docs-only), clean. Baseline green (73 tests).
 - Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Probed remote-URL parsing (scp, https trailing slash, lookalike host, port) and test-path detection (substring `contest/`, `__tests__`, `.spec.ts`): all correct, no change.
 - Open questions for Vijay: unchanged (task 30/32 BLOCKED approvals).
+
+## 2026-11-03 (Builder, EMPTY-BACKLOG branch b)
+- Done: TASKS.md has no open item (all DONE or BLOCKED 30/32), so EMPTY-BACKLOG applied. Branch (a) not taken: the only unresolved open questions are Vijay-only (task 30/32 unblocks). Took (b): hunted `reviewer/src/utils/resolveFileContent.js`, `parseArgv.js`, `consumeFlagValue.js`, which no recent hunt entry covers. Clean, no code change. Baseline `npm test` green (73 sample-app tests, reviewer suite passing).
+- Decisions: only theoretical finding is that `git diff <range>` / `git show <sha>:<path>` accept a single-dash positional (e.g. `-p`); inputs are operator-supplied local CLI args, so not treated as a defect.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32.

@@ -4445,3 +4445,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 tests), idle-streak 0. Reviewed 10d44e0..74422b6 (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Branch taken: EMPTY-BACKLOG (b) ((a) Vijay-only); performance.js was among the least recently hunted modules (last touched in July). Probed AST path with expression-body async callbacks, optional-chained forEach, for-await, function expressions, parenthesized callbacks, multi-line chains, nested-function awaits, JSON?.parse: all correct. No code changed.
 - Decisions: no code touched; hunt only.
 - Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider slowing or pausing the loop.
+
+## 2026-11-03 (Builder) — EMPTY-BACKLOG (b) hunt: docDrift/generateDocDrift.js + compareRoutes.js
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only per prior entries). Hunted `reviewer/src/docDrift/generateDocDrift.js` and `compareRoutes.js` (least recently mentioned in PROGRESS.md): optional params, constrained params, param-name positional matching, dedupe, DI wiring. No reproduced defect, no code change.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.

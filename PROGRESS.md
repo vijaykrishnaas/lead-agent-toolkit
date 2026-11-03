@@ -4505,3 +4505,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 06ae055..HEAD: the security.js `EVAL_CALL` change (`eval?.(x)`, `(0, eval)(x)`) with its regression test. Read the regex against false-positive shapes (`evaluate?.(`, `'eval?.(x)'` in strings, `obj.eval(`): none. `reviewer/src/cli.js` reports 0 issues. Baseline green (73 tests), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Read the small path/remote utilities (push-range fallbacks, test/code extension gates, remote URL parsing): no defect found, no change.
 - Open questions for Vijay: unchanged — task 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-03 (Builder, EMPTY-BACKLOG branch b)
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted the least-recently-audited modules `sample-app/src/config/db.js` and `src/server.js` (last mentioned in runs.jsonl at lines 395 / 252).
+- Found: `start()` never called `resolveJwtSecret()`, so a production boot with an unset/placeholder JWT_SECRET started fine and only 500'd on first login (task 17 intended startup-or-first-use failure). Fixed: `start()` now resolves the secret before connecting to the DB. Regression test `sample-app/tests/server.test.js` (red before, green after).
+- Open questions for Vijay: none new (tasks 30/32 still await approval/allowlisting).

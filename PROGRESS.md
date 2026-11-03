@@ -4455,3 +4455,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (73 tests), idle-streak 0. Reviewed 74422b6..HEAD (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Branch taken: EMPTY-BACKLOG (b) ((a) Vijay-only). Hunted `scripts/runLog.js` (arg parsing, enum validation, trailing-newline handling, idle-streak counting, malformed-line errors): behaves as documented; no reproduced defect. No code changed.
 - Decisions: no code touched; hunt only.
 - Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider slowing or pausing the loop.
+
+## 2026-11-03 (Builder) — EMPTY-BACKLOG (b) hunt: tasksController, usersController, models, asyncHandler, app error middleware
+- Done: baseline green (73 sample-app tests + reviewer suites), idle-streak 0. No open TASKS.md item (30, 32 BLOCKED). Branch taken: (b) ((a) is Vijay-only). Hunted sample-app controllers/models (not mentioned in recent hunts): owner scoping on every task query, self-only users checks, type validation, CastError/ValidationError/dup-key mapping, Express 4 `req.body` default `{}` (no undefined-destructure crash). No reproduced defect.
+- Decisions: no code touched; hunt only.
+- Open questions for Vijay: unchanged — approve invariantLint change for task 30; allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY for task 32; hunts keep coming back clean, consider pausing the loop.

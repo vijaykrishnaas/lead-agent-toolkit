@@ -4608,3 +4608,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Read `config/loadRuleConfig.js`, `config/buildRules.js`, `docDrift/formatDocDriftReport` (never hunted per SKILL_CHANGELOG) plus `standup/groupByAuthor.js`/`collectPullRequests.js`: validation warnings, default merging, severity filtering and the unparsed-routes "no drift" guard behave as documented. No defect, no change.
 - Decisions: no new tasks, no FEATURE task today.
 - Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-03 (Builder, 21:05+ UTC) — EMPTY-BACKLOG branch b — invariantLint / defaultExecGit / subtreeInOwnScope hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): read `scripts/invariantLint.js`, `reviewer/src/utils/defaultExecGit.js`, `reviewer/src/utils/subtreeInOwnScope.js` (not hunted in recent runs.jsonl entries). Clean, no change.
+- Baseline `npm test` green (74 sample-app tests in the tail; reviewer suite passes), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

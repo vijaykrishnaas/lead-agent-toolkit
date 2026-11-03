@@ -4525,3 +4525,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 31adcf7..HEAD: only PROGRESS.md and runs.jsonl changed (docs-only); `reviewer/src/cli.js` reports 0 issues. Baseline green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Hunted the least-mentioned modules (route files): auth routes skip `asyncHandler`, but `register`/`login` wrap their whole bodies in try/catch, so guideline 1 holds; no defect, no change.
 - Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-03 (Builder, EMPTY-BACKLOG branch b) — sample-app tasksController / usersController hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted `sample-app/src/controllers/tasksController.js` and `usersController.js` (not covered by recent hunts). Read for owner-scoping, type validation, email normalization (schema setters apply on findByIdAndUpdate), 409 mapping. Clean, no code change.
+- Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.

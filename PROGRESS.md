@@ -4580,3 +4580,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Found and fixed: `security.js` flagged `eval()` but not `new Function("return " + x)` / `Function(...)` (same string-to-code injection; reproduced 0 issues). Added `FUNCTION_CTOR` (string-masked, excludes `.Function(`, `myFunction(`, `Function2`), regression test first in `tests/rules/security.test.js` (positives plus string/comment/identifier negatives). Message now "Use of eval()/Function constructor".
 - Baseline and final `npm test` green (604 reviewer + 74 sample-app), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32.
+
+## 2026-11-03 Reviewer (19:35 UTC)
+- Done: reviewed 89282d1..HEAD (security.js `new Function()` detection + test). Verified the FUNCTION_CTOR regex against member calls, longer identifiers, strings and comments: correct. CLI report: 0 issues.
+- Branch taken: EMPTY-BACKLOG (b). Hunted `parseOpenApi.js` and `isTestFile.js` (no recent hunt entry for either): no bug found, no change.
+- Decisions: no new tasks, no FEATURE task today.
+- Open questions for Vijay: none new (oldest (a) question remains Vijay-only).

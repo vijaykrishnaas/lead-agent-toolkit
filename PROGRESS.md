@@ -4618,3 +4618,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 2971e82..HEAD (PROGRESS/runs.jsonl only; reviewer CLI: 0 issues). Baseline green (74 tests).
 - Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted `reviewPrCli.js` (oldest PROGRESS mention) and `parseOpenApi.js`: no defects reproduced, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-03 (Builder, 22:05 UTC) — EMPTY-BACKLOG branch b — memberCallLine / codeSpan / parseArgv / consumeFlagValue hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): read `utils/memberCallLine.js`, `utils/codeSpan.js`, `utils/parseArgv.js`, `utils/consumeFlagValue.js`. Probed codeSpan with embedded backticks, space-padded and all-space text (fences/padding correct); parseArgv prototype-key and missing-value paths guarded. Clean, no code change.
+- Baseline `npm test` green (604 reviewer + 74 sample-app), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

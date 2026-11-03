@@ -4500,3 +4500,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: TASKS.md has no open item (30, 32 BLOCKED), so EMPTY-BACKLOG applied. Branch (a) not taken: remaining open questions are Vijay-only. Took (b): hunted `rules/security.js` and `rules/missingTests.js` (oldest unhunted rule modules). Reproduced one gap: `eval?.(x)` and `(0, eval)(x)` bypassed the eval check (same evasion class as the bracket form already covered). Fixed `EVAL_CALL` in security.js; regression test written first (failed red without the fix, green with it). missingTests.js probes clean.
 - Decisions: other probes (`new Function`, `setTimeout('str')`) not added — different APIs, not eval evasions; left as-is.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32.
+
+## 2026-11-03 (Reviewer, 10:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: resolvePushRange/isTestFile/isCodeFile/parseGitHubRemote
+- Reviewed 06ae055..HEAD: the security.js `EVAL_CALL` change (`eval?.(x)`, `(0, eval)(x)`) with its regression test. Read the regex against false-positive shapes (`evaluate?.(`, `'eval?.(x)'` in strings, `obj.eval(`): none. `reviewer/src/cli.js` reports 0 issues. Baseline green (73 tests), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Read the small path/remote utilities (push-range fallbacks, test/code extension gates, remote URL parsing): no defect found, no change.
+- Open questions for Vijay: unchanged — task 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop.

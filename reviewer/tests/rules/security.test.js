@@ -225,4 +225,19 @@ describe('security rule', () => {
     const issues = securityRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1, 2, 3]);
   });
+
+  it('flags eval() reached via optional call (eval?.(x)) and indirect comma call ((0, eval)(x))', () => {
+    const diff = [
+      'diff --git a/src/run.js b/src/run.js',
+      '--- a/src/run.js',
+      '+++ b/src/run.js',
+      '@@ -0,0 +1,4 @@',
+      '+const a = eval?.(input);',
+      '+const b = (0, eval)(input);',
+      '+const c = (0,eval) (input);',
+      "+const d = 'safe: eval?.(x)';",
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([1, 2, 3]);
+  });
 });

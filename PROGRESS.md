@@ -4485,3 +4485,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 449610b..HEAD: only PROGRESS.md and runs.jsonl changed (docs-only), clean. Baseline green (73 tests).
 - Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Read the least-recently-hunted report/posting modules (escape set, newline collapse, @-mention defusing, HMAC marker, 65536-char truncation incl. surrogate split): no defect found, no change.
 - Open questions for Vijay: unchanged (task 30/32 BLOCKED approvals; hunts keep returning clean, consider pausing the loop).
+
+## 2026-11-03 (Builder, EMPTY-BACKLOG branch b) — diffParser.js / parseOpenApi.js hunt
+- Done: TASKS.md has no open item (all DONE or BLOCKED 30/32), so EMPTY-BACKLOG applied. Branch (a) not taken: remaining open questions are Vijay-only. Took (b): hunted `reviewer/src/diffParser.js` and `reviewer/src/docDrift/parseOpenApi.js` (not covered by recent hunts). Probed CRLF diffs, tab-suffixed paths with spaces, renames, path-item `$ref`, `servers: [{url: "/"}]`, empty path items, non-object `paths`: all behave correctly, no change.
+- Decisions: no code change; baseline green (73 sample-app tests plus reviewer suite).
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

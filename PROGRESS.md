@@ -4510,3 +4510,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): hunted the least-recently-audited modules `sample-app/src/config/db.js` and `src/server.js` (last mentioned in runs.jsonl at lines 395 / 252).
 - Found: `start()` never called `resolveJwtSecret()`, so a production boot with an unset/placeholder JWT_SECRET started fine and only 500'd on first login (task 17 intended startup-or-first-use failure). Fixed: `start()` now resolves the secret before connecting to the DB. Regression test `sample-app/tests/server.test.js` (red before, green after).
 - Open questions for Vijay: none new (tasks 30/32 still await approval/allowlisting).
+
+## 2026-11-03 (Reviewer, 11:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: docDriftCli.js
+- Reviewed 2f14226..HEAD: `server.js` start() now calls `resolveJwtSecret()` before `connectDB`; test asserts rejection and no DB connect. Verified against jwtSecret.js (production-only throw; dev unchanged). Clean.
+- Branch taken: EMPTY-BACKLOG (b); (a) open questions are Vijay-only. Read docDriftCli.js (arg parsing, stage try/catch per guideline 3): no defect, no change.
+- Open questions for Vijay: unchanged — tasks 30/32 BLOCKED approvals; hunts keep returning mostly clean, consider pausing the loop.

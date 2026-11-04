@@ -4831,3 +4831,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed 0423ba2..c0fa79a (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues): clean.
 - Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) is Vijay-only). Least recently probed: sample-app `tasksController`/`usersController`/`auth` middleware/`app.js` error middleware (no prior hunt entry). Read all; ownership scoping, type validation, 11000→409, CastError→400, async wrapping all consistent with guidelines 1/7/11. No reproducible bug; no change.
 - Open questions for Vijay: unchanged (re-enable/idle policy as previously stated).
+
+## 2026-11-04 (Builder, ~19:07 UTC) — EMPTY-BACKLOG branch b — formatDocDrift/codeSpan/memberCallLine hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/docDrift/formatDocDrift.js`, `utils/codeSpan.js`, `utils/memberCallLine.js` (no recent hunt entry names them). Read-through plus live `codeSpan` probes (lone backtick, backtick runs, space-padded, all-space, newline): fence/padding correct; empty-state and unparsed-section branches correct; `memberCallLine` correct for chained/computed calls. No reproducible bug, no code change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

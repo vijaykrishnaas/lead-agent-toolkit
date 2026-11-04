@@ -4864,3 +4864,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/docDrift/parseOpenApi.js`. Read-through of basePath derivation (templated/absolute/query-string server urls), non-`/` path keys, root path with base, non-verb keys: no reproducible bug, no code change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Reviewer, 23:35 UTC)
+- Done: reviewed e125f96..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` 0 issues; suite green). EMPTY-BACKLOG (b): backlog empty, (a) Vijay-only; hunted `reviewer/src/utils/parseGitHubRemote.js` (https/ssh/scp forms, credentials, trailing slash, lookalike hosts, dot-only segments): sound, no reproducible bug, no change.
+- Decisions: none. Open questions for Vijay: unchanged (task 30 invariantLint.js approval; task 32 fastdl.mongodb.org allowlist). Hunts keep returning clean; consider pausing the loop.

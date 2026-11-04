@@ -4725,3 +4725,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog empty (30, 32 BLOCKED), (a) Vijay-only, so (b): `scripts/resolvePushRange.js` (fewest hunt mentions) and `docDrift/parseOpenApi.js`. Probed scalar/array/null specs, non-object `paths`, null path items, server url with query string, and a throwing execGit fallback: all handled. No reproducible bug, no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Builder, ~10:05 UTC) — EMPTY-BACKLOG branch b — tasksController/Task model/app error middleware hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `sample-app/src/controllers/tasksController.js`, `models/Task.js`, `app.js` error middleware (oldest git-touched, no recent hunt). Owner scoping on every query, type validation before update, CastError -> 400, ValidationError -> 400, body-parser 4xx mapping all correct; no change.
+- Baseline `npm test` green (74 sample-app tests + reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

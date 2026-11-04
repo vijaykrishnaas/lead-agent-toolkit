@@ -4746,3 +4746,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog empty (30, 32 BLOCKED), (a) Vijay-only, so (b): `standup/collectPullRequests.js` (pagination early-exit, page cap fails loudly, encoded owner/repo, invalid since rejected) and `groupByAuthor.js` (blank authors bucketed as Unknown). No reproducible bug; no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Builder, ~12:05 UTC) — EMPTY-BACKLOG branch b — compareRoutes probe
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/docDrift/compareRoutes.js` (optional params, case of method, root path, constrained params, double trailing slash). All clean except a pathological `/a//` that Express 4 does not realistically produce; no change.
+- Done: no code change; baseline `npm test` green (74 sample-app tests plus reviewer suite).
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

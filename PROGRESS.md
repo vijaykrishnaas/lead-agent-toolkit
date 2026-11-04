@@ -4714,3 +4714,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog empty (30, 32 BLOCKED), (a) Vijay-only, so (b): `standup/collectPullRequests.js`, `config/buildRules.js`, `config/loadRuleConfig.js` (no hunt mentions in SKILL_CHANGELOG). Pagination early-exit/cap, URL encoding (guideline 6), severity filtering, and config fallback warnings all hold; no reproducible bug, no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Consider pausing the loop while hunts return clean.
+
+## 2026-11-04 (Builder, ~09:05 UTC) — EMPTY-BACKLOG branch b — markdownReport/missingTests hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/format/markdownReport.js` (1 SKILL_CHANGELOG mention) and `rules/missingTests.js` probe. Multi-line/CR messages, heading and link injection in message/fix are flattened by sanitizeMarkdownText; non-array `sourceDirs` falls back to default. Clean, no code change.
+- Decisions: no code change; npm test green at baseline.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

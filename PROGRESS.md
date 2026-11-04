@@ -4663,3 +4663,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/utils/parseGitHubRemote.js` (zero hunt mentions in SKILL_CHANGELOG). Probed https/ssh/scp forms, port, credentials, trailing slash/`.git`, lookalike hosts (`github.com.evil.com`), extra path segments, query strings, case, trailing whitespace/newline, `/.git`: all correct. Clean, no code change.
 - Baseline `npm test` green (74 tests), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Reviewer, 03:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: parseOpenApi/compareRoutes
+- Done: reviewed a28c9ac..HEAD (PROGRESS/runs.jsonl only; no code). Baseline green (74 tests), idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Picked docDrift/parseOpenApi.js + compareRoutes.js (zero/one SKILL_CHANGELOG hunt mentions). Probed empty/scalar/array/null-path specs, basePath from relative server url, uppercase verb keys, optional params vs. split spec paths: all correct. Only oddity is `//a` not normalizing to `/a`, not a realistic Express/OpenAPI route; no change.
+- Open questions for Vijay: unchanged (task 30 invariantLint approval; task 32 mongodb binary allowlist). Hunts keep returning clean; consider pausing the loop.

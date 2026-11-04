@@ -4836,3 +4836,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/docDrift/formatDocDrift.js`, `utils/codeSpan.js`, `utils/memberCallLine.js` (no recent hunt entry names them). Read-through plus live `codeSpan` probes (lone backtick, backtick runs, space-padded, all-space, newline): fence/padding correct; empty-state and unparsed-section branches correct; `memberCallLine` correct for chained/computed calls. No reproducible bug, no code change.
 - Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Reviewer, 20:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: standupCli/parseArgv
+- Reviewed c0fa79a..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues.
+- Branch taken: (b) — backlog has no non-DONE/non-BLOCKED task (32 is BLOCKED on Vijay), (a) is Vijay-only. standupCli.js had the oldest last mention in PROGRESS.md among unprobed modules. Probed flag-last, flag-followed-by-flag, empty value, unknown flag, `--flag=value`, invalid `--since` (rejected downstream with exit 1): all clean, no change.
+- Open question for Vijay: unchanged (task 32 needs fastdl.mongodb.org allowlisted or MONGOMS_SYSTEM_BINARY).

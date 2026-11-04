@@ -4826,3 +4826,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/format/markdownReport.js` and `reviewer/src/reviewer.js` (not named in recent hunt entries). Read-through of category grouping/sort, sanitized file/message/fix sinks, empty-result branch, risk computation, optional content resolution: no reproducible bug (an unknown severity string would sort inconsistently, but no rule emits one), no change.
 - Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Reviewer, 18:35 UTC) — review clean, EMPTY-BACKLOG (b) hunt: sample-app controllers
+- Reviewed 0423ba2..c0fa79a (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues): clean.
+- Branch taken: EMPTY-BACKLOG (b) (backlog empty; (a) is Vijay-only). Least recently probed: sample-app `tasksController`/`usersController`/`auth` middleware/`app.js` error middleware (no prior hunt entry). Read all; ownership scoping, type validation, 11000→409, CastError→400, async wrapping all consistent with guidelines 1/7/11. No reproducible bug; no change.
+- Open questions for Vijay: unchanged (re-enable/idle policy as previously stated).

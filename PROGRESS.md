@@ -4719,3 +4719,9 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/format/markdownReport.js` (1 SKILL_CHANGELOG mention) and `rules/missingTests.js` probe. Multi-line/CR messages, heading and link injection in message/fix are flattened by sanitizeMarkdownText; non-array `sourceDirs` falls back to default. Clean, no code change.
 - Decisions: no code change; npm test green at baseline.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Reviewer, ~09:35 UTC) — review clean, EMPTY-BACKLOG branch b — resolvePushRange/parseOpenApi hunt
+- Reviewed ccc9db5..HEAD: PROGRESS.md/runs.jsonl only; nothing to fix.
+- Branch taken: backlog empty (30, 32 BLOCKED), (a) Vijay-only, so (b): `scripts/resolvePushRange.js` (fewest hunt mentions) and `docDrift/parseOpenApi.js`. Probed scalar/array/null specs, non-object `paths`, null path items, server url with query string, and a throwing execGit fallback: all handled. No reproducible bug, no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

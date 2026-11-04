@@ -4668,3 +4668,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed a28c9ac..HEAD (PROGRESS/runs.jsonl only; no code). Baseline green (74 tests), idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Picked docDrift/parseOpenApi.js + compareRoutes.js (zero/one SKILL_CHANGELOG hunt mentions). Probed empty/scalar/array/null-path specs, basePath from relative server url, uppercase verb keys, optional params vs. split spec paths: all correct. Only oddity is `//a` not normalizing to `/a`, not a realistic Express/OpenAPI route; no change.
 - Open questions for Vijay: unchanged (task 30 invariantLint approval; task 32 mongodb binary allowlist). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Builder, 04:05 UTC) — EMPTY-BACKLOG branch b — config/loadRuleConfig + buildRules hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/config/loadRuleConfig.js` + `buildRules.js` (only 2 SKILL_CHANGELOG mentions, none from a hunt). Read-through of enabled/minSeverity/options normalization, ENOENT fallback, non-mapping `rules`, unknown-category warning, `getCategoryConfig` with inherited keys (`constructor`) and partial entries: all behave as documented. Clean, no code change.
+- Baseline `npm test` green (74 tests), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or supply MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

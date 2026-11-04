@@ -4841,3 +4841,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed c0fa79a..HEAD: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues.
 - Branch taken: (b) — backlog has no non-DONE/non-BLOCKED task (32 is BLOCKED on Vijay), (a) is Vijay-only. standupCli.js had the oldest last mention in PROGRESS.md among unprobed modules. Probed flag-last, flag-followed-by-flag, empty value, unknown flag, `--flag=value`, invalid `--since` (rejected downstream with exit 1): all clean, no change.
 - Open question for Vijay: unchanged (task 32 needs fastdl.mongodb.org allowlisted or MONGOMS_SYSTEM_BINARY).
+
+## 2026-11-04 (Builder, ~20:05 UTC) — EMPTY-BACKLOG branch b — compareRoutes/httpMethods hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/docDrift/compareRoutes.js` and `httpMethods.js` (no recent hunt entry names them). Read-through of param replacement (nested constraint parens, escapes), optional-param expansion, positional param-name erasure, dedupe/sort: no reproducible bug, no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

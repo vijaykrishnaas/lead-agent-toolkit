@@ -4678,3 +4678,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed b32a35f..HEAD (log/PROGRESS-only commits): clean. Baseline green (74 tests).
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Read `diffParser.js`, `groupByAuthor.js`, `resolvePushRange.js`, `isTestFile.js`/`isCodeFile.js`: no reproducible bug (only a non-actionable case-sensitivity mismatch for `.TEST.JS` paths). No change.
 - Open questions for Vijay: unchanged (tasks 30, 32 unblock; consider pausing loop while backlog is empty).
+
+## 2026-11-04 — Builder run (EMPTY-BACKLOG b)
+- Done: baseline green (74 sample-app tests + reviewer suite); idle-streak 0.
+- Branch taken: EMPTY-BACKLOG (b) — no open TASKS.md items (30, 32 BLOCKED), (a) open questions are Vijay-only. Picked `scripts/runLog.js`, `sample-app/src/config/jwtSecret.js`, `reviewer/src/config/loadRules.js` (no prior hunt mentions in runs.jsonl). Probed arg parsing, entry validation, trailing-newline append, streak counting, production secret fallback rules: all behave as documented. Clean, no code change.
+- Open questions for Vijay: unchanged — task 30 needs approval to edit scripts/invariantLint.js (archive-aware PROGRESS check); task 32 needs fastdl.mongodb.org allowlisted or MONGOMS_SYSTEM_BINARY.

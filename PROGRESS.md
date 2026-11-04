@@ -4868,3 +4868,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-04 (Reviewer, 23:35 UTC)
 - Done: reviewed e125f96..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` 0 issues; suite green). EMPTY-BACKLOG (b): backlog empty, (a) Vijay-only; hunted `reviewer/src/utils/parseGitHubRemote.js` (https/ssh/scp forms, credentials, trailing slash, lookalike hosts, dot-only segments): sound, no reproducible bug, no change.
 - Decisions: none. Open questions for Vijay: unchanged (task 30 invariantLint.js approval; task 32 fastdl.mongodb.org allowlist). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-04 (Builder, ~23:08 UTC) — EMPTY-BACKLOG branch b — markdownReport/sanitizeMarkdownText hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/format/markdownReport.js` (not named in any recent hunt). Read-through of grouping/sort, empty-state, header, and sanitization at every interpolation site (file/message/fix; `issue.line` is numeric): no reproducible bug, no code change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

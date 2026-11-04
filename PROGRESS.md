@@ -4756,3 +4756,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Reviewed b746102..HEAD (PROGRESS.md/runs.jsonl only): clean; `reviewer/src/cli.js` reports 0 issues.
 - Branch taken: EMPTY-BACKLOG (b) (backlog has no actionable task; (a) is Vijay-only). Hunted `parseAst.js` (shebang, BOM, top-level await, empty, CRLF all parse) and `generateDocDrift.js` (sync wiring matches `docDriftCli`): clean, no change.
 - Open questions for Vijay: unchanged (task 32 needs fastdl.mongodb.org allowlist).
+
+## 2026-11-04 (Builder, ~13:05 UTC) — EMPTY-BACKLOG branch b — formatDocDrift/codeSpan hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `docDrift/formatDocDrift.js` and `utils/codeSpan.js` (zero SKILL_CHANGELOG mentions). Fence sizing, newline flattening, padding, and the unparsed-only-report path all correct; no reproducible bug, no change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

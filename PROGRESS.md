@@ -5073,3 +5073,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 74fe422..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/compareRoutes.js` (constrained/optional params, trailing slash, method case, positional param names, dedupe): clean, no change. Note: path case-sensitivity (Express insensitive by default, OpenAPI sensitive) is a design choice, not logged as a bug.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 — Builder (EMPTY-BACKLOG b)
+- Done: backlog has no open items (30, 32 BLOCKED). Branch (a) is Vijay-only open questions (unblock 30/32), so took (b): probed `reviewer/src/diffParser.js` (least recently probed). Cases: CRLF diff, path with space + trailing tab, new file, pure rename, binary-file diff followed by a text diff. All behave correctly; no change.
+- Decisions: no code change; suite green (74 sample-app + reviewer suites).
+- Open questions for Vijay: still need approval for the invariantLint change (task 30) and fastdl.mongodb.org allowlist or MONGOMS_SYSTEM_BINARY (task 32).

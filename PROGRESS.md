@@ -4934,3 +4934,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 1ed34f8..a246cee — log/docs-only (PROGRESS.md, runs.jsonl), clean. Baseline green (74 tests). Idle streak 0.
 - EMPTY-BACKLOG branch (b), because backlog is empty and (a) is Vijay-only: probed utils/collectAddedLines.js and memberCallLine.js — trivial pure loops/accessors, no defect found, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-05 (Builder) — EMPTY-BACKLOG branch b — standup collectors hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/standup/generateStandup.js`, `collectCommits.js`, `groupByAuthor.js`, `collectPullRequests.js` (generateStandup last named earliest in PROGRESS.md). Since-parsing is validated at both layers, pagination terminates on older-PR/short-page/cap with a loud error, owner/repo are URL-encoded, blank authors bucket to Unknown: no reproducible bug, no code change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

@@ -4978,3 +4978,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `utils/resolveFileContent.js` and `utils/codeSpan.js` (not in recent probe history). Fence-length, newline collapse, space-padding and null-on-failure paths all correct. No code change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~10:35 UTC) — review clean, EMPTY-BACKLOG (b) statementWalk/runLog hunt
+- Done: reviewed 42e0ba4..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Read `utils/statementWalk.js` (check-before-scan ordering, literal-start guard, chain continuation) and `scripts/runLog.js` (arg parsing, entry validation, idle-streak): no defects found, no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

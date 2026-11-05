@@ -5083,3 +5083,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 7e61476..HEAD (log/docs-only commits), clean; baseline green (74 tests). Branch taken: EMPTY-BACKLOG (b), since the backlog is empty and (a) is Vijay-only. Probed the least-audited modules `utils/collectAddedLines.js` and `scripts/syncPlugin.js`; plugin/skills is in sync with .claude/skills. No reproducible defect (a symlink in a skills dir would be skipped but never mirrored; none exist, so not worth a task).
 - Decisions: no code or backlog changes.
 - Open questions for Vijay: unchanged (see earlier entries).
+
+## 2026-11-05 — Builder (EMPTY-BACKLOG b, markdownReport / sanitizeMarkdownText)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `format/markdownReport.js` and `utils/sanitizeMarkdownText.js` (no markdownReport/sanitize probe in runs.jsonl history). Checked category ordering, severity sort, file/message/fix sanitization, newline collapse, backslash parity, @-mention neutralization; `issue.line` is numeric from the parser. No reproducible defect; no code change.
+- Decisions: none; baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

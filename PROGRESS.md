@@ -4919,3 +4919,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/utils/isTestFile.js` and `isCodeFile.js` (small shared helpers not named in any recent hunt). Whole-segment dir match (`latest.js`, `contest.js`, `protest/`, `testing/` correctly not tests), `.test/.spec` suffix with m/c/t/x variants, and non-code extensions all behave correctly. Only asymmetry: `isTestFile` is case-sensitive while `isCodeFile` is `/i` (`A.TEST.JS` not treated as test) — unrealistic for git paths in this repo, no reproduced failure, so no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~05:35 UTC) — EMPTY-BACKLOG branch b — parseGitHubRemote/resolvePushRange hunt
+- Done: reviewed ec1be31..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` 0 issues; suite green, 74 tests). Branch taken: backlog empty (30, 32 BLOCKED), (a) Vijay-only, so (b): probed `parseGitHubRemote.js` (12 URL shapes incl. lookalike hosts, userinfo, query, trailing slash/.git) and read `scripts/resolvePushRange.js` (zero-SHA, missing before, missing parent fallbacks): clean, no change.
+- Decisions: none. Open questions for Vijay: unchanged (task 30 invariantLint.js approval; task 32 fastdl.mongodb.org allowlist). Hunts keep returning clean; consider pausing the loop.

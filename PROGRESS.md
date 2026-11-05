@@ -4968,3 +4968,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/rules/style.js` (not probed in recent run history). Probed 20 var/console.log cases (comments, strings, template interpolation, optional chaining, spaced member access, regex literal, `variable` identifier, `x.var`): all correct; `obj.console.log(` is flagged, which is intentional. No code change.
 - Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~09:35 UTC) — review clean, EMPTY-BACKLOG (b) config loader hunt
+- Done: reviewed feab903..HEAD (PROGRESS/runs.jsonl only; no code). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Read `config/loadRuleConfig.js` and `buildRules.js` (scalar/array/null settings, invalid enabled/minSeverity/options, unknown categories, ENOENT vs malformed YAML, partial entries, severity filter): no reproducible defect, no code change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

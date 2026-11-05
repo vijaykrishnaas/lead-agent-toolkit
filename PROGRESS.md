@@ -5038,3 +5038,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `utils/parseArgv.js`, `utils/consumeFlagValue.js`, `sample-app/src/config/jwtSecret.js`, `controllers/usersController.js` (not in recent probe history). Missing-value errors, own-property flag lookup, production secret refusal, self-only owner checks and update type validation all correct (schema lowercase/trim setters cover email on update). No reproducible bug; no code change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~16:35 UTC) — EMPTY-BACKLOG branch b — docDrift parseOpenApi/compareRoutes hunt
+- Done: reviewed 83ee7bf..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/parseOpenApi.js` (scalar/array YAML, base path "/" and trailing slash, case-variant verb keys, non-verb keys) and `docDrift/compareRoutes.js` (read through param/optional expansion/dedupe): clean, no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

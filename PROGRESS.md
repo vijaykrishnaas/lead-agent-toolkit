@@ -5068,3 +5068,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `standup/collectPullRequests.js` (date-window early exit, page cap fail-loud, URL encoding), `standup/formatStandup.js` (numeric date sort, sanitized author/title, window-aware empty message) and `standup/generateStandup.js` (since normalisation) — not in recent probe history. No reproducible bug; no code change.
 - Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~19:35 UTC) — EMPTY-BACKLOG branch b — compareRoutes hunt
+- Done: reviewed 74fe422..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/compareRoutes.js` (constrained/optional params, trailing slash, method case, positional param names, dedupe): clean, no change. Note: path case-sensitivity (Express insensitive by default, OpenAPI sensitive) is a design choice, not logged as a bug.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

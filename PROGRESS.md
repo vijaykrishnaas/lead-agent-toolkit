@@ -5028,3 +5028,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `utils/sanitizeMarkdownText.js`, `utils/codeSpan.js`, `format/markdownReport.js`, `format/formatDocDrift.js` (zero prior probe mentions in runs.jsonl). Escaping, newline collapsing, @-mention defusing, backtick fence/padding all correct; `finding.reason` is a code constant. No reproducible bug; no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~15:35 UTC) — EMPTY-BACKLOG branch b — runLog/postReviewComment hunt
+- Done: reviewed ddc0c58..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `scripts/runLog.js` (arg parsing, idle-streak, append newline handling) and `github/postReviewComment.js` (marker HMAC, oldest-match, truncation/surrogate cut, URL encoding): no reproducible bug; no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

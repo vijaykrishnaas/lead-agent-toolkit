@@ -4914,3 +4914,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: baseline green (74 tests), idle-streak 0. Reviewed 5a5f6e7..ec1be31 (PROGRESS.md/runs.jsonl only): clean.
 - Branch taken: backlog empty, (a) Vijay-only; (b) hunted `reviewer/src/rules/performance.js` (least recently probed, last 4445): optional-chain forEach, nested async method, for-await, class static block, computed-key await, multi-line and optional-call JSON clone — all behave correctly. No change.
 - Open questions for Vijay: unchanged.
+
+## 2026-11-05 (Builder, ~04:05 UTC) — EMPTY-BACKLOG branch b — isTestFile/isCodeFile hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/utils/isTestFile.js` and `isCodeFile.js` (small shared helpers not named in any recent hunt). Whole-segment dir match (`latest.js`, `contest.js`, `protest/`, `testing/` correctly not tests), `.test/.spec` suffix with m/c/t/x variants, and non-code extensions all behave correctly. Only asymmetry: `isTestFile` is case-sensitive while `isCodeFile` is `/i` (`A.TEST.JS` not treated as test) — unrealistic for git paths in this repo, no reproduced failure, so no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

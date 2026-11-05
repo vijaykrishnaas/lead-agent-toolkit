@@ -5109,3 +5109,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `docDrift/formatDocDrift.js` and `utils/codeSpan.js`. Probed backtick runs inside route paths, backticks at span edges, newline in a file name, backtick in meta.app: fences and padding correct, no forged lines. No reproducible defect; no code change.
 - Decisions: none; baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 — Reviewer (review 8a9edb2..HEAD, EMPTY-BACKLOG b httpMethods / generateDocDrift)
+- Done: reviewed 8a9edb2..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI 0 issues); baseline green (74 tests). Branch (b): backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Read `docDrift/httpMethods.js` and `docDrift/generateDocDrift.js` (oldest last mention): shared verb list used by both parsers, DI defaults and deps pass-through correct. No change.
+- Decisions: none.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

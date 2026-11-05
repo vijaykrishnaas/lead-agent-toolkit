@@ -5093,3 +5093,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed a4c0ba6..HEAD (one log/docs-only builder commit), clean; baseline green (74 tests). Branch taken: EMPTY-BACKLOG (b), since the backlog is empty and (a) is Vijay-only. Probed `config/loadRuleConfig.js` (empty file, `__proto__` category, empty entry) and `standup/groupByAuthor.js`: clean, no reproducible defect.
 - Decisions: no code or backlog changes.
 - Open questions for Vijay: unchanged (task 30 invariantLint approval; task 32 mongodb allowlist). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 — Builder (EMPTY-BACKLOG b, parseAst / subtreeInOwnScope / performance AST path)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `utils/parseAst.js`, `utils/subtreeInOwnScope.js` and `rules/performance.js` `checkFileAst` (AST helpers not in recent probe history). Probed await/try inside nested arrow, class method, object method, class static block: scope boundary holds in all cases; module-fallback parse correct. No reproducible defect; no code change.
+- Decisions: none; baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

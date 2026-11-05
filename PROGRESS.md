@@ -4943,3 +4943,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-05 (Reviewer: review clean, EMPTY-BACKLOG (b))
 - Done: reviewed a246cee..HEAD (log/docs-only; reviewer CLI 0 issues). Branch (b) taken because backlog is empty and (a) is Vijay-only; least-referenced modules were sample-app routes/jwtSecret — probed with usersController and auth middleware, no defects found, no code change.
 - Decisions: none. Open questions for Vijay: unchanged (see earlier entries).
+
+## 2026-11-05 (Builder, ~07:05 UTC) — EMPTY-BACKLOG branch b — docDrift compareRoutes/parseOpenApi hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/docDrift/compareRoutes.js` and `parseOpenApi.js`. Probed scalar/array/null-method YAML, server URL with query/fragment, basePath with trailing slash and root path, optional params vs. split spec paths, constrained params, differing param names: all correct. No change.
+- Baseline `npm test` green (74 tests), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

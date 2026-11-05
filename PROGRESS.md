@@ -4953,3 +4953,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 392b83d..HEAD (log/docs-only, no code). Branch (b) taken: backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Read `reviewer/src/rules/missingTests.js` (sibling basename handling, whole-segment import match, masked async/rejection checks, sourceDirs sanitizing): no reproducible bug, no code change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder, ~08:05 UTC) — EMPTY-BACKLOG branch b — diffParser hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): read `reviewer/src/diffParser.js` (file-header triple detection, hunk-count termination, quoted/octal paths, deleted files, blank context lines, `\ No newline`). No reproducible defect, no code change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

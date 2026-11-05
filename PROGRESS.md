@@ -5008,3 +5008,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/rules/security.js` and `sample-app/src/controllers/tasksController.js` + app error middleware (not in recent probe history). Credential/eval/Function-ctor patterns, owner-scoped queries, type validation, CastError/ValidationError mapping all correct. No code change.
 - Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~13:35 UTC) — review clean, EMPTY-BACKLOG (b) collectBoundedBlock hunt
+- Done: reviewed 31fc51f..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `utils/collectBoundedBlock.js` (least-referenced module in PROGRESS/SKILL_CHANGELOG): braces in a regex literal and in a `//` comment are masked, chained-closer start line handled. No reproducible bug; no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

@@ -5023,3 +5023,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 72a581a..HEAD (PROGRESS/runs.jsonl only; no code). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `reviewer.js` (computeRisk, content-resolution opt-in) and `config/loadRules.js`: unknown severities rank as low, empty issues give 'none', no reproducible bug; no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder, ~15:07 UTC) — EMPTY-BACKLOG branch b — markdown sink hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `utils/sanitizeMarkdownText.js`, `utils/codeSpan.js`, `format/markdownReport.js`, `format/formatDocDrift.js` (zero prior probe mentions in runs.jsonl). Escaping, newline collapsing, @-mention defusing, backtick fence/padding all correct; `finding.reason` is a code constant. No reproducible bug; no change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

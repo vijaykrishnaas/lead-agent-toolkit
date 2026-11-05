@@ -4948,3 +4948,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/docDrift/compareRoutes.js` and `parseOpenApi.js`. Probed scalar/array/null-method YAML, server URL with query/fragment, basePath with trailing slash and root path, optional params vs. split spec paths, constrained params, differing param names: all correct. No change.
 - Baseline `npm test` green (74 tests), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~07:35 UTC) — review clean, EMPTY-BACKLOG (b) missingTests hunt
+- Done: reviewed 392b83d..HEAD (log/docs-only, no code). Branch (b) taken: backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Read `reviewer/src/rules/missingTests.js` (sibling basename handling, whole-segment import match, masked async/rejection checks, sourceDirs sanitizing): no reproducible bug, no code change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

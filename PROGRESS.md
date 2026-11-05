@@ -4895,3 +4895,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-05 (Reviewer, ~01:35 UTC)
 - Done: reviewed dbbf5d0..HEAD (PROGRESS.md/runs.jsonl only; clean; suite green). EMPTY-BACKLOG (b): backlog empty, (a) Vijay-only; hunted sample-app routes + `authController.js` + `jwtSecret.js` (lowest mention counts). Handlers carry their own try/catch (guideline 1 satisfied), preconditions precede side effects (11), timing-safe login holds; no reproducible bug, no change.
 - Decisions: none. Open questions for Vijay: unchanged (task 30 invariantLint.js approval; task 32 fastdl.mongodb.org allowlist). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder, ~02:05 UTC) — EMPTY-BACKLOG branch b — usersController/User hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `sample-app/src/controllers/usersController.js` and `models/User.js` (auth routes/controller were hunted last Reviewer run; this is the sibling not yet named). Owner checks precede lookups, type validation precedes the update, 11000 maps to 409, other errors rethrow to asyncHandler: no reproducible bug, no code change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

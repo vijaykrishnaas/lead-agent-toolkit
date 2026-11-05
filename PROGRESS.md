@@ -5053,3 +5053,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed af91836..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/collectExpressRoutes.js` (`joinPath` trailing-slash/root/relative variants, ancestor-scoped cycle guard, resolveRouterPath): clean. Observation only: `router.get('')` is not parsed at all (never reaches `joinPath`); too rare to justify a task.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder, ~18:05 UTC) — EMPTY-BACKLOG branch b — diffParser / security rule hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `diffParser.js` (hunk-count-driven header disambiguation, quoted/octal paths, deleted files, `\ No newline`) and `rules/security.js` (secret/eval/Function patterns, masking choice per check) — neither in recent probe history. Read-through found no reproducible bug; no code change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

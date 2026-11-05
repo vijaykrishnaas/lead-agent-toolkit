@@ -4904,3 +4904,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-05 (Reviewer, ~02:35 UTC) — EMPTY-BACKLOG branch b — scripts/runLog.js hunt
 - Done: reviewed 6260c8d..5a5f6e7 (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues; suite green). Branch taken: backlog empty (30, 32 BLOCKED), (a) Vijay-only, so (b): `scripts/runLog.js` (older mention in PROGRESS.md than the sample-app modules hunted this session). Flag parsing errors on a missing value (guideline 7), enum validation, trailing-newline handling and idle-streak all behave: no reproducible bug, no change.
 - Decisions: none. Open questions for Vijay: unchanged (task 30 invariantLint.js approval; task 32 fastdl.mongodb.org allowlist). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder) — EMPTY-BACKLOG branch b — loadRuleConfig/defaultExecGit hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/config/loadRuleConfig.js` and `reviewer/src/utils/defaultExecGit.js` (config loader not named in any recent hunt). Invalid enabled/minSeverity/options/rules shapes all warn and fall back to permissive defaults, ENOENT handled, malformed YAML rethrown; maxBuffer raised for large diffs: no reproducible bug, no code change.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

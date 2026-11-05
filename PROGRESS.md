@@ -5043,3 +5043,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 83ee7bf..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/parseOpenApi.js` (scalar/array YAML, base path "/" and trailing slash, case-variant verb keys, non-verb keys) and `docDrift/compareRoutes.js` (read through param/optional expansion/dedupe): clean, no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder, ~17:05 UTC) — EMPTY-BACKLOG branch b — standup collectors hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `standup/collectCommits.js`, `standup/groupByAuthor.js`, `utils/defaultExecGit.js` (not in recent probe history). `since` validation (missing/unparseable/Date), field-separator subject rejoin, blank-author bucketing and maxBuffer all correct. No reproducible bug; no code change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

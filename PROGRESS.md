@@ -4886,3 +4886,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-05 (Reviewer, ~00:35 UTC)
 - Done: reviewed ec4c1dd..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` 0 issues; suite green, 74 tests). EMPTY-BACKLOG (b): backlog empty, (a) Vijay-only; hunted `reviewer/src/standup/formatStandup.js` (few prior probes): empty-state wording, sort comparators, sanitization at author/message/title sites are sound; no reproducible bug, no change.
 - Decisions: none. Open questions for Vijay: unchanged (task 30 invariantLint.js approval; task 32 fastdl.mongodb.org allowlist). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder) — EMPTY-BACKLOG branch b — subtreeInOwnScope/parseAst hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/utils/subtreeInOwnScope.js` and `parseAst.js` (lowest PROGRESS.md mention counts among non-index modules). Checked that all three callers pass a function *body* (not the function node, which OWN_SCOPE_BASE would not descend into), expression-bodied arrows, `for await`, and script→module parse fallback: no reproducible bug, no code change.
+- Baseline `npm test` green (74 sample-app tests shown; full suites pass), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

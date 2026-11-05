@@ -5104,3 +5104,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty and (a) is Vijay-only. Probed utils/parseArgv.js + consumeFlagValue.js: missing/empty/flag-shaped values all throw, prototype-key flags are guarded by hasOwnProperty. Clean, no change.
 - Decisions: no new tasks or features (no evidence of a gap).
 - Open questions for Vijay: unchanged (task 30 still BLOCKED awaiting invariantLint approval).
+
+## 2026-11-05 — Builder (EMPTY-BACKLOG b, formatDocDrift / codeSpan)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `docDrift/formatDocDrift.js` and `utils/codeSpan.js`. Probed backtick runs inside route paths, backticks at span edges, newline in a file name, backtick in meta.app: fences and padding correct, no forged lines. No reproducible defect; no code change.
+- Decisions: none; baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

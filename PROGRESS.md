@@ -5048,3 +5048,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `standup/collectCommits.js`, `standup/groupByAuthor.js`, `utils/defaultExecGit.js` (not in recent probe history). `since` validation (missing/unparseable/Date), field-separator subject rejoin, blank-author bucketing and maxBuffer all correct. No reproducible bug; no code change.
 - Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer, ~17:35 UTC) — EMPTY-BACKLOG branch b — collectExpressRoutes hunt
+- Done: reviewed af91836..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/collectExpressRoutes.js` (`joinPath` trailing-slash/root/relative variants, ancestor-scoped cycle guard, resolveRouterPath): clean. Observation only: `router.get('')` is not parsed at all (never reaches `joinPath`); too rare to justify a task.
+- Baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

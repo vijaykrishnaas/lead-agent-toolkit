@@ -5013,3 +5013,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 31fc51f..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues). Branch (b): backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only. Probed `utils/collectBoundedBlock.js` (least-referenced module in PROGRESS/SKILL_CHANGELOG): braces in a regex literal and in a `//` comment are masked, chained-closer start line handled. No reproducible bug; no change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Builder, ~14:05 UTC) — EMPTY-BACKLOG branch b — remote/path-classifier utils hunt
+- Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `utils/parseGitHubRemote.js`, `utils/isTestFile.js`, `utils/isCodeFile.js` (not in recent probe history). Remote patterns (https/ssh/scp/port, dot-only owner/repo rejection, .git strip) and path classifiers correct. No code change.
+- Baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.

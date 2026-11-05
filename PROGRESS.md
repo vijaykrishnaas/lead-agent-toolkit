@@ -4923,3 +4923,9 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-05 (Reviewer, ~05:35 UTC) — EMPTY-BACKLOG branch b — parseGitHubRemote/resolvePushRange hunt
 - Done: reviewed ec1be31..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` 0 issues; suite green, 74 tests). Branch taken: backlog empty (30, 32 BLOCKED), (a) Vijay-only, so (b): probed `parseGitHubRemote.js` (12 URL shapes incl. lookalike hosts, userinfo, query, trailing slash/.git) and read `scripts/resolvePushRange.js` (zero-SHA, missing before, missing parent fallbacks): clean, no change.
 - Decisions: none. Open questions for Vijay: unchanged (task 30 invariantLint.js approval; task 32 fastdl.mongodb.org allowlist). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 05:07 UTC — Builder run (EMPTY-BACKLOG)
+- Branch taken: backlog has no open items (30 and 32 are BLOCKED, awaiting Vijay), so EMPTY-BACKLOG applied. (a) only leaves Vijay-only questions (tasks 30/32 approvals), so (b).
+- Done: adversarial hunt of `utils/consumeFlagValue.js` and `utils/parseArgv.js`. Probed missing/empty/flag-like values, prototype-key flags (hasOwnProperty guard), a second positional, and the required check. No defect found, no code change.
+- Decisions: none beyond the above. Baseline `npm test` green (74 sample-app tests plus reviewer suite).
+- Open questions for Vijay: unchanged. Approve the `scripts/invariantLint.js` change (task 30) and allowlist `fastdl.mongodb.org` or supply `MONGOMS_SYSTEM_BINARY` (task 32).

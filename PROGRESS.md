@@ -4909,3 +4909,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Branch taken: backlog has no open items (30, 32 BLOCKED); (a) open questions are Vijay-only, so (b): `reviewer/src/config/loadRuleConfig.js` and `reviewer/src/utils/defaultExecGit.js` (config loader not named in any recent hunt). Invalid enabled/minSeverity/options/rules shapes all warn and fall back to permissive defaults, ENOENT handled, malformed YAML rethrown; maxBuffer raised for large diffs: no reproducible bug, no code change.
 - Baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change for task 30; allowlist fastdl.mongodb.org (or MONGOMS_SYSTEM_BINARY) for task 32. Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-05 (Reviewer)
+- Done: baseline green (74 tests), idle-streak 0. Reviewed 5a5f6e7..ec1be31 (PROGRESS.md/runs.jsonl only): clean.
+- Branch taken: backlog empty, (a) Vijay-only; (b) hunted `reviewer/src/rules/performance.js` (least recently probed, last 4445): optional-chain forEach, nested async method, for-await, class static block, computed-key await, multi-line and optional-call JSON clone — all behave correctly. No change.
+- Open questions for Vijay: unchanged.

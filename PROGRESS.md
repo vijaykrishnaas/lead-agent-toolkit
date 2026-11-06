@@ -5347,3 +5347,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted sample-app `middleware/asyncHandler.js` and `routes/auth.routes.js` (low mention count, not recently hunted). Probed async rejection, `Promise.reject(null)`, non-promise return: all route to `next`. A synchronous throw escapes the wrapper itself, but Express 4's Layer try/catch forwards it to the error middleware, so no defect. Baseline green (74 sample-app tests plus reviewer suites). Clean, no change.
 - Decisions: no code change; nothing speculative.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-06 (Reviewer, ~00:35 UTC)
+- Done: reviewed 643ce42..HEAD (log/docs-only), reviewer CLI reports 0 issues; baseline 74 tests green.
+- Branch taken: EMPTY-BACKLOG (b) — hunted `maskStringLiterals.js`/`collectBoundedBlock.js` (fewest mentions). Reproduced a real gap: nested template inside `${}` leaks inner content/braces unmasked. Not a small fix, so added task 36 (SKILL_CHANGELOG entry written).
+- Open questions for Vijay: none new.

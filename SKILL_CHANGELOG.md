@@ -333,3 +333,7 @@
 ## 2026-11-01 (Reviewer: backlog addition, task 35)
 **Change:** TASKS.md: appended task 35 (sanitizeMarkdownText @mention neutralization). No skill/CLAUDE.md change.
 **Evidence:** PROGRESS.md 2026-11-01 Reviewer entry — reproduced `sanitizeMarkdownText('@someone')` returning `@someone`; sink posts live to PR comments (guideline 15).
+
+## 2026-11-06 (Reviewer: backlog addition, task 36)
+**Change:** TASKS.md: appended task 36 (maskStringLiterals nested-template-in-interpolation leak). No skill/CLAUDE.md change.
+**Evidence:** PROGRESS.md 2026-11-06 Reviewer (~00:35 UTC) entry — reproduced inner-template content/brace leaking unmasked from `${ok ? \`yes\` : 'no'}`; fix is larger than a one-line patch (needs a nested state stack).

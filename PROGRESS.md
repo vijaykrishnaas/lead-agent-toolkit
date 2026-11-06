@@ -5342,3 +5342,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed f7f39b5..HEAD (log/docs-only commits), clean; baseline 74 tests green.
 - Branch taken: EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted sample-app `config/db.js` (fewest PROGRESS/SKILL_CHANGELOG mentions) and its caller `server.js`: thin mongoose wrapper, startup failure path exits 1 via `.catch`; no defect found, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-06 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted sample-app `middleware/asyncHandler.js` and `routes/auth.routes.js` (low mention count, not recently hunted). Probed async rejection, `Promise.reject(null)`, non-promise return: all route to `next`. A synchronous throw escapes the wrapper itself, but Express 4's Layer try/catch forwards it to the error middleware, so no defect. Baseline green (74 sample-app tests plus reviewer suites). Clean, no change.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

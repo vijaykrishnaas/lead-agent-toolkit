@@ -5148,3 +5148,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `sample-app/src/models/User.js` and `routes/auth.routes.js` (lowest PROGRESS mention counts among non-hunted-recently modules). Email is lowercase+trim+unique, required fields set, routes only expose register/login. No defect; no code change.
 - Decisions: none; baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-06 — Reviewer (~03:35 UTC) — EMPTY-BACKLOG branch b — usersController/auth middleware hunt
+- Done: reviewed 13d0756..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI 0 issues); baseline green (74 tests). Branch (b): backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Probed `sample-app` `usersController.js`, `routes/users.routes.js`, `middleware/auth.js`: self-only id checks, typed-field validation, 11000 -> 409, empty bearer token -> 401, HS256 pinned. No defect; no code change.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

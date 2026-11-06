@@ -5143,3 +5143,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-06 — Reviewer (~03:35 UTC) — EMPTY-BACKLOG branch b — parseOpenApi hunt
 - Done: reviewed 896bc7a..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI 0 issues); baseline green (74 tests). Branch (b): backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/parseOpenApi.js` (+ `compareRoutes.js` optional params/wildcards): scalar/list/null `paths`, null operations, root path with basePath, empty servers, uppercase verb keys — all behave sensibly, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-06 — Builder (EMPTY-BACKLOG b, sample-app User model / auth routes)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `sample-app/src/models/User.js` and `routes/auth.routes.js` (lowest PROGRESS mention counts among non-hunted-recently modules). Email is lowercase+trim+unique, required fields set, routes only expose register/login. No defect; no code change.
+- Decisions: none; baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

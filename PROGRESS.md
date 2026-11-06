@@ -5211,3 +5211,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog has no open items (all DONE/BLOCKED), so branch (a) applies only to Vijay-only questions; took (b). Probed least-recently-audited modules: rules/missingTests.js, utils/parseGitHubRemote.js, utils/isTestFile.js (https/ssh/scp/port/userinfo/trailing-slash/lookalike-host remotes; missing-test, async-without-rejection, comment-only-rejection, test-only diffs). Clean, no change.
 - Decisions: no code change; nothing speculative.
 - Open questions for Vijay: tasks 30 (invariantLint archive-aware PROGRESS check) and 32 (allowlist fastdl.mongodb.org / MONGOMS_SYSTEM_BINARY) remain BLOCKED awaiting you.
+
+## 2026-11-06 (Reviewer: review + EMPTY-BACKLOG (b) hunt, postReviewComment)
+- Done: reviewed 3b8d932..e1fa48f (log/docs-only; reviewer CLI: 0 issues). Baseline green (74 tests).
+- Branch taken: backlog empty and (a) is Vijay-only, so (b). Picked github/postReviewComment.js, the least recently mentioned module in PROGRESS.md (last at line ~5033). Read marker HMAC, first-match search, 65536 truncation (surrogate-safe, marker kept at the head), pagination cap, URL encoding and the updated flag. Found no defect, no change.
+- Open questions for Vijay: none new.

@@ -5114,3 +5114,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 8a9edb2..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI 0 issues); baseline green (74 tests). Branch (b): backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Read `docDrift/httpMethods.js` and `docDrift/generateDocDrift.js` (oldest last mention): shared verb list used by both parsers, DI defaults and deps pass-through correct. No change.
 - Decisions: none.
 - Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-06 — Builder (EMPTY-BACKLOG b, diffParser / isTestFile / isCodeFile)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `diffParser.js`, `utils/isTestFile.js`, `utils/isCodeFile.js` (not covered by any prior hunt entry). Probed CRLF hunk lines, rename-only headers, new-file `/dev/null` pre-image, `\ No newline` markers, back-to-back files, single-line hunk headers: line numbers and file names correct. No regression found, no code change.
+- Decisions: none; baseline `npm test` green (74 sample-app tests plus reviewer suite), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

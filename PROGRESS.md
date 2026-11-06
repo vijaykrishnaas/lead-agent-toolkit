@@ -5226,3 +5226,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed e1fa48f..HEAD (PROGRESS/runs.jsonl only; reviewer CLI reports 0 issues).
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Probed scripts/runLog.js (flag parsing, entry validation, idle streak): clean, no change.
 - Open questions for Vijay: none new (BLOCKED tasks 30 and 32 still await your approval).
+
+## 2026-11-06 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Probed `reviewer/src/diffParser.js` (new file, rename with edits, binary-file section followed by a normal file, tab-suffixed and space-containing paths, deleted file). Line numbers and paths correct. Clean, no change. Baseline green (74 tests).
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 (invariantLint archive-aware PROGRESS check) and 32 (allowlist fastdl.mongodb.org / MONGOMS_SYSTEM_BINARY) remain BLOCKED; hunts keep returning clean, consider pausing the loop.

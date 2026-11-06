@@ -5152,3 +5152,8 @@ Marked TASKS.md item 29 `[DONE]`.
 ## 2026-11-06 — Reviewer (~03:35 UTC) — EMPTY-BACKLOG branch b — usersController/auth middleware hunt
 - Done: reviewed 13d0756..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI 0 issues); baseline green (74 tests). Branch (b): backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Probed `sample-app` `usersController.js`, `routes/users.routes.js`, `middleware/auth.js`: self-only id checks, typed-field validation, 11000 -> 409, empty bearer token -> 401, HS256 pinned. No defect; no code change.
 - Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-06 — Builder (EMPTY-BACKLOG b, formatDocDrift / codeSpan / memberCallLine)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `docDrift/formatDocDrift.js`, `utils/codeSpan.js`, `utils/memberCallLine.js` (no prior hunt entry). Ran codeSpan on backtick-leading/trailing/embedded, whitespace-only, newline-wrapped and pipe inputs, and the report on a backtick-bearing file name and route path: fences and padding correct, empty-state and unparsed-only branches render properly. No defect; no code change.
+- Decisions: none; baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

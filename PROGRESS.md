@@ -5332,3 +5332,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Branch taken: EMPTY-BACKLOG (b); (a) is Vijay-only, tasks 30/32 BLOCKED. Hunted `docDriftCli.js` + `utils/parseArgv.js` (missing flag values, missing required flags, nonexistent openapi path, sync generateDocDrift): all exit 1 with proper messages. Clean, no change.
 - Decisions: no [FEATURE] task (no evidenced gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-06 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/isCodeFile.js` and `utils/resolveFileContent.js` (not hunted in recent entries). Probed uppercase extensions, `.d.ts`, `.js.map`, `.json`, `.md`, undefined path, a `.js` directory containing a `.md` file, trailing newline, throwing `execGit`, and a dash-leading path: all behave correctly. Baseline green (74 sample-app tests plus reviewer suites). Clean, no change.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

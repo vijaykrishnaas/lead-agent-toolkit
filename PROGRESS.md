@@ -5124,3 +5124,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed 06a20bb..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI 0 issues); baseline green (74 tests). Branch (b): backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Read `standup/collectPullRequests.js`, `standup/collectCommits.js`, `utils/defaultExecGit.js` (paging early-exit, window-cap error, date validation, maxBuffer): all correct. No change.
 - Decisions: none.
 - Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-06 — Builder (EMPTY-BACKLOG b, groupByAuthor / resolveFileContent)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `standup/groupByAuthor.js` and `utils/resolveFileContent.js` (no prior hunt entry). Probed whitespace-padded/blank/non-string authors (trimmed or bucketed "Unknown"), input-order preservation, missing list args; execGit invoked with an argv array (no shell injection), throwing execGit returns null. No defect; no code change.
+- Decisions: none; baseline `npm test` green, idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

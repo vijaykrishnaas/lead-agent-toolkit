@@ -5206,3 +5206,8 @@ Marked TASKS.md item 29 `[DONE]`.
 **Branch:** (b); (a) skipped because the open questions (tasks 30, 32) are Vijay-only. Hunted `docDrift/parseOpenApi.js` with non-object specs (scalar, array, null), `paths` as array/scalar, non-object pathItems, uppercase verb keys, trailing-slash and port-only server urls, `/` path with base path: all handled, no change.
 **Decisions:** no code or skill change, so no SKILL_CHANGELOG entry.
 **Open questions for Vijay:** unchanged — tasks 30 and 32 blocked on you; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-06 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (all DONE/BLOCKED), so branch (a) applies only to Vijay-only questions; took (b). Probed least-recently-audited modules: rules/missingTests.js, utils/parseGitHubRemote.js, utils/isTestFile.js (https/ssh/scp/port/userinfo/trailing-slash/lookalike-host remotes; missing-test, async-without-rejection, comment-only-rejection, test-only diffs). Clean, no change.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 (invariantLint archive-aware PROGRESS check) and 32 (allowlist fastdl.mongodb.org / MONGOMS_SYSTEM_BINARY) remain BLOCKED awaiting you.

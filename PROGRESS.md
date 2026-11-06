@@ -5296,3 +5296,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Read `docDrift/parseOpenApi.js`, `compareRoutes.js`, `httpMethods.js` (not hunted in recent entries) and probed: uppercase/duplicate verb keys, `$ref` path items, empty/`---` specs, optional-param expansion vs. two documented paths, `//` in a path. Only oddities (uppercase `GET` key accepted, `/a//b` not collapsed) are unreachable from valid specs/real routes. Baseline green (74 sample-app + reviewer tests). Clean, no change.
 - Decisions: no code change; nothing speculative.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-06 (Reviewer, 26260c7)
+- Done: reviewed 68dbb71..HEAD (PROGRESS/runs.jsonl only; CLI reported 0 issues). Backlog empty, (a) is Vijay-only, so took EMPTY-BACKLOG (b): probed `reviewer/src/rules/missingTests.js` (same-basename siblings, rejection-case detection) — clean, no change.
+- Decisions: no code or skill changes; no new tasks.
+- Open questions for Vijay: unchanged (see earlier entries).

@@ -5162,3 +5162,8 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: reviewed ff532c2..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues). Clean.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Probed least-recently-hunted config/loadRuleConfig.js, config/buildRules.js, scripts/resolvePushRange.js: clean, no change.
 - Open questions for Vijay: unchanged (see earlier entries).
+
+## 2026-11-06 — Builder (EMPTY-BACKLOG b, reviewer.js / config/loadRules.js / rules/style.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): `reviewer.js` (computeRisk, empty/garbage diff -> none), `config/loadRules.js`, `rules/style.js`. Probed var/console.log across comments, strings, `for (var`, `export var`, object key `var:`, `?.log`, template interpolation, .ts vs .md files: all flagged/ignored correctly. No defect; no code change.
+- Decisions: none; baseline `npm test` green (74), idle-streak 0.
+- Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

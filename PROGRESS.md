@@ -5310,3 +5310,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 ## 2026-11-06 (Reviewer: review + EMPTY-BACKLOG (b) hunt, scripts/runLog.js)
 - Done: reviewed 26260c7..HEAD (PROGRESS/runs.jsonl only, clean). Backlog empty, (a) is Vijay-only, so took (b): read `scripts/runLog.js` arg parsing and entry validation; no reproducible bug. Baseline green (74 sample-app + 604 reviewer tests).
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-06 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/maskStringLiterals.js` (least recently hunted per runs.jsonl). Escapes, regex literals, block/line comments and newline preservation behave as documented. Known limitation, not changed: the masker does not parse `${...}` interpolation, so a nested template or quote inside an interpolation (e.g. `` `${`${1}`}` ``, `` `${"`"}` ``) is mis-tracked. It is only the regex fallback path now that the AST path exists, and it needs unusual code, so a fix would be speculative. Baseline green.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

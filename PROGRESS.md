@@ -5139,3 +5139,7 @@ Marked TASKS.md item 29 `[DONE]`.
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b): sample-app `tasksController.js`, `models/Task.js`, `routes/tasks.routes.js`, `middleware/asyncHandler.js` and `app.js` error middleware (no prior hunt entry for the tasks controller). Checked: owner scoping on every query, wrong-typed title/description/completed rejected, CastError -> 400, rejected promises routed to error middleware, $set built only from validated fields. No defect; no code change.
 - Decisions: none; baseline `npm test` green, idle-streak 0.
 - Open questions for Vijay: unchanged — approve invariantLint.js change (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.
+
+## 2026-11-06 — Reviewer (~03:35 UTC) — EMPTY-BACKLOG branch b — parseOpenApi hunt
+- Done: reviewed 896bc7a..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI 0 issues); baseline green (74 tests). Branch (b): backlog empty (30, 32 BLOCKED), (a) is Vijay-only. Probed `docDrift/parseOpenApi.js` (+ `compareRoutes.js` optional params/wildcards): scalar/list/null `paths`, null operations, root path with basePath, empty servers, uppercase verb keys — all behave sensibly, no change.
+- Open questions for Vijay: none new.

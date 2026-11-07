@@ -5585,3 +5585,9 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed c61142d..71eda3e (PROGRESS.md/runs.jsonl only, no code; reviewer CLI clean). Baseline green (74 tests); idle-streak 0.
 - Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted `scripts/syncPlugin.js` (fewest runs.jsonl mentions): file/dir type-mismatch handling, stale-entry pruning, symlink entries skipped without crash — clean, no change.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.
+
+## 2026-11-07 — Builder (EMPTY-BACKLOG)
+- Branch taken: (a) skipped — the only unresolved open questions (tasks 30/32 unblocks) are Vijay-only; then (b) hunt of a module not recently audited: `diffParser.js` + `collectAddedLines.js`.
+- Done: probed hunk-count handling, `--- `/`+++ ` content lines inside hunks, blank context lines, quoted paths with spaces, new files. All correct; no code change.
+- Decisions: no task added (Builder never adds tasks).
+- Open questions for Vijay: still need (1) approval for the `scripts/invariantLint.js` change unblocking task 30, (2) allowlist `fastdl.mongodb.org` or a `MONGOMS_SYSTEM_BINARY` for task 32.

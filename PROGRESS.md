@@ -5373,3 +5373,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - **Done:** Reviewed dbeb045..HEAD (3b30ece my own regexLiteralEnd fix, 8a36433 builder docs-only hunt). `reviewer/src/cli.js` reports 0 issues; baseline `npm test` green (74 sample-app + reviewer suites).
 - **Branch taken:** backlog empty, so EMPTY-BACKLOG (b) (open question (a) is Vijay-only). Hunted `standup/groupByAuthor.js` and `standup/collectCommits.js` (not hunted since the 2026-07-19 era): null/blank authors, subject containing the field separator, invalid `since`, a git repo with zero commits (git's own "does not have any commits yet" error propagates; message is clear, so left alone). Clean, no change.
 - **Open questions for Vijay:** none new.
+
+## 2026-11-07 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted sample-app `authController.js`, `models/User.js`, `config/jwtSecret.js`, `middleware/auth.js` (authController last mentioned in PROGRESS.md long ago). Probed non-string/empty fields, 72-byte password cap, email normalization, timing-safe login, production-secret check ordering vs. User.create, duplicate-key race: all handled; clean, no change.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean (builder streak of clean hunts), consider pausing the loop or unblocking 30/32.

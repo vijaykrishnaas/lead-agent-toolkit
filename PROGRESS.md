@@ -5363,3 +5363,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Branch taken: review of new commits (not EMPTY-BACKLOG).
 - Decisions: small reproduced fix applied directly; no new task, no [FEATURE].
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED.
+
+## 2026-11-07 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted sample-app `tasks.routes.js`/`users.routes.js` (fewest PROGRESS/SKILL_CHANGELOG mentions) and `tasksController.js`/`app.js` error middleware. Probed bodiless POST/PUT (400, no crash), malformed id (CastError -> 400), bodiless login (400): all handled correctly.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

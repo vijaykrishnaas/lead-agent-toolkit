@@ -14,14 +14,15 @@ const SECRET_ENV_FALLBACK = /(password|secret|apikey|api_key|token)(?:_?key)?['"
 // brackets, immediately invoked).
 // Also catches the optional call `eval?.(x)` and the indirect comma form
 // `(0, eval)(x)`, both trivial evasions with the same runtime semantics.
-const EVAL_CALL = /\beval\s*(?:\?\.\s*)?\(|,\s*eval\s*\)\s*\(/;
+// The lookbehind (not \b) keeps `page.$eval(` / `$$eval(` helpers from matching.
+const EVAL_CALL = /(?<![\w$])eval\s*(?:\?\.\s*)?\(|,\s*eval\s*\)\s*\(/;
 // `new Function(...)` / `Function(...)` compiles a string to code, same
 // injection class as eval. `.Function(` member calls and longer identifiers
 // (myFunction, Function2) are excluded by the lookbehind/word boundary.
 const FUNCTION_CTOR = /(?<![\w$.])(?:new\s+)?Function\s*\(/;
 // Template interpolation bodies are code, but the masker blanks them with the
 // rest of the template, so the direct form is also checked inside `${...}`.
-const EVAL_IN_INTERPOLATION = /\$\{[^}]*\beval\s*\(/;
+const EVAL_IN_INTERPOLATION = /\$\{[^}]*(?<![\w$])eval\s*\(/;
 const EVAL_BRACKET_CALL = /\[\s*(['"`])eval\1\s*\]\s*\(/;
 
 // No process.env exemption here: SECRET_PATTERN only matches when the

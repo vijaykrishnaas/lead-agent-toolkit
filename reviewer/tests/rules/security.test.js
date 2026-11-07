@@ -257,4 +257,18 @@ describe('security rule', () => {
     const issues = securityRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([1, 2, 3]);
   });
+
+  it('does not flag Puppeteer/Playwright-style $eval( / $$eval( helpers, but still flags a real member eval(', () => {
+    const diff = [
+      'diff --git a/src/run.js b/src/run.js',
+      '--- a/src/run.js',
+      '+++ b/src/run.js',
+      '@@ -0,0 +1,3 @@',
+      "+const t = await page.$eval('h1', (el) => el.textContent);",
+      "+const all = await page.$$eval('li', (els) => els.length);",
+      '+const r = vm.eval(input);',
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.map((i) => i.line)).toEqual([3]);
+  });
 });

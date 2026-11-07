@@ -5435,3 +5435,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 184823b..HEAD; the `codeSpan` change (loop instead of `Math.max(...spread)`) is correct and the new 200k-run test passes. Suite green (74 + reviewer tests).
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only; hunted `scripts/runLog.js` (least-recently-hunted script). Clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, security.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/rules/security.js` (oldest last PROGRESS.md mention, line ~5188). Found `\beval\s*\(` matched `page.$eval(`/`page.$$eval(` (Puppeteer/Playwright helpers, not eval) because `\b` sits between `$` and `e`. Swapped to `(?<![\w$])eval` in EVAL_CALL and EVAL_IN_INTERPOLATION; regression test added (member `vm.eval(` still flagged).
+- Decisions: left `obj.eval(` flagged (could be real eval-like API, e.g. vm/redis); multi-line secret assignments remain unflagged (narrow, per-line design).
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning mostly clean, consider pausing the loop or unblocking 30/32.

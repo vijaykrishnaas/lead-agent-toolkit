@@ -5383,3 +5383,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - **Done:** Reviewed 8a36433..HEAD (docs/log-only commits: builder and reviewer hunts). Baseline `npm test` green.
 - **Branch taken:** backlog empty, so EMPTY-BACKLOG (b) ((a) is Vijay-only). Hunted `standup/collectPullRequests.js` (pagination early-exit, MAX_PAGES overflow error, invalid `since`, encoded owner/repo, null user, merged state): clean, no change.
 - **Open questions for Vijay:** hunts keep coming back clean; consider pausing the loop or unblocking tasks 30/32.
+
+## 2026-11-07 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/subtreeInOwnScope.js` and `consumeFlagValue.js`/`parseArgv.js` (last mentioned at PROGRESS.md lines ~5098-5104, among the oldest). Probed own-scope walk from a function root vs. its body (all three call sites pass `.body`/statement, so correct), class static blocks, repeated flags (last wins), `-`/`--` values, prototype-name flags (`--toString` rejected via hasOwnProperty): clean, no change.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop or unblocking 30/32.

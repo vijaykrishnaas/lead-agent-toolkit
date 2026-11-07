@@ -5545,3 +5545,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 6f885ec..0584625 (PROGRESS.md/runs.jsonl only, no code). Backlog has no open items, so took (b) on `standup/collectPullRequests.js` (pagination early-exit, MAX_PAGES overflow error, encodeURIComponent on owner/repo, invalid `since`) and `standup/groupByAuthor.js` (blank/non-string authors bucket to Unknown). No defect found; no code changed. Suite green (74 tests).
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry. No new task and no [FEATURE] task: no concrete gap found.
 - Open questions for Vijay: unchanged. Tasks 30 and 32 are still BLOCKED and hunts keep coming back clean; consider unblocking them or pausing the loop.
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, CLI parsers)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `utils/parseArgv.js`, `utils/consumeFlagValue.js`, `reviewPrCli.js`, `standupCli.js`, `docDriftCli.js` and the `--since` path through `generateStandup`/`collectCommits`/`collectPullRequests`. Checked flag-as-value, `--flag=value`, single-dash positional, the `--repo` pre-scan, and an invalid `--since`. All fail loudly or behave correctly. No defect reproduced, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

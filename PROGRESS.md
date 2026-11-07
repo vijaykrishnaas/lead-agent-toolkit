@@ -5393,3 +5393,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 96f36da..HEAD (PROGRESS.md/runs.jsonl only, no code). Suite green (74 sample-app tests + reviewer suites). Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `reviewer/src/utils/parseGitHubRemote.js` (last hunted well before the recent runs): lookalike hosts, trailing slash, `.git.git`, `..` names, port, uppercase host, embedded credentials, whitespace — all behave correctly. No change.
 - Decisions: no code or skill edits, so no SKILL_CHANGELOG entry.
 - Open question for Vijay: hunts keep returning clean; consider pausing the loop or unblocking 30/32.
+
+## 2026-11-07 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/parseAst.js` and `docDrift/httpMethods.js` (zero SKILL_CHANGELOG mentions, low recent attention). Probed hashbang, BOM, empty source, top-level await, ESM, CRLF, top-level return, private fields/static blocks: all parse. HTTP verb list is shared by both docDrift parsers, as intended.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop or unblocking 30/32.

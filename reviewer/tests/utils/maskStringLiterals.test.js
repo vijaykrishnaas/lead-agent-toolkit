@@ -195,3 +195,37 @@ describe('maskComments', () => {
     expect(second.quoteState).toBeNull();
   });
 });
+
+describe('template literal nested inside a ${...} interpolation (task 36)', () => {
+  it('masks the inner template content on a single line', () => {
+    const line = "log(`a ${ok ? `yes` : 'no'} b`)";
+    const { masked, quoteState } = maskStringLiterals(line);
+    expect(masked).toBe('log(' + ' '.repeat(line.length - 5) + ')');
+    expect(masked.length).toBe(line.length);
+    expect(quoteState).toBeNull();
+  });
+
+  it('does not leak a brace or keyword from the inner template', () => {
+    const line = "x(`${a ? `{ try` : ''}`); y();";
+    const { masked } = maskStringLiterals(line);
+    expect(masked).not.toMatch(/[{}]|try/);
+    expect(masked.endsWith('); y();')).toBe(true);
+  });
+
+  it('threads nested state across lines and keeps a compliant sibling visible', () => {
+    const first = maskStringLiterals('f(`a ${b ? `{', null);
+    expect(first.quoteState).not.toBeNull();
+    const second = maskStringLiterals('} try` : 1} end`); g({ ok: 1 });', first.quoteState);
+    expect(second.masked).not.toContain('try');
+    expect(second.masked).toContain('g({ ok: 1 });');
+    expect(second.quoteState).toBeNull();
+  });
+
+  it('maskComments keeps nested template text but still masks a comment in the expression', () => {
+    const line = "x(`${a ? `//k` : 1 /* c */}`)";
+    const { masked } = maskComments(line);
+    expect(masked).toContain('`//k`');
+    expect(masked).not.toContain('c */');
+    expect(masked.length).toBe(line.length);
+  });
+});

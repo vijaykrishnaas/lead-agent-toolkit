@@ -5352,3 +5352,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 643ce42..HEAD (log/docs-only), reviewer CLI reports 0 issues; baseline 74 tests green.
 - Branch taken: EMPTY-BACKLOG (b) — hunted `maskStringLiterals.js`/`collectBoundedBlock.js` (fewest mentions). Reproduced a real gap: nested template inside `${}` leaks inner content/braces unmasked. Not a small fix, so added task 36 (SKILL_CHANGELOG entry written).
 - Open questions for Vijay: none new.
+
+## 2026-11-07 Builder run — task 36
+- Done: `maskStringLiterals`/`maskComments` now share one scanner (`maskCore`) with a frame stack (`"`, `'`, template, `${`, nested `{`, `/*`), so a template nested in a `${}` interpolation is masked and its `{`/`}`/keywords no longer leak into `collectBoundedBlock` depth. `quoteState` stays an opaque null-or-string (single frames serialize to the legacy values). 4 new tests; they fail against the old code (4 failed) and pass now; full suite green.
+- Decisions: applied the fix to `maskComments` too (guideline 22: sibling check on same data). In strings mode all interpolation code stays blanked, as before, so no rule behavior changes beyond the nesting fix. No new guideline (existing 10/22 cover it).
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED.

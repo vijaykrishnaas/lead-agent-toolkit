@@ -64,89 +64,7 @@ function regexLiteralEnd(content, i, prev) {
 // the one non-code-structure text category maskStringLiterals didn't
 // already neutralize, despite doing exactly this for string literals.)
 function maskStringLiterals(content, quoteState = null) {
-  let masked = '';
-  let state = quoteState;
-  let prev = null;
-  let i = 0;
-  while (i < content.length) {
-    if (state === '/*') {
-      if (content[i] === '*' && content[i + 1] === '/') {
-        masked += '  ';
-        i += 2;
-        state = null;
-      } else {
-        masked += blank(content[i]);
-        i += 1;
-      }
-      continue;
-    }
-    const ch = content[i];
-    if (state) {
-      if (ch === '\\') {
-        // A backslash as the very last character of this chunk (e.g. one
-        // line of a multi-line template literal ending in a line-
-        // continuation escape, `` `...text \ `` then a newline) has no next
-        // character *in this chunk* to escape -- content[i + 1] doesn't
-        // exist here, it's on whatever the caller passes in the next call.
-        // Consuming 2 characters via `i += 2` in that case would step past
-        // content.length after appending 2 spaces for only 1 real character
-        // consumed, breaking the documented same-length invariant (masked
-        // ends up 1 char longer than content) -- not observed to affect any
-        // current caller's own char-counting logic, but real and caught by
-        // the length assertion this fix adds a regression test for. The
-        // backslash itself still just becomes one space, and `state` stays
-        // open (correct: a line-continuation escape doesn't close the
-        // string either way).
-        if (i + 1 >= content.length) {
-          masked += ' ';
-          i += 1;
-          continue;
-        }
-        masked += ' ' + blank(content[i + 1]);
-        i += 2;
-        continue;
-      }
-      if (ch === state) {
-        state = null;
-        prev = ch;
-      }
-      masked += blank(ch);
-      i += 1;
-      continue;
-    }
-    if (ch === '/' && content[i + 1] === '/') {
-      let end = content.indexOf('\n', i);
-      if (end === -1) end = content.length;
-      masked += ' '.repeat(end - i);
-      i = end;
-      continue;
-    }
-    if (ch === '/' && content[i + 1] === '*') {
-      masked += '  ';
-      i += 2;
-      state = '/*';
-      continue;
-    }
-    if (ch === '/') {
-      const end = regexLiteralEnd(content, i, prev);
-      if (end !== -1) {
-        masked += ' '.repeat(end - i);
-        i = end;
-        prev = '/';
-        continue;
-      }
-    }
-    if (ch === '"' || ch === "'" || ch === '`') {
-      state = ch;
-      masked += ' ';
-      i += 1;
-      continue;
-    }
-    masked += ch;
-    if (ch.trim() !== '') prev = ch;
-    i += 1;
-  }
-  return { masked, quoteState: state };
+  return maskCore(content, quoteState, true);
 }
 
 // Like maskStringLiterals, but masks only `//` and `/* */` comments to
@@ -160,42 +78,81 @@ function maskStringLiterals(content, quoteState = null) {
 // maskStringLiterals() call would blank the string content those callers
 // need to capture, along with the comment they want ignored.
 function maskComments(content, quoteState = null) {
+  return maskCore(content, quoteState, false);
+}
+
+// Scanner state is a stack of frames so a template literal nested inside a
+// `${...}` interpolation of another template (`a ${x ? `{` : ''} b`) is
+// tracked structurally instead of the inner backtick being read as the
+// outer template's close (TASKS.md 36; guidelines 10/22). Frames: '"', "'",
+// '`' (template text), '${' (interpolation expression), '{' (brace nested in
+// an interpolation expression), '/*' (block comment). The stack is
+// serialized as a space-joined string so `quoteState` stays an opaque
+// null-or-string value for callers; a single-frame stack serializes to the
+// legacy values ('"', "'", '`', '/*').
+function parseState(quoteState) {
+  return quoteState ? quoteState.split(' ') : [];
+}
+
+function maskCore(content, quoteState, maskStrings) {
+  const stack = parseState(quoteState);
   let masked = '';
-  let state = quoteState;
   let prev = null;
   let i = 0;
+  // Strings mode: everything inside a template literal (text and
+  // interpolation code alike) is blanked, as before the nesting fix.
+  const out = (text) => {
+    if (!maskStrings) return text;
+    if (!stack.includes('`')) return text;
+    return text.replace(/[^\n]/g, ' ');
+  };
+  const blankStr = (text) => (maskStrings ? text.replace(/[^\n]/g, ' ') : text);
   while (i < content.length) {
-    if (state === '/*') {
-      if (content[i] === '*' && content[i + 1] === '/') {
+    const top = stack[stack.length - 1];
+    const ch = content[i];
+    if (top === '/*') {
+      if (ch === '*' && content[i + 1] === '/') {
+        stack.pop();
         masked += '  ';
         i += 2;
-        state = null;
       } else {
-        masked += blank(content[i]);
+        masked += blank(ch);
         i += 1;
       }
       continue;
     }
-    const ch = content[i];
-    if (state) {
+    if (top === '"' || top === "'" || top === '`') {
       if (ch === '\\') {
+        // A backslash as the very last character of this chunk (a line-
+        // continuation escape at the end of one line of a multi-line
+        // template) has no next character in this chunk to escape; consume
+        // only it so masked stays the same length as content. State stays
+        // open either way.
         if (i + 1 >= content.length) {
-          masked += ch;
+          masked += blankStr(ch);
           i += 1;
-          continue;
+        } else {
+          masked += blankStr(ch + content[i + 1]);
+          i += 2;
         }
-        masked += ch + content[i + 1];
-        i += 2;
         continue;
       }
-      if (ch === state) {
-        state = null;
+      if (top === '`' && ch === '$' && content[i + 1] === '{') {
+        stack.push('${');
+        masked += blankStr('${');
+        i += 2;
+        prev = null;
+        continue;
+      }
+      if (ch === top) {
+        stack.pop();
         prev = ch;
       }
-      masked += ch;
+      masked += blankStr(ch);
       i += 1;
       continue;
     }
+    // Code (top level, or inside an interpolation expression).
     if (ch === '/' && content[i + 1] === '/') {
       let end = content.indexOf('\n', i);
       if (end === -1) end = content.length;
@@ -206,29 +163,42 @@ function maskComments(content, quoteState = null) {
     if (ch === '/' && content[i + 1] === '*') {
       masked += '  ';
       i += 2;
-      state = '/*';
+      stack.push('/*');
       continue;
     }
     if (ch === '/') {
       const end = regexLiteralEnd(content, i, prev);
       if (end !== -1) {
-        masked += content.slice(i, end);
+        masked += out(maskStrings ? ' '.repeat(end - i) : content.slice(i, end));
         i = end;
         prev = '/';
         continue;
       }
     }
     if (ch === '"' || ch === "'" || ch === '`') {
-      state = ch;
-      masked += ch;
+      stack.push(ch);
+      masked += maskStrings ? ' ' : ch;
       i += 1;
       continue;
     }
-    masked += ch;
+    if (top === '${' || top === '{') {
+      if (ch === '{') {
+        stack.push('{');
+      } else if (ch === '}') {
+        stack.pop();
+        // Closing an interpolation returns to template text; its brace is
+        // template syntax, so it is blanked like the opening `${`.
+        masked += top === '${' ? blankStr(ch) : out(ch);
+        i += 1;
+        prev = ch;
+        continue;
+      }
+    }
+    masked += out(ch);
     if (ch.trim() !== '') prev = ch;
     i += 1;
   }
-  return { masked, quoteState: state };
+  return { masked, quoteState: stack.length ? stack.join(' ') : null };
 }
 
 module.exports = { maskStringLiterals, maskComments };

@@ -5520,3 +5520,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `rules/missingTests.js` and `docDrift/compareRoutes.js` (not named in recent hunts). Probed optional params (`:id?`) against partial spec coverage, constrained params, differing param names, duplicate registrations, a non-HTTP `use` method, and comment-only rejection notes in tests. All behave correctly. No defect reproduced, no code change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.
+
+## 2026-11-07 (Reviewer, 16:37 UTC)
+- Done: reviewed 6ba9a50..HEAD (log-only commits; reviewer CLI 0 issues; npm test green, 74 tests). Backlog empty and (a) is Vijay-only, so took (b): hunted sample-app auth.routes.js / authController.js. register/login are not asyncHandler-wrapped but each has a full try/catch, so guideline 1 holds. Clean, no change.
+- Decisions: no TASKS/skill edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: none new.

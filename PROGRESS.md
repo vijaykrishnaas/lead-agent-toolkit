@@ -5490,3 +5490,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/format/markdownReport.js` and `utils/sanitizeMarkdownText.js` (oldest last mention, line ~5188). Probed U+2028, `@-u`/`@é`, raw `<b>`, `![i](u)`, multi-line file/message forging `##`/`#` headings, unknown severity, backtick in range. All neutralized or inert; bare `http://` URLs still autolink (GitHub-only, no mention/ping impact, left as-is). Clean, no change.
 - Decisions: no code change; suite green (74 + reviewer).
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.
+
+## 2026-11-07 (Reviewer: review log-only range, hunt defaultExecGit/collectCommits/collectPullRequests)
+- Done: reviewed ff501e1..65a44b2 (PROGRESS.md/runs.jsonl only, no code). Baseline green. Idle streak 0.
+- Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted `utils/defaultExecGit.js` (oldest last mention), `standup/collectCommits.js`, `standup/collectPullRequests.js`: since validation, pagination/cap exit paths, missing updated_at, maxBuffer. Clean, no change.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

@@ -5560,3 +5560,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Picked the modules with the oldest PROGRESS.md mentions: `utils/parseAst.js`, `utils/memberCallLine.js`, `docDrift/httpMethods.js`, `config/loadRules.js`. Probed hashbang source, script-vs-module fallback, and `memberCallLine` on optional-chain, computed-property and multi-line chain callees. All correct. No defect reproduced, no code change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.
+
+## 2026-11-07 (Reviewer: review log-only range, EMPTY-BACKLOG (b) hunt, collectExpressRoutes.js)
+- Done: reviewed 25a6b9f..HEAD (441dc4f: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues). Backlog has no open items, so branch (b): picked `docDrift/collectExpressRoutes.js`, the least-named module in runs.jsonl (8 mentions). Probed `joinPath` with empty/trailing-slash/no-leading-slash inputs and a three-level mount chain with `router.get('')`. Only oddity: `router.get('')` is skipped because `METHOD_CALL_PATTERN` requires a leading `/` or `*` (deliberate, to avoid matching `app.get('env')`). No reproduced bug, no change.
+- Decisions: no code change, no new task, no [FEATURE] added.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

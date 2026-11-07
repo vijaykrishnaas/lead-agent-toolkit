@@ -5388,3 +5388,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/subtreeInOwnScope.js` and `consumeFlagValue.js`/`parseArgv.js` (last mentioned at PROGRESS.md lines ~5098-5104, among the oldest). Probed own-scope walk from a function root vs. its body (all three call sites pass `.body`/statement, so correct), class static blocks, repeated flags (last wins), `-`/`--` values, prototype-name flags (`--toString` rejected via hasOwnProperty): clean, no change.
 - Decisions: no code change; nothing speculative.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop or unblocking 30/32.
+
+## 2026-11-07 (Reviewer, ~04:35 UTC)
+- Done: reviewed 96f36da..HEAD (PROGRESS.md/runs.jsonl only, no code). Suite green (74 sample-app tests + reviewer suites). Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `reviewer/src/utils/parseGitHubRemote.js` (last hunted well before the recent runs): lookalike hosts, trailing slash, `.git.git`, `..` names, port, uppercase host, embedded credentials, whitespace — all behave correctly. No change.
+- Decisions: no code or skill edits, so no SKILL_CHANGELOG entry.
+- Open question for Vijay: hunts keep returning clean; consider pausing the loop or unblocking 30/32.

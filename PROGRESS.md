@@ -5485,3 +5485,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed a219fd2..HEAD (ff501e1): log-only commits (PROGRESS.md, runs.jsonl); reviewer CLI reports 0 issues. Baseline green (74 tests).
 - Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted `config/loadRuleConfig.js` and `config/buildRules.js` (invalid enabled/minSeverity/options, non-mapping rules, missing/empty file, partial entries, severity filtering): behavior matches intent, no defect reproduced, no change.
 - Open questions for Vijay: unchanged — tasks 30 and 32 BLOCKED; consider unblocking or pausing the loop.
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, markdownReport.js + sanitizeMarkdownText.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/format/markdownReport.js` and `utils/sanitizeMarkdownText.js` (oldest last mention, line ~5188). Probed U+2028, `@-u`/`@é`, raw `<b>`, `![i](u)`, multi-line file/message forging `##`/`#` headings, unknown severity, backtick in range. All neutralized or inert; bare `http://` URLs still autolink (GitHub-only, no mention/ping impact, left as-is). Clean, no change.
+- Decisions: no code change; suite green (74 + reviewer).
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

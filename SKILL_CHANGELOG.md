@@ -341,3 +341,6 @@
 ## 2026-11-07 (Reviewer: bug fix, no skill change)
 **Change:** `regexLiteralEnd` in maskStringLiterals.js returns -1 at a newline; regression test added. No skill/CLAUDE.md/backlog change.
 **Evidence:** PROGRESS.md 2026-11-07 Reviewer entry — fuzz reproduced newline-count mismatch (e.g. `*/"x=(\n${/*`), guideline 25.
+
+## 2026-11-07 (Reviewer: EMPTY-BACKLOG (b) hunt, scripts/runLog.js)
+Reviewed 184823b..HEAD (codeSpan loop-vs-spread fix: verified correct, test covers it). Hunted runLog.js (arg parsing, idleStreak, append newline handling): no defect reproduced, no change. Evidence: PROGRESS.md 2026-11-07 entry.

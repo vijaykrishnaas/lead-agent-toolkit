@@ -5565,3 +5565,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 25a6b9f..HEAD (441dc4f: PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues). Backlog has no open items, so branch (b): picked `docDrift/collectExpressRoutes.js`, the least-named module in runs.jsonl (8 mentions). Probed `joinPath` with empty/trailing-slash/no-leading-slash inputs and a three-level mount chain with `router.get('')`. Only oddity: `router.get('')` is skipped because `METHOD_CALL_PATTERN` requires a leading `/` or `*` (deliberate, to avoid matching `app.get('env')`). No reproduced bug, no change.
 - Decisions: no code change, no new task, no [FEATURE] added.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, compareRoutes.js + isTestFile.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Read `docDrift/compareRoutes.js` (param normalization, constraint skipping by paren depth, optional-param expansion, positional param-name erasure) and probed `utils/isTestFile.js` (`latest.js`, `contest/`, `protest.js` correctly not tests; `test/`, `__tests__`, `.spec.ts` are). No defect reproduced, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

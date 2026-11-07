@@ -5450,3 +5450,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/rules/errorHandling.js` (last hunted runs.jsonl line ~346, the least recent rule module). Probed the AST path with ~17 shapes (class fields, methods, nested try, try/finally, optional chain, switch/if bodies): all correct except `.then(f, undefined)` / `.then(f, null)`, which were treated as having a rejection handler. Fixed in the AST path (`isNoopRejectionArg`) with a test-first regression test (fails without the fix).
 - Decisions: `const p = g().then(h); p.catch(e)` stays flagged (conservative, needs data-flow); a try anywhere in a handler body counts as handled (existing heuristic). No skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; loop keeps finding only narrow edge cases.
+
+## 2026-11-07 — Reviewer (09:35 UTC): review 3bac7e9..HEAD, EMPTY-BACKLOG (b) hunt of invariantLint.js (clean)
+- Done: reviewed 091513c (errorHandling `.then(f, null|undefined)` now flagged). Correct: AST path only; `arguments.length >= 2` skip now requires a real second argument; test covers null/undefined/real handler. Reviewer CLI over the range: 0 issues; suite green (74 sample-app tests, reviewer suites pass).
+- Branch taken: (a) has only Vijay-only questions; backlog empty, so (b). Chose `scripts/invariantLint.js` — last mentioned in runs.jsonl at line 620 (oldest of the candidates). Read splitRange, removed-line counting, task parsing, substantive-change detection and the deleted-file paths; no reproducible defect, no change.
+- Open questions for Vijay: none new (task 30 and 32 BLOCKED items still await you).

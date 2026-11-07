@@ -5420,3 +5420,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/memberCallLine.js` (oldest last PROGRESS.md mention among utils, line ~5157). Reasoned through multi-line chains, computed members, and optional-chaining callees: property `loc` is always present, non-member callees fall back to the node start. Clean, no change. Suite green.
 - Decisions: no code change; nothing speculative.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop or unblocking 30/32.
+
+## 2026-11-07 (Reviewer: EMPTY-BACKLOG (b) hunt, statementWalk.js)
+- Reviewed b617d15..184823b (docs-only; reviewer CLI: 0 issues). Backlog empty and (a) is Vijay-only, so branch (b): least-audited module `reviewer/src/utils/statementWalk.js`.
+- Finding: a line starting with an operator (`&&`, `?`) after a closed paren ends the walk early. Only caller is the regex fallback in `errorHandling.js`, where such a continuation would need to carry `.catch`; no rule-level failure reproduced, so no change (AST path is primary).
+- Open questions for Vijay: none new.

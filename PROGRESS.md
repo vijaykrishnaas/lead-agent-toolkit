@@ -5475,3 +5475,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 91f96fb..HEAD (a219fd2): log-only commits (PROGRESS.md, runs.jsonl); no code to review. Baseline green (74 tests).
 - Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted parseGitHubRemote.js, isTestFile.js, isCodeFile.js (probed scp/ssh/https/userinfo/port/trailing-slash/`.git.git`, and `latest/`, `contest/` segment cases): clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, diffParser.js + collectAddedLines.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/diffParser.js` and `utils/collectAddedLines.js` (no hunt entry in runs.jsonl). Probed paths with spaces and trailing tab, new-file diffs whose added content looks like `--- `/`+++ ` headers, renames with multiple hunks and `\ No newline` markers, and CRLF hunks: line numbers and types all correct. No defect reproduced, no change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

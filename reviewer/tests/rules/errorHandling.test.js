@@ -1057,4 +1057,10 @@ describe('error-handling rule (AST path, direct)', () => {
   it('does not flag a two-argument .then(onFulfilled, onRejected)', () => {
     expect(thenIssuesFor('p.then((x) => x, (e) => log(e));')).toHaveLength(0);
   });
+
+  it('still flags .then(onFulfilled, undefined) and .then(onFulfilled, null): no real rejection handler', () => {
+    expect(thenIssuesFor('p.then((x) => x, undefined);')).toHaveLength(1);
+    expect(thenIssuesFor('p.then((x) => x, null);')).toHaveLength(1);
+    expect(thenIssuesFor('p.then((x) => x, handleError);')).toHaveLength(0);
+  });
 });

@@ -316,6 +316,10 @@ function isAwaitedInTryCatch(ancestors) {
   return false;
 }
 
+function isNoopRejectionArg(arg) {
+  return (arg.type === 'Literal' && arg.value === null && arg.raw === 'null') || (arg.type === 'Identifier' && arg.name === 'undefined');
+}
+
 function checkFileAst(file, addedLines) {
   const addedLineNumbers = new Set(addedLines.map((l) => l.newLine));
   const lineContent = new Map(addedLines.map((l) => [l.newLine, l.content]));
@@ -348,7 +352,8 @@ function checkFileAst(file, addedLines) {
       if (node.callee.type !== 'MemberExpression' || node.callee.computed) return;
       if (node.callee.property.type !== 'Identifier' || node.callee.property.name !== 'then') return;
       // .then(onFulfilled, onRejected) carries its own rejection handler.
-      if (node.arguments.length >= 2) return;
+      // A literal `null` / `undefined` second argument is not a handler.
+      if (node.arguments.length >= 2 && !isNoopRejectionArg(node.arguments[1])) return;
       const line = memberCallLine(node);
       if (!addedLineNumbers.has(line) || reportedThenLines.has(line)) return;
       if (isAwaitedInTryCatch(ancestors)) return;

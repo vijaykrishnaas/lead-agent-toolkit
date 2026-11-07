@@ -5409,3 +5409,9 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/docDrift/compareRoutes.js` and `formatDocDrift.js` (not hunted in recent runs). Probed constrained optional params (`:id(\d+)?`), `:x.:y` multi-param segments, root `/`, nested/escaped parens in constraints: all compare correctly. Only oddity is a `//` double-slash path, which is not a realistic Express route. Suite green (74 sample-app, 609 reviewer tests).
 - Decisions: no code change; nothing speculative.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop or unblocking 30/32.
+
+## 2026-11-07 (Reviewer, ~06:35 UTC)
+- Done: reviewed 0df7560..HEAD (PROGRESS.md/runs.jsonl only, no code); `reviewer/src/cli.js` reports 0 issues; baseline `npm test` green. Idle streak 0.
+- Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `reviewer/src/docDrift/parseOpenApi.js`: scalar/array/empty YAML, string `paths`, null path items, uppercase method keys, non-method keys, root `/` with and without a server base path, trailing-slash paths. All handled. Clean, no change.
+- Decisions: no code or skill edits, so no SKILL_CHANGELOG entry.
+- Open question for Vijay: hunts keep returning clean; consider pausing the loop or unblocking 30/32.

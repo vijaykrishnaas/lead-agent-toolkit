@@ -5455,3 +5455,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 091513c (errorHandling `.then(f, null|undefined)` now flagged). Correct: AST path only; `arguments.length >= 2` skip now requires a real second argument; test covers null/undefined/real handler. Reviewer CLI over the range: 0 issues; suite green (74 sample-app tests, reviewer suites pass).
 - Branch taken: (a) has only Vijay-only questions; backlog empty, so (b). Chose `scripts/invariantLint.js` — last mentioned in runs.jsonl at line 620 (oldest of the candidates). Read splitRange, removed-line counting, task parsing, substantive-change detection and the deleted-file paths; no reproducible defect, no change.
 - Open questions for Vijay: none new (task 30 and 32 BLOCKED items still await you).
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, scripts/resolvePushRange.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `scripts/resolvePushRange.js` (never named in a hunt entry; rarely in runs.jsonl). Walked the first-push (zero SHA), missing-`before`, missing-`after`-parent (root commit → empty tree) and normal paths; fallbacks are correct and the only throw is the intended empty-`after` guard. No defect reproduced, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean or narrow results, consider unblocking them or pausing the loop.

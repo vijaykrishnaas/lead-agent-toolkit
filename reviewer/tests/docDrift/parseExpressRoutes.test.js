@@ -315,6 +315,16 @@ describe('parseAppEntrySource', () => {
 });
 
 describe('findUnparsedRoutes', () => {
+  it('reports an array-path router.<verb>([...]) call as unparsed instead of silently dropping it', () => {
+    const source = "router.get('/', list);\nrouter.get(['/a', '/b'], h);\nrouter.use(['/x', '/y'], sub);";
+
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/' }]);
+    expect(findUnparsedRoutes(source).map((f) => [f.method, f.line])).toEqual([
+      ['GET', 2],
+      ['MOUNT', 3],
+    ]);
+  });
+
   it('reports a template-literal router.<verb>() path as an unparsed-route finding, and does not extract it as a real route', () => {
     // AUDIT.md F8: METHOD_CALL_PATTERN only matches quote-delimited paths,
     // so a template-literal path (interpolated, can't be resolved

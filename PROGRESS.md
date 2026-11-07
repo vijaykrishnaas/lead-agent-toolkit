@@ -5440,3 +5440,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/rules/security.js` (oldest last PROGRESS.md mention, line ~5188). Found `\beval\s*\(` matched `page.$eval(`/`page.$$eval(` (Puppeteer/Playwright helpers, not eval) because `\b` sits between `$` and `e`. Swapped to `(?<![\w$])eval` in EVAL_CALL and EVAL_IN_INTERPOLATION; regression test added (member `vm.eval(` still flagged).
 - Decisions: left `obj.eval(` flagged (could be real eval-like API, e.g. vm/redis); multi-line secret assignments remain unflagged (narrow, per-line design).
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning mostly clean, consider pausing the loop or unblocking 30/32.
+
+## 2026-11-07 (Reviewer: review security.js + hunt parseExpressRoutes)
+- Done: reviewed c293683..HEAD (`$eval(` lookbehind fix in security.js: correct, `vm.eval(` still flagged, tested). Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) Vijay-only; hunted `parseExpressRoutes.js` (oldest PROGRESS.md mention). Reproduced: `router.get(['/a','/b'], h)` / `.route([...])` / `.use([...], sub)` were neither parsed nor reported by `findUnparsedRoutes` (silent drop, same class as AUDIT.md F8). Fixed test-first: the unparsed patterns now also match an opening `[`.
+- Decisions: array paths are flagged unparsed rather than expanded (narrow, avoids new parsing). Not addressed: `router.all(...)` and non-`router`/`app` receiver names (e.g. `r.get`) are still invisible; left as design limits.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; loop keeps finding only narrow edge cases.

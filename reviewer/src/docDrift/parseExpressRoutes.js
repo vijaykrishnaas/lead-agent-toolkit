@@ -26,10 +26,11 @@ const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION})\\(`);
 // quote-only patterns above ever match it -- the route/mount silently never
 // appeared on the code side of the comparison at all (AUDIT.md F8). These
 // patterns only need to detect *that* such a call exists and where, not
-// resolve its path, so they stop right after the opening backtick.
-const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*\``, 'g');
-const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*`/g;
-const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*`/g;
+// resolve its path, so they stop right after the opening backtick. An array
+// path (`['/a', '/b']`) is the same silent drop, so `[` is matched too.
+const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*[\`\\[]`, 'g');
+const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*[`[]/g;
+const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*[`[]/g;
 
 // A match whose first character was blanked by the full string-and-comment
 // mask starts inside a string/template literal (e.g. a log message quoting

@@ -5415,3 +5415,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `reviewer/src/docDrift/parseOpenApi.js`: scalar/array/empty YAML, string `paths`, null path items, uppercase method keys, non-method keys, root `/` with and without a server base path, trailing-slash paths. All handled. Clean, no change.
 - Decisions: no code or skill edits, so no SKILL_CHANGELOG entry.
 - Open question for Vijay: hunts keep returning clean; consider pausing the loop or unblocking 30/32.
+
+## 2026-11-07 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/memberCallLine.js` (oldest last PROGRESS.md mention among utils, line ~5157). Reasoned through multi-line chains, computed members, and optional-chaining callees: property `loc` is always present, non-member callees fall back to the node start. Clean, no change. Suite green.
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop or unblocking 30/32.

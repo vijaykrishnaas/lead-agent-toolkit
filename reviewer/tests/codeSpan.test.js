@@ -30,4 +30,10 @@ describe('codeSpan', () => {
   test('round-trips text with a leading/trailing backtick', () => {
     expect(decode(codeSpan('`a`'))).toBe('`a`');
   });
+
+  test('does not overflow the call stack on input with very many backtick runs', () => {
+    const text = '`a'.repeat(200000) + '``';
+    const out = codeSpan(text);
+    expect(out.startsWith('``` ')).toBe(true);
+  });
 });

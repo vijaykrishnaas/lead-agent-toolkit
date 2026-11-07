@@ -5425,3 +5425,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Reviewed b617d15..184823b (docs-only; reviewer CLI: 0 issues). Backlog empty and (a) is Vijay-only, so branch (b): least-audited module `reviewer/src/utils/statementWalk.js`.
 - Finding: a line starting with an operator (`&&`, `?`) after a closed paren ends the walk early. Only caller is the regex fallback in `errorHandling.js`, where such a continuation would need to carry `.catch`; no rule-level failure reproduced, so no change (AST path is primary).
 - Open questions for Vijay: none new.
+
+## 2026-11-07 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/utils/codeSpan.js` (oldest last PROGRESS.md mention, line ~5237). Found `Math.max(0, ...runs)` throws RangeError (stack overflow) when the text has ~150k+ separate backtick runs; a hostile route path/file name could crash the doc-drift/report render. Fixed with a plain loop; added a regression test (200k runs). Suite green (610 reviewer, 74 sample-app).
+- Decisions: small reproduced bug, fixed directly; no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; consider unblocking them or pausing the loop.

@@ -5480,3 +5480,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/diffParser.js` and `utils/collectAddedLines.js` (no hunt entry in runs.jsonl). Probed paths with spaces and trailing tab, new-file diffs whose added content looks like `--- `/`+++ ` headers, renames with multiple hunks and `\ No newline` markers, and CRLF hunks: line numbers and types all correct. No defect reproduced, no change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.
+
+## 2026-11-07 (Reviewer: review log-only range, hunt config loaders)
+- Done: reviewed a219fd2..HEAD (ff501e1): log-only commits (PROGRESS.md, runs.jsonl); reviewer CLI reports 0 issues. Baseline green (74 tests).
+- Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted `config/loadRuleConfig.js` and `config/buildRules.js` (invalid enabled/minSeverity/options, non-mapping rules, missing/empty file, partial entries, severity filtering): behavior matches intent, no defect reproduced, no change.
+- Open questions for Vijay: unchanged — tasks 30 and 32 BLOCKED; consider unblocking or pausing the loop.

@@ -337,3 +337,7 @@
 ## 2026-11-06 (Reviewer: backlog addition, task 36)
 **Change:** TASKS.md: appended task 36 (maskStringLiterals nested-template-in-interpolation leak). No skill/CLAUDE.md change.
 **Evidence:** PROGRESS.md 2026-11-06 Reviewer (~00:35 UTC) entry — reproduced inner-template content/brace leaking unmasked from `${ok ? \`yes\` : 'no'}`; fix is larger than a one-line patch (needs a nested state stack).
+
+## 2026-11-07 (Reviewer: bug fix, no skill change)
+**Change:** `regexLiteralEnd` in maskStringLiterals.js returns -1 at a newline; regression test added. No skill/CLAUDE.md/backlog change.
+**Evidence:** PROGRESS.md 2026-11-07 Reviewer entry — fuzz reproduced newline-count mismatch (e.g. `*/"x=(\n${/*`), guideline 25.

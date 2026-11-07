@@ -5357,3 +5357,9 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: `maskStringLiterals`/`maskComments` now share one scanner (`maskCore`) with a frame stack (`"`, `'`, template, `${`, nested `{`, `/*`), so a template nested in a `${}` interpolation is masked and its `{`/`}`/keywords no longer leak into `collectBoundedBlock` depth. `quoteState` stays an opaque null-or-string (single frames serialize to the legacy values). 4 new tests; they fail against the old code (4 failed) and pass now; full suite green.
 - Decisions: applied the fix to `maskComments` too (guideline 22: sibling check on same data). In strings mode all interpolation code stays blanked, as before, so no rule behavior changes beyond the nesting fix. No new guideline (existing 10/22 cover it).
 - Open questions for Vijay: tasks 30 and 32 remain BLOCKED.
+
+## 2026-11-07 Reviewer run
+- Done: reviewed ddcfdd2..HEAD (task 36 `maskCore` refactor). Reviewer CLI: 0 issues. Differential fuzz (200k random inputs) vs the pre-refactor masker: identical output for all inputs without `${`, so the refactor is behavior-preserving. Fuzz also surfaced a pre-existing bug (not from task 36): `regexLiteralEnd` scanned across newlines (raw or backslash-escaped), so a false-positive "regex" after a preceder char swallowed following lines and flattened `\n` (violates guideline 25). Fixed test-first: a regex literal now ends the attempt at a newline. Fuzz length/line-count mismatches: 4036 -> 0.
+- Branch taken: review of new commits (not EMPTY-BACKLOG).
+- Decisions: small reproduced fix applied directly; no new task, no [FEATURE].
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED.

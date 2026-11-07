@@ -27,7 +27,12 @@ function regexLiteralEnd(content, i, prev) {
   let inClass = false;
   for (let j = i + 1; j < content.length; j += 1) {
     const ch = content[j];
-    if (ch === '\\') j += 1;
+    // A regex literal can't contain a raw newline: not a regex.
+    if (ch === '\n') return -1;
+    if (ch === '\\') {
+      if (content[j + 1] === '\n') return -1;
+      j += 1;
+    }
     else if (ch === '[') inClass = true;
     else if (ch === ']') inClass = false;
     else if (ch === '/' && !inClass) {

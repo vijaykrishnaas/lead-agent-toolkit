@@ -228,4 +228,16 @@ describe('template literal nested inside a ${...} interpolation (task 36)', () =
     expect(masked).not.toContain('c */');
     expect(masked.length).toBe(line.length);
   });
+
+  it('does not read an unterminated "regex" across a newline (keeps newlines and later code)', () => {
+    const src = 'f(/unterminated\nif (a) { b(); }\nx = c / d;';
+    for (const fn of [maskStringLiterals, maskComments]) {
+      const { masked } = fn(src);
+      expect(masked.length).toBe(src.length);
+      expect(masked.split('\n').length).toBe(src.split('\n').length);
+      expect(masked).toContain('if (a) { b(); }');
+    }
+    const esc = '*/\\\n //x';
+    expect(maskStringLiterals(esc).masked.split('\n').length).toBe(2);
+  });
 });

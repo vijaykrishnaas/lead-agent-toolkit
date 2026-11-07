@@ -5404,3 +5404,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only. Hunted `reviewer/src/config/loadRuleConfig.js` and `buildRules.js`: invalid `enabled`/`minSeverity` types warn and fall back to permissive defaults, unknown severities rank as low, null rule output tolerated, empty/missing YAML yields `{rules:{}}`. Clean, no change.
 - Decisions: no code or skill edits, so no SKILL_CHANGELOG entry.
 - Open question for Vijay: hunts keep returning clean; consider pausing the loop or unblocking 30/32.
+
+## 2026-11-07 Builder run — EMPTY-BACKLOG (b)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/docDrift/compareRoutes.js` and `formatDocDrift.js` (not hunted in recent runs). Probed constrained optional params (`:id(\d+)?`), `:x.:y` multi-param segments, root `/`, nested/escaped parens in constraints: all compare correctly. Only oddity is a `//` double-slash path, which is not a realistic Express route. Suite green (74 sample-app, 609 reviewer tests).
+- Decisions: no code change; nothing speculative.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop or unblocking 30/32.

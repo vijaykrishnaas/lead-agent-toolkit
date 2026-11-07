@@ -5555,3 +5555,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 0584625..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI reports 0 issues). Backlog has no actionable items (30, 32 BLOCKED), so branch (b) taken — (a) is Vijay-only. Hunted `resolveFileContent.js` and `parseGitHubRemote.js` (probed https/ssh/scp/.git/.git.git/userinfo forms): clean, no change.
 - Decisions: no new task, no FEATURE task today (no concrete gap found).
 - Open questions for Vijay: unchanged (tasks 30 and 32 remain BLOCKED on approvals/allowlist).
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, parseAst.js + memberCallLine.js + httpMethods.js + loadRules.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Picked the modules with the oldest PROGRESS.md mentions: `utils/parseAst.js`, `utils/memberCallLine.js`, `docDrift/httpMethods.js`, `config/loadRules.js`. Probed hashbang source, script-vs-module fallback, and `memberCallLine` on optional-chain, computed-property and multi-line chain callees. All correct. No defect reproduced, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

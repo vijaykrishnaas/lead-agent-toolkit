@@ -5535,3 +5535,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 62f9dfa and d024c62 (PROGRESS.md/runs.jsonl only, no code). Backlog has no open items, so took (b) and picked modules not hunted in runs.jsonl. Read `utils/codeSpan.js` (fence longer than any backtick run, newline collapse, CommonMark space padding), `docDrift/formatDocDrift.js` (the unparsed-routes section keeps an otherwise empty report from reading "No drift"; `finding.reason` is internally generated, so no sanitization gap), and `scripts/resolvePushRange.js` (zero-SHA, missing-before and missing-parent fallbacks). No defect found; no code changed. Suite green.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry. No new task and no [FEATURE] task: no concrete gap found.
 - Open questions for Vijay: unchanged. Tasks 30 and 32 are still BLOCKED and the hunts keep coming back clean, so consider unblocking them or pausing the loop.
+
+## 2026-11-07 (Builder: EMPTY-BACKLOG (b) hunt, parseOpenApi.js + style.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `docDrift/parseOpenApi.js` (not named in recent hunts) and re-read `rules/style.js`. Probed `paths: []`, null path item, `$ref` path item, non-mapping document, base path `/v1/` with `/` route, and upper-case `GET` key. All behave correctly. No defect reproduced, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider unblocking them or pausing the loop.

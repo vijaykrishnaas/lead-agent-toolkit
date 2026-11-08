@@ -5799,3 +5799,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 98fa433..b343324 (log-only commits; reviewer CLI 0 issues). Baseline green (74 tests).
 - Branch taken: backlog empty, (a) open questions are Vijay-only (tasks 30/32); took (b): hunted `scripts/resolvePushRange.js` (fallback chain before→after^→empty tree). No defects; no code changed.
 - Open questions for Vijay: unchanged (task 30 lint approval, task 32 mongod allowlist).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, sample-app server.js + config/db.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Re-checked `diffParser.js`, `postReviewComment.js`, `security.js`, `missingTests.js` (all hunted within recent runs), then read `sample-app/src/server.js` and `config/db.js`: JWT secret resolved before connect, startup failures caught and exit 1, `require.main` guard keeps `start` testable. Clean, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Nearly every module has now been hunted clean; consider pausing the loop.

@@ -5758,3 +5758,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Branch taken: EMPTY-BACKLOG (b) — `utils/isTestFile.js` and `utils/memberCallLine.js` (no recent hunt mentions). Probed lookalike dirs (latest/, attests/, contest/), .map suffix, .mjs/.ts specs, optional-chain and computed-property member calls: all behave as intended. Clean, no change.
 - Decisions: no skill/CLAUDE.md edits, no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged (tasks 30/32 BLOCKED; hunts keep returning clean, consider pausing the loop).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, utils/parseArgv.js + consumeFlagValue.js + codeSpan.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted the shared CLI parser and `codeSpan` (not named in recent hunt summaries). Probed missing value, flag-as-value, boolean flag, extra positional, `--toString` (prototype key), missing required: all error loudly or parse correctly. codeSpan backtick runs, padding and whitespace-only inputs render per CommonMark. Clean, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

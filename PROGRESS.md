@@ -5606,3 +5606,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 8fa5abd..HEAD (log-only commits; reviewer CLI: 0 issues). Backlog empty and (a) is Vijay-only, so took (b). Hunted `docDrift/generateDocDrift.js` (least recently hunted, last PROGRESS mention ~line 5332) and `joinPath`/`resolveRouterPath` in `collectExpressRoutes.js`: DI wiring, slash joining ('/' prefix, trailing slash, root route) and ancestor-scoped cycle guard behave as intended. No defect reproduced, no change.
 - Decisions: no new task/feature (no evidence of a gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; consider pausing the loop while hunts return clean.
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, diffParser.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `reviewer/src/diffParser.js` (no prior hunt entry). Parsed a real `git diff` containing a mode change on a path with a space (trailing-tab headers), a rename with edits, and a quoted path with an escaped tab: file names, hunk line numbers and add/context types all correct. Hunk-count termination, `---`/`+++` content-line disambiguation, `\ No newline` and `/dev/null` handling read clean. No change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; consider pausing the loop while hunts return clean.

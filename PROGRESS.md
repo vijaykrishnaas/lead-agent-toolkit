@@ -5809,3 +5809,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed b343324..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues; baseline `npm test` green, 74 tests). Backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so branch (b): read `users.routes.js` (auth + asyncHandler on every route) and `usersController.js` (ownership check precedes lookup, type/empty validation precedes the update, 11000 mapped to 409, other errors rethrown). No reproduced bug, no change.
 - Decisions: no new task, no FEATURE task today (no concrete gap); no SKILL_CHANGELOG entry.
 - Open questions for Vijay: unchanged (task 30 lint approval, task 32 mongod allowlist; consider pausing the loop).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, sample-app tasksController.js + app.js error middleware)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Read `tasksController.js` (every query owner-scoped, type/blank validation precedes writes, update builds `$set` only from validated fields) and `app.js` (CastError->400, ValidationError->400, body-parser 4xx mapped, catch-all 500). Clean, no code change. Baseline `npm test` green (74 sample-app tests + reviewer suite).
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

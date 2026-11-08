@@ -5626,3 +5626,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed bfc3192..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues). Backlog empty, (a) Vijay-only, so took (b). Least-recently-hunted modules: `defaultExecGit.js` and `docDrift/formatDocDrift.js` (+ its `codeSpan` sink). Probed codeSpan with backtick runs, leading/trailing backticks, newlines, empty string: fences and padding correct. Unparsed-route section forces a non-"in sync" report. No defect reproduced, no change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no new task or feature.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, docDrift/compareRoutes.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `docDrift/compareRoutes.js` (no recent hunt entry): multiple optional params, `:x-:y` and `:x.json` param shapes, constrained params and slash normalization all compare correctly. Only oddities: case-differing paths and a `//` double slash report as drift (Express is case-insensitive by default, but this is unreachable in the sample app and not a reproduced failure). No code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added (Builder never adds tasks).
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

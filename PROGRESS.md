@@ -5664,3 +5664,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed f703a89 (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues). Backlog has no open items (30, 32 BLOCKED), (a) is Vijay-only, so took (b). Picked the controllers, which no earlier hunt entry names. Read both for ownership scoping, type validation, empty-update and 11000 handling: no reproducible bug found, no code change.
 - Decisions: no new tasks, no FEATURE task today (no concrete gap cited).
 - Open questions for Vijay: unchanged (tasks 30 and 32 remain BLOCKED pending approval/network access).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, standup/collectCommits.js + groupByAuthor.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `standup/collectCommits.js` and `groupByAuthor.js` (oldest hunt mention, ~line 5550-5580): option-looking `since` rejected by date validation, invalid Date message, empty subject, subject containing the field separator, mixed-offset dates, null/blank authors bucketed under "Unknown" (a real author named "Unknown" shares that bucket — benign). Clean, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

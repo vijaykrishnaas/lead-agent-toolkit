@@ -5616,3 +5616,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 3d4926c..HEAD (PROGRESS.md/runs.jsonl only; reviewer CLI: 0 issues). Backlog empty and (a) is Vijay-only, so took (b). Hunted `config/buildRules.js` and `loadRuleConfig.js` (no recent hunt entry): undefined/null option values, unknown/missing severities, prototype-named categories (`constructor`, `toString`), empty and missing config files all behave correctly. No defect reproduced, no change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no new task or feature (no evidence of a gap).
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, sanitizeMarkdownText/markdownReport)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `utils/sanitizeMarkdownText.js` and `format/markdownReport.js` (no recent hunt entry): backslash/structural escaping, newline collapse, `@` zero-width neutralization and per-issue sanitization of file/message/fix are consistent. Only residual: bare `https://` URLs and `#123` refs still autolink on GitHub (low impact, no code-execution/forged-structure vector; not a guideline-15 sink gap). No defect reproduced, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

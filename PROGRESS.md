@@ -5769,3 +5769,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Branch taken: EMPTY-BACKLOG (b) — `scripts/resolvePushRange.js` (oldest hunt mention among scripts/standup modules). Read through zero-SHA, missing `before`, missing parent and empty-tree fallbacks: logic correct. Clean, no change.
 - Decisions: no skill/CLAUDE.md edits, no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged (tasks 30/32 BLOCKED; hunts keep returning clean, consider pausing the loop).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, utils/parseGitHubRemote.js + defaultExecGit.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `utils/parseGitHubRemote.js` and `utils/defaultExecGit.js` (not named in recent hunt summaries). Probed scp-style, https, ssh with port, token userinfo, trailing slash, dotted repo name, lookalike host (github.com.evil.com), other host, extra path segments, whitespace, null/empty: all parse or reject correctly. Clean, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

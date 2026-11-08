@@ -5819,3 +5819,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed e902589..HEAD (PROGRESS.md/runs.jsonl only; `reviewer/src/cli.js` reports 0 issues; baseline `npm test` green, 74 tests). Backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so branch (b): read `middleware/auth.js` (case-insensitive scheme, HS256 pinned, secret resolved outside try so misconfig is 500), `config/jwtSecret.js` (prod rejects unset/placeholder/dev secret), `middleware/asyncHandler.js`. No reproduced bug, no change.
 - Decisions: no new task, no FEATURE task today (no concrete gap); no SKILL_CHANGELOG entry.
 - Open questions for Vijay: unchanged (task 30 lint approval, task 32 mongod allowlist; hunts keep coming back clean, consider pausing the loop).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, utils/memberCallLine.js + isTestFile.js + resolveFileContent.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `memberCallLine`, `isTestFile` and `resolveFileContent` plus the option-injection surface they feed: `git show <sha>:<path>` receives a rev-parse hex sha, and `git diff <range>` is guarded by `RANGE_PATTERN` (`[^-]` first char) — a `--output=...` range is rejected, no file written. Clean, no code change. Baseline `npm test` green.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

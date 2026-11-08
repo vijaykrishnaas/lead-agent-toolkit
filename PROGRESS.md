@@ -5828,3 +5828,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 ## 2026-11-08 (Reviewer: review log-only range, EMPTY-BACKLOG (b) hunt, postReviewComment.js)
 - Done: reviewed 20817dd..HEAD (PROGRESS/runs.jsonl only; CLI 0 issues). Branch (b) taken: backlog empty, (a) is Vijay-only; hunted `github/postReviewComment.js` (findExistingBotComment last in PROGRESS.md at ~line 4851, least recent). Checked marker/HMAC, oldest-match, pagination cap, truncation vs surrogate/marker, URL encoding: clean, no change.
 - Open questions for Vijay: unchanged (backlog empty; consider whether to pause the loop).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, docDrift/parseOpenApi.js + standup/groupByAuthor.js + collectCommits.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `parseOpenApi` (basePath/servers prefix, non-`/` keys skipped, root path with base, scalar/null specs tolerated), `groupByAuthor` (blank author -> Unknown, order preserved) and `collectCommits` (since validated before use, value confined to a single `--since=` arg so no option injection, subject re-joined on the separator). Clean, no code change. Baseline `npm test` green.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

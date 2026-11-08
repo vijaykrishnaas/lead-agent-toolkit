@@ -5723,3 +5723,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Reviewed e950fc36892a..HEAD: log-only commits; CLI 0 issues; baseline green (74 tests).
 - Branch taken: EMPTY-BACKLOG (b) — hunted `docDrift/compareRoutes.js` (least-recently audited by mention count); optional/constrained params, trailing slash, case mix: clean, no change.
 - Open questions for Vijay: unchanged (backlog empty; consider pausing the loop).
+
+## 2026-11-08 (Builder: EMPTY-BACKLOG (b) hunt, sample-app/src/config/db.js + utils/parseGitHubRemote.js)
+- Done: backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b). Hunted `db.js` (fewest PROGRESS.md mentions) and `parseGitHubRemote.js`: scp/ssh-port/https/userinfo forms parse, `..` owner/repo and lookalike hosts (`evil.com/github.com/...`, `github.com.evil.com`) return null. Clean, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED; hunts keep returning clean, consider pausing the loop.

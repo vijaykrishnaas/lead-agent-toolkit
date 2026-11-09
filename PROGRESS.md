@@ -5858,3 +5858,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 37ae311..HEAD (PROGRESS.md/runs.jsonl only; no code). Reviewer CLI reported 1 "eval()" finding, a false positive from prose in PROGRESS.md describing the security.js hunt — no source affected. Baseline `npm test` green (74).
 - Hunt: re-read `diffParser.js`, `config/loadRuleConfig.js`, `config/loadRules.js` (hunk-count-driven parsing, quoted-path decoding, config fallbacks and warnings). No defect reproduced, no code change.
 - Open questions for Vijay: none new.
+
+## 2026-11-09 (Builder: EMPTY-BACKLOG (b) hunt, utils/subtreeInOwnScope.js + docDriftCli.js)
+- Done: baseline `npm test` green (74 tests), idle-streak 0. Backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b), picking the modules with the fewest PROGRESS.md mentions. Probed `subtreeInOwnScope` (class methods, object-method shorthand, getters, arrow props all stop at the function boundary) and `docDriftCli` (missing value, unknown flag, missing required flags, usage output). No defect reproduced; no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

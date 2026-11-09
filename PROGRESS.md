@@ -5949,3 +5949,7 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: baseline green (74 tests), idle-streak 0. Only BLOCKED tasks (30, 32) remain; branch (a) is Vijay-only, so took (b). Hunted `sample-app` `authController.js`, `usersController.js`, `models/User.js` and `docDrift/httpMethods.js` (not hunted in recent entries): type guards on body fields, 72-byte password cap, precondition-before-side-effect order, timing-safe login, self-only id checks, duplicate-key 409 paths, email normalization vs schema setters. No reproducible defect; no change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 approval, task 32 fastdl.mongodb.org allowlist; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-09 11:35 UTC (Reviewer)
+- Done: reviewed 8fc1116..314612f (log/PROGRESS-only commits; reviewer CLI 0 issues). Backlog empty and (a) is Vijay-only, so took EMPTY-BACKLOG (b): hunted `docDrift/generateDocDrift.js`, `formatDocDrift.js`, `docDriftCli.js` (least recently hunted per SKILL_CHANGELOG/runs.jsonl). Clean — DI, error wrapping, empty-state wording all correct. No code change.
+- Open questions for Vijay: none new.

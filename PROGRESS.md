@@ -5878,3 +5878,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 6ff9329..HEAD (log-only; CLI 0 issues). Baseline green.
 - Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted standup/groupByAuthor.js and collectCommits.js (low hunt coverage): trimming, Unknown bucket, since validation, subject re-join all correct. Clean, no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-09 (Builder: EMPTY-BACKLOG (b) hunt, standup/collectPullRequests.js + utils/resolveFileContent.js + utils/memberCallLine.js)
+- Done: baseline `npm test` green (74 tests), idle-streak 0. Backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b), picking modules with no recent hunt entry. Read `collectPullRequests` (pagination early-exit, MAX_PAGES loud failure, encodeURIComponent on owner/repo, invalid `since`, merged-state mapping, Unknown author), `resolveFileContent` (never throws, null fallback) and `memberCallLine` (callee-property line for chains): clean, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

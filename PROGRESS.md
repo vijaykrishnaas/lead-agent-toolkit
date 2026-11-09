@@ -5847,3 +5847,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Done: reviewed 5fe9bb0..HEAD — only PROGRESS.md/runs.jsonl changed (log-only); reviewer CLI reported 0 issues. Backlog empty and (a) is Vijay-only, so branch (b) taken: hunted `scripts/runLog.js` (arg parsing, entry building, idle-streak, append newline handling). No defect reproduced; no code change.
 - Decisions: no new task or [FEATURE] (no evidenced gap). Baseline `npm test` green (both suites passing).
 - Open questions for Vijay: none new.
+
+## 2026-11-09 (Builder: EMPTY-BACKLOG (b) hunt, rules/security.js + rules/missingTests.js)
+- Done: baseline `npm test` green (74 tests), idle-streak 0. Backlog has no open items (30, 32 BLOCKED); (a) is Vijay-only, so took (b), picking rules not hunted in recent entries. Probed `security.js` (eval in comment/string masked, `${eval()}` and `x.eval()` flagged, quoted-credential variants flagged) and read `missingTests.js` (source-dir config sanitising, sibling-basename disambiguation, declaration/deleted files skipped, masked async/rejection checks): clean, no code change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — approve invariantLint archive-aware PROGRESS check (task 30); allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY (task 32). Hunts keep returning clean; consider pausing the loop.

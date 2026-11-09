@@ -5906,3 +5906,8 @@ Reviewed b067467..HEAD: log/docs-only (PROGRESS.md, runs.jsonl), CLI reports 0 i
 - Branch taken: EMPTY-BACKLOG (b) — only BLOCKED tasks remain, (a) is Vijay-only. Hunted `docDrift/parseOpenApi.js` + `compareRoutes.js` (not hunted since ~Oct): optional-param expansion vs spec `/` and `/{id}`, multi-param segments (`:x-:y`), server-url base path with port/trailing slash, non-verb keys, empty/non-object YAML. Clean, no change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 approval, task 32 network allowlist; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-09 (Builder, ~07:09 UTC, EMPTY-BACKLOG (b) hunt, utils/subtreeInOwnScope.js + parseAst.js)
+- Done: baseline `npm test` green (74 tests), idle-streak 0. Only BLOCKED tasks (30, 32) remain; (a) is Vijay-only, so took (b). Hunted `subtreeInOwnScope` and `parseAst` plus callers in errorHandling.js/performance.js: every caller passes a body/statement (never a function node as root, which would stop the walk at the root); the predicate runs on the root node; script→module fallback rethrows the original error. Clean, no change.
+- Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 approval, task 32 network allowlist; hunts keep returning clean, consider pausing the loop.

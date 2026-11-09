@@ -907,3 +907,4 @@
 {"ts":"2026-11-09T21:06:45.588Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"180bc97","summary":"Backlog empty; (a) Vijay-only. Hunted auth.routes/authController: clean, no change."}
 {"ts":"2026-11-09T21:36:12.406Z","trigger":"reviewer","outcome":"done","task":"REVIEW","tests":"green","sha":"d8f2126","summary":"Reviewed 3c83970..HEAD (log-only, CLI 0 issues). (b) hunt of scripts/runLog.js: clean, no change."}
 {"ts":"2026-11-09T22:06:42.764Z","trigger":"builder","outcome":"done","task":"EMPTY-BACKLOG-b","tests":"green","sha":"02c1b6d","summary":"Backlog empty; (a) Vijay-only. Hunted diffParser/parseOpenApi: clean, no change."}
+{"ts":"2026-11-09T22:36:14.183Z","trigger":"reviewer","outcome":"done","task":"REVIEW","tests":"green","sha":"305508a","summary":"Reviewed d8f2126..HEAD (log-only, CLI 0 issues). (b) hunt of sanitizeMarkdownText/subtreeInOwnScope: clean, no change."}

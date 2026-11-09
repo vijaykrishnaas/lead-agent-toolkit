@@ -5976,3 +5976,6 @@ Reviewed af73940..HEAD (log-only commits; CLI 0 issues). EMPTY-BACKLOG branch (b
 - Done: baseline green (74 tests), idle-streak 0. Only BLOCKED tasks (30, 32) remain; branch (a) is Vijay-only, so took (b). Hunted `scripts/resolvePushRange.js`, `utils/memberCallLine.js`, `docDrift/parseOpenApi.js` (not hunted in recent entries): fallback chain for zero/missing SHAs, member-call line derivation, basePath/server-url handling. Clean, no change.
 - Decisions: no skill/CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 approval, task 32 fastdl.mongodb.org allowlist; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-09 14:35 UTC — Reviewer run
+Reviewed affe870..HEAD (log-only commits; CLI 0 issues). EMPTY-BACKLOG branch (b): hunted `utils/defaultExecGit.js` and `utils/collectAddedLines.js` (small utils, not recently hunted). maxBuffer factory and add-line collection verified; clean, no change. Open questions for Vijay: unchanged (tasks 30/32 blocked on approvals; hunts keep coming back clean, consider pausing the loop).

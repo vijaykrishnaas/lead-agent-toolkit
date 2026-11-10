@@ -6209,3 +6209,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Branch taken: (b) — only BLOCKED tasks remain and (a) is Vijay-only. Hunted `loadRuleConfig.js`/`buildRules.js`/`loadRules.js` (last hunted earliest per PROGRESS.md grep): read for bad-config handling (scalar rules, null enabled/minSeverity, non-mapping options, unknown categories, partial entries). All handled with warnings and permissive defaults; no reproducible bug, no change.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — docDrift/parseOpenApi.js, compareRoutes.js)
+- Done: baseline green (root `npm test` rc=0), idle-streak 0. Branch (b): only BLOCKED tasks remain (30, 32), (a) is Vijay-only. Hunted `docDrift/parseOpenApi.js` and `docDrift/compareRoutes.js` (not hunted in recent runs). Probed optional params vs split spec paths, `:a-:b` segments, templated/trailing-slash server url base path, `/` root with base path, non-verb keys, empty spec. All behave correctly; no change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist.

@@ -6138,3 +6138,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green, idle-streak 0. Reviewed c1a5070..HEAD: the prior reviewer's `maskStringLiterals` keyword-before-regex fix (read, correct, tested) plus log-only builder commits; CLI reports 0 issues. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only; hunted `reviewer/src/cli.js` (fewest runs.jsonl mentions). Probed range parsing (`a...b`, `a..`, `..b`, leading-dash sides, `HEAD~1..HEAD`): all validated correctly; stage try/catch coverage matches guideline 3. Clean, no change.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — sample-app usersController/tasksController)
+- Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `sample-app/src/controllers/usersController.js` and `tasksController.js` (not hunted in recent runs). Read type/blank validation, owner scoping on every task query, self-only user routes, 409 on duplicate-key, trim/lowercase schema setters applying to findByIdAndUpdate. No defect reproduced.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.

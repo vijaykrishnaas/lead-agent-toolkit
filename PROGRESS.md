@@ -6103,3 +6103,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Branch taken: EMPTY-BACKLOG (b) — only BLOCKED tasks remain, (a) is Vijay-only. Hunted `utils/parseAst.js` and `utils/isTestFile.js` (least recently mentioned). ESM fallback and script/module error rethrow behave as documented; test-path patterns match whole segments and both suffix forms. Clean, no change.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; hunts keep returning clean, consider pausing the loop.
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — first real finding in a while)
+- Done: baseline green. Branch (b) (only BLOCKED tasks remain; (a) is Vijay-only). Hunted `reviewer/src/rules/security.js` (fewest recent mentions). Found: the hardcoded-credential issue message quoted the offending line verbatim, and the review report is posted to PR comments, so the bot republished the secret itself. Failing test first, then `redactLiterals` blanks quoted literals (3+ chars) to `[REDACTED]`, keeping the key name. Suite green (614 + 74).
+- Decisions: redact all quoted literals on the line, not only the matched one (simpler, safer). No new guideline added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist. Note: existing PR comments already posted may contain earlier-leaked secrets; consider rotating any real ones.

@@ -271,4 +271,22 @@ describe('security rule', () => {
     const issues = securityRule.check(parseDiff(diff));
     expect(issues.map((i) => i.line)).toEqual([3]);
   });
+  it('does not echo the secret literal into the issue message (report is posted to PR comments)', () => {
+    const diff = [
+      'diff --git a/src/c.js b/src/c.js',
+      '--- a/src/c.js',
+      '+++ b/src/c.js',
+      '@@ -1,1 +1,3 @@',
+      ' const x = 1;',
+      "+const apiKey = 'sk_live_SUPERSECRET123';",
+      "+const t = process.env.T; const password = 'hunter2hunter2' || process.env.P;",
+    ].join('\n');
+    const issues = securityRule.check(parseDiff(diff));
+    expect(issues.length).toBeGreaterThanOrEqual(2);
+    for (const issue of issues) {
+      expect(issue.message).toMatch(/hardcoded credential/i);
+      expect(issue.message).not.toMatch(/SUPERSECRET123|hunter2/);
+      expect(issue.message).toMatch(/apiKey|password/);
+    }
+  });
 });

@@ -25,6 +25,13 @@ const FUNCTION_CTOR = /(?<![\w$.])(?:new\s+)?Function\s*\(/;
 const EVAL_IN_INTERPOLATION = /\$\{[^}]*(?<![\w$])eval\s*\(/;
 const EVAL_BRACKET_CALL = /\[\s*(['"`])eval\1\s*\]\s*\(/;
 
+// The report is posted to PR comments, so quoting the offending line verbatim
+// would republish the secret itself. Blank every quoted literal (3+ chars, the
+// same floor SECRET_PATTERN uses) but keep the key name/shape for locating it.
+function redactLiterals(text) {
+  return text.replace(/(['"`])[^'"`]{3,}\1/g, '$1[REDACTED]$1');
+}
+
 // No process.env exemption here: SECRET_PATTERN only matches when the
 // operator is immediately followed by a quoted literal, which a genuine
 // `= process.env.X` read never is (there's no quote around a property
@@ -43,7 +50,7 @@ function check(files) {
           file: file.file,
           line: line.newLine,
           severity: 'high',
-          message: `Possible hardcoded credential: "${line.content.trim()}"`,
+          message: `Possible hardcoded credential: "${redactLiterals(line.content.trim())}"`,
           fix: 'Load secrets from environment variables or a secrets manager instead of hardcoding them.',
         });
       }

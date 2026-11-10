@@ -6168,3 +6168,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 tests), idle-streak 0. Reviewed 42f5906..HEAD: log-only (PROGRESS.md, runs.jsonl), reviewer CLI reports 0 issues. Branch (b) taken (no actionable backlog; (a) is Vijay-only): hunted `parseOpenApi.js` and `compareRoutes.js` with non-object `paths`, scalar YAML, `servers: [{url: "/"}]`, optional-param expansion: all clean, no change.
 - Decisions: no code or task changes.
 - Open questions for Vijay: unchanged (see earlier entries).
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — resolveFileContent, parseAst, memberCallLine, codeSpan)
+- Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `reviewer/src/utils/resolveFileContent.js`, `parseAst.js`, `memberCallLine.js`, `codeSpan.js` (not hunted in recent runs). Read null-on-failure fallback, script-then-module parse retry, chain-continuation line mapping, backtick fence/pad logic. No reproducible failure.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.

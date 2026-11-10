@@ -6183,3 +6183,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `rules/security.js` and `rules/missingTests.js` (not hunted in recent runs). Found: `FUNCTION_CTOR` excludes all `.Function(` member calls, so `new globalThis.Function(code)` / `window.Function(code)` / `global?.Function(code)` evaded the dynamic-code check (eval already catches these receivers). Fixed test-first: allowed an optional global-object receiver (globalThis/window/global/self) in the pattern; other member calls (`lodash.Function(`, `mywindow.Function(`), strings and comments still unflagged. missingTests.js: clean.
 - Decisions: no skill or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.
+
+## 2026-11-10 (Reviewer, ~12:35 UTC)
+- Done: baseline green (74 tests), idle-streak 0. Reviewed 9e48ded..190579a: one code commit (190579a, globalThis/window.Function in security.js FUNCTION_CTOR) — verified regex lookbehinds (e.g. `foo.window.Function(` stays exempt); reviewer CLI reports 0 issues. No fix needed.
+- Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only; hunted scripts/resolvePushRange.js (earliest PROGRESS.md mention): clean, no change.
+- Open questions for Vijay: unchanged.

@@ -9,7 +9,10 @@ const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION}
 // under a sub-prefix) — the same mount syntax, just on a different receiver
 // — so a nested router's own routes aren't dropped when this same parser is
 // run recursively against router files, not just the app entry file.
-const MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(['"])(.*?)\1\s*,\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\3\s*\)(?:\.[A-Za-z_$][\w$]*)?|([A-Za-z_$][\w$]*))\s*\)/g;
+// The prefix capture stops at the literal's own closing quote: a lazy `.*?`
+// would run on to a later quote, mounting app.use('/api' + '/v1', r) at the
+// garbage prefix "/api' + '/v1" (that call is findUnparsedRoutes' to report).
+const MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(['"])((?:(?!\1).)*)\1\s*,\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\3\s*\)(?:\.[A-Za-z_$][\w$]*)?|([A-Za-z_$][\w$]*))\s*\)/g;
 // The same mount with no prefix argument at all -- app.use(router),
 // app.use(mw, router), app.use(require('./x')) -- which Express mounts at
 // the receiver's own path. The first argument must be an identifier or a
@@ -376,7 +379,11 @@ function findUnparsedRoutes(source) {
   for (const match of masked.matchAll(USE_CALL_PATTERN)) {
     const argsStart = match.index + match[0].length;
     const args = splitTopLevelArgs(masked, argsStart);
-    if (!args || args.length < 2) continue;
+    if (!args) continue;
+    // A trailing comma -- app.use(a || b,) -- is not a second argument.
+    const [lastStart, lastEnd] = args[args.length - 1];
+    if (commentMasked.slice(lastStart, lastEnd).trim() === '') args.pop();
+    if (args.length < 2) continue;
     const [firstStart, firstEnd] = args[0];
     if (/^\s*[`[]/.test(commentMasked.slice(firstStart, firstEnd))) continue;
     if (!hasTopLevelOperator(masked.slice(firstStart, firstEnd))) continue;

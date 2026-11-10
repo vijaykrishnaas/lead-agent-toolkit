@@ -817,4 +817,41 @@ describe('mounts whose prefix is an inline non-literal expression (task 39)', ()
   it('skips an unterminated use( call instead of throwing', () => {
     expect(findUnparsedRoutes("app.use(API + '/v1', r")).toEqual([]);
   });
+
+  // Reviewer 2026-11-10: MOUNT_PATTERN's lazy prefix capture ran past the
+  // first literal's closing quote to a later one, so a concatenation of two
+  // literals was mounted at the garbage prefix "/api' + '/v1".
+  it.each([
+    ["app.use('/api' + '/v1', r);"],
+    ["app.use('/api' + v, r); app.use('/ok' + w, r);"],
+    ['app.use("/api" + "/v1", auth, r);'],
+  ])('never mounts at a prefix spanning two string literals for %s', (call) => {
+    const source = ["const r = require('./r');", '', call].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source).length).toBeGreaterThan(0);
+  });
+
+  it('still mounts a literal prefix that follows an expression-prefix mount on the same line', () => {
+    const source = ["const r = require('./r');", "app.use('/api' + v, r); app.use('/ok', r);"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/ok', requirePath: './r' }]);
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(2)]);
+  });
+
+  it('keeps a prefix containing the other quote character', () => {
+    const source = ["const r = require('./r');", 'app.use("/it\'s", r);'].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: "/it's", requirePath: './r' }]);
+  });
+
+  // Reviewer 2026-11-10: a trailing comma (Prettier's default for a call
+  // broken over several lines) was counted as a second argument.
+  it('does not count a trailing comma as a second argument', () => {
+    for (const call of ['app.use(\n  customMw || defaultMw,\n);', 'app.use(isProd ? limiter : noop, );']) {
+      expect(findUnparsedRoutes(call)).toEqual([]);
+    }
+  });
+
+  it('still warns for a two-argument mount written with a trailing comma', () => {
+    const source = ["const r = require('./r');", '', "app.use(\n  API + '/v1',\n  r,\n);"].join('\n');
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(3)]);
+  });
 });

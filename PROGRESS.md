@@ -6231,3 +6231,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Branch taken: (b) — only BLOCKED tasks remain and (a) is Vijay-only. Read `resolvePushRange` (zero-SHA, missing `before`, root-commit `after`, empty-tree fallback) and `resolveFileContent` (null on any git failure). All correct; no change.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — github/postReviewComment.js findExistingBotComment)
+- Done: baseline green (`npm run install:all && npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain (30, 32); (a) is Vijay-only. Hunted `postReviewComment.js` (oldest PROGRESS.md hunt mention, 2026-07-19): earliest-match marker selection, pagination/page cap, URL encoding at every sink, comment-limit truncation with surrogate guard, `updated` flag. All correct; no change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist.

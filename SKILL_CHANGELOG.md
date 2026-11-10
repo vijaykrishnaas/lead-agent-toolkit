@@ -351,3 +351,7 @@ Reviewed 184823b..HEAD (codeSpan loop-vs-spread fix: verified correct, test cove
 
 ## 2026-11-07 (Reviewer: EMPTY-BACKLOG (b) hunt, isCodeFile/consumeFlagValue)
 Hunted isCodeFile.js and consumeFlagValue.js: no defect reproduced, no change to skills/rules. Evidence: PROGRESS.md 2026-11-07 entry above.
+
+## 2026-11-10 (Reviewer: bug fix + backlog addition, task 37)
+**Change:** `collectChainedVerbs` in parseExpressRoutes.js now walks past a chained `.all(...)` instead of ending the chain there; regression test added. TASKS.md: appended task 37 (prefixless `app.use(router)` mount silently dropped). No skill/CLAUDE.md change.
+**Evidence:** PROGRESS.md 2026-11-10 Reviewer (~19:35 UTC) entry — reproduced `router.route('/a').all(mw).get(h).post(h2)` parsing to zero routes, and `app.use(r5); const r5 = require('./r5');` parsing to zero mounts; the mount fix changes MOUNT_PATTERN's shape and what files get followed, so it is a task rather than an inline patch.

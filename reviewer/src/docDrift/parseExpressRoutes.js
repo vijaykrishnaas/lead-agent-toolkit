@@ -16,7 +16,10 @@ const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\
 // METHOD_CALL_PATTERN can't see them because the verb call isn't preceded
 // by "router."/"app." directly, only by the ").route(...)" chain.
 const ROUTE_CALL_PATTERN = /\.route\(\s*(['"])(.*?)\1\s*\)/g;
-const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION})\\(`);
+// `all` is matched too: `.all(mw)` is the per-path middleware hook in a route
+// chain, not an HTTP verb, so it adds no route — but the chain continues past
+// it, and stopping there dropped every real verb chained after it.
+const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION}|all)\\(`);
 
 // Mirror of METHOD_CALL_PATTERN/ROUTE_CALL_PATTERN/MOUNT_PATTERN above, but
 // matching a template-literal-delimited (backtick) path/prefix argument
@@ -70,7 +73,7 @@ function collectChainedVerbs(commentMasked, masked, chainStart) {
     const afterWs = pos + wsLen;
     const verbMatch = CHAINED_VERB_START_PATTERN.exec(commentMasked.slice(afterWs));
     if (!verbMatch) break;
-    verbs.push(verbMatch[1].toUpperCase());
+    if (verbMatch[1] !== 'all') verbs.push(verbMatch[1].toUpperCase());
     let depth = 1;
     let i = afterWs + verbMatch[0].length;
     while (i < masked.length && depth > 0) {

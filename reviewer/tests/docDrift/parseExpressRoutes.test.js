@@ -93,6 +93,29 @@ describe('parseRouterSource', () => {
     ]);
   });
 
+  it('keeps collecting verbs after a chained .all() in a .route() chain', () => {
+    // Regression: .all(mw) is the idiomatic per-path middleware hook in a
+    // route chain. It is not an HTTP verb, so the chain walk stopped at it
+    // and every real verb chained after it silently vanished.
+    const source = `
+      router.route('/widgets').all(requireAuth).get(listWidgets).post(createWidget);
+      router.route('/gadgets')
+        .get(listGadgets)
+        .all(audit('(x)'))
+        .delete(removeGadgets);
+      router.route('/plain').all(onlyMiddleware);
+      router.get('/after', h);
+    `;
+
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/after' },
+      { method: 'GET', path: '/widgets' },
+      { method: 'POST', path: '/widgets' },
+      { method: 'GET', path: '/gadgets' },
+      { method: 'DELETE', path: '/gadgets' },
+    ]);
+  });
+
   it('does not let one .route() chain\'s verbs bleed into the next .route() chain in the same file', () => {
     const source = `
       router.route('/a').get(getA);

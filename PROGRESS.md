@@ -6193,3 +6193,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `docDrift/formatDocDrift.js`, `docDrift/generateDocDrift.js`, `rules/style.js`, `format/markdownReport.js` (not hunted in recent runs). Read the unparsed-routes-only empty-state branch, DI plumbing, per-line masking for var/console.log, and sanitization of file/message/fix. Clean, no change.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.
+
+## 2026-11-10 (Reviewer run: review 190579a..HEAD + EMPTY-BACKLOG (b) hunt — reviewer/src/diffParser.js)
+- Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Reviewed 190579a..HEAD: log-only (PROGRESS.md, runs.jsonl), no code; `reviewer/src/cli.js` reports 0 issues.
+- Branch taken: (b) — backlog has only BLOCKED tasks and (a) is Vijay-only. Hunted `reviewer/src/diffParser.js` (last hunted 2026-10-30, older than most modules): probed standard hunk, tab-suffixed space path, `--`/`++` content lines inside a hunk, quoted/escaped path. All parsed correctly; no change.
+- Open questions for Vijay: none new.

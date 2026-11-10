@@ -723,3 +723,98 @@ describe('mounts whose prefix variable is a non-literal expression (task 38)', (
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });
+
+describe('mounts whose prefix is an inline non-literal expression (task 39)', () => {
+  const WARNING = (line) => ({
+    type: 'unparsed-route',
+    method: 'MOUNT',
+    line,
+    reason: 'mount exists but prefix could not be statically resolved',
+  });
+
+  it.each([
+    ["app.use(API + '/v1', r);"],
+    ["app.use('/api' + version, r);"],
+    ["app.use(process.env.API_PREFIX || '/api', r);"],
+    ["app.use(config.prefix ?? '/api', r);"],
+    ["app.use(isV2 ? '/v2' : '/v1', auth, r);"],
+    ["router.use(\n  base + '/x',\n  r\n);"],
+  ])('warns once and mounts nothing for %s', (call) => {
+    const source = ["const r = require('./r');", '', call].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(3)]);
+  });
+
+  it('does not warn for a single-argument middleware selection', () => {
+    for (const call of ['app.use(customMw || defaultMw);', 'app.use(isProd ? limiter : noop);']) {
+      expect(findUnparsedRoutes(call)).toEqual([]);
+    }
+  });
+
+  it('ignores an operator nested inside a call, object or array in the first argument', () => {
+    const source = [
+      "const r = require('./r');",
+      'app.use(mw({ a: 1 + 2 }), r);',
+      'app.use(pick(a || b, [c ? d : e]), r);',
+      'app.use(config?.auth, r);',
+    ].join('\n');
+    expect(findUnparsedRoutes(source)).toEqual([]);
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '', requirePath: './r' },
+      { prefix: '', requirePath: './r' },
+    ]);
+  });
+
+  it('does not warn when the operator is in a later argument or the prefix is a literal', () => {
+    const source = [
+      "const r = require('./r');",
+      "app.use('/api', r);",
+      "app.use('/a', flag ? r : other);",
+      'app.use(auth, a || b);',
+    ].join('\n');
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('ignores the same text inside a comment or a string', () => {
+    const source = [
+      "const r = require('./r');",
+      "// app.use(API + '/v1', r);",
+      "/* app.use('/api' + v, r); */",
+      'log("app.use(API + \'/v1\', r)");',
+      "log(`app.use(P || '/api', r)`);",
+    ].join('\n');
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('is not fooled by an operator or comma inside a string or comment in the arguments', () => {
+    const source = [
+      "const r = require('./r');",
+      "app.use('/a+b,c', r);",
+      'app.use(auth /* a || b, */, r);',
+      "app.use(API /* , */ + '/v1' // x || y",
+      '  , r);',
+    ].join('\n');
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(4)]);
+  });
+
+  it('warns per occurrence, mixed with resolvable mounts, without doubling a template-literal warning', () => {
+    const source = [
+      "const a = require('./a');",
+      "const b = require('./b');",
+      "app.use('/a', a);",
+      "app.use(API + '/b', b);",
+      'app.use(`/c/${v}` + x, b);',
+      "app.use(P || '/d', b);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/a', requirePath: './a' }]);
+    expect(findUnparsedRoutes(source).map((f) => [f.method, f.line]).sort()).toEqual([
+      ['MOUNT', 4],
+      ['MOUNT', 5],
+      ['MOUNT', 6],
+    ]);
+  });
+
+  it('skips an unterminated use( call instead of throwing', () => {
+    expect(findUnparsedRoutes("app.use(API + '/v1', r")).toEqual([]);
+  });
+});

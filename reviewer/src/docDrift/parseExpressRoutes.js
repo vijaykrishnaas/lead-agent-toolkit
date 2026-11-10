@@ -59,6 +59,10 @@ const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALT
 const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*[`[]/g;
 const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*[`[]/g;
 
+// Any live app|router.use( call, matched against the fully masked source so
+// its arguments can be split by depth (see splitTopLevelArgs).
+const USE_CALL_PATTERN = /\b(?:router|app)\.use\(/g;
+
 // A match whose first character was blanked by the full string-and-comment
 // mask starts inside a string/template literal (e.g. a log message quoting
 // "router.get('/x', h)"), so it's text, not a live call. `commentMasked`
@@ -257,9 +261,60 @@ function parseAppEntrySource(source) {
   return { directRoutes, mounts };
 }
 
+// Splits a call's argument list at its top-level commas. `argsStart` is the
+// index right after the call's opening "(". Depth is counted over (), [] and
+// {} on `masked` (strings and comments blanked), so a comma, bracket or
+// operator inside a string, a comment or a nested call never splits or ends
+// the list. Returns [start, end) index pairs, or null when the call never
+// closes.
+function splitTopLevelArgs(masked, argsStart) {
+  const args = [];
+  let depth = 0;
+  let start = argsStart;
+  for (let i = argsStart; i < masked.length; i += 1) {
+    const ch = masked[i];
+    if (ch === '(' || ch === '[' || ch === '{') depth += 1;
+    else if (ch === ']' || ch === '}') depth -= 1;
+    else if (ch === ')') {
+      if (depth === 0) {
+        args.push([start, i]);
+        return args;
+      }
+      depth -= 1;
+    } else if (ch === ',' && depth === 0) {
+      args.push([start, i]);
+      start = i + 1;
+    }
+  }
+  return null;
+}
+
+// True when masked argument text has a binary/conditional operator (`+`,
+// `||`, `??`, `? :`) outside any nested (), [] or {} -- i.e. the argument is
+// itself an expression to evaluate, not a name, member, call or literal.
+// Optional chaining (`a?.b`) is not an operator here.
+function hasTopLevelOperator(maskedArg) {
+  let depth = 0;
+  for (let i = 0; i < maskedArg.length; i += 1) {
+    const ch = maskedArg[i];
+    if (ch === '(' || ch === '[' || ch === '{') depth += 1;
+    else if (ch === ')' || ch === ']' || ch === '}') depth -= 1;
+    else if (depth !== 0) continue;
+    else if (ch === '+') return true;
+    else if (ch === '|' && maskedArg[i + 1] === '|') return true;
+    else if (ch === '?') {
+      const next = maskedArg[i + 1];
+      const optionalChain = next === '.' && !/\d/.test(maskedArg[i + 2] || '');
+      if (!optionalChain) return true;
+    }
+  }
+  return false;
+}
+
 // Finds router/app verb calls, .route() calls, and app|router.use() mounts
 // whose path/prefix argument is a template literal (or, for a mount, a
-// variable collectUnresolvablePrefixNames can't resolve), in either a router
+// variable collectUnresolvablePrefixNames can't resolve or an inline
+// expression such as `API + '/v1'`), in either a router
 // file or an app entry file's source text. Returns explicit warning findings
 // (type 'unparsed-route') instead of the silent skip described above, so a
 // doc-drift report can say "this route exists but couldn't be checked"
@@ -304,6 +359,27 @@ function findUnparsedRoutes(source) {
     if (!matchIsLive(match, masked)) continue;
     const firstArg = firstArgIdentifier(match[0]);
     if (!firstArg || !unresolvablePrefixNames.has(firstArg)) continue;
+    findings.push({
+      type: 'unparsed-route',
+      method: 'MOUNT',
+      line: lineNumberAt(commentMasked, match.index),
+      reason: 'mount exists but prefix could not be statically resolved',
+    });
+  }
+
+  // A prefix written as an inline expression -- app.use(API + '/v1', r),
+  // app.use(process.env.P || '/api', r) -- matches none of the mount patterns,
+  // so the router was dropped with no mount and no warning. The expression
+  // is not evaluated, only reported. A single argument (app.use(a || b)) is
+  // middleware selection, not a prefix. A first argument opening with a
+  // backtick or "[" was already reported by UNPARSED_MOUNT_PATTERN above.
+  for (const match of masked.matchAll(USE_CALL_PATTERN)) {
+    const argsStart = match.index + match[0].length;
+    const args = splitTopLevelArgs(masked, argsStart);
+    if (!args || args.length < 2) continue;
+    const [firstStart, firstEnd] = args[0];
+    if (/^\s*[`[]/.test(commentMasked.slice(firstStart, firstEnd))) continue;
+    if (!hasTopLevelOperator(masked.slice(firstStart, firstEnd))) continue;
     findings.push({
       type: 'unparsed-route',
       method: 'MOUNT',

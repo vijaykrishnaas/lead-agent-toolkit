@@ -6220,3 +6220,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Branch taken: (b) — only BLOCKED tasks remain and (a) is Vijay-only. Hunted small utils not recently audited. Probed parseGitHubRemote (.git/trailing slash, token userinfo, ssh port, lookalike host, extra path segments, `..` repo) and isTestFile (`latest/`, `contest/`, `__tests__`, `.spec.ts`, `.test.json`). All correct; no change.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — utils/parseArgv, collectAddedLines, reviewer.js, subtreeInOwnScope)
+- Done: baseline green (`npm run install:all && npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain (30, 32); (a) is Vijay-only. Hunted `parseArgv.js` (prototype-key flags, positional handling, required checks), `collectAddedLines.js`, `reviewer.js` (risk computation, content resolution opt-in) and `subtreeInOwnScope.js` (function-boundary coverage incl. methods/getters). Read-only review; all correct, no change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist.

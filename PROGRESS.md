@@ -6225,3 +6225,9 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (`npm run install:all && npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain (30, 32); (a) is Vijay-only. Hunted `parseArgv.js` (prototype-key flags, positional handling, required checks), `collectAddedLines.js`, `reviewer.js` (risk computation, content resolution opt-in) and `subtreeInOwnScope.js` (function-boundary coverage incl. methods/getters). Read-only review; all correct, no change.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist.
+
+## 2026-11-10 (Reviewer run: review 0ebc5cb..HEAD + EMPTY-BACKLOG (b) hunt — scripts/resolvePushRange, utils/resolveFileContent)
+- Done: baseline green (root `npm test`), idle-streak 0. Reviewed 0ebc5cb..HEAD: log-only (PROGRESS.md, runs.jsonl), nothing to fix.
+- Branch taken: (b) — only BLOCKED tasks remain and (a) is Vijay-only. Read `resolvePushRange` (zero-SHA, missing `before`, root-commit `after`, empty-tree fallback) and `resolveFileContent` (null on any git failure). All correct; no change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.

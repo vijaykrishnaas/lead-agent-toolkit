@@ -6198,3 +6198,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Reviewed 190579a..HEAD: log-only (PROGRESS.md, runs.jsonl), no code; `reviewer/src/cli.js` reports 0 issues.
 - Branch taken: (b) — backlog has only BLOCKED tasks and (a) is Vijay-only. Hunted `reviewer/src/diffParser.js` (last hunted 2026-10-30, older than most modules): probed standard hunk, tab-suffixed space path, `--`/`++` content lines inside a hunk, quoted/escaped path. All parsed correctly; no change.
 - Open questions for Vijay: none new.
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — sample-app tasksController/Task model/app error handler, scripts/runLog.js)
+- Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `tasksController.js` (last touched 2026-10-24), `models/Task.js`, `app.js` error middleware, and `scripts/runLog.js` (2026-10-21): owner scoping on every query, type validation on create/update, CastError/ValidationError mapped to 400, runLog arg parsing/streak logic all hold. Clean, no change.
+- Decisions: no code changes; no speculative edits.
+- Open questions for Vijay: unchanged — tasks 30 (invariantLint archive-aware edit approval) and 32 (allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.

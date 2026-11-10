@@ -355,3 +355,7 @@ Hunted isCodeFile.js and consumeFlagValue.js: no defect reproduced, no change to
 ## 2026-11-10 (Reviewer: bug fix + backlog addition, task 37)
 **Change:** `collectChainedVerbs` in parseExpressRoutes.js now walks past a chained `.all(...)` instead of ending the chain there; regression test added. TASKS.md: appended task 37 (prefixless `app.use(router)` mount silently dropped). No skill/CLAUDE.md change.
 **Evidence:** PROGRESS.md 2026-11-10 Reviewer (~19:35 UTC) entry — reproduced `router.route('/a').all(mw).get(h).post(h2)` parsing to zero routes, and `app.use(r5); const r5 = require('./r5');` parsing to zero mounts; the mount fix changes MOUNT_PATTERN's shape and what files get followed, so it is a task rather than an inline patch.
+
+## 2026-11-10 (Reviewer: bug fix + backlog addition, task 38)
+**Change:** `parseAppEntrySource` resolves a const-string prefix variable (`const API = '/api'; app.use(API, router)`) instead of mounting at ''; regression tests added. TASKS.md: appended task 38 (non-literal prefix expression mounted at '' with no warning). No skill/CLAUDE.md change.
+**Evidence:** PROGRESS.md 2026-11-10 Reviewer (~20:40 UTC) entry — reproduced `app.use(API, tasks)` yielding `GET /:id` instead of `GET /api/tasks/:id` after task 37 (commit 771c626), and `app.use(config.prefix, auth, tasks)` yielding prefix ''.

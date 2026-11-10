@@ -15,6 +15,11 @@ const MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(['"])(.*?)\1\s*,\s*(?:[A-Za-z_
 // the receiver's own path. The first argument must be an identifier or a
 // require(), so a quoted prefix (MOUNT_PATTERN's case) never matches here.
 const PREFIXLESS_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\1\s*\)(?:\.[A-Za-z_$][\w$]*)?|([A-Za-z_$][\w$]*))\s*\)/g;
+// `const API = '/api';` -- a prefix held in a variable. Only a `const` whose
+// whole initializer is one string literal counts (not `'/a' + x`, not a
+// reassignable let/var), so the resolved prefix is exactly what Express sees.
+const CONST_STRING_PATTERN = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(['"])([^'"\\\n]*)\2\s*(?:;|$)/gm;
+const FIRST_ARG_IDENTIFIER_PATTERN = /\.use\(\s*([A-Za-z_$][\w$]*)\s*,/;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
@@ -141,7 +146,8 @@ function parseRouterSource(source) {
 // require()'d from. Any middleware args between the prefix and the router
 // (e.g. app.use(prefix, authMiddleware, router)) are tolerated — only the
 // final identifier before the closing paren is treated as the router. The
-// prefix may be omitted entirely (app.use(router)), giving prefix ''. A mount
+// prefix may be omitted entirely (app.use(router)), giving prefix '', or be
+// a const bound to a string literal (app.use(API, router)). A mount
 // whose variable has no matching require(...) in the same source is skipped
 // (e.g. app.use(express.json()), not a route module). directRoutes reuses
 // parseRouterSource so router.route(path).<verb>() chains are recognized
@@ -155,6 +161,12 @@ function parseAppEntrySource(source) {
   for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
     if (!matchIsLive(match, masked)) continue;
     requiresByVarName.set(match[1], match[3]);
+  }
+
+  const constStringsByVarName = new Map();
+  for (const match of commentMasked.matchAll(CONST_STRING_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
+    constStringsByVarName.set(match[1], match[3]);
   }
 
   const mounts = [];
@@ -173,7 +185,16 @@ function parseAppEntrySource(source) {
     if (!matchIsLive(match, masked)) continue;
     const [, , inlineRequirePath, varName] = match;
     const requirePath = inlineRequirePath || requiresByVarName.get(varName);
-    if (requirePath && requirePath.startsWith('.')) mounts.push({ prefix: '', requirePath, index: match.index });
+    if (!requirePath) continue;
+    // app.use(API, router) with `const API = '/api'` has the same shape as
+    // app.use(mw, router); without this lookup the router was mounted at ''
+    // and every one of its routes reported under the wrong path.
+    const firstArg = FIRST_ARG_IDENTIFIER_PATTERN.exec(match[0]);
+    if (firstArg && constStringsByVarName.has(firstArg[1])) {
+      mounts.push({ prefix: constStringsByVarName.get(firstArg[1]), requirePath, index: match.index });
+    } else if (requirePath.startsWith('.')) {
+      mounts.push({ prefix: '', requirePath, index: match.index });
+    }
   }
   // Keep source order across the two passes, so a route list reads the way
   // the file mounts it.

@@ -269,4 +269,18 @@ describe('collectExpressRoutes', () => {
       unparsedRoutes: [],
     });
   });
+
+  it('joins a const-string prefix variable onto the mounted router\'s routes', () => {
+    const files = {
+      '/repo/src/app.js': "const API = '/api/tasks';\nconst tasks = require('./tasks.routes');\napp.use(API, tasks);",
+      '/repo/src/tasks.routes.js': "router.get('/:id', show);",
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    expect(collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile }).routes).toEqual([
+      { method: 'GET', path: '/api/tasks/:id' },
+    ]);
+  });
 });

@@ -533,3 +533,45 @@ describe('parseAppEntrySource prefixless mounts (task 37)', () => {
     expect(parseAppEntrySource(source).mounts).toEqual([]);
   });
 });
+
+describe('parseAppEntrySource mounts with a const-string prefix variable', () => {
+  it('uses the string a const prefix variable is bound to, instead of treating it as middleware', () => {
+    const source = [
+      "const API = '/api/tasks';",
+      "const tasks = require('./tasks.routes');",
+      'app.use(API, tasks);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api/tasks', requirePath: './tasks.routes' }]);
+  });
+
+  it('resolves it with middleware args and an inline require, mixed with a real prefixless mount', () => {
+    const source = [
+      'const BASE = "/v1";',
+      "const auth = require('./middleware/auth');",
+      "const open = require('./open.routes');",
+      "app.use(BASE, auth, require('./things.routes'));",
+      'app.use(auth, open);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/v1', requirePath: './things.routes' },
+      { prefix: '', requirePath: './open.routes' },
+    ]);
+  });
+
+  it('does not take a prefix from a non-literal initializer, a commented-out const, or a later argument', () => {
+    const source = [
+      "const A = '/a' + suffix;",
+      "// const B = '/b';",
+      "const C = '/c';",
+      "const r = require('./r');",
+      'app.use(A, r);',
+      'app.use(B, r);',
+      'app.use(mw, C, r);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '', requirePath: './r' },
+      { prefix: '', requirePath: './r' },
+      { prefix: '', requirePath: './r' },
+    ]);
+  });
+});

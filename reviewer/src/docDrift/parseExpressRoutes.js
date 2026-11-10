@@ -10,6 +10,11 @@ const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION}
 // — so a nested router's own routes aren't dropped when this same parser is
 // run recursively against router files, not just the app entry file.
 const MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(['"])(.*?)\1\s*,\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\3\s*\)(?:\.[A-Za-z_$][\w$]*)?|([A-Za-z_$][\w$]*))\s*\)/g;
+// The same mount with no prefix argument at all -- app.use(router),
+// app.use(mw, router), app.use(require('./x')) -- which Express mounts at
+// the receiver's own path. The first argument must be an identifier or a
+// require(), so a quoted prefix (MOUNT_PATTERN's case) never matches here.
+const PREFIXLESS_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\1\s*\)(?:\.[A-Za-z_$][\w$]*)?|([A-Za-z_$][\w$]*))\s*\)/g;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
@@ -135,7 +140,8 @@ function parseRouterSource(source) {
 // resolving each mount's router variable back to the file it was
 // require()'d from. Any middleware args between the prefix and the router
 // (e.g. app.use(prefix, authMiddleware, router)) are tolerated — only the
-// final identifier before the closing paren is treated as the router. A mount
+// final identifier before the closing paren is treated as the router. The
+// prefix may be omitted entirely (app.use(router)), giving prefix ''. A mount
 // whose variable has no matching require(...) in the same source is skipped
 // (e.g. app.use(express.json()), not a route module). directRoutes reuses
 // parseRouterSource so router.route(path).<verb>() chains are recognized
@@ -156,8 +162,23 @@ function parseAppEntrySource(source) {
     if (!matchIsLive(match, masked)) continue;
     const [, , prefix, , inlineRequirePath, varName] = match;
     const requirePath = inlineRequirePath || requiresByVarName.get(varName);
-    if (requirePath) mounts.push({ prefix, requirePath });
+    if (requirePath) mounts.push({ prefix, requirePath, index: match.index });
   }
+
+  // A prefixless app.use(x) is far more often plain middleware than a router,
+  // so only a relative require is kept: a bare package (helmet, cors) is
+  // never a router file in this repo. A relative middleware module is still
+  // followed, and simply contributes no routes.
+  for (const match of commentMasked.matchAll(PREFIXLESS_MOUNT_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
+    const [, , inlineRequirePath, varName] = match;
+    const requirePath = inlineRequirePath || requiresByVarName.get(varName);
+    if (requirePath && requirePath.startsWith('.')) mounts.push({ prefix: '', requirePath, index: match.index });
+  }
+  // Keep source order across the two passes, so a route list reads the way
+  // the file mounts it.
+  mounts.sort((a, b) => a.index - b.index);
+  for (const mount of mounts) delete mount.index;
 
   return { directRoutes, mounts };
 }

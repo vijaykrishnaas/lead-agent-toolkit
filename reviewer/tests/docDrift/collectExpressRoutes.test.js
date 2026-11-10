@@ -238,4 +238,35 @@ describe('collectExpressRoutes', () => {
     const { routes } = collectExpressRoutes({ appEntryPath }, { readFile });
     expect(routes).toEqual([{ method: 'GET', path: '/x/y' }]);
   });
+
+  it('collects the routes of a prefixless mount, and zero routes from a required non-router middleware module', () => {
+    const files = {
+      '/repo/src/app.js': [
+        "const errorHandler = require('./middleware/errorHandler');",
+        "const api = require('./routes');",
+        "app.use('/api', api);",
+        "app.use(require('./routes/health.routes'));",
+        'app.use(errorHandler);',
+      ].join('\n'),
+      '/repo/src/routes/index.js': "const things = require('./things.routes');\nrouter.use(things);",
+      '/repo/src/routes/things.routes.js': "router.get('/things', list);",
+      '/repo/src/routes/health.routes.js': "router.get('/health', ok);",
+      '/repo/src/middleware/errorHandler.js': 'module.exports = (err, req, res, next) => res.status(500).end();',
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) {
+        const err = new Error(`ENOENT: ${filePath}`);
+        err.code = 'ENOENT';
+        throw err;
+      }
+      return files[filePath];
+    };
+    expect(collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile })).toEqual({
+      routes: [
+        { method: 'GET', path: '/api/things' },
+        { method: 'GET', path: '/health' },
+      ],
+      unparsedRoutes: [],
+    });
+  });
 });

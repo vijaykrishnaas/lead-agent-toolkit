@@ -474,3 +474,62 @@ describe('route-shaped text inside a string/template literal', () => {
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });
+
+describe('parseAppEntrySource prefixless mounts (task 37)', () => {
+  it('resolves a prefixless identifier mount to an empty prefix', () => {
+    const source = "app.use(r5);\nconst r5 = require('./r5');";
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '', requirePath: './r5' }]);
+  });
+
+  it('resolves a prefixless inline-require mount, with or without a property access', () => {
+    const source = "app.use(require('./routes/a'));\nrouter.use(require('./routes/b').router);";
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '', requirePath: './routes/a' },
+      { prefix: '', requirePath: './routes/b' },
+    ]);
+  });
+
+  it('tolerates middleware args before a prefixless router', () => {
+    const source = [
+      "const auth = require('./middleware/auth');",
+      "const things = require('./routes/things');",
+      "app.use(auth, authorize('admin'), things);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '', requirePath: './routes/things' }]);
+  });
+
+  it('keeps prefixed and prefixless mounts apart, each resolved to its own file', () => {
+    const source = [
+      "const a = require('./a');",
+      "const b = require('./b');",
+      "app.use('/api/a', a);",
+      'app.use(b);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/api/a', requirePath: './a' },
+      { prefix: '', requirePath: './b' },
+    ]);
+  });
+
+  it('produces no mount for a call-expression middleware, an inline function, or a bare-package identifier', () => {
+    const source = [
+      "const express = require('express');",
+      "const helmet = require('helmet');",
+      'app.use(express.json());',
+      'app.use(helmet);',
+      "app.use(require('cors'));",
+      'app.use((req, res) => res.status(404).end());',
+      'app.use(notRequiredHere);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+  });
+
+  it('ignores a prefixless mount that is commented out or quoted inside a string', () => {
+    const source = [
+      "const r = require('./r');",
+      '// app.use(r);',
+      'const doc = "app.use(r)";',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+  });
+});

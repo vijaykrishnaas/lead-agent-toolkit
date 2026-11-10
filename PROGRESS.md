@@ -6203,3 +6203,9 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `tasksController.js` (last touched 2026-10-24), `models/Task.js`, `app.js` error middleware, and `scripts/runLog.js` (2026-10-21): owner scoping on every query, type validation on create/update, CastError/ValidationError mapped to 400, runLog arg parsing/streak logic all hold. Clean, no change.
 - Decisions: no code changes; no speculative edits.
 - Open questions for Vijay: unchanged — tasks 30 (invariantLint archive-aware edit approval) and 32 (allowlist fastdl.mongodb.org or supply MONGOMS_SYSTEM_BINARY) remain BLOCKED on you.
+
+## 2026-11-10 (Reviewer run: review 2d7ef61..HEAD + EMPTY-BACKLOG (b) hunt — config/loadRuleConfig, buildRules, loadRules)
+- Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Reviewed 2d7ef61..HEAD: log-only (PROGRESS.md, runs.jsonl); `reviewer/src/cli.js` reports 0 issues.
+- Branch taken: (b) — only BLOCKED tasks remain and (a) is Vijay-only. Hunted `loadRuleConfig.js`/`buildRules.js`/`loadRules.js` (last hunted earliest per PROGRESS.md grep): read for bad-config handling (scalar rules, null enabled/minSeverity, non-mapping options, unknown categories, partial entries). All handled with warnings and permissive defaults; no reproducible bug, no change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — tasks 30 and 32 remain BLOCKED on you.

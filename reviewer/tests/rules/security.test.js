@@ -289,4 +289,17 @@ describe('security rule', () => {
       expect(issue.message).toMatch(/apiKey|password/);
     }
   });
+  it('redacts the secret even when earlier quotes on the line would misalign quote pairing', () => {
+    const lines = [
+      "const m = \"it's\"; const password = \"hunter2hunter2\";",
+      "const a = \"x\"; const m = \"don't\", password = \"hunter2hunter2\";",
+    ];
+    for (const l of lines) {
+      const diff = ['diff --git a/a.js b/a.js', '--- a/a.js', '+++ b/a.js', '@@ -1,1 +1,2 @@', ' x', '+' + l].join('\n');
+      const issues = securityRule.check(parseDiff(diff));
+      expect(issues).toHaveLength(1);
+      expect(issues[0].message).not.toMatch(/hunter2/);
+      expect(issues[0].message).toMatch(/password/);
+    }
+  });
 });

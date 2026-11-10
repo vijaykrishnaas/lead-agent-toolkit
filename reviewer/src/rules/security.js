@@ -26,10 +26,15 @@ const EVAL_IN_INTERPOLATION = /\$\{[^}]*(?<![\w$])eval\s*\(/;
 const EVAL_BRACKET_CALL = /\[\s*(['"`])eval\1\s*\]\s*\(/;
 
 // The report is posted to PR comments, so quoting the offending line verbatim
-// would republish the secret itself. Blank every quoted literal (3+ chars, the
-// same floor SECRET_PATTERN uses) but keep the key name/shape for locating it.
-function redactLiterals(text) {
-  return text.replace(/(['"`])[^'"`]{3,}\1/g, '$1[REDACTED]$1');
+// would republish the secret itself. Redact exactly the literal each secret
+// pattern matched (never "every quoted literal": pairing quotes left-to-right
+// misaligns when an earlier literal on the line contains an odd quote, and the
+// real secret then survives). Key name/shape stays for locating the line.
+function redactSecrets(text) {
+  const blank = (m) => m.replace(/(['"`])[^'"`]{3,}\1$/, '$1[REDACTED]$1');
+  return text
+    .replace(new RegExp(SECRET_PATTERN.source, 'gi'), blank)
+    .replace(new RegExp(SECRET_ENV_FALLBACK.source, 'gi'), blank);
 }
 
 // No process.env exemption here: SECRET_PATTERN only matches when the
@@ -50,7 +55,7 @@ function check(files) {
           file: file.file,
           line: line.newLine,
           severity: 'high',
-          message: `Possible hardcoded credential: "${redactLiterals(line.content.trim())}"`,
+          message: `Possible hardcoded credential: "${redactSecrets(line.content.trim())}"`,
           fix: 'Load secrets from environment variables or a secrets manager instead of hardcoding them.',
         });
       }

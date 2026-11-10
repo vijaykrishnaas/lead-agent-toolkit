@@ -6153,3 +6153,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `reviewer/src/diffParser.js`, `rules/missingTests.js`, `utils/isTestFile.js`, `utils/isCodeFile.js` (not hunted in recent runs). Probed tab-suffixed paths with spaces, rename headers, "\ No newline" markers, `.spec.ts` rejection-case detection. All behave correctly.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.
+
+## 2026-11-10 (Reviewer run: review 584c0d9..HEAD + EMPTY-BACKLOG (b) hunt of config loaders / parseGitHubRemote / defaultExecGit)
+- Done: baseline green (74 sample-app tests + reviewer suite), idle-streak 0. Reviewed 584c0d9..HEAD: only log commits (PROGRESS/runs.jsonl), CLI 0 issues. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only; hunted `config/loadRuleConfig.js`, `config/buildRules.js`, `utils/parseGitHubRemote.js`, `utils/defaultExecGit.js`; probed scp/https/userinfo/trailing-slash/PR-path/lookalike-host remotes: all behave correctly. No change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.

@@ -19,7 +19,9 @@ const EVAL_CALL = /(?<![\w$])eval\s*(?:\?\.\s*)?\(|,\s*eval\s*\)\s*\(/;
 // `new Function(...)` / `Function(...)` compiles a string to code, same
 // injection class as eval. `.Function(` member calls and longer identifiers
 // (myFunction, Function2) are excluded by the lookbehind/word boundary.
-const FUNCTION_CTOR = /(?<![\w$.])(?:new\s+)?Function\s*\(/;
+// A global-object receiver (`globalThis.Function(...)`, `window?.Function(...)`)
+// is the same constructor, a one-line evasion of the member-call exclusion.
+const FUNCTION_CTOR = /(?<![\w$.])(?:new\s+)?(?:(?<![\w$])(?:globalThis|window|global|self)\s*\??\.\s*)?Function\s*\(/;
 // Template interpolation bodies are code, but the masker blanks them with the
 // rest of the template, so the direct form is also checked inside `${...}`.
 const EVAL_IN_INTERPOLATION = /\$\{[^}]*(?<![\w$])eval\s*\(/;

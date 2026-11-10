@@ -118,6 +118,25 @@ describe('security rule', () => {
     expect(securityRule.check(mk('function Function2() {}'))).toHaveLength(0);
   });
 
+  it('flags Function construction reached through a global object (window/globalThis/global/self), but not other member calls', () => {
+    const mk = (line) => parseDiff([
+      'diff --git a/src/a.js b/src/a.js',
+      '--- a/src/a.js',
+      '+++ b/src/a.js',
+      '@@ -1,1 +1,2 @@',
+      ' x',
+      `+${line}`,
+    ].join('\n'));
+    expect(securityRule.check(mk('const f = new globalThis.Function("a", "return " + a);'))).toHaveLength(1);
+    expect(securityRule.check(mk('const f = window.Function(code);'))).toHaveLength(1);
+    expect(securityRule.check(mk('const f = global?.Function(code);'))).toHaveLength(1);
+    expect(securityRule.check(mk('const f = self . Function(code);'))).toHaveLength(1);
+    expect(securityRule.check(mk('const s = "globalThis.Function(x)";'))).toHaveLength(0);
+    expect(securityRule.check(mk('// window.Function(x)'))).toHaveLength(0);
+    expect(securityRule.check(mk('const f = lodash.Function(x);'))).toHaveLength(0);
+    expect(securityRule.check(mk('const f = mywindow.Function(x);'))).toHaveLength(0);
+  });
+
   it('flags eval() reached via bracket-property access (a one-line evasion of a direct eval( match)', () => {
     const diff = [
       'diff --git a/src/utils/parse.js b/src/utils/parse.js',

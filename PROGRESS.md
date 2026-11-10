@@ -6178,3 +6178,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green, idle-streak 0. Reviewed 49a368f..HEAD: log-only (PROGRESS.md, runs.jsonl), no code. Branch (b) taken (no actionable backlog; (a) is Vijay-only): hunted `reviewer/src/standup/` (collectCommits, groupByAuthor, collectPullRequests): date validation, pagination termination, blank-author bucketing all clean, no change.
 - Decisions: no code, skill, or task changes.
 - Open questions for Vijay: unchanged (see earlier entries).
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — reviewer/src/rules/security.js, missingTests.js)
+- Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `rules/security.js` and `rules/missingTests.js` (not hunted in recent runs). Found: `FUNCTION_CTOR` excludes all `.Function(` member calls, so `new globalThis.Function(code)` / `window.Function(code)` / `global?.Function(code)` evaded the dynamic-code check (eval already catches these receivers). Fixed test-first: allowed an optional global-object receiver (globalThis/window/global/self) in the pattern; other member calls (`lodash.Function(`, `mywindow.Function(`), strings and comments still unflagged. missingTests.js: clean.
+- Decisions: no skill or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.

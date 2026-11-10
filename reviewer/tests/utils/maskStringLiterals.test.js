@@ -241,3 +241,19 @@ describe('template literal nested inside a ${...} interpolation (task 36)', () =
     expect(maskStringLiterals(esc).masked.split('\n').length).toBe(2);
   });
 });
+
+describe('regex literal after a keyword', () => {
+  const { maskStringLiterals } = require('../../src/utils/maskStringLiterals');
+  it.each([
+    'return /\\{/.test(x)',
+    'typeof /}/',
+    'case /\\}/.test(s):',
+  ])('masks the brace inside %s', (src) => {
+    const { masked } = maskStringLiterals(src);
+    expect(masked).toHaveLength(src.length);
+    expect(masked).not.toMatch(/[{}]/);
+  });
+  it('still treats `x / 2` after an identifier ending in a keyword as division', () => {
+    expect(maskStringLiterals('myreturn / 2 + "{"').masked).toBe('myreturn / 2 +    ');
+  });
+});

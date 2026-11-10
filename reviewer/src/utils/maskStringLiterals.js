@@ -20,8 +20,10 @@ function blank(ch) {
 // close on this line. A brace or quote inside a regex (`/\{/`, `/'/`) would
 // otherwise be read as real block structure or the start of a string.
 const REGEX_PRECEDERS = '(,=:[!&|?{};+-*%<>~^';
+// `return /x/`, `typeof /x/`: a keyword also precedes a regex, not division.
+const KEYWORD_BEFORE = /(?<![\w$.])(return|typeof|case|in|of|delete|void|throw|new|else|do|yield|await)\s*$/;
 function regexLiteralEnd(content, i, prev) {
-  if (prev !== null && !REGEX_PRECEDERS.includes(prev)) return -1;
+  if (prev !== null && !REGEX_PRECEDERS.includes(prev) && !KEYWORD_BEFORE.test(content.slice(0, i))) return -1;
   // `i++ / 2` is division: a doubled +/- is a postfix operator, not a sign.
   if (/(\+\+|--)\s*$/.test(content.slice(0, i))) return -1;
   let inClass = false;

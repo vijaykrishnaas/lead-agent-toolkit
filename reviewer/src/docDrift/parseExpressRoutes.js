@@ -20,6 +20,17 @@ const PREFIXLESS_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(?:[A-Za-z_$][\w$.]*
 // reassignable let/var), so the resolved prefix is exactly what Express sees.
 const CONST_STRING_PATTERN = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(['"])([^'"\\\n]*)\2\s*(?:;|$)/gm;
 const FIRST_ARG_IDENTIFIER_PATTERN = /\.use\(\s*([A-Za-z_$][\w$]*)\s*,/;
+// Any `const|let|var x = <initializer>` binding, capturing the initializer's
+// first line. Used to tell a prefix variable the parser cannot resolve
+// (`const API = process.env.API_PREFIX || '/api'`, a template literal, a
+// reassignable `let API = '/api'`) from middleware (see
+// collectUnresolvablePrefixNames).
+const BINDING_PATTERN = /\b(const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^\n]*)/g;
+// Initializers that make a binding middleware-shaped rather than a prefix:
+// a function/arrow expression, or a call -- require('./auth'), and factory
+// calls such as rateLimit({...}) / express.json() / new Limiter(), which is
+// how most middleware is built.
+const MIDDLEWARE_INITIALIZER_PATTERN = /^(?:(?:async\s+)?function\b|(?:async\s+)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>|(?:new\s+)?[A-Za-z_$][\w$.]*\s*\()/;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
@@ -138,6 +149,38 @@ function parseRouterSource(source) {
   return routes;
 }
 
+// Names bound in this file to something that is neither middleware-shaped
+// (MIDDLEWARE_INITIALIZER_PATTERN) nor a const single string literal (which
+// parseAppEntrySource resolves). As the first of two or more use(...)
+// arguments such a name is a prefix whose value can't be read statically:
+// mounting the router at '' would report every one of its routes under the
+// wrong path, so the mount is dropped and findUnparsedRoutes warns instead.
+// Limits: an unbound name, a function declaration, a destructured binding
+// and a dotted member (`config.apiPrefix` looks exactly like
+// `auth.requireAuth`) are all still treated as middleware, i.e. prefix ''.
+function collectUnresolvablePrefixNames(commentMasked, masked) {
+  const constStrings = new Set();
+  for (const match of commentMasked.matchAll(CONST_STRING_PATTERN)) {
+    if (matchIsLive(match, masked)) constStrings.add(match[1]);
+  }
+  const names = new Set();
+  for (const match of commentMasked.matchAll(BINDING_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
+    const [, , name, initializer] = match;
+    if (constStrings.has(name)) continue;
+    if (MIDDLEWARE_INITIALIZER_PATTERN.test(initializer)) continue;
+    names.add(name);
+  }
+  return names;
+}
+
+// The identifier in first position of a use(...) call with two or more
+// arguments, or null.
+function firstArgIdentifier(mountText) {
+  const firstArg = FIRST_ARG_IDENTIFIER_PATTERN.exec(mountText);
+  return firstArg ? firstArg[1] : null;
+}
+
 // Extracts the routes defined directly on the app/router object (e.g.
 // app.get('/health', ...)) plus its own app.use|router.use(prefix, router)
 // mounts from an Express source file's text (the app entry file, e.g.
@@ -147,7 +190,9 @@ function parseRouterSource(source) {
 // (e.g. app.use(prefix, authMiddleware, router)) are tolerated — only the
 // final identifier before the closing paren is treated as the router. The
 // prefix may be omitted entirely (app.use(router)), giving prefix '', or be
-// a const bound to a string literal (app.use(API, router)). A mount
+// a const bound to a string literal (app.use(API, router)); a prefix
+// variable bound to anything else non-middleware is not mounted at all (see
+// collectUnresolvablePrefixNames). A mount
 // whose variable has no matching require(...) in the same source is skipped
 // (e.g. app.use(express.json()), not a route module). directRoutes reuses
 // parseRouterSource so router.route(path).<verb>() chains are recognized
@@ -169,6 +214,8 @@ function parseAppEntrySource(source) {
     constStringsByVarName.set(match[1], match[3]);
   }
 
+  const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
+
   const mounts = [];
   for (const match of commentMasked.matchAll(MOUNT_PATTERN)) {
     if (!matchIsLive(match, masked)) continue;
@@ -189,9 +236,12 @@ function parseAppEntrySource(source) {
     // app.use(API, router) with `const API = '/api'` has the same shape as
     // app.use(mw, router); without this lookup the router was mounted at ''
     // and every one of its routes reported under the wrong path.
-    const firstArg = FIRST_ARG_IDENTIFIER_PATTERN.exec(match[0]);
-    if (firstArg && constStringsByVarName.has(firstArg[1])) {
-      mounts.push({ prefix: constStringsByVarName.get(firstArg[1]), requirePath, index: match.index });
+    const firstArg = firstArgIdentifier(match[0]);
+    if (firstArg && constStringsByVarName.has(firstArg)) {
+      mounts.push({ prefix: constStringsByVarName.get(firstArg), requirePath, index: match.index });
+    } else if (firstArg && unresolvablePrefixNames.has(firstArg)) {
+      // Reported by findUnparsedRoutes rather than mounted at a wrong prefix.
+      continue;
     } else if (requirePath.startsWith('.')) {
       mounts.push({ prefix: '', requirePath, index: match.index });
     }
@@ -205,8 +255,9 @@ function parseAppEntrySource(source) {
 }
 
 // Finds router/app verb calls, .route() calls, and app|router.use() mounts
-// whose path/prefix argument is a template literal, in either a router file
-// or an app entry file's source text. Returns explicit warning findings
+// whose path/prefix argument is a template literal (or, for a mount, a
+// variable collectUnresolvablePrefixNames can't resolve), in either a router
+// file or an app entry file's source text. Returns explicit warning findings
 // (type 'unparsed-route') instead of the silent skip described above, so a
 // doc-drift report can say "this route exists but couldn't be checked"
 // rather than reading as full, verified coverage. Matched against
@@ -238,6 +289,18 @@ function findUnparsedRoutes(source) {
   }
   for (const match of commentMasked.matchAll(UNPARSED_MOUNT_PATTERN)) {
     if (!matchIsLive(match, masked)) continue;
+    findings.push({
+      type: 'unparsed-route',
+      method: 'MOUNT',
+      line: lineNumberAt(commentMasked, match.index),
+      reason: 'mount exists but prefix could not be statically resolved',
+    });
+  }
+  const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
+  for (const match of commentMasked.matchAll(PREFIXLESS_MOUNT_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
+    const firstArg = firstArgIdentifier(match[0]);
+    if (!firstArg || !unresolvablePrefixNames.has(firstArg)) continue;
     findings.push({
       type: 'unparsed-route',
       method: 'MOUNT',

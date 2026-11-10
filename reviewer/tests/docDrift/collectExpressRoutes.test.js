@@ -180,6 +180,33 @@ describe('collectExpressRoutes', () => {
     ]);
   });
 
+  it('reports an unparsed-route finding for a non-literal prefix variable, and does not recurse into it (task 38)', () => {
+    const readFile = jest.fn((filePath) => {
+      if (filePath === appEntryPath) {
+        return [
+          "const API = process.env.API_PREFIX || '/api';",
+          "const tasksRoutes = require('./routes/tasks.routes');",
+          'app.use(API, tasksRoutes);',
+        ].join('\n');
+      }
+      throw new Error(`unexpected read: ${filePath}`);
+    });
+
+    const { routes, unparsedRoutes } = collectExpressRoutes({ appEntryPath }, { readFile });
+
+    expect(routes).toEqual([]);
+    expect(unparsedRoutes).toEqual([
+      {
+        type: 'unparsed-route',
+        method: 'MOUNT',
+        line: 3,
+        reason: 'mount exists but prefix could not be statically resolved',
+        file: appEntryPath,
+      },
+    ]);
+    expect(readFile).toHaveBeenCalledTimes(1);
+  });
+
   it('reports an unparsed-route finding for a template-literal mount prefix, and does not recurse into it', () => {
     const readFile = jest.fn((filePath) => {
       if (filePath === appEntryPath) {

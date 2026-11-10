@@ -117,6 +117,8 @@ npm run standup -- [--owner <owner> --gh-repo <name>] [--since <iso-date>] [--ou
 npm run doc-drift -- --app <path/to/app.js> --openapi <path/to/openapi.yaml> [--out report.md]
 ```
 
+A mount prefix is resolved when it is a string literal, omitted (`app.use(router)`), or a `const` bound to a single string literal. A prefix variable bound to anything else (`const API = process.env.API_PREFIX || '/api'`, a template literal, a `let`/`var`) is reported as an unparsed mount warning and its router is not followed, rather than listing its routes under the wrong path. Known limit: a dotted member prefix (`app.use(config.apiPrefix, router)`) is indistinguishable from middleware (`app.use(auth.requireAuth, router)`) and is mounted at the receiver's own path; so is a prefix produced by a call (`const API = getPrefix()`), which reads like a middleware factory (`const limiter = rateLimit()`).
+
 ## Claude Code plugin
 
 The `review-pr`, `standup`, and `doc-drift` skills are also packaged as an

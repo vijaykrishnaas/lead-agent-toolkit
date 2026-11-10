@@ -559,6 +559,8 @@ describe('parseAppEntrySource mounts with a const-string prefix variable', () =>
   });
 
   it('does not take a prefix from a non-literal initializer, a commented-out const, or a later argument', () => {
+    // Task 38: `A` is bound to a non-literal expression, so its mount is
+    // dropped (and warned about) rather than mounted at ''.
     const source = [
       "const A = '/a' + suffix;",
       "// const B = '/b';",
@@ -571,7 +573,119 @@ describe('parseAppEntrySource mounts with a const-string prefix variable', () =>
     expect(parseAppEntrySource(source).mounts).toEqual([
       { prefix: '', requirePath: './r' },
       { prefix: '', requirePath: './r' },
+    ]);
+    expect(findUnparsedRoutes(source).map((f) => [f.method, f.line])).toEqual([['MOUNT', 5]]);
+  });
+});
+
+describe('mounts whose prefix variable is a non-literal expression (task 38)', () => {
+  const WARNING = (line) => ({
+    type: 'unparsed-route',
+    method: 'MOUNT',
+    line,
+    reason: 'mount exists but prefix could not be statically resolved',
+  });
+
+  it('warns and does not mount for an env-fallback const prefix', () => {
+    const source = [
+      "const API = process.env.API_PREFIX || '/api';",
+      "const tasks = require('./tasks.routes');",
+      'app.use(API, tasks);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(3)]);
+  });
+
+  it('warns and does not mount for a template-literal const prefix, with middleware and an inline require', () => {
+    const source = [
+      'const API = `/api/${version}`;',
+      "const auth = require('./middleware/auth');",
+      "app.use(API, auth, require('./tasks.routes'));",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(3)]);
+  });
+
+  it('warns for a reassignable let/var string prefix and an initializer on the next line', () => {
+    const source = [
+      "let A = '/a';",
+      'var B =',
+      '  config.prefix;',
+      "const r = require('./r');",
+      'app.use(A, r);',
+      'router.use(B, r);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(5), WARNING(6)]);
+  });
+
+  it('still mounts at an empty prefix when the first argument is middleware', () => {
+    const source = [
+      "const viaRequire = require('./middleware/auth');",
+      'function viaDeclaration(req, res, next) { next(); }',
+      'const viaArrow = (req, res, next) => next();',
+      'const viaAsyncArrow = async (req, res, next) => next();',
+      'const viaFunction = function (req, res, next) { next(); };',
+      'const viaFactory = rateLimit({ max: 5 });',
+      'const viaNew = new Limiter();',
+      "const r = require('./r');",
+      'app.use(viaRequire, r);',
+      'app.use(viaDeclaration, r);',
+      'app.use(viaArrow, r);',
+      'app.use(viaAsyncArrow, r);',
+      'app.use(viaFunction, r);',
+      'app.use(viaFactory, r);',
+      'app.use(viaNew, r);',
+      'app.use(unbound, r);',
+      'app.use(config.apiPrefix, r);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual(Array(9).fill({ prefix: '', requirePath: './r' }));
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('does not warn when the unresolvable name is not the first of several arguments', () => {
+    const source = [
+      "const API = process.env.API_PREFIX || '/api';",
+      "const r = require('./r');",
+      'app.use(API);',
+      'app.use(mw, API, r);',
+    ].join('\n');
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('ignores a commented-out or quoted binding and a commented-out mount', () => {
+    const source = [
+      "// const A = process.env.A || '/a';",
+      'const doc = "const B = process.env.B";',
+      "const C = process.env.C || '/c';",
+      "const r = require('./r');",
+      'app.use(A, r);',
+      'app.use(B, r);',
+      '// app.use(C, r);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '', requirePath: './r' },
       { prefix: '', requirePath: './r' },
     ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('keeps a const-string prefix mount and a real prefixless mount in the same file', () => {
+    const source = [
+      "const V1 = '/v1';",
+      "const V2 = process.env.V2_PREFIX || '/v2';",
+      "const auth = require('./middleware/auth');",
+      "const a = require('./a.routes');",
+      "const b = require('./b.routes');",
+      "const c = require('./c.routes');",
+      'app.use(V1, a);',
+      'app.use(V2, b);',
+      'app.use(auth, c);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/v1', requirePath: './a.routes' },
+      { prefix: '', requirePath: './c.routes' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([WARNING(8)]);
   });
 });

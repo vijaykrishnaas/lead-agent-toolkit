@@ -973,3 +973,69 @@ describe('mounts with arbitrary middle arguments and chained use() (task 40)', (
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });
+
+// Reviewer 2026-11-10 (~23:40 UTC), review of task 40 (f91333e).
+describe('chained and receiver-on-its-own-line use()/verb calls', () => {
+  const MOUNT_WARNING = {
+    type: 'unparsed-route',
+    method: 'MOUNT',
+    reason: 'mount exists but prefix could not be statically resolved',
+  };
+
+  it('warns for a chained use() whose prefix is a template literal or an array', () => {
+    // resolvePrefix left these to UNPARSED_MOUNT_PATTERN, which only matches
+    // a use( written directly on app|router -- so the chained form vanished.
+    const source = [
+      "const r = require('./r');",
+      'app.use(helmet()).use(`/api/${v}`, r);',
+      'app.use(helmet())',
+      "  .use(['/a', '/b'], r);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      { ...MOUNT_WARNING, line: 2 },
+      { ...MOUNT_WARNING, line: 4 },
+    ]);
+  });
+
+  it('still warns exactly once for a template-literal prefix written directly on app', () => {
+    const source = ["const r = require('./r');", 'app.use(`/api/${v}`, r).use(`/b/${v}`, r);'].join('\n');
+    expect(findUnparsedRoutes(source)).toEqual([
+      { ...MOUNT_WARNING, line: 2 },
+      { ...MOUNT_WARNING, line: 2 },
+    ]);
+  });
+
+  it('reads a use() chain whose receiver sits on its own line', () => {
+    const source = [
+      "const r = require('./r');",
+      "const r2 = require('./r2');",
+      'app',
+      '  .use(helmet())',
+      "  .use('/api', r)",
+      '  // .use(\'/dead\', r2)',
+      '  .use(`/x/${v}`, r2);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './r' }]);
+    expect(findUnparsedRoutes(source)).toEqual([{ ...MOUNT_WARNING, line: 7 }]);
+  });
+
+  it('reads a verb or unparsed verb call whose receiver sits on its own line', () => {
+    const source = ['router', "  .get('/x', h);", 'router', '  .post(`/y/${id}`, h);'].join('\n');
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/x' }]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      {
+        type: 'unparsed-route',
+        method: 'POST',
+        line: 3,
+        reason: 'route exists but path could not be statically resolved',
+      },
+    ]);
+  });
+
+  it('does not treat an unrelated .use on a later line as an app call', () => {
+    const source = ["const r = require('./r');", 'const app = express();', "other.use('/api', r);"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+});

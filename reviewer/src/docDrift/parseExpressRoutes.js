@@ -3,7 +3,9 @@ const { HTTP_METHODS } = require('./httpMethods');
 const VERB_ALTERNATION = HTTP_METHODS.join('|');
 // The path must start with "/" or "*": app.get('env') / req.app.get('title')
 // is Express's settings getter (same receiver, same verb name), not a route.
-const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*(['"])([/*].*?)\\2`, 'g');
+// `\s*` before the dot: a receiver on its own line (`app` / `  .use(...)`)
+// is the same call, here and in every receiver pattern below.
+const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\s*\\.(${VERB_ALTERNATION})\\(\\s*(['"])([/*].*?)\\2`, 'g');
 // Mounts -- app.use(prefix, router) in the app entry file, and the same
 // syntax on a router receiver for a nested sub-router -- are not matched by
 // one whole-call regex: analyzeUseCalls splits each use(...) call's argument
@@ -59,13 +61,13 @@ const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION}|all)\\(`
 // patterns only need to detect *that* such a call exists and where, not
 // resolve its path, so they stop right after the opening backtick. An array
 // path (`['/a', '/b']`) is the same silent drop, so `[` is matched too.
-const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*[\`\\[]`, 'g');
+const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\s*\\.(${VERB_ALTERNATION})\\(\\s*[\`\\[]`, 'g');
 const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*[`[]/g;
-const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*[`[]/g;
+const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\s*\.use\(\s*[`[]/g;
 
 // Any live app|router.use( call, matched against the fully masked source so
 // its arguments can be split by depth (see splitTopLevelArgs).
-const USE_CALL_PATTERN = /\b(?:router|app)\.use\(/g;
+const USE_CALL_PATTERN = /\b(?:router|app)\s*\.use\(/g;
 
 // A match whose first character was blanked by the full string-and-comment
 // mask starts inside a string/template literal (e.g. a log message quoting
@@ -278,8 +280,10 @@ function hasTopLevelOperator(maskedArg) {
 //     since a prefixless app.use(x) is far more often plain middleware and a
 //     bare package (helmet, cors) is never a router file in this repo. A
 //     relative middleware module is still followed and contributes no routes.
-// A first argument opening with a backtick or "[" yields neither: it is
-// already reported by UNPARSED_MOUNT_PATTERN. A call whose last argument is
+// A first argument opening with a backtick or "[" yields neither on a call
+// written directly on app|router: it is already reported by
+// UNPARSED_MOUNT_PATTERN. That pattern cannot see a chained .use(, so there
+// the same first argument warns here instead. A call whose last argument is
 // not a require-bound identifier or an inline require (express.json(), an
 // unbound name) has no router to mount.
 function analyzeUseCalls(commentMasked, masked) {
@@ -316,7 +320,7 @@ function analyzeUseCalls(commentMasked, masked) {
   }
 
   const calls = [];
-  function analyzeCall(index, argsStart) {
+  function analyzeCall(index, argsStart, isChained) {
     const args = splitTopLevelArgs(masked, argsStart);
     if (!args) return;
     const closeIndex = args[args.length - 1][1];
@@ -330,7 +334,7 @@ function analyzeUseCalls(commentMasked, masked) {
         ? { prefix: null }
         : resolvePrefix(argText(args[0]), masked.slice(args[0][0], args[0][1]));
       let mount = null;
-      let warn = resolved === 'warn';
+      let warn = resolved === 'warn' || (resolved === 'skip' && isChained);
       if (typeof resolved === 'object' && requirePath) {
         if (resolved.prefix !== null) mount = { prefix: resolved.prefix, requirePath };
         else if (requirePath.startsWith('.')) mount = { prefix: '', requirePath };
@@ -343,13 +347,13 @@ function analyzeUseCalls(commentMasked, masked) {
     const chained = CHAINED_USE_PATTERN.exec(masked.slice(closeIndex + 1));
     if (chained) {
       const chainIndex = closeIndex + 1 + chained[0].indexOf('.');
-      analyzeCall(chainIndex, closeIndex + 1 + chained[0].length);
+      analyzeCall(chainIndex, closeIndex + 1 + chained[0].length, true);
     }
   }
   // Matched on the fully masked source, so a call quoted in a string or
   // sitting in a comment is never analyzed.
   for (const match of masked.matchAll(USE_CALL_PATTERN)) {
-    analyzeCall(match.index, match.index + match[0].length);
+    analyzeCall(match.index, match.index + match[0].length, false);
   }
   calls.sort((a, b) => a.index - b.index);
   return calls;

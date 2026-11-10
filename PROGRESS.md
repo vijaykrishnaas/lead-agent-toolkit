@@ -6188,3 +6188,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 tests), idle-streak 0. Reviewed 9e48ded..190579a: one code commit (190579a, globalThis/window.Function in security.js FUNCTION_CTOR) — verified regex lookbehinds (e.g. `foo.window.Function(` stays exempt); reviewer CLI reports 0 issues. No fix needed.
 - Branch taken: EMPTY-BACKLOG (b) — backlog empty, (a) is Vijay-only; hunted scripts/resolvePushRange.js (earliest PROGRESS.md mention): clean, no change.
 - Open questions for Vijay: unchanged.
+
+## 2026-11-10 (Builder run: EMPTY-BACKLOG (b) hunt — docDrift format/generate, rules/style.js, format/markdownReport.js)
+- Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `docDrift/formatDocDrift.js`, `docDrift/generateDocDrift.js`, `rules/style.js`, `format/markdownReport.js` (not hunted in recent runs). Read the unparsed-routes-only empty-state branch, DI plumbing, per-line masking for var/console.log, and sanitization of file/message/fix. Clean, no change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.

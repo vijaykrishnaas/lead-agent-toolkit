@@ -359,3 +359,7 @@ Hunted isCodeFile.js and consumeFlagValue.js: no defect reproduced, no change to
 ## 2026-11-10 (Reviewer: bug fix + backlog addition, task 38)
 **Change:** `parseAppEntrySource` resolves a const-string prefix variable (`const API = '/api'; app.use(API, router)`) instead of mounting at ''; regression tests added. TASKS.md: appended task 38 (non-literal prefix expression mounted at '' with no warning). No skill/CLAUDE.md change.
 **Evidence:** PROGRESS.md 2026-11-10 Reviewer (~20:40 UTC) entry — reproduced `app.use(API, tasks)` yielding `GET /:id` instead of `GET /api/tasks/:id` after task 37 (commit 771c626), and `app.use(config.prefix, auth, tasks)` yielding prefix ''.
+
+## 2026-11-10 (Reviewer: bug fixes + backlog addition, task 39)
+**Change:** `parseExpressRoutes.js`: `CONST_STRING_PATTERN` no longer resolves a semicolon-less const string literal whose expression continues on the next line (`const API = '/a'` / `  + version`), and `MIDDLEWARE_INITIALIZER_PATTERN` accepts an awaited factory call; regression tests added. TASKS.md: appended task 39 (inline non-literal prefix expression silently dropped). No skill/CLAUDE.md change.
+**Evidence:** PROGRESS.md 2026-11-10 Reviewer (~21:40 UTC) entry — reproduced the continued literal mounting at `/a`, `const mw = await build(); app.use(mw, r)` losing its router after task 38 (commit ffb93b7), and `app.use(API + '/v1', r)` yielding no mount and no warning; the last needs top-level argument splitting, so it is a task rather than an inline patch.

@@ -18,7 +18,10 @@ const PREFIXLESS_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(?:[A-Za-z_$][\w$.]*
 // `const API = '/api';` -- a prefix held in a variable. Only a `const` whose
 // whole initializer is one string literal counts (not `'/a' + x`, not a
 // reassignable let/var), so the resolved prefix is exactly what Express sees.
-const CONST_STRING_PATTERN = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(['"])([^'"\\\n]*)\2\s*(?:;|$)/gm;
+// A literal ending its line without a `;` only counts when the next line does
+// not continue the expression (`const API = '/a'` / `  + version`), which
+// would otherwise resolve to just the first operand.
+const CONST_STRING_PATTERN = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(['"])([^'"\\\n]*)\2[ \t]*(?:;|$(?!\s*[-+*/%.?:|&,[(<>=]))/gm;
 const FIRST_ARG_IDENTIFIER_PATTERN = /\.use\(\s*([A-Za-z_$][\w$]*)\s*,/;
 // Any `const|let|var x = <initializer>` binding, capturing the initializer's
 // first line. Used to tell a prefix variable the parser cannot resolve
@@ -28,9 +31,9 @@ const FIRST_ARG_IDENTIFIER_PATTERN = /\.use\(\s*([A-Za-z_$][\w$]*)\s*,/;
 const BINDING_PATTERN = /\b(const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^\n]*)/g;
 // Initializers that make a binding middleware-shaped rather than a prefix:
 // a function/arrow expression, or a call -- require('./auth'), and factory
-// calls such as rateLimit({...}) / express.json() / new Limiter(), which is
-// how most middleware is built.
-const MIDDLEWARE_INITIALIZER_PATTERN = /^(?:(?:async\s+)?function\b|(?:async\s+)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>|(?:new\s+)?[A-Za-z_$][\w$.]*\s*\()/;
+// calls such as rateLimit({...}) / express.json() / new Limiter() (awaited
+// or not), which is how most middleware is built.
+const MIDDLEWARE_INITIALIZER_PATTERN = /^(?:(?:async\s+)?function\b|(?:async\s+)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>|(?:await\s+)?(?:new\s+)?[A-Za-z_$][\w$.]*\s*\()/;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —

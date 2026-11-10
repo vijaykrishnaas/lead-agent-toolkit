@@ -688,4 +688,38 @@ describe('mounts whose prefix variable is a non-literal expression (task 38)', (
     ]);
     expect(findUnparsedRoutes(source)).toEqual([WARNING(8)]);
   });
+
+  it('does not resolve a const string literal that continues as a multi-line expression', () => {
+    for (const continuation of ["  + '/b';", '  + version;', '  || fallback;']) {
+      const source = [
+        "const r = require('./r');",
+        "const API = '/a' // base",
+        continuation,
+        'app.use(API, r);',
+      ].join('\n');
+      expect(parseAppEntrySource(source).mounts).toEqual([]);
+      expect(findUnparsedRoutes(source)).toEqual([WARNING(4)]);
+    }
+  });
+
+  it('still resolves a semicolon-less const string followed by an unrelated statement', () => {
+    const source = [
+      "const r = require('./r')",
+      "const API = '/api'",
+      '',
+      'app.use(API, r)',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './r' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('treats an awaited factory call as middleware, like the un-awaited call', () => {
+    const source = [
+      "const r = require('./r');",
+      'const mw = await buildMiddleware();',
+      'app.use(mw, r);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '', requirePath: './r' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
 });

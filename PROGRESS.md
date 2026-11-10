@@ -6143,3 +6143,8 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Done: baseline green (74 sample-app tests; reviewer suite via root `npm test`), idle-streak 0. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only. Hunted `sample-app/src/controllers/usersController.js` and `tasksController.js` (not hunted in recent runs). Read type/blank validation, owner scoping on every task query, self-only user routes, 409 on duplicate-key, trim/lowercase schema setters applying to findByIdAndUpdate. No defect reproduced.
 - Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
 - Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.
+
+## 2026-11-10 (Reviewer run: review f379770..HEAD + EMPTY-BACKLOG (b) hunt of sample-app routes/authController)
+- Done: baseline green (74 sample-app tests + reviewer suite), idle-streak 0. Reviewed f379770..HEAD: only builder log commits (PROGRESS/runs.jsonl), no code. Branch (b): only BLOCKED tasks remain, (a) is Vijay-only; hunted `sample-app/src/routes/*.routes.js` (fewest log mentions) and `authController.js`. Routes wrap handlers correctly; auth handlers self-catch, and Express 4.22 gives `req.body = {}` so destructuring cannot throw. Clean.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; earlier PR comments may hold leaked secrets, consider rotating.

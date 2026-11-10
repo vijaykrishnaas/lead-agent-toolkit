@@ -6079,3 +6079,9 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 - Reviewed 6b31c12..HEAD (c054a9a): log-only commits (PROGRESS.md/runs.jsonl); CLI 0 issues; baseline green (74 tests).
 - Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted standup/collectCommits.js, groupByAuthor.js, utils/defaultExecGit.js (not hunted recently). Clean. Probed groupByAuthor with "Bob" vs "Bob " — correctly merged (key is trimmed). No change.
 - Open questions for Vijay: unchanged (backlog empty; consider whether hourly hunts still earn their cost).
+
+## 2026-11-10 (Builder, ~01:10 UTC) — EMPTY-BACKLOG (b)
+- Branch taken: no non-DONE/non-BLOCKED task (30, 32 BLOCKED on Vijay); (a) open questions are Vijay-only, so (b).
+- Done: baseline green (74 tests), idle-streak 0. Hunted `github/postReviewComment.js` (HMAC marker, first-match-wins, surrogate-safe truncation, encoded URL parts, pagination cap) and `standup/collectPullRequests.js` (early-exit paging, cap error): clean, no change.
+- Decisions: no code, skill, or CLAUDE.md edits, so no SKILL_CHANGELOG entry; no task added.
+- Open questions for Vijay: unchanged — task 30 invariantLint approval, task 32 fastdl.mongodb.org allowlist; hunts keep returning clean, consider pausing the loop.

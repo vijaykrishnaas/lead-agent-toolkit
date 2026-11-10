@@ -6077,5 +6077,5 @@ Reviewed 6ba79ee..HEAD (log-only commits; CLI 0 issues; 74 tests green). EMPTY-B
 
 ## 2026-11-10 — Reviewer run
 - Reviewed 6b31c12..HEAD (c054a9a): log-only commits (PROGRESS.md/runs.jsonl); CLI 0 issues; baseline green (74 tests).
-- Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted standup/collectCommits.js, groupByAuthor.js, utils/defaultExecGit.js (not hunted recently). Clean. Only note: groupByAuthor keys on the untrimmed author string ("Bob" vs "Bob "); git trims names so not reproducible in practice — no change.
+- Branch taken: EMPTY-BACKLOG (b) — (a) is Vijay-only. Hunted standup/collectCommits.js, groupByAuthor.js, utils/defaultExecGit.js (not hunted recently). Clean. Probed groupByAuthor with "Bob" vs "Bob " — correctly merged (key is trimmed). No change.
 - Open questions for Vijay: unchanged (backlog empty; consider whether hourly hunts still earn their cost).

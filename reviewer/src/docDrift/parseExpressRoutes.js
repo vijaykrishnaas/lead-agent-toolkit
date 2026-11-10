@@ -4,20 +4,22 @@ const VERB_ALTERNATION = HTTP_METHODS.join('|');
 // The path must start with "/" or "*": app.get('env') / req.app.get('title')
 // is Express's settings getter (same receiver, same verb name), not a route.
 const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\.(${VERB_ALTERNATION})\\(\\s*(['"])([/*].*?)\\2`, 'g');
-// Matches both app.use(prefix, router) (in the app entry file) and
-// router.use(prefix, subRouter) (a router file mounting a *nested* router
-// under a sub-prefix) — the same mount syntax, just on a different receiver
-// — so a nested router's own routes aren't dropped when this same parser is
-// run recursively against router files, not just the app entry file.
-// The prefix capture stops at the literal's own closing quote: a lazy `.*?`
-// would run on to a later quote, mounting app.use('/api' + '/v1', r) at the
-// garbage prefix "/api' + '/v1" (that call is findUnparsedRoutes' to report).
-const MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(['"])((?:(?!\1).)*)\1\s*,\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\3\s*\)(?:\.[A-Za-z_$][\w$]*)?|([A-Za-z_$][\w$]*))\s*\)/g;
-// The same mount with no prefix argument at all -- app.use(router),
-// app.use(mw, router), app.use(require('./x')) -- which Express mounts at
-// the receiver's own path. The first argument must be an identifier or a
-// require(), so a quoted prefix (MOUNT_PATTERN's case) never matches here.
-const PREFIXLESS_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(?:[A-Za-z_$][\w$.]*(?:\((?:[^()]|\([^()]*\))*\))?\s*,\s*)*(?:require\(\s*(['"])(.*?)\1\s*\)(?:\.[A-Za-z_$][\w$]*)?|([A-Za-z_$][\w$]*))\s*\)/g;
+// Mounts -- app.use(prefix, router) in the app entry file, and the same
+// syntax on a router receiver for a nested sub-router -- are not matched by
+// one whole-call regex: analyzeUseCalls splits each use(...) call's argument
+// list by depth and reads only the first argument (prefix) and the last
+// (router), so the shape of any middleware in between cannot drop the mount.
+// A whole quoted string literal with no escapes: the prefix exactly as
+// Express sees it. `'/api' + '/v1'` is not one (it has a top-level operator).
+const STRING_LITERAL_ARG_PATTERN = /^(['"])((?:(?!\1)[^\\\n])*)\1$/;
+const IDENTIFIER_ARG_PATTERN = /^[A-Za-z_$][\w$]*$/;
+// An inline require('./x') (optionally one member deep) as the router.
+const INLINE_REQUIRE_ARG_PATTERN = /^require\(\s*(['"])(.*?)\1\s*\)(?:\.[A-Za-z_$][\w$]*)?$/;
+// An inline function/arrow argument: middleware, whatever its body holds.
+const INLINE_FUNCTION_ARG_PATTERN = /^(?:async\s+)?(?:function\b|(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>)/;
+// A .use( chained directly onto a use(...) call's closing paren, which
+// Express runs against the same receiver.
+const CHAINED_USE_PATTERN = /^\s*\.use\(/;
 // `const API = '/api';` -- a prefix held in a variable. Only a `const` whose
 // whole initializer is one string literal counts (not `'/a' + x`, not a
 // reassignable let/var), so the resolved prefix is exactly what Express sees.
@@ -25,7 +27,6 @@ const PREFIXLESS_MOUNT_PATTERN = /\b(?:router|app)\.use\(\s*(?:[A-Za-z_$][\w$.]*
 // not continue the expression (`const API = '/a'` / `  + version`), which
 // would otherwise resolve to just the first operand.
 const CONST_STRING_PATTERN = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(['"])([^'"\\\n]*)\2[ \t]*(?:;|$(?!\s*[-+*/%.?:|&,[(<>=]))/gm;
-const FIRST_ARG_IDENTIFIER_PATTERN = /\.use\(\s*([A-Za-z_$][\w$]*)\s*,/;
 // Any `const|let|var x = <initializer>` binding, capturing the initializer's
 // first line. Used to tell a prefix variable the parser cannot resolve
 // (`const API = process.env.API_PREFIX || '/api'`, a template literal, a
@@ -48,7 +49,7 @@ const ROUTE_CALL_PATTERN = /\.route\(\s*(['"])(.*?)\1\s*\)/g;
 // it, and stopping there dropped every real verb chained after it.
 const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION}|all)\\(`);
 
-// Mirror of METHOD_CALL_PATTERN/ROUTE_CALL_PATTERN/MOUNT_PATTERN above, but
+// Mirror of METHOD_CALL_PATTERN/ROUTE_CALL_PATTERN and the mount prefix, but
 // matching a template-literal-delimited (backtick) path/prefix argument
 // instead of a quoted one. A template literal can embed an interpolated
 // expression (e.g. `` `/api/${version}/things` ``) whose actual runtime
@@ -124,7 +125,7 @@ function collectChainedVerbs(commentMasked, masked, chainStart) {
 // anything but a recognized HTTP verb.
 //
 // All top-level route-detection regexes (METHOD_CALL_PATTERN here,
-// MOUNT_PATTERN/REQUIRE_PATTERN in parseAppEntrySource) are matched against
+// REQUIRE_PATTERN/CONST_STRING_PATTERN in analyzeUseCalls) are matched against
 // `commentMasked`, not raw `source` — a commented-out call like
 // `// router.delete('/:id', remove);` is not real, live code, but a raw
 // regex match can't tell the difference, and would report a dead route as
@@ -184,21 +185,15 @@ function collectUnresolvablePrefixNames(commentMasked, masked) {
   return names;
 }
 
-// The identifier in first position of a use(...) call with two or more
-// arguments, or null.
-function firstArgIdentifier(mountText) {
-  const firstArg = FIRST_ARG_IDENTIFIER_PATTERN.exec(mountText);
-  return firstArg ? firstArg[1] : null;
-}
-
 // Extracts the routes defined directly on the app/router object (e.g.
 // app.get('/health', ...)) plus its own app.use|router.use(prefix, router)
 // mounts from an Express source file's text (the app entry file, e.g.
 // app.js, or a router file that itself mounts a nested sub-router),
 // resolving each mount's router variable back to the file it was
 // require()'d from. Any middleware args between the prefix and the router
-// (e.g. app.use(prefix, authMiddleware, router)) are tolerated — only the
-// final identifier before the closing paren is treated as the router. The
+// (app.use(prefix, authMiddleware, router), an inline function, an array)
+// are ignored whatever their shape — only the last argument is treated as
+// the router, and a chained .use(...) is read too (see analyzeUseCalls). The
 // prefix may be omitted entirely (app.use(router)), giving prefix '', or be
 // a const bound to a string literal (app.use(API, router)); a prefix
 // variable bound to anything else non-middleware is not mounted at all (see
@@ -211,56 +206,10 @@ function parseAppEntrySource(source) {
   const directRoutes = parseRouterSource(source);
   const { masked: commentMasked } = maskComments(source);
   const { masked } = maskStringLiterals(source);
-
-  const requiresByVarName = new Map();
-  for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
-    if (!matchIsLive(match, masked)) continue;
-    requiresByVarName.set(match[1], match[3]);
-  }
-
-  const constStringsByVarName = new Map();
-  for (const match of commentMasked.matchAll(CONST_STRING_PATTERN)) {
-    if (!matchIsLive(match, masked)) continue;
-    constStringsByVarName.set(match[1], match[3]);
-  }
-
-  const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
-
   const mounts = [];
-  for (const match of commentMasked.matchAll(MOUNT_PATTERN)) {
-    if (!matchIsLive(match, masked)) continue;
-    const [, , prefix, , inlineRequirePath, varName] = match;
-    const requirePath = inlineRequirePath || requiresByVarName.get(varName);
-    if (requirePath) mounts.push({ prefix, requirePath, index: match.index });
+  for (const call of analyzeUseCalls(commentMasked, masked)) {
+    if (call.mount) mounts.push(call.mount);
   }
-
-  // A prefixless app.use(x) is far more often plain middleware than a router,
-  // so only a relative require is kept: a bare package (helmet, cors) is
-  // never a router file in this repo. A relative middleware module is still
-  // followed, and simply contributes no routes.
-  for (const match of commentMasked.matchAll(PREFIXLESS_MOUNT_PATTERN)) {
-    if (!matchIsLive(match, masked)) continue;
-    const [, , inlineRequirePath, varName] = match;
-    const requirePath = inlineRequirePath || requiresByVarName.get(varName);
-    if (!requirePath) continue;
-    // app.use(API, router) with `const API = '/api'` has the same shape as
-    // app.use(mw, router); without this lookup the router was mounted at ''
-    // and every one of its routes reported under the wrong path.
-    const firstArg = firstArgIdentifier(match[0]);
-    if (firstArg && constStringsByVarName.has(firstArg)) {
-      mounts.push({ prefix: constStringsByVarName.get(firstArg), requirePath, index: match.index });
-    } else if (firstArg && unresolvablePrefixNames.has(firstArg)) {
-      // Reported by findUnparsedRoutes rather than mounted at a wrong prefix.
-      continue;
-    } else if (requirePath.startsWith('.')) {
-      mounts.push({ prefix: '', requirePath, index: match.index });
-    }
-  }
-  // Keep source order across the two passes, so a route list reads the way
-  // the file mounts it.
-  mounts.sort((a, b) => a.index - b.index);
-  for (const mount of mounts) delete mount.index;
-
   return { directRoutes, mounts };
 }
 
@@ -314,6 +263,98 @@ function hasTopLevelOperator(maskedArg) {
   return false;
 }
 
+// Classifies every live app|router.use(...) call in source order, including
+// a .use( chained onto another's closing paren. Each entry is
+// { index, mount, warn }: `mount` is { prefix, requirePath } or null, and
+// `warn` is true when the call's prefix cannot be read statically (so the
+// router is reported by findUnparsedRoutes instead of being mounted at a
+// wrong path). The first argument decides the prefix, the last decides the
+// router, and anything between them is middleware of any shape:
+//   - a quoted string literal, or a const bound to one -> that prefix;
+//   - a name collectUnresolvablePrefixNames flags, an inline expression
+//     (`API + '/v1'`, `a || b`), a regex or an escaped string -> warn;
+//   - anything else (identifier, member, call, inline function), or a single
+//     argument -> no prefix, i.e. '' -- kept only for a relative require,
+//     since a prefixless app.use(x) is far more often plain middleware and a
+//     bare package (helmet, cors) is never a router file in this repo. A
+//     relative middleware module is still followed and contributes no routes.
+// A first argument opening with a backtick or "[" yields neither: it is
+// already reported by UNPARSED_MOUNT_PATTERN. A call whose last argument is
+// not a require-bound identifier or an inline require (express.json(), an
+// unbound name) has no router to mount.
+function analyzeUseCalls(commentMasked, masked) {
+  const requiresByVarName = new Map();
+  for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
+    if (matchIsLive(match, masked)) requiresByVarName.set(match[1], match[3]);
+  }
+  const constStringsByVarName = new Map();
+  for (const match of commentMasked.matchAll(CONST_STRING_PATTERN)) {
+    if (matchIsLive(match, masked)) constStringsByVarName.set(match[1], match[3]);
+  }
+  const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
+
+  function resolveRouter(argText) {
+    const inline = INLINE_REQUIRE_ARG_PATTERN.exec(argText);
+    if (inline) return inline[2];
+    if (IDENTIFIER_ARG_PATTERN.test(argText)) return requiresByVarName.get(argText) || null;
+    return null;
+  }
+
+  // 'skip' (reported elsewhere), 'warn', or { prefix } with prefix null when
+  // the first argument is middleware rather than a prefix.
+  function resolvePrefix(argText, maskedArgText) {
+    if (/^[`[]/.test(argText)) return 'skip';
+    const literal = STRING_LITERAL_ARG_PATTERN.exec(argText);
+    if (literal) return { prefix: literal[2] };
+    if (IDENTIFIER_ARG_PATTERN.test(argText)) {
+      if (constStringsByVarName.has(argText)) return { prefix: constStringsByVarName.get(argText) };
+      return unresolvablePrefixNames.has(argText) ? 'warn' : { prefix: null };
+    }
+    if (INLINE_FUNCTION_ARG_PATTERN.test(argText)) return { prefix: null };
+    if (/^['"/]/.test(argText) || hasTopLevelOperator(maskedArgText)) return 'warn';
+    return { prefix: null };
+  }
+
+  const calls = [];
+  function analyzeCall(index, argsStart) {
+    const args = splitTopLevelArgs(masked, argsStart);
+    if (!args) return;
+    const closeIndex = args[args.length - 1][1];
+    const argText = ([start, end]) => commentMasked.slice(start, end).trim();
+    // A trailing comma -- app.use(a || b,) -- is not another argument.
+    if (argText(args[args.length - 1]) === '') args.pop();
+    if (args.length > 0) {
+      const requirePath = resolveRouter(argText(args[args.length - 1]));
+      // A single argument is the router (or middleware), never a prefix.
+      const resolved = args.length < 2
+        ? { prefix: null }
+        : resolvePrefix(argText(args[0]), masked.slice(args[0][0], args[0][1]));
+      let mount = null;
+      let warn = resolved === 'warn';
+      if (typeof resolved === 'object' && requirePath) {
+        if (resolved.prefix !== null) mount = { prefix: resolved.prefix, requirePath };
+        else if (requirePath.startsWith('.')) mount = { prefix: '', requirePath };
+      }
+      // Safety net: a relative-require router must never vanish with neither
+      // a mount nor a warning (the "skip" case is warned by its own pattern).
+      if (!mount && !warn && resolved !== 'skip' && requirePath && requirePath.startsWith('.')) warn = true;
+      calls.push({ index, mount, warn });
+    }
+    const chained = CHAINED_USE_PATTERN.exec(masked.slice(closeIndex + 1));
+    if (chained) {
+      const chainIndex = closeIndex + 1 + chained[0].indexOf('.');
+      analyzeCall(chainIndex, closeIndex + 1 + chained[0].length);
+    }
+  }
+  // Matched on the fully masked source, so a call quoted in a string or
+  // sitting in a comment is never analyzed.
+  for (const match of masked.matchAll(USE_CALL_PATTERN)) {
+    analyzeCall(match.index, match.index + match[0].length);
+  }
+  calls.sort((a, b) => a.index - b.index);
+  return calls;
+}
+
 // Finds router/app verb calls, .route() calls, and app|router.use() mounts
 // whose path/prefix argument is a template literal (or, for a mount, a
 // variable collectUnresolvablePrefixNames can't resolve or an inline
@@ -357,40 +398,17 @@ function findUnparsedRoutes(source) {
       reason: 'mount exists but prefix could not be statically resolved',
     });
   }
-  const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
-  for (const match of commentMasked.matchAll(PREFIXLESS_MOUNT_PATTERN)) {
-    if (!matchIsLive(match, masked)) continue;
-    const firstArg = firstArgIdentifier(match[0]);
-    if (!firstArg || !unresolvablePrefixNames.has(firstArg)) continue;
+  // A mount whose prefix is a variable collectUnresolvablePrefixNames can't
+  // resolve, or an inline expression -- app.use(API + '/v1', r),
+  // app.use(process.env.P || '/api', r) -- is never mounted (see
+  // analyzeUseCalls), so it is reported here instead of vanishing. The
+  // expression is not evaluated, only reported.
+  for (const call of analyzeUseCalls(commentMasked, masked)) {
+    if (!call.warn) continue;
     findings.push({
       type: 'unparsed-route',
       method: 'MOUNT',
-      line: lineNumberAt(commentMasked, match.index),
-      reason: 'mount exists but prefix could not be statically resolved',
-    });
-  }
-
-  // A prefix written as an inline expression -- app.use(API + '/v1', r),
-  // app.use(process.env.P || '/api', r) -- matches none of the mount patterns,
-  // so the router was dropped with no mount and no warning. The expression
-  // is not evaluated, only reported. A single argument (app.use(a || b)) is
-  // middleware selection, not a prefix. A first argument opening with a
-  // backtick or "[" was already reported by UNPARSED_MOUNT_PATTERN above.
-  for (const match of masked.matchAll(USE_CALL_PATTERN)) {
-    const argsStart = match.index + match[0].length;
-    const args = splitTopLevelArgs(masked, argsStart);
-    if (!args) continue;
-    // A trailing comma -- app.use(a || b,) -- is not a second argument.
-    const [lastStart, lastEnd] = args[args.length - 1];
-    if (commentMasked.slice(lastStart, lastEnd).trim() === '') args.pop();
-    if (args.length < 2) continue;
-    const [firstStart, firstEnd] = args[0];
-    if (/^\s*[`[]/.test(commentMasked.slice(firstStart, firstEnd))) continue;
-    if (!hasTopLevelOperator(masked.slice(firstStart, firstEnd))) continue;
-    findings.push({
-      type: 'unparsed-route',
-      method: 'MOUNT',
-      line: lineNumberAt(commentMasked, match.index),
+      line: lineNumberAt(commentMasked, call.index),
       reason: 'mount exists but prefix could not be statically resolved',
     });
   }

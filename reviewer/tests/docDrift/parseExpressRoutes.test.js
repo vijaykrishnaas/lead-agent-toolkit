@@ -759,7 +759,10 @@ describe('mounts whose prefix is an inline non-literal expression (task 39)', ()
       'app.use(config?.auth, r);',
     ].join('\n');
     expect(findUnparsedRoutes(source)).toEqual([]);
+    // Task 40: the optional-chained member is middleware like any dotted
+    // member, so its router mounts at '' too (it used to vanish silently).
     expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '', requirePath: './r' },
       { prefix: '', requirePath: './r' },
       { prefix: '', requirePath: './r' },
     ]);
@@ -853,5 +856,120 @@ describe('mounts whose prefix is an inline non-literal expression (task 39)', ()
   it('still warns for a two-argument mount written with a trailing comma', () => {
     const source = ["const r = require('./r');", '', "app.use(\n  API + '/v1',\n  r,\n);"].join('\n');
     expect(findUnparsedRoutes(source)).toEqual([WARNING(3)]);
+  });
+});
+
+describe('mounts with arbitrary middle arguments and chained use() (task 40)', () => {
+  const MOUNT_WARNING = {
+    type: 'unparsed-route',
+    method: 'MOUNT',
+    reason: 'mount exists but prefix could not be statically resolved',
+  };
+
+  it.each([
+    ['an inline arrow function', "app.use('/api', (req, res, next) => next(), r);"],
+    ['an inline function expression', "app.use('/api', function (q, s, n) { n(); }, r);"],
+    ['an array of middleware', "app.use('/api', [auth, limiter], r);"],
+    ['an inline expression', "app.use('/api', customMw || defaultMw, r);"],
+  ])('mounts at the prefix when a middle argument is %s', (_label, call) => {
+    const source = ["const r = require('./r');", "const plain = require('./plain');", "app.use('/plain', plain);", call].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/plain', requirePath: './plain' },
+      { prefix: '/api', requirePath: './r' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('mounts every call of a chained use(), including across lines and comments', () => {
+    const source = [
+      "const r = require('./r');",
+      "const r2 = require('./r2');",
+      "const r3 = require('./r3');",
+      "app.use('/plain', r3);",
+      "app.use('/api', r).use('/b', r2)",
+      '  // still the same chain',
+      "  .use(require('./r4'));",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/plain', requirePath: './r3' },
+      { prefix: '/api', requirePath: './r' },
+      { prefix: '/b', requirePath: './r2' },
+      { prefix: '', requirePath: './r4' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('warns on the right line for an unresolvable prefix in a chained use()', () => {
+    const source = [
+      "const r = require('./r');",
+      "app.use('/api', r)",
+      "  .use(base + '/v2', r);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './r' }]);
+    expect(findUnparsedRoutes(source)).toEqual([{ ...MOUNT_WARNING, line: 3 }]);
+  });
+
+  it('does not treat a .use( on an unrelated receiver as a chained mount', () => {
+    const source = ["const r = require('./r');", "app.use('/api', r);", "other.use('/b', r);"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './r' }]);
+  });
+
+  it('ignores commas, parens and quotes inside inline middleware bodies', () => {
+    const source = [
+      "const r = require('./r');",
+      "app.use('/api', (req, res, next) => { log('a, b) \\' (', \"x)\", `t, ${req.id})`); /* ), */ next(); }, r);",
+      "app.use('/v2', function (q, s, n) { if (q.a ? 1 : 0) { s.send(')'); } n(); }, [a, b], r);",
+      "app.use((req, res, next) => (req.ok ? next() : res.end()), r);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/api', requirePath: './r' },
+      { prefix: '/v2', requirePath: './r' },
+      { prefix: '', requirePath: './r' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('resolves a const-string prefix and an inline require router around odd middleware', () => {
+    const source = [
+      "const API = '/api';",
+      "app.use(API, [auth], (q, s, n) => n(), require('./r').router);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './r' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('still produces no mount and no warning for plain middleware calls', () => {
+    const source = [
+      "const express = require('express');",
+      "app.use('/api', express.json());",
+      "app.use('/static', express.static('public'));",
+      "app.use('/api', (req, res, next) => next());",
+      'app.use(express.json()).use(helmet());',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('warns instead of dropping a relative router behind a prefix it cannot read', () => {
+    const source = [
+      "const r = require('./r');",
+      "app.use(/^\\/api/, r);",
+      "app.use('/it\\'s', r);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      { ...MOUNT_WARNING, line: 2 },
+      { ...MOUNT_WARNING, line: 3 },
+    ]);
+  });
+
+  it('ignores a use() call quoted in a string or sitting in a comment', () => {
+    const source = [
+      "const r = require('./r');",
+      '// app.use(\'/dead\', () => {}, r);',
+      'const hint = "app.use(\'/quoted\', [a], r)";',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });

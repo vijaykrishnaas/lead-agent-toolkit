@@ -16,7 +16,7 @@ const METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\s*\\.(${VERB_ALTERNAT
 const STRING_LITERAL_ARG_PATTERN = /^(['"])((?:(?!\1)[^\\\n])*)\1$/;
 const IDENTIFIER_ARG_PATTERN = /^[A-Za-z_$][\w$]*$/;
 // An inline require('./x') (optionally one member deep) as the router.
-const INLINE_REQUIRE_ARG_PATTERN = /^require\(\s*(['"])(.*?)\1\s*\)(?:\.[A-Za-z_$][\w$]*)?$/;
+const INLINE_REQUIRE_ARG_PATTERN = /^require\(\s*(['"])(.*?)\1\s*\)(?:\.([A-Za-z_$][\w$]*))?$/;
 // An inline function/arrow argument: middleware, whatever its body holds.
 const INLINE_FUNCTION_ARG_PATTERN = /^(?:async\s+)?(?:function\b|(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>)/;
 // `const API = '/api';` -- a prefix held in a variable. Only a `const` whose
@@ -42,7 +42,14 @@ const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\
 // by destructuring a require. Only a flat pattern (no nested `{}`) matches.
 const DESTRUCTURED_REQUIRE_PATTERN = /\b(?:const|let|var)\s*\{([^{}]*)\}\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
 // One member of a binding as the router: `routes.tasks` (or `routes?.tasks`).
-const MEMBER_ARG_PATTERN = /^([A-Za-z_$][\w$]*)\s*\??\.\s*[A-Za-z_$][\w$]*$/;
+const MEMBER_ARG_PATTERN = /^([A-Za-z_$][\w$]*)\s*\??\.\s*([A-Za-z_$][\w$]*)$/;
+// A barrel file's exports (see findExportedRequire): the opening of a
+// `module.exports = {` object literal, one `key`, `key: value` or
+// `'key': value` entry of it, and an `exports.<name> =` /
+// `module.exports.<name> =` property assignment.
+const MODULE_EXPORTS_OBJECT_PATTERN = /\bmodule\s*\.\s*exports\s*=\s*\{/g;
+const EXPORT_ENTRY_PATTERN = /^(?:([A-Za-z_$][\w$]*)|(['"])([^'"\\\n]*)\2)\s*(?::\s*([\s\S]+))?$/;
+const EXPORT_ASSIGNMENT_PATTERN = /(?<![\w$.])(?:module\s*\.\s*)?exports\s*\.\s*([A-Za-z_$][\w$]*)\s*=(?![=>])/g;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
 // METHOD_CALL_PATTERN can't see them because the verb call isn't preceded
@@ -317,21 +324,136 @@ function hasTopLevelOperator(maskedArg) {
   return false;
 }
 
-// The local names a flat destructuring pattern's body binds: `a`, the alias
-// in `a: b`, either with a default (`a = x`), and a rest element (`...rest`).
+// The local names a flat destructuring pattern's body binds, each with the
+// export it reads: `a` ({ local: 'a', key: 'a' }), the alias in `a: b`
+// ({ local: 'b', key: 'a' }), either with a default (`a = x`), and a rest
+// element (`...rest`, key null -- it is not one named export).
 function destructuredNames(patternBody) {
   const names = [];
   for (const part of patternBody.split(',')) {
     const binding = part.split('=')[0];
-    const target = binding.slice(binding.indexOf(':') + 1).replace('...', '').trim();
-    if (IDENTIFIER_ARG_PATTERN.test(target)) names.push(target);
+    const isRest = binding.includes('...');
+    const colon = binding.indexOf(':');
+    const local = binding.slice(colon + 1).replace('...', '').trim();
+    const key = isRest ? null : (colon === -1 ? local : binding.slice(0, colon).trim());
+    if (IDENTIFIER_ARG_PATTERN.test(local)) names.push({ local, key: key && IDENTIFIER_ARG_PATTERN.test(key) ? key : null });
   }
   return names;
 }
 
+// Builds the lookup from an expression's text to the file it comes from:
+// returns resolve(text) -> { requirePath, exportName } or null. A router
+// reached one step away from a relative require -- `routes.tasks` where
+// `routes` is a require binding, or a name destructured from the require --
+// resolves to the required file, exactly as the inline `require('./x').member`
+// form does, and carries the member/destructured export name (the original
+// key for an alias `a: b`) so the collector can follow a barrel file's named
+// export (see findExportedRequire). Both are relative-only: `express.json` /
+// `const { Router } = require('express')` are never router files in this
+// repo. exportName is null for a whole-module binding or a rest element.
+function buildRequireResolver(commentMasked, masked) {
+  const requiresByVarName = new Map();
+  for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
+    if (matchIsLive(match, masked)) requiresByVarName.set(match[1], match[3]);
+  }
+  const destructuredRequiresByVarName = new Map();
+  for (const match of commentMasked.matchAll(DESTRUCTURED_REQUIRE_PATTERN)) {
+    if (!matchIsLive(match, masked) || !match[3].startsWith('.')) continue;
+    for (const { local, key } of destructuredNames(match[1])) {
+      destructuredRequiresByVarName.set(local, { requirePath: match[3], exportName: key });
+    }
+  }
+  return function resolve(text) {
+    const inline = INLINE_REQUIRE_ARG_PATTERN.exec(text);
+    if (inline) return { requirePath: inline[2], exportName: inline[3] || null };
+    if (IDENTIFIER_ARG_PATTERN.test(text)) {
+      if (requiresByVarName.get(text)) return { requirePath: requiresByVarName.get(text), exportName: null };
+      return destructuredRequiresByVarName.get(text) || null;
+    }
+    const member = MEMBER_ARG_PATTERN.exec(text);
+    if (member) {
+      const requirePath = requiresByVarName.get(member[1]);
+      return requirePath && requirePath.startsWith('.') ? { requirePath, exportName: member[2] } : null;
+    }
+    return null;
+  };
+}
+
+// Splits an object literal's body at its top-level commas. `bodyStart` is
+// the index right after the opening "{"; depth is counted on `masked` like
+// splitTopLevelArgs. Returns [start, end) pairs, or null when it never closes.
+function splitObjectEntries(masked, bodyStart) {
+  const entries = [];
+  let depth = 0;
+  let start = bodyStart;
+  for (let i = bodyStart; i < masked.length; i += 1) {
+    const ch = masked[i];
+    if (ch === '(' || ch === '[' || ch === '{') depth += 1;
+    else if (ch === ')' || ch === ']') depth -= 1;
+    else if (ch === '}') {
+      if (depth === 0) {
+        entries.push([start, i]);
+        return entries;
+      }
+      depth -= 1;
+    } else if (ch === ',' && depth === 0) {
+      entries.push([start, i]);
+      start = i + 1;
+    }
+  }
+  return null;
+}
+
+// Where a file's named export `exportName` comes from when the file only
+// re-exports it from another file (a barrel): { requirePath, exportName } of
+// the relative require behind it, or null. Reads `module.exports = { name:
+// require('./x') }`, `module.exports = { name }` / `{ name: local }` with the
+// local bound by (or destructured from) a relative require, and
+// `exports.name = ...` / `module.exports.name = ...` with the same right-hand
+// sides. null -- the name is not exported that way, e.g. `module.exports =
+// { router }` with the router built in this same file -- tells the collector
+// to read this file itself. Matched on comment-masked source and checked
+// live against the full mask, so a commented-out or quoted export is ignored.
+function findExportedRequire(source, exportName) {
+  const { masked: commentMasked } = maskComments(source);
+  const { masked } = maskStringLiterals(source);
+  const resolve = buildRequireResolver(commentMasked, masked);
+  const relative = (text) => {
+    const resolved = resolve(text.trim());
+    return resolved && resolved.requirePath.startsWith('.') ? resolved : null;
+  };
+
+  for (const match of masked.matchAll(MODULE_EXPORTS_OBJECT_PATTERN)) {
+    const entries = splitObjectEntries(masked, match.index + match[0].length) || [];
+    for (const [start, end] of entries) {
+      const entry = EXPORT_ENTRY_PATTERN.exec(commentMasked.slice(start, end).trim());
+      if (!entry || (entry[1] || entry[3]) !== exportName) continue;
+      // Shorthand `{ name }` reads the local of the same name.
+      const found = relative(entry[4] === undefined ? exportName : entry[4]);
+      if (found) return found;
+    }
+  }
+  for (const match of masked.matchAll(EXPORT_ASSIGNMENT_PATTERN)) {
+    if (match[1] !== exportName) continue;
+    // The right-hand side runs to the statement's `;` or line end at depth 0.
+    const valueStart = match.index + match[0].length;
+    let depth = 0;
+    let end = valueStart;
+    for (; end < masked.length; end += 1) {
+      const ch = masked[end];
+      if (ch === '(' || ch === '[' || ch === '{') depth += 1;
+      else if (ch === ')' || ch === ']' || ch === '}') depth -= 1;
+      else if (depth === 0 && (ch === ';' || (ch === '\n' && masked.slice(valueStart, end).trim() !== ''))) break;
+    }
+    const found = relative(commentMasked.slice(valueStart, end));
+    if (found) return found;
+  }
+  return null;
+}
+
 // Classifies every live app|router.use(...) call in source order, including
 // a .use( chained onto another use(/verb call's closing paren. Each entry is
-// { index, mount, warn }: `mount` is { prefix, requirePath } or null, and
+// { index, mount, warn }: `mount` is { prefix, requirePath[, exportName] } or null, and
 // `warn` is true when the call's prefix cannot be read statically (so the
 // router is reported by findUnparsedRoutes instead of being mounted at a
 // wrong path). The first argument decides the prefix, the last decides the
@@ -352,42 +474,14 @@ function destructuredNames(patternBody) {
 // relative require, or an inline require (express.json(), an unbound name)
 // has no router to mount.
 function analyzeUseCalls(commentMasked, masked) {
-  const requiresByVarName = new Map();
-  for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
-    if (matchIsLive(match, masked)) requiresByVarName.set(match[1], match[3]);
-  }
   const constStringsByVarName = new Map();
   for (const match of commentMasked.matchAll(CONST_STRING_PATTERN)) {
     if (matchIsLive(match, masked)) constStringsByVarName.set(match[1], match[3]);
   }
   const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
 
-  // Names destructured from a relative require, each mapped to that file.
-  const destructuredRequiresByVarName = new Map();
-  for (const match of commentMasked.matchAll(DESTRUCTURED_REQUIRE_PATTERN)) {
-    if (!matchIsLive(match, masked) || !match[3].startsWith('.')) continue;
-    for (const name of destructuredNames(match[1])) destructuredRequiresByVarName.set(name, match[3]);
-  }
-
-  // The file the router argument comes from, or null. A router reached one
-  // step away from a relative require -- `routes.tasks` where `routes` is a
-  // require binding, or a name destructured from the require -- resolves to
-  // the required file, exactly as the inline `require('./x').member` form
-  // does. Both are relative-only: `express.json` / `const { Router } =
-  // require('express')` are never router files in this repo.
-  function resolveRouter(argText) {
-    const inline = INLINE_REQUIRE_ARG_PATTERN.exec(argText);
-    if (inline) return inline[2];
-    if (IDENTIFIER_ARG_PATTERN.test(argText)) {
-      return requiresByVarName.get(argText) || destructuredRequiresByVarName.get(argText) || null;
-    }
-    const member = MEMBER_ARG_PATTERN.exec(argText);
-    if (member) {
-      const requirePath = requiresByVarName.get(member[1]);
-      return requirePath && requirePath.startsWith('.') ? requirePath : null;
-    }
-    return null;
-  }
+  // The file (and named export) the router argument comes from, or null.
+  const resolveRouter = buildRequireResolver(commentMasked, masked);
 
   // 'skip' (reported elsewhere), 'warn', or { prefix } with prefix null when
   // the first argument is middleware rather than a prefix.
@@ -411,7 +505,11 @@ function analyzeUseCalls(commentMasked, masked) {
     // A trailing comma -- app.use(a || b,) -- is not another argument.
     if (argText(args[args.length - 1]) === '') args.pop();
     if (args.length > 0) {
-      const requirePath = resolveRouter(argText(args[args.length - 1]));
+      const router = resolveRouter(argText(args[args.length - 1]));
+      const requirePath = router && router.requirePath;
+      // exportName is only set when the router is one named export of the
+      // required file, so a whole-module mount stays { prefix, requirePath }.
+      const target = router && router.exportName ? { requirePath, exportName: router.exportName } : { requirePath };
       // A single argument is the router (or middleware), never a prefix.
       const resolved = args.length < 2
         ? { prefix: null }
@@ -419,8 +517,8 @@ function analyzeUseCalls(commentMasked, masked) {
       let mount = null;
       let warn = resolved === 'warn' || (resolved === 'skip' && isChained);
       if (typeof resolved === 'object' && requirePath) {
-        if (resolved.prefix !== null) mount = { prefix: resolved.prefix, requirePath };
-        else if (requirePath.startsWith('.')) mount = { prefix: '', requirePath };
+        if (resolved.prefix !== null) mount = { prefix: resolved.prefix, ...target };
+        else if (requirePath.startsWith('.')) mount = { prefix: '', ...target };
       }
       // Safety net: a relative-require router must never vanish with neither
       // a mount nor a warning (the "skip" case is warned by its own pattern).
@@ -511,4 +609,4 @@ function findUnparsedRoutes(source) {
   return findings;
 }
 
-module.exports = { parseRouterSource, parseAppEntrySource, findUnparsedRoutes };
+module.exports = { parseRouterSource, parseAppEntrySource, findUnparsedRoutes, findExportedRequire };

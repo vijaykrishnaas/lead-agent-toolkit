@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { parseAppEntrySource, findUnparsedRoutes } = require('./parseExpressRoutes');
+const { parseAppEntrySource, findUnparsedRoutes, findExportedRequire } = require('./parseExpressRoutes');
 
 // Joins a mount prefix (e.g. '/api/tasks') with a route path from inside that
 // router (e.g. '/', '/:id') into one full path, without doubling or dropping
@@ -28,6 +28,20 @@ function resolveRouterPath(base, readFile) {
   return candidates[0];
 }
 
+// The file a relative require from a file in `fileDir` points at, or null
+// when it is not a router source file in this repo:
+//  - a bare specifier (e.g. 'swagger-ui-express') is an npm package;
+//    resolving it as a path would throw ENOENT;
+//  - a relative .json/.node require (config data, a native addon) is never a
+//    router source file either; guessing <path>.js for it would throw ENOENT
+//    and abort the whole run over a use() argument such as `cfg.mw` with
+//    `const cfg = require('./config.json')`.
+function resolveRequiredFile(fileDir, requirePath, readFile) {
+  if (!requirePath.startsWith('.')) return null;
+  if (/\.(?:json|node)$/.test(requirePath)) return null;
+  return resolveRouterPath(path.resolve(fileDir, requirePath), readFile);
+}
+
 // Recursively walks a source file's own direct routes and mounts, resolving
 // each mount to its required file and recursing into *that* file too — a
 // router file can itself mount a nested sub-router (router.use(prefix,
@@ -44,7 +58,28 @@ function resolveRouterPath(base, readFile) {
 // Set (current path + this file) to each child call keeps cycle detection
 // scoped to genuine ancestor chains while leaving sibling branches
 // independent.
-function collectFromFile(filePath, prefix, readFile, ancestors) {
+// `exportName` is set when the mount reached this file through one named
+// export (`routes.tasks`, `const { tasks } = require('./routes')`): if the
+// file only re-exports that name from another file (a barrel -- see
+// findExportedRequire), that file is collected instead, at the same prefix.
+// A barrel hop is tracked in `ancestors` per file *and* export name, so a
+// barrel legitimately passed through twice on one path (for two different
+// exports) is not mistaken for a cycle while a self-referencing export still
+// terminates. When the name is not re-exported that way, the file itself is
+// collected, as before (`module.exports = { router }` with the routes
+// defined in the same file).
+function collectFromFile(filePath, prefix, readFile, ancestors, exportName) {
+  if (exportName) {
+    const hopKey = `${filePath}\0${exportName}`;
+    if (ancestors.has(hopKey)) return { routes: [], unparsedRoutes: [] };
+    const reExport = findExportedRequire(readFile(filePath), exportName);
+    const target = reExport && resolveRequiredFile(path.dirname(filePath), reExport.requirePath, readFile);
+    if (target) {
+      const hopAncestors = new Set(ancestors);
+      hopAncestors.add(hopKey);
+      return collectFromFile(target, prefix, readFile, hopAncestors, reExport.exportName);
+    }
+  }
   if (ancestors.has(filePath)) return { routes: [], unparsedRoutes: [] };
   const nextAncestors = new Set(ancestors);
   nextAncestors.add(filePath);
@@ -56,17 +91,10 @@ function collectFromFile(filePath, prefix, readFile, ancestors) {
   const unparsedRoutes = findUnparsedRoutes(source).map((finding) => ({ ...finding, file: filePath }));
 
   const fileDir = path.dirname(filePath);
-  for (const { prefix: mountPrefix, requirePath } of mounts) {
-    // A bare specifier (e.g. 'swagger-ui-express') is an npm package, not a
-    // router file in this repo; resolving it as a path would throw ENOENT.
-    if (!requirePath.startsWith('.')) continue;
-    // A relative .json/.node require (config data, a native addon) is never
-    // a router source file either; guessing <path>.js for it would throw
-    // ENOENT and abort the whole run over a use() argument such as
-    // `cfg.mw` with `const cfg = require('./config.json')`.
-    if (/\.(?:json|node)$/.test(requirePath)) continue;
-    const routerPath = resolveRouterPath(path.resolve(fileDir, requirePath), readFile);
-    const nested = collectFromFile(routerPath, joinPath(prefix, mountPrefix), readFile, nextAncestors);
+  for (const { prefix: mountPrefix, requirePath, exportName: mountExportName } of mounts) {
+    const routerPath = resolveRequiredFile(fileDir, requirePath, readFile);
+    if (!routerPath) continue;
+    const nested = collectFromFile(routerPath, joinPath(prefix, mountPrefix), readFile, nextAncestors, mountExportName);
     routes.push(...nested.routes);
     unparsedRoutes.push(...nested.unparsedRoutes);
   }

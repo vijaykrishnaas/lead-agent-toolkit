@@ -335,6 +335,115 @@ describe('collectExpressRoutes', () => {
     });
   });
 
+  describe('a router reached through a barrel file (task 43)', () => {
+    const collect = (files) => {
+      const readFile = (filePath) => {
+        if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+        return files[filePath];
+      };
+      return collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile });
+    };
+    const routerFiles = {
+      '/repo/src/routes/tasks.routes.js': "router.get('/:id', show);\nmodule.exports = router;",
+      '/repo/src/routes/users.routes.js': "router.post('/', create);\nmodule.exports = router;",
+    };
+    const barrels = {
+      'inline require in module.exports': "module.exports = { tasks: require('./tasks.routes'), users: require('./users.routes') };",
+      'exports.name assignments': "exports.tasks = require('./tasks.routes');\nmodule.exports.users = require('./users.routes');",
+      'shorthand locals': "const tasks = require('./tasks.routes');\nconst u = require('./users.routes');\nmodule.exports = { tasks, users: u };",
+    };
+    const mountStyles = {
+      member: "const routes = require('./routes');\napp.use('/api/tasks', routes.tasks);\napp.use('/api/users', auth(), routes.users);",
+      destructured: "const { tasks, users } = require('./routes');\napp.use('/api/tasks', tasks);\napp.use('/api/users', users);",
+      'aliased destructure': "const { tasks: t, users: u } = require('./routes');\napp.use('/api/tasks', t);\napp.use('/api/users', u);",
+      'inline require member': "app.use('/api/tasks', require('./routes').tasks);\napp.use('/api/users', require('./routes').users);",
+    };
+
+    for (const [barrelName, barrelSource] of Object.entries(barrels)) {
+      for (const [mountName, appSource] of Object.entries(mountStyles)) {
+        it(`follows two routers through a barrel (${barrelName}) mounted by ${mountName}`, () => {
+          const files = { ...routerFiles, '/repo/src/app.js': appSource, '/repo/src/routes/index.js': barrelSource };
+          expect(collect(files)).toEqual({
+            routes: [
+              { method: 'GET', path: '/api/tasks/:id' },
+              { method: 'POST', path: '/api/users' },
+            ],
+            unparsedRoutes: [],
+          });
+        });
+      }
+    }
+
+    it('follows a barrel that re-exports from another barrel, and a named export of the routes file', () => {
+      const files = {
+        '/repo/src/app.js': "const { tasks } = require('./routes');\napp.use('/api/tasks', tasks);",
+        '/repo/src/routes/index.js': "const { tasks } = require('./v1');\nmodule.exports = { tasks };",
+        '/repo/src/routes/v1/index.js': "exports.tasks = require('./tasks.routes').router;",
+        '/repo/src/routes/v1/tasks.routes.js': "router.get('/:id', show);\nmodule.exports = { router };",
+      };
+      expect(collect(files).routes).toEqual([{ method: 'GET', path: '/api/tasks/:id' }]);
+    });
+
+    it('reports an unparsed route found behind the barrel against the routes file', () => {
+      const files = {
+        '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api/tasks', routes.tasks);",
+        '/repo/src/routes/index.js': "module.exports = { tasks: require('./tasks.routes') };",
+        '/repo/src/routes/tasks.routes.js': 'router.get(`/${id}`, show);',
+      };
+      expect(collect(files)).toEqual({
+        routes: [],
+        unparsedRoutes: [expect.objectContaining({ type: 'unparsed-route', file: '/repo/src/routes/tasks.routes.js' })],
+      });
+    });
+
+    it('ignores a commented-out export line in the barrel', () => {
+      const files = {
+        ...routerFiles,
+        '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api/tasks', routes.tasks);",
+        '/repo/src/routes/index.js': "// exports.tasks = require('./users.routes');\nexports.tasks = require('./tasks.routes');",
+      };
+      expect(collect(files).routes).toEqual([{ method: 'GET', path: '/api/tasks/:id' }]);
+    });
+
+    it('still reads the required file itself when the name is not re-exported from another file', () => {
+      const files = {
+        '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api', routes.router);\napp.use('/x', routes.missing);",
+        '/repo/src/routes/index.js': "router.get('/ping', ping);\nmodule.exports = { router, pkg: require('helmet'), cfg: require('./cfg.json') };",
+      };
+      expect(collect(files).routes).toEqual([
+        { method: 'GET', path: '/api/ping' },
+        { method: 'GET', path: '/x/ping' },
+      ]);
+      files['/repo/src/app.js'] = "const routes = require('./routes');\napp.use('/p', routes.pkg);\napp.use('/c', routes.cfg);";
+      expect(collect(files).routes).toEqual([
+        { method: 'GET', path: '/p/ping' },
+        { method: 'GET', path: '/c/ping' },
+      ]);
+    });
+
+    it('terminates on a barrel export that points back at itself', () => {
+      const files = {
+        '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api', routes.tasks);",
+        '/repo/src/routes/index.js': "exports.tasks = require('./other').tasks;",
+        '/repo/src/routes/other.js': "exports.tasks = require('./index').tasks;",
+      };
+      expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [] });
+    });
+
+    it('lets a routes file behind a barrel mount a sibling through the same barrel', () => {
+      const files = {
+        '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api/tasks', routes.tasks);",
+        '/repo/src/routes/index.js': "module.exports = { tasks: require('./tasks.routes'), users: require('./users.routes') };",
+        '/repo/src/routes/tasks.routes.js': "const routes = require('./index');\nrouter.get('/:id', show);\nrouter.use('/:id/users', routes.users);",
+        '/repo/src/routes/users.routes.js': "router.post('/', create);",
+      };
+      expect(collect(files).routes).toEqual([
+        { method: 'GET', path: '/api/tasks/:id' },
+        { method: 'POST', path: '/api/tasks/:id/users' },
+      ]);
+    });
+  });
+
   it('does not try to read a relative .json/.node require used as a use() argument as a router file', () => {
     const files = {
       '/repo/src/app.js': [

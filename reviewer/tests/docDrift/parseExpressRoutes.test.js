@@ -1,4 +1,4 @@
-const { parseRouterSource, parseAppEntrySource, findUnparsedRoutes } = require('../../src/docDrift/parseExpressRoutes');
+const { parseRouterSource, parseAppEntrySource, findUnparsedRoutes, findExportedRequire } = require('../../src/docDrift/parseExpressRoutes');
 
 describe('parseRouterSource', () => {
   it('extracts one route per router.<verb>(path, ...) call', () => {
@@ -217,7 +217,7 @@ describe('parseAppEntrySource', () => {
   it('keeps a mount whose router is an inline require() with a property access', () => {
     const source = "app.use('/a', require('./a').router);";
     expect(parseAppEntrySource(source).mounts).toEqual([
-      { prefix: '/a', requirePath: './a' },
+      { prefix: '/a', requirePath: './a', exportName: 'router' },
     ]);
   });
 
@@ -485,7 +485,7 @@ describe('parseAppEntrySource prefixless mounts (task 37)', () => {
     const source = "app.use(require('./routes/a'));\nrouter.use(require('./routes/b').router);";
     expect(parseAppEntrySource(source).mounts).toEqual([
       { prefix: '', requirePath: './routes/a' },
-      { prefix: '', requirePath: './routes/b' },
+      { prefix: '', requirePath: './routes/b', exportName: 'router' },
     ]);
   });
 
@@ -934,7 +934,7 @@ describe('mounts with arbitrary middle arguments and chained use() (task 40)', (
       "const API = '/api';",
       "app.use(API, [auth], (q, s, n) => n(), require('./r').router);",
     ].join('\n');
-    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './r' }]);
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './r', exportName: 'router' }]);
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 
@@ -1049,13 +1049,13 @@ describe('mounts whose router is a member of a require binding or a destructured
 
   it('mounts a member of a relative-require binding, with a prefix', () => {
     const source = ["const routes = require('./routes');", "app.use('/api', routes.tasks);"].join('\n');
-    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './routes' }]);
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './routes', exportName: 'tasks' }]);
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 
   it('mounts a destructured relative require, with a prefix', () => {
     const source = ["const { tasks } = require('./routes');", "app.use('/api', tasks);"].join('\n');
-    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './routes' }]);
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './routes', exportName: 'tasks' }]);
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 
@@ -1070,11 +1070,11 @@ describe('mounts whose router is a member of a require binding or a destructured
       'app.use(requireAuth, routes?.tasks);',
     ].join('\n');
     expect(parseAppEntrySource(source).mounts).toEqual([
-      { prefix: '', requirePath: './routes' },
-      { prefix: '', requirePath: './more' },
-      { prefix: '/a', requirePath: './routes' },
-      { prefix: '/b', requirePath: './more' },
-      { prefix: '', requirePath: './routes' },
+      { prefix: '', requirePath: './routes', exportName: 'tasks' },
+      { prefix: '', requirePath: './more', exportName: 'users' },
+      { prefix: '/a', requirePath: './routes', exportName: 'admin' },
+      { prefix: '/b', requirePath: './more', exportName: 'auth' },
+      { prefix: '', requirePath: './routes', exportName: 'tasks' },
     ]);
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
@@ -1092,8 +1092,8 @@ describe('mounts whose router is a member of a require binding or a destructured
       "app.use('/x', users);",
     ].join('\n');
     expect(parseAppEntrySource(source).mounts).toEqual([
-      { prefix: '/t', requirePath: './routes' },
-      { prefix: '/u', requirePath: './routes' },
+      { prefix: '/t', requirePath: './routes', exportName: 'tasks' },
+      { prefix: '/u', requirePath: './routes', exportName: 'users' },
       { prefix: '/o', requirePath: './routes' },
     ]);
   });
@@ -1147,6 +1147,68 @@ describe('mounts whose router is a member of a require binding or a destructured
       "app.use('/u', users);",
     ].join('\n');
     expect(parseAppEntrySource(source).mounts).toEqual([]);
+  });
+});
+
+describe('findExportedRequire: a barrel file\'s named export (task 43)', () => {
+  it('reads a require written inline in module.exports', () => {
+    const source = "module.exports = {\n  tasks: require('./tasks.routes'),\n  users: require('./users.routes').router,\n};";
+    expect(findExportedRequire(source, 'tasks')).toEqual({ requirePath: './tasks.routes', exportName: null });
+    expect(findExportedRequire(source, 'users')).toEqual({ requirePath: './users.routes', exportName: 'router' });
+    expect(findExportedRequire(source, 'missing')).toBeNull();
+  });
+
+  it('reads a shorthand or renamed local bound by, or destructured from, a relative require', () => {
+    const source = [
+      "const tasks = require('./tasks.routes');",
+      "const usersRouter = require('./users.routes');",
+      "const { admin: adminRouter } = require('./admin');",
+      "module.exports = { tasks, users: usersRouter, 'admin': adminRouter, build() { return 1; }, ...rest };",
+    ].join('\n');
+    expect(findExportedRequire(source, 'tasks')).toEqual({ requirePath: './tasks.routes', exportName: null });
+    expect(findExportedRequire(source, 'users')).toEqual({ requirePath: './users.routes', exportName: null });
+    expect(findExportedRequire(source, 'admin')).toEqual({ requirePath: './admin', exportName: 'admin' });
+    expect(findExportedRequire(source, 'build')).toBeNull();
+    expect(findExportedRequire(source, 'rest')).toBeNull();
+  });
+
+  it('reads exports.name and module.exports.name assignments', () => {
+    const source = [
+      "const users = require('./users.routes');",
+      "exports.tasks = require('./tasks.routes');",
+      'module.exports.users = users',
+      "exports.multi =\n  require('./multi.routes');",
+    ].join('\n');
+    expect(findExportedRequire(source, 'tasks')).toEqual({ requirePath: './tasks.routes', exportName: null });
+    expect(findExportedRequire(source, 'users')).toEqual({ requirePath: './users.routes', exportName: null });
+    expect(findExportedRequire(source, 'multi')).toEqual({ requirePath: './multi.routes', exportName: null });
+  });
+
+  it('returns null for a router built in the same file, a bare package and a non-require value', () => {
+    const source = [
+      "const express = require('express');",
+      'const router = express.Router();',
+      "const helmet = require('helmet');",
+      "module.exports = { router, helmet, json: express.json, made: makeRouter(require('./x')) };",
+      'exports.other = router;',
+      "exports.eq == require('./eq');",
+    ].join('\n');
+    for (const name of ['router', 'helmet', 'json', 'made', 'other', 'eq']) {
+      expect(findExportedRequire(source, name)).toBeNull();
+    }
+  });
+
+  it('ignores a commented-out or quoted export', () => {
+    const source = [
+      "// exports.tasks = require('./old.routes');",
+      "const text = \"module.exports = { users: require('./old.routes') }\";",
+      'module.exports = {',
+      "  // tasks: require('./older.routes'),",
+      "  tasks: require('./tasks.routes'), /* users: require('./old.routes') */",
+      '};',
+    ].join('\n');
+    expect(findExportedRequire(source, 'tasks')).toEqual({ requirePath: './tasks.routes', exportName: null });
+    expect(findExportedRequire(source, 'users')).toBeNull();
   });
 });
 

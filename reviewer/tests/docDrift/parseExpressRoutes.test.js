@@ -1653,3 +1653,67 @@ describe('verb calls whose path is not one whole string literal (task 45)', () =
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });
+
+describe('a const string name bound more than once in the file (review of task 45)', () => {
+  const warning = (method, line) => ({
+    type: 'unparsed-route',
+    method,
+    line,
+    reason: 'route exists but path could not be statically resolved',
+  });
+
+  it('warns instead of listing every verb path at the last binding\'s value', () => {
+    const source = [
+      'function a() {',
+      "  const P = '/a';",
+      '  router.get(P, h);',
+      '}',
+      'function b() {',
+      "  const P = '/b';",
+      '  router.post(P, h);',
+      '}',
+      "router.put('/real', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([{ method: 'PUT', path: '/real' }]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 3), warning('POST', 7)]);
+  });
+
+  it('warns when the other binding of the name is not a const string at all', () => {
+    const source = [
+      "const P = '/a';",
+      'function b(base) {',
+      '  let P = base + suffix;',
+      '  router.post(P, h);',
+      '}',
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('POST', 4)]);
+  });
+
+  it('does not mount two routers at the last same-named prefix const', () => {
+    const source = [
+      "const tasks = require('./tasks.routes');",
+      'function a() {',
+      "  const API = '/v1';",
+      '  app.use(API, tasks);',
+      '}',
+      'function b() {',
+      "  const API = '/v2';",
+      '  app.use(API, tasks);',
+      '}',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source).map((f) => f.line)).toEqual([4, 8]);
+  });
+
+  it('still resolves a name bound once, and ignores a second binding in a comment or string', () => {
+    const source = [
+      "const P = '/a';",
+      "// const P = '/b';",
+      'const msg = "const P = \'/c\';";',
+      'router.get(P, h);',
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/a' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+});

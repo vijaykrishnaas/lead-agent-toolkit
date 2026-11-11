@@ -170,10 +170,23 @@ function collectCallChains(masked) {
 
 // `const NAME = '<literal>';` bindings by name (see CONST_STRING_PATTERN) --
 // the one const-string lookup, shared by mount prefixes and verb paths.
+// A name bound more than once in the file (a `const P` in each of two
+// functions, or a `let P` elsewhere) is left out: this lookup has no scopes,
+// so it cannot tell which binding a use refers to, and resolving to the last
+// one listed routes at a path Express never serves. Left out, the name reads
+// as unresolvable and its uses warn.
 function collectConstStrings(commentMasked, masked) {
   const constStringsByVarName = new Map();
   for (const match of commentMasked.matchAll(CONST_STRING_PATTERN)) {
-    if (matchIsLive(match, masked)) constStringsByVarName.set(match[1], match[3]);
+    if (!matchIsLive(match, masked)) continue;
+    constStringsByVarName.set(match[1], match[3]);
+  }
+  const bindingCounts = new Map();
+  for (const match of commentMasked.matchAll(BINDING_PATTERN)) {
+    if (matchIsLive(match, masked)) bindingCounts.set(match[2], (bindingCounts.get(match[2]) || 0) + 1);
+  }
+  for (const name of [...constStringsByVarName.keys()]) {
+    if (bindingCounts.get(name) > 1) constStringsByVarName.delete(name);
   }
   return constStringsByVarName;
 }

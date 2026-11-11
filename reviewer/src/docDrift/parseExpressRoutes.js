@@ -40,6 +40,9 @@ const BINDING_PATTERN = /\b(const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^\n]*)/g
 // calls such as rateLimit({...}) / express.json() / new Limiter() (awaited
 // or not), which is how most middleware is built.
 const MIDDLEWARE_INITIALIZER_PATTERN = /^(?:(?:async\s+)?function\b|(?:async\s+)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>|(?:await\s+)?(?:new\s+)?[A-Za-z_$][\w$.]*\s*\()/;
+// What follows a right-hand side that ended at a line end when the next line
+// continues the expression -- the operator set CONST_STRING_PATTERN refuses.
+const INITIALIZER_CONTINUATION_PATTERN = /^\n\s*[-+*/%.?:|&,[(<>=]/;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
 // `const { tasks, users: usersRouter } = require('./routes');` -- names bound
 // by destructuring a require. Only a flat pattern (no nested `{}`) matches.
@@ -411,6 +414,21 @@ function destructuredNames(patternBody) {
 // export (see findExportedRequire). Both are relative-only: `express.json` /
 // `const { Router } = require('express')` are never router files in this
 // repo. exportName is null for a whole-module binding or a rest element.
+//
+// An identifier may also be bound to one call of a relative one of those
+// forms -- a router factory's result held in a local before it is mounted:
+// `const tasksRouter = makeTasksRouter(db)`, `= routes.tasks(db)`, a
+// destructured name called, `= require('./x')(db)`, `= require('./x').tasks(db)`
+// -- and resolves to the callee's file and export name. Only a
+// `const|let|var name = <initializer>` whose whole initializer (to the
+// statement's `;` or line end at depth 0, see rightHandSideEnd) is that one
+// call counts, and only one level: a name bound to a call of another
+// call-bound name, a later assignment (`let r; r = make(db);`),
+// `new Make(db)`, `await make(db)`, `make(db).router`, `make(db)(x)` and a
+// call on a bare package (`rateLimit({...})`, `express.Router()`) stay
+// unresolved, as does an initializer the next line carries on
+// (`make(db)` / `  .router`). A name bound more than once in the file by any initializer is
+// not call-resolved either (no scope analysis, like collectConstStrings).
 function buildRequireResolver(commentMasked, masked) {
   const requiresByVarName = new Map();
   for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
@@ -423,7 +441,7 @@ function buildRequireResolver(commentMasked, masked) {
       destructuredRequiresByVarName.set(local, { requirePath: match[3], exportName: key });
     }
   }
-  return function resolve(text) {
+  function resolveDirect(text) {
     const inline = INLINE_REQUIRE_ARG_PATTERN.exec(text);
     if (inline) return { requirePath: inline[2], exportName: inline[3] || null };
     if (IDENTIFIER_ARG_PATTERN.test(text)) {
@@ -436,7 +454,66 @@ function buildRequireResolver(commentMasked, masked) {
       return requirePath && requirePath.startsWith('.') ? { requirePath, exportName: member[2] } : null;
     }
     return null;
-  };
+  }
+  // Call-bound names are resolved with resolveDirect, never with the final
+  // resolver, which is what keeps the lookup one level deep.
+  const callBoundByVarName = new Map();
+  const bindingCounts = new Map();
+  for (const match of commentMasked.matchAll(BINDING_PATTERN)) {
+    if (!matchIsLive(match, masked)) continue;
+    const name = match[2];
+    bindingCounts.set(name, (bindingCounts.get(name) || 0) + 1);
+    const valueStart = match.index + match[0].length - match[3].length;
+    const valueEnd = rightHandSideEnd(masked, valueStart);
+    // An initializer carried on by the next line (`make(db)` / `  .router`)
+    // is more than the one call.
+    if (INITIALIZER_CONTINUATION_PATTERN.test(masked.slice(valueEnd))) continue;
+    const called = resolveRelativeCall(commentMasked, masked, [valueStart, valueEnd], resolveDirect);
+    if (called) callBoundByVarName.set(name, called);
+  }
+  for (const name of [...callBoundByVarName.keys()]) {
+    if (bindingCounts.get(name) > 1) callBoundByVarName.delete(name);
+  }
+  function resolve(text) {
+    // Checked first: `const r = require('./x').tasks(db)` also matches
+    // REQUIRE_PATTERN by its prefix, which would drop the `.tasks` member.
+    if (callBoundByVarName.has(text)) return callBoundByVarName.get(text);
+    return resolveDirect(text);
+  }
+  // The lookup without call-bound names, for a caller unwrapping a call
+  // itself: a call of a call-bound name is two calls deep.
+  resolve.direct = resolveDirect;
+  return resolve;
+}
+
+// The file (and named export) behind an expression that is exactly one call
+// of a relative-require form `resolve` reads -- makeTasksRouter(db),
+// routes.tasks(db), a destructured name called, require('./x')(db),
+// require('./x').member(db) -- or null. `[start, end)` is the expression's
+// range in the source. The callee is the text before the paren that the
+// expression's closing paren matches, found by depth on `masked` so nothing
+// inside the call's own arguments (parens, commas, quotes, comments) is
+// read. Relative-only: express.json(), helmet(), swaggerUi.setup(doc) and
+// rateLimit({...}) are never router files in this repo. Only one call is
+// unwrapped -- make(db)(x) and wrap(make(db)) are not resolved.
+function resolveRelativeCall(commentMasked, masked, [start, end], resolve) {
+  const raw = commentMasked.slice(start, end);
+  const text = raw.trim();
+  if (!text.endsWith(')')) return null;
+  const textStart = start + raw.indexOf(text);
+  let depth = 0;
+  let open = textStart + text.length - 1;
+  for (; open >= textStart; open -= 1) {
+    const ch = masked[open];
+    if (ch === ')' || ch === ']' || ch === '}') depth += 1;
+    else if (ch === '(' || ch === '[' || ch === '{') {
+      depth -= 1;
+      if (depth === 0) break;
+    }
+  }
+  if (open < textStart || masked[open] !== '(') return null;
+  const callee = resolve(commentMasked.slice(textStart, open).trim());
+  return callee && callee.requirePath.startsWith('.') ? callee : null;
 }
 
 // Splits an object literal's body at its top-level commas. `bodyStart` is
@@ -622,37 +699,14 @@ function analyzeUseCalls(commentMasked, masked) {
 
   // The file (and named export) the router argument comes from, or null.
   // `[start, end)` is the argument's range in the source. Besides the forms
-  // buildRequireResolver reads, the argument may be one call of such a form --
-  // a router factory: makeTasksRouter(db), routes.tasks(db), a destructured
-  // name called, require('./x')(db), require('./x').member(db) -- which
-  // resolves to the same file, since the factory's router.<verb> calls are
-  // written there. The callee is the text before the paren that the
-  // argument's closing paren matches, found by depth on `masked` so nothing
-  // inside the call's own arguments (parens, commas, quotes, comments) is
-  // read. A call is relative-only in every form, prefixed or not:
-  // express.json(), helmet(), swaggerUi.setup(doc) and rateLimit({...}) are
-  // never router files in this repo. Only one call is unwrapped --
-  // make(db)(x) and wrap(make(db)) are not resolved.
+  // buildRequireResolver reads (a local bound to a factory call among them),
+  // the argument may itself be one call of such a form -- a router factory
+  // called inline, see resolveRelativeCall -- which resolves to the same
+  // file, since the factory's router.<verb> calls are written there.
   const resolveRequire = buildRequireResolver(commentMasked, masked);
   function resolveRouter([start, end]) {
-    const raw = commentMasked.slice(start, end);
-    const text = raw.trim();
-    const direct = resolveRequire(text);
-    if (direct || !text.endsWith(')')) return direct;
-    const textStart = start + raw.indexOf(text);
-    let depth = 0;
-    let open = textStart + text.length - 1;
-    for (; open >= textStart; open -= 1) {
-      const ch = masked[open];
-      if (ch === ')' || ch === ']' || ch === '}') depth += 1;
-      else if (ch === '(' || ch === '[' || ch === '{') {
-        depth -= 1;
-        if (depth === 0) break;
-      }
-    }
-    if (open < textStart || masked[open] !== '(') return null;
-    const callee = resolveRequire(commentMasked.slice(textStart, open).trim());
-    return callee && callee.requirePath.startsWith('.') ? callee : null;
+    const direct = resolveRequire(commentMasked.slice(start, end).trim());
+    return direct || resolveRelativeCall(commentMasked, masked, [start, end], resolveRequire.direct);
   }
 
   // 'skip' (reported elsewhere), 'warn', or { prefix } with prefix null when

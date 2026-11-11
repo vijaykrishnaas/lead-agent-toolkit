@@ -855,4 +855,68 @@ describe('collectExpressRoutes', () => {
       expect(collect(files)).toEqual({ routes: [{ method: 'GET', path: '/health' }], unparsedRoutes: [] });
     });
   });
+
+  describe('a factory result bound to a local before it is mounted (task 47)', () => {
+    const collect = (files) => {
+      const readFile = (filePath) => {
+        if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+        return files[filePath];
+      };
+      return collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile });
+    };
+    const factory = [
+      'module.exports = (db) => {',
+      '  const router = express.Router();',
+      "  router.get('/', list(db));",
+      '  return router;',
+      '};',
+    ].join('\n');
+    const barrel = {
+      '/repo/src/routes/index.js': "module.exports = { tasks: require('./tasks.routes') };",
+      '/repo/src/routes/tasks.routes.js': factory,
+    };
+    const expected = { routes: [{ method: 'GET', path: '/api/tasks' }], unparsedRoutes: [] };
+
+    it('(a) lists the routes of a require-bound factory called into a local', () => {
+      const files = {
+        '/repo/src/app.js': [
+          "const makeTasksRouter = require('./tasks.routes');",
+          'const tasksRouter = makeTasksRouter(db);',
+          "app.use('/api/tasks', tasksRouter);",
+        ].join('\n'),
+        '/repo/src/tasks.routes.js': factory,
+      };
+      expect(collect(files)).toEqual(expected);
+    });
+
+    it('(b), (c), (d) follow a member, a destructured name and an inline require member through a barrel', () => {
+      for (const appSource of [
+        "const routes = require('./routes');\nconst tasksRouter = routes.tasks(db);\napp.use('/api/tasks', tasksRouter);",
+        "const { tasks } = require('./routes');\nconst tasksRouter = tasks(db);\napp.use('/api/tasks', tasksRouter);",
+        "const tasksRouter = require('./routes').tasks(db);\napp.use('/api/tasks', tasksRouter);",
+      ]) {
+        expect(collect({ '/repo/src/app.js': appSource, ...barrel })).toEqual(expected);
+      }
+    });
+
+    it('lists the routes of a call-bound local mounted without a prefix', () => {
+      const files = {
+        '/repo/src/app.js': [
+          "const makeTasksRouter = require('./tasks.routes');",
+          'const tasksRouter = makeTasksRouter(db);',
+          'app.use(tasksRouter);',
+        ].join('\n'),
+        '/repo/src/tasks.routes.js': factory,
+      };
+      expect(collect(files)).toEqual({ routes: [{ method: 'GET', path: '/' }], unparsedRoutes: [] });
+    });
+
+    it('keeps listing a local bound to a call of an inline whole-module require', () => {
+      const files = {
+        '/repo/src/app.js': "const tasksRouter = require('./tasks.routes')(db);\napp.use('/api/tasks', tasksRouter);",
+        '/repo/src/tasks.routes.js': factory,
+      };
+      expect(collect(files)).toEqual(expected);
+    });
+  });
 });

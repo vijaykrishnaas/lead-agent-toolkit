@@ -1539,6 +1539,161 @@ describe('mounts whose router is built by calling a factory from a relative requ
   });
 });
 
+describe('mounts whose router is a factory result bound to a local first (task 47)', () => {
+  const MOUNT_WARNING = {
+    type: 'unparsed-route',
+    method: 'MOUNT',
+    reason: 'mount exists but prefix could not be statically resolved',
+  };
+
+  it('mounts a local bound to a call of a relative-require binding, with and without a prefix', () => {
+    const source = [
+      "const makeTasksRouter = require('./tasks.routes');",
+      'const tasksRouter = makeTasksRouter(db);',
+      "app.use('/api/tasks', tasksRouter);",
+      'app.use(tasksRouter);',
+      "app.use('/mw', auth(), [a, b], tasksRouter);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/api/tasks', requirePath: './tasks.routes' },
+      { prefix: '', requirePath: './tasks.routes' },
+      { prefix: '/mw', requirePath: './tasks.routes' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('carries the export name of a member, destructured or inline-require-member callee', () => {
+    const source = [
+      "const routes = require('./routes');",
+      "const { users, admin: makeAdmin } = require('./more');",
+      'const a = routes.tasks(db);',
+      'let b = users(db)',
+      'var c = makeAdmin();',
+      "const d = require('./routes').tasks(db);",
+      "const e = require(\"./plain\")(db);",
+      "app.use('/a', a);",
+      "app.use('/b', b);",
+      "app.use('/c', c);",
+      "app.use('/d', d);",
+      "app.use('/e', e);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/a', requirePath: './routes', exportName: 'tasks' },
+      { prefix: '/b', requirePath: './more', exportName: 'users' },
+      { prefix: '/c', requirePath: './more', exportName: 'admin' },
+      { prefix: '/d', requirePath: './routes', exportName: 'tasks' },
+      { prefix: '/e', requirePath: './plain' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('reads past parens, commas, quotes and line breaks inside the bound call\'s arguments', () => {
+    const source = [
+      "const make = require('./tasks.routes');",
+      'const tasksRouter = make(db, {',
+      "  name: 'a, (b); c)',",
+      '  hooks: [one(), two(x, y)], // ) ;',
+      '});',
+      "app.use('/api/tasks', tasksRouter);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api/tasks', requirePath: './tasks.routes' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('ignores the same binding text inside a comment or a string', () => {
+    const source = [
+      "const make = require('./tasks.routes');",
+      '// const tasksRouter = make(db);',
+      '/* const other = make(db); */',
+      'const note = "const quoted = make(db);";',
+      "app.use('/a', tasksRouter);",
+      "app.use('/b', other);",
+      "app.use('/c', quoted);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('leaves every binding that is not exactly one call of a relative-require form unresolved', () => {
+    const source = [
+      "const make = require('./tasks.routes');",
+      "const rateLimit = require('express-rate-limit');",
+      'const first = make(db);',
+      'const second = first(db);',
+      'let late; late = make(db);',
+      'const viaNew = new make(db);',
+      'const awaited = await make(db);',
+      'const member = make(db).router;',
+      'const twice = make(db)(x);',
+      'const wrapped = wrap(make(db));',
+      'const either = make(db) || fallback;',
+      'const plain = express.Router();',
+      'const limiter = rateLimit({ max: 1 });',
+      "app.use('/second', second);",
+      "app.use('/inline', first(db));",
+      "app.use('/late', late);",
+      "app.use('/new', viaNew);",
+      "app.use('/awaited', awaited);",
+      "app.use('/member', member);",
+      "app.use('/twice', twice);",
+      "app.use('/wrapped', wrapped);",
+      "app.use('/either', either);",
+      "app.use('/plain', plain);",
+      'app.use(limiter);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('does not resolve an initializer that the next line carries on', () => {
+    const source = [
+      "const make = require('./tasks.routes');",
+      'const a = make(db)',
+      '  .router;',
+      'const b = make(db)',
+      '  || fallback;',
+      'const c = make(db)',
+      "app.use('/a', a);",
+      "app.use('/b', b);",
+      "app.use('/c', c);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/c', requirePath: './tasks.routes' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('does not resolve a name call-bound more than once in the file', () => {
+    const source = [
+      "const makeA = require('./a.routes');",
+      "const makeB = require('./b.routes');",
+      'function one() { const r = makeA(db); return r; }',
+      'function two() { const r = makeB(db); return r; }',
+      "app.use('/api', r);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+  });
+
+  it('keeps treating a call-bound local as middleware when it is the first argument', () => {
+    const source = [
+      "const make = require('./tasks.routes');",
+      "const other = require('./other.routes');",
+      'const guard = make(db);',
+      'app.use(guard, other);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '', requirePath: './other.routes' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('warns instead of mounting when the prefix in front of a call-bound local cannot be resolved', () => {
+    const source = [
+      "const make = require('./tasks.routes');",
+      'const tasksRouter = make(db);',
+      "app.use(API + '/v1', tasksRouter);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([{ ...MOUNT_WARNING, line: 3 }]);
+  });
+});
+
 describe('verb calls whose path is not one whole string literal (task 45)', () => {
   const warning = (method, line) => ({
     type: 'unparsed-route',

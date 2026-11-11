@@ -19,9 +19,6 @@ const IDENTIFIER_ARG_PATTERN = /^[A-Za-z_$][\w$]*$/;
 const INLINE_REQUIRE_ARG_PATTERN = /^require\(\s*(['"])(.*?)\1\s*\)(?:\.[A-Za-z_$][\w$]*)?$/;
 // An inline function/arrow argument: middleware, whatever its body holds.
 const INLINE_FUNCTION_ARG_PATTERN = /^(?:async\s+)?(?:function\b|(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>)/;
-// A .use( chained directly onto a use(...) call's closing paren, which
-// Express runs against the same receiver.
-const CHAINED_USE_PATTERN = /^\s*\.use\(/;
 // `const API = '/api';` -- a prefix held in a variable. Only a `const` whose
 // whole initializer is one string literal counts (not `'/a' + x`, not a
 // reassignable let/var), so the resolved prefix is exactly what Express sees.
@@ -70,9 +67,16 @@ const UNPARSED_METHOD_CALL_PATTERN = new RegExp(`\\b(?:router|app)\\s*\\.(${VERB
 const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*[`[]/g;
 const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\s*\.use\(\s*[`[]/g;
 
-// Any live app|router.use( call, matched against the fully masked source so
-// its arguments can be split by depth (see splitTopLevelArgs).
-const USE_CALL_PATTERN = /\b(?:router|app)\s*\.use\(/g;
+// The head of a call chain: any live app|router.<verb>( / .use( / .all( call,
+// matched against the fully masked source so its arguments can be split by
+// depth (see splitTopLevelArgs). Each of these returns the app/router itself,
+// so a .<verb>( / .use( / .all( written directly onto its closing paren
+// (CHAIN_LINK_PATTERN) runs against the same receiver.
+const CHAIN_HEAD_PATTERN = new RegExp(`\\b(?:router|app)\\s*\\.(${VERB_ALTERNATION}|all|use)\\(`, 'g');
+const CHAIN_LINK_PATTERN = new RegExp(`^\\s*\\.(${VERB_ALTERNATION}|all|use)\\(`);
+// A chained verb's path: a quoted literal opening its argument list, with the
+// same "/" or "*" start METHOD_CALL_PATTERN requires of a head call.
+const CHAINED_PATH_PATTERN = /^\s*(['"])([/*].*?)\1/;
 
 // A match whose first character was blanked by the full string-and-comment
 // mask starts inside a string/template literal (e.g. a log message quoting
@@ -125,8 +129,46 @@ function collectChainedVerbs(commentMasked, masked, chainStart) {
   return verbs;
 }
 
+// Every call in every app|router call chain, in source order: the head
+// (`router.get(...)`, `app.use(...)`) and each .<verb>( / .use( / .all( call
+// directly chained onto the previous call's closing paren -- nothing but
+// whitespace between them on `masked`, where a commented-out link reads as
+// whitespace and so is skipped without ending the chain. Each call's own
+// argument list is skipped by depth (splitTopLevelArgs), never by jumping to
+// the next occurrence. Each entry is { name, index, argsStart, args,
+// closeIndex, isChained }; `index` is the receiver's start for a head and the
+// "." for a chained link. Any other link (.listen(, .route() ends the walk.
+function collectCallChains(masked) {
+  const calls = [];
+  for (const head of masked.matchAll(CHAIN_HEAD_PATTERN)) {
+    let call = { name: head[1], index: head.index, argsStart: head.index + head[0].length, isChained: false };
+    while (call) {
+      const args = splitTopLevelArgs(masked, call.argsStart);
+      if (!args) break;
+      const closeIndex = args[args.length - 1][1];
+      calls.push({ ...call, args, closeIndex });
+      const link = CHAIN_LINK_PATTERN.exec(masked.slice(closeIndex + 1));
+      call = link && {
+        name: link[1],
+        index: closeIndex + 1 + link[0].indexOf('.'),
+        argsStart: closeIndex + 1 + link[0].length,
+        isChained: true,
+      };
+    }
+  }
+  return calls;
+}
+
+// The verb calls among collectCallChains' chained links (not heads, which
+// METHOD_CALL_PATTERN and UNPARSED_METHOD_CALL_PATTERN already read; not
+// use/all, which add no route).
+function collectChainedVerbCalls(masked) {
+  return collectCallChains(masked).filter((call) => call.isChained && HTTP_METHODS.includes(call.name));
+}
+
 // Extracts { method, path } route entries from a single Express router file's
-// source text (e.g. tasks.routes.js). Only router.<verb>(path, ...) calls
+// source text (e.g. tasks.routes.js). Only router.<verb>(path, ...) calls,
+// verbs chained onto one (router.get('/a', h).post('/b', h)) or onto a use(),
 // and router.route(path).<verb>(...) chains count as routes — router.use
 // (middleware) and similar are ignored because neither pattern matches
 // anything but a recognized HTTP verb.
@@ -149,6 +191,11 @@ function parseRouterSource(source) {
   for (const match of commentMasked.matchAll(METHOD_CALL_PATTERN)) {
     if (!matchIsLive(match, masked)) continue;
     routes.push({ method: match[1].toUpperCase(), path: match[3] });
+  }
+  // A verb chained onto a verb/use call carries its own path argument.
+  for (const call of collectChainedVerbCalls(masked)) {
+    const path = CHAINED_PATH_PATTERN.exec(commentMasked.slice(call.argsStart, call.closeIndex));
+    if (path) routes.push({ method: call.name.toUpperCase(), path: path[2] });
   }
 
   // For each .route(path) call, its chained verbs are only the .<verb>(...)
@@ -283,7 +330,7 @@ function destructuredNames(patternBody) {
 }
 
 // Classifies every live app|router.use(...) call in source order, including
-// a .use( chained onto another's closing paren. Each entry is
+// a .use( chained onto another use(/verb call's closing paren. Each entry is
 // { index, mount, warn }: `mount` is { prefix, requirePath } or null, and
 // `warn` is true when the call's prefix cannot be read statically (so the
 // router is reported by findUnparsedRoutes instead of being mounted at a
@@ -358,10 +405,8 @@ function analyzeUseCalls(commentMasked, masked) {
   }
 
   const calls = [];
-  function analyzeCall(index, argsStart, isChained) {
-    const args = splitTopLevelArgs(masked, argsStart);
-    if (!args) return;
-    const closeIndex = args[args.length - 1][1];
+  function analyzeCall(index, callArgs, isChained) {
+    const args = callArgs.slice();
     const argText = ([start, end]) => commentMasked.slice(start, end).trim();
     // A trailing comma -- app.use(a || b,) -- is not another argument.
     if (argText(args[args.length - 1]) === '') args.pop();
@@ -382,16 +427,12 @@ function analyzeUseCalls(commentMasked, masked) {
       if (!mount && !warn && resolved !== 'skip' && requirePath && requirePath.startsWith('.')) warn = true;
       calls.push({ index, mount, warn });
     }
-    const chained = CHAINED_USE_PATTERN.exec(masked.slice(closeIndex + 1));
-    if (chained) {
-      const chainIndex = closeIndex + 1 + chained[0].indexOf('.');
-      analyzeCall(chainIndex, closeIndex + 1 + chained[0].length, true);
-    }
   }
-  // Matched on the fully masked source, so a call quoted in a string or
-  // sitting in a comment is never analyzed.
-  for (const match of masked.matchAll(USE_CALL_PATTERN)) {
-    analyzeCall(match.index, match.index + match[0].length, false);
+  // Walked on the fully masked source, so a call quoted in a string or
+  // sitting in a comment is never analyzed. A use( chained onto a verb call
+  // (app.get('/health', h).use('/api', r)) is read like one chained onto use(.
+  for (const call of collectCallChains(masked)) {
+    if (call.name === 'use') analyzeCall(call.index, call.args, call.isChained);
   }
   calls.sort((a, b) => a.index - b.index);
   return calls;
@@ -419,6 +460,18 @@ function findUnparsedRoutes(source) {
       type: 'unparsed-route',
       method: match[1].toUpperCase(),
       line: lineNumberAt(commentMasked, match.index),
+      reason: 'route exists but path could not be statically resolved',
+    });
+  }
+  // UNPARSED_METHOD_CALL_PATTERN cannot see a verb chained onto another call
+  // (no "router."/"app." before it), so the same template-literal/array path
+  // is reported here, at the chained link's own line.
+  for (const call of collectChainedVerbCalls(masked)) {
+    if (!/^\s*[`[]/.test(commentMasked.slice(call.argsStart, call.closeIndex))) continue;
+    findings.push({
+      type: 'unparsed-route',
+      method: call.name.toUpperCase(),
+      line: lineNumberAt(commentMasked, call.index),
       reason: 'route exists but path could not be statically resolved',
     });
   }

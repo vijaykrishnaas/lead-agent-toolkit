@@ -1149,3 +1149,129 @@ describe('mounts whose router is a member of a require binding or a destructured
     expect(parseAppEntrySource(source).mounts).toEqual([]);
   });
 });
+
+describe('verb calls chained onto a verb or use() call (task 42)', () => {
+  it('reads every verb of a single-line chain', () => {
+    const source = "router.get('/a', h).post('/b', h).delete('/c/:id', h);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/b' },
+      { method: 'DELETE', path: '/c/:id' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('reads a multi-line chain with the receiver on its own line', () => {
+    const source = [
+      'router',
+      "  .get('/a', h)",
+      "  .post('/b', auth, (req, res) => { res.json({ ok: ')' }); })",
+      "  .put('/c', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/b' },
+      { method: 'PUT', path: '/c' },
+    ]);
+  });
+
+  it('reads a verb chained onto use(), and a use() chained onto a verb', () => {
+    const source = [
+      "const r = require('./r.routes');",
+      "const s = require('./s.routes');",
+      "app.use('/api', r).get('/health', h).use('/s', s).post('/echo', h);",
+    ].join('\n');
+    const { directRoutes, mounts } = parseAppEntrySource(source);
+    expect(directRoutes).toEqual([
+      { method: 'GET', path: '/health' },
+      { method: 'POST', path: '/echo' },
+    ]);
+    expect(mounts).toEqual([
+      { prefix: '/api', requirePath: './r.routes' },
+      { prefix: '/s', requirePath: './s.routes' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('skips a commented-out link and keeps reading the chain past it', () => {
+    const source = [
+      'router',
+      "  .get('/a', h)",
+      "  // .post('/dead', h)",
+      "  /* .patch('/dead2', h) */",
+      "  .put('/c', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'PUT', path: '/c' },
+    ]);
+  });
+
+  it('warns for a chained verb with a template-literal or array path', () => {
+    const source = [
+      "router.get('/a', h)",
+      '  .post(`/b/${v}`, h)',
+      "  .put(['/c', '/d'], h)",
+      "  .delete('/e', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'DELETE', path: '/e' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      { type: 'unparsed-route', method: 'POST', line: 2, reason: 'route exists but path could not be statically resolved' },
+      { type: 'unparsed-route', method: 'PUT', line: 3, reason: 'route exists but path could not be statically resolved' },
+    ]);
+  });
+
+  it('warns for a use() with a template-literal prefix chained onto a verb', () => {
+    const source = [
+      "const r = require('./r.routes');",
+      "app.get('/health', h).use(`/api/${v}`, r);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      { type: 'unparsed-route', method: 'MOUNT', line: 2, reason: 'mount exists but prefix could not be statically resolved' },
+    ]);
+  });
+
+  it('continues past a chained .all() without adding a route for it', () => {
+    const source = "router.get('/a', h).all('/b', mw).post('/b', h);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/b' },
+    ]);
+  });
+
+  it('does not treat a separate statement or an unrelated call as part of the chain', () => {
+    const source = [
+      "router.get('/a', h);",
+      "other.post('/not-a-route', h);",
+      "client.get('/x').post('/y', h);",
+      "router.get('/b', h).listen(3000).post('/after-unknown-link', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'GET', path: '/b' },
+    ]);
+  });
+
+  it('ignores a chained settings getter and a chain quoted in a string', () => {
+    const source = [
+      "app.use(helmet()).get('env');",
+      "const text = \"router.get('/a', h).post('/b', h)\";",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('still reads a .route() chain exactly once', () => {
+    const source = "router.route('/a').get(h).post(h);\nrouter.get('/b', h).route('/c').put(h);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/b' },
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/a' },
+      { method: 'PUT', path: '/c' },
+    ]);
+  });
+});

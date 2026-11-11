@@ -786,6 +786,149 @@ describe('collectExpressRoutes', () => {
     });
   });
 
+  describe('whole-module exports that are not one plain re-export line (task 49)', () => {
+    const collect = (files) => {
+      const readFile = (filePath) => {
+        if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+        return files[filePath];
+      };
+      return collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile });
+    };
+    const app = '/repo/src/app.js';
+    const index = '/repo/src/r.js';
+    const wholeMount = "const r = require('./r');\napp.use('/api', r);";
+    const namedMount = "const r = require('./r');\napp.use('/api', r.tasks);";
+    const make = {
+      '/repo/src/make.js': ['module.exports = (db) => {', '  const router = express.Router();', "  router.get('/:id', show(db));", '  return router;', '};'].join('\n'),
+    };
+    const tasksRoutes = { '/repo/src/t.js': "router.get('/:id', show);\nmodule.exports = router;" };
+    const barrel = { '/repo/src/a.js': "module.exports = { tasks: require('./t') };" };
+    const listed = { routes: [{ method: 'GET', path: '/api/:id' }], unparsedRoutes: [] };
+    const nothing = { routes: [], unparsedRoutes: [] };
+
+    describe('(a) a factory call as the whole module', () => {
+      it('follows an inline relative require called', () => {
+        expect(collect({ ...make, [app]: wholeMount, [index]: "module.exports = require('./make')(db);" })).toEqual(listed);
+      });
+
+      it('follows a require-bound factory called', () => {
+        expect(collect({ ...make, [app]: wholeMount, [index]: "const make = require('./make');\nmodule.exports = make(db);" })).toEqual(listed);
+      });
+
+      it('follows a call whose arguments span lines and hold parens, quotes and a comment', () => {
+        const source = "const make = require('./make');\nmodule.exports = make({\n  db: connect('x)'), // )\n  log,\n});";
+        expect(collect({ ...make, [app]: wholeMount, [index]: source })).toEqual(listed);
+      });
+
+      it('follows one member of a relative require called, through the barrel that names it', () => {
+        const files = {
+          ...make,
+          [app]: wholeMount,
+          [index]: "const factories = require('./factories');\nmodule.exports = factories.tasks(db);",
+          '/repo/src/factories.js': "module.exports = { tasks: require('./make') };",
+        };
+        expect(collect(files)).toEqual(listed);
+      });
+
+      it('does not answer a named mount with a factory call: a member of its result is not an export of the file', () => {
+        expect(collect({ ...make, [app]: namedMount, [index]: "module.exports = require('./make')(db);" })).toEqual(nothing);
+      });
+
+      it('reads a bare-package call itself', () => {
+        const source = "const express = require('express');\nmodule.exports = express.Router();";
+        expect(collect({ [app]: wholeMount, [index]: source })).toEqual(nothing);
+      });
+
+      it('reads a file with its own routes itself, despite exporting a factory call', () => {
+        const source = "const wrap = require('./make');\nrouter.get('/own', h);\nmodule.exports = wrap(router);";
+        expect(collect({ ...make, [app]: wholeMount, [index]: source })).toEqual({ routes: [{ method: 'GET', path: '/api/own' }], unparsedRoutes: [] });
+      });
+
+      it('does not unwrap a call of a call or a wrapped call', () => {
+        expect(collect({ ...make, [app]: wholeMount, [index]: "module.exports = require('./make')(db)(x);" })).toEqual(nothing);
+        expect(collect({ ...make, [app]: wholeMount, [index]: "const make = require('./make');\nmodule.exports = wrap(make(db));" })).toEqual(nothing);
+      });
+
+      it('terminates on a factory call of the file itself', () => {
+        expect(collect({ [app]: wholeMount, [index]: "module.exports = require('./r')(db);" })).toEqual(nothing);
+      });
+
+      it('reads the file itself when the called require is not a readable .js file', () => {
+        expect(collect({ [app]: wholeMount, [index]: "module.exports = require('./gone')(db);" })).toEqual(nothing);
+      });
+    });
+
+    describe('(b) module.exports = exports = ...', () => {
+      it('follows a whole-module mount', () => {
+        expect(collect({ ...tasksRoutes, [app]: wholeMount, [index]: "module.exports = exports = require('./t');" })).toEqual(listed);
+      });
+
+      it('follows a named mount', () => {
+        expect(collect({ ...tasksRoutes, ...barrel, [app]: namedMount, [index]: "module.exports = exports = require('./a');" })).toEqual(listed);
+      });
+
+      it('still follows the mirrored exports = module.exports = ...', () => {
+        expect(collect({ ...tasksRoutes, [app]: wholeMount, [index]: "exports = module.exports = require('./t');" })).toEqual(listed);
+      });
+    });
+
+    describe('(c) a right-hand side continued on a line starting with "."', () => {
+      it('follows a member written on the next line for a whole-module mount', () => {
+        expect(collect({ ...tasksRoutes, ...barrel, [app]: wholeMount, [index]: "module.exports = require('./a')\n  .tasks;" })).toEqual(listed);
+      });
+
+      it('follows it past a comment line and without a semicolon', () => {
+        const source = "const a = require('./a');\nmodule.exports = a\n  // the tasks router\n  .tasks\n";
+        expect(collect({ ...tasksRoutes, ...barrel, [app]: wholeMount, [index]: source })).toEqual(listed);
+      });
+
+      it('follows a factory call continued on the next line', () => {
+        const source = "module.exports = require('./factories')\n  .tasks(db);";
+        const files = { ...make, [app]: wholeMount, [index]: source, '/repo/src/factories.js': "module.exports = { tasks: require('./make') };" };
+        expect(collect(files)).toEqual(listed);
+      });
+
+      it('follows a named export assignment continued on the next line', () => {
+        expect(collect({ ...tasksRoutes, ...barrel, [app]: namedMount, [index]: "exports.tasks = require('./a')\n  .tasks;" })).toEqual(listed);
+      });
+
+      it('does not read a member of a call result as the bare call', () => {
+        expect(collect({ ...make, [app]: wholeMount, [index]: "module.exports = require('./make')(db)\n  .router;" })).toEqual(nothing);
+      });
+
+      it('does not join a next line that starts another statement', () => {
+        expect(collect({ ...tasksRoutes, [app]: wholeMount, [index]: "module.exports = require('./t')\nconsole.log('loaded');" })).toEqual(listed);
+      });
+    });
+
+    describe('(d) Object.assign with whitespace before the paren', () => {
+      it('follows a named mount', () => {
+        expect(collect({ ...tasksRoutes, [app]: namedMount, [index]: "Object.assign (module.exports, { tasks: require('./t') });" })).toEqual(listed);
+      });
+
+      it('follows a name behind a spread entry', () => {
+        expect(collect({ ...tasksRoutes, ...barrel, [app]: namedMount, [index]: "Object.assign\n  (exports, { ...require('./a') });" })).toEqual(listed);
+      });
+    });
+
+    describe('(e) a conditional whole-module export is not followed (documented limit)', () => {
+      const branches = { '/repo/src/a.js': "router.get('/a', h);", '/repo/src/b.js': "router.get('/b', h);" };
+
+      it('lists neither branch of a ternary', () => {
+        expect(collect({ ...branches, [app]: wholeMount, [index]: "module.exports = c ? require('./a') : require('./b');" })).toEqual(nothing);
+      });
+
+      it('lists neither branch of a ternary continued on the next lines', () => {
+        expect(collect({ ...branches, [app]: wholeMount, [index]: "module.exports = c\n  ? require('./a')\n  : require('./b');" })).toEqual(nothing);
+      });
+
+      it('lists neither branch of an if/else pair', () => {
+        const source = "if (x) module.exports = require('./a'); else module.exports = require('./b');";
+        expect(collect({ ...branches, [app]: wholeMount, [index]: source })).toEqual(nothing);
+      });
+    });
+  });
+
   describe('a router built by a factory exported from a relative require (task 44)', () => {
     const collect = (files) => {
       const readFile = (filePath) => {

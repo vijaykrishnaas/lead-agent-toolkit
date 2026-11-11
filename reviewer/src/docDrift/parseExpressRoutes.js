@@ -60,8 +60,12 @@ const EXPORT_ASSIGNMENT_PATTERN = /(?<![\w$.])(?:module\s*\.\s*)?exports\s*\.\s*
 // `module.exports = <rhs>` statement (any right-hand side; the `{` form is
 // counted too, so "the file's only export statement" can be checked), and an
 // `Object.assign(module.exports, ...)` / `Object.assign(exports, ...)` call.
-const WHOLE_MODULE_EXPORT_PATTERN = /(?<![\w$.])module\s*\.\s*exports\s*=(?![=>])/g;
-const OBJECT_ASSIGN_EXPORTS_PATTERN = /\bObject\s*\.\s*assign\(\s*(?:module\s*\.\s*)?exports\s*,/g;
+const WHOLE_MODULE_EXPORT_PATTERN = /(?<![\w$.])module\s*\.\s*exports\s*=(?![=>])(?:\s*exports\s*=(?![=>]))?/g;
+const OBJECT_ASSIGN_EXPORTS_PATTERN = /\bObject\s*\.\s*assign\s*\(\s*(?:module\s*\.\s*)?exports\s*,/g;
+// A member access carried onto the next line (`require('./a')` / `  .tasks`):
+// the line break, and any blank or comment-only line in it, before the ".".
+const MEMBER_LINE_BREAK_PATTERN = /\s*\n\s*\.(?!\.)/g;
+const MEMBER_CONTINUATION_PATTERN = /^\s*\n\s*\.(?!\.)/;
 // The opening of a .route(path) call, whose chained .<verb>(...) calls (e.g.
 // .get(fn).post(fn)) are found separately — the head-call walk
 // (CHAIN_HEAD_PATTERN) can't see them because the verb call isn't preceded
@@ -620,11 +624,23 @@ function rightHandSideEnd(masked, valueStart) {
   return end;
 }
 
+// The end of an export's right-hand side: rightHandSideEnd, carried on over
+// every following line that starts with "." (`require('./a')` / `  .tasks;`),
+// which is the same expression. Any other next line ends it, as before.
+function exportValueEnd(masked, valueStart) {
+  let end = rightHandSideEnd(masked, valueStart);
+  for (;;) {
+    const continuation = MEMBER_CONTINUATION_PATTERN.exec(masked.slice(end));
+    if (!continuation) return end;
+    end = rightHandSideEnd(masked, end + continuation[0].length - 1);
+  }
+}
+
 // The body start (index right after the "{") of every object literal that
 // sets this file's exports, in source order: `module.exports = {` (or
 // `module.exports = exports = {`) and each object-literal argument after the
 // first of `Object.assign(module.exports, { ... })` / `Object.assign(exports,
-// { ... })`. Matched on the full mask, so commented-out or quoted text is
+// { ... })` (whitespace before its paren allowed). Matched on the full mask, so commented-out or quoted text is
 // never read.
 function exportObjectBodies(masked) {
   const bodies = [];
@@ -656,9 +672,12 @@ function exportObjectBodies(masked) {
 //    object has `...require('./x')` / `...local` entries; one hop per spread,
 //    the last-written first (later entries win in JavaScript). An own entry
 //    always beats a spread here, wherever it is written.
-//  - via 'module': the file's only `module.exports = ` statement is a
-//    relative require, a local bound by one, or one member of either; the
-//    hop keeps `exportName`. With a member (`module.exports =
+//  - via 'module': the file's only `module.exports = ` statement (also
+//    written `module.exports = exports = `) is a relative require, a local
+//    bound by one, or one member of either; the hop keeps `exportName`. For
+//    a whole-module lookup it may also be one call of such a form (a router
+//    factory). A conditional value (`c ? require('./a') : require('./b')`)
+//    cannot be chosen statically and is not followed -- no branch is. With a member (`module.exports =
 //    require('./x').routers`) only a whole-module lookup is answered -- a
 //    named export of a member would be two levels deep.
 // Matched on comment-masked source and checked live against the full mask,
@@ -667,8 +686,10 @@ function analyzeExports(source, exportName) {
   const { masked: commentMasked } = maskComments(source);
   const { masked } = maskStringLiterals(source);
   const resolve = buildRequireResolver(commentMasked, masked);
+  // A member written on a following line reads as if written on one.
+  const joinMemberLines = (text) => text.replace(MEMBER_LINE_BREAK_PATTERN, '.');
   const relative = (text) => {
-    const resolved = resolve(text.trim());
+    const resolved = resolve(joinMemberLines(text).trim());
     return resolved && resolved.requirePath.startsWith('.') ? resolved : null;
   };
   let declared = false;
@@ -697,7 +718,7 @@ function analyzeExports(source, exportName) {
     if (match[1] !== exportName) continue;
     declared = true;
     const valueStart = match.index + match[0].length;
-    const found = relative(commentMasked.slice(valueStart, rightHandSideEnd(masked, valueStart)));
+    const found = relative(commentMasked.slice(valueStart, exportValueEnd(masked, valueStart)));
     if (found) return { declared, hops: [{ ...found, via: 'named' }] };
   }
   if (declared) return { declared, hops: [] };
@@ -706,9 +727,19 @@ function analyzeExports(source, exportName) {
   const wholeModule = [...masked.matchAll(WHOLE_MODULE_EXPORT_PATTERN)];
   if (wholeModule.length === 1) {
     const valueStart = wholeModule[0].index + wholeModule[0][0].length;
-    const found = relative(commentMasked.slice(valueStart, rightHandSideEnd(masked, valueStart)));
+    const valueEnd = exportValueEnd(masked, valueStart);
+    const found = relative(commentMasked.slice(valueStart, valueEnd));
+    // One call of a relative-require form (`module.exports = make(db)`,
+    // `require('./make')(db)`): the factory's router.<verb> calls are written
+    // in that file, so it stands behind the module as a whole -- read with
+    // resolveRelativeCall and the plain lookup, exactly as a factory called
+    // inline in use() is, so only one call is unwrapped. A named lookup is
+    // not answered: a member of the call's result is not an export of the
+    // factory's file.
+    const called = found ? null : resolveRelativeCall(commentMasked, masked, [valueStart, valueEnd], (text) => resolve.direct(joinMemberLines(text)));
     if (found && exportName === null) hops.push({ ...found, via: 'module' });
     else if (found && !found.exportName) hops.push({ requirePath: found.requirePath, exportName, via: 'module' });
+    else if (called && exportName === null) hops.push({ ...called, via: 'module' });
   }
   return { declared, hops };
 }

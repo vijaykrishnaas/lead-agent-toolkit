@@ -414,6 +414,9 @@ function destructuredNames(patternBody) {
 // export (see findExportedRequire). Both are relative-only: `express.json` /
 // `const { Router } = require('express')` are never router files in this
 // repo. exportName is null for a whole-module binding or a rest element.
+// A local whose whole initializer is one member of an inline relative require
+// (`const tasks = require('./routes').tasks;`) resolves like the destructured
+// form, to { requirePath, exportName: 'tasks' }.
 //
 // An identifier may also be bound to one call of a relative one of those
 // forms -- a router factory's result held in a local before it is mounted:
@@ -431,8 +434,23 @@ function destructuredNames(patternBody) {
 // not call-resolved either (no scope analysis, like collectConstStrings).
 function buildRequireResolver(commentMasked, masked) {
   const requiresByVarName = new Map();
+  // `const tasks = require('./routes').tasks;` -- REQUIRE_PATTERN matches it
+  // by its `require('./routes')` prefix, which alone would read the barrel
+  // itself and never follow `.tasks`. A binding whose whole initializer is
+  // one member of an inline relative require keeps the member as its export
+  // name. Set and cleared alongside requiresByVarName, so whichever binding
+  // of a name is written last decides both.
+  const memberRequiresByVarName = new Map();
   for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
-    if (matchIsLive(match, masked)) requiresByVarName.set(match[1], match[3]);
+    if (!matchIsLive(match, masked)) continue;
+    requiresByVarName.set(match[1], match[3]);
+    memberRequiresByVarName.delete(match[1]);
+    const valueStart = match.index + match[0].indexOf('=') + 1;
+    const valueEnd = rightHandSideEnd(masked, valueStart);
+    const inline = INLINE_REQUIRE_ARG_PATTERN.exec(commentMasked.slice(valueStart, valueEnd).trim());
+    if (!inline || !inline[3] || !inline[2].startsWith('.')) continue;
+    if (INITIALIZER_CONTINUATION_PATTERN.test(masked.slice(valueEnd))) continue;
+    memberRequiresByVarName.set(match[1], { requirePath: inline[2], exportName: inline[3] });
   }
   const destructuredRequiresByVarName = new Map();
   for (const match of commentMasked.matchAll(DESTRUCTURED_REQUIRE_PATTERN)) {
@@ -445,6 +463,7 @@ function buildRequireResolver(commentMasked, masked) {
     const inline = INLINE_REQUIRE_ARG_PATTERN.exec(text);
     if (inline) return { requirePath: inline[2], exportName: inline[3] || null };
     if (IDENTIFIER_ARG_PATTERN.test(text)) {
+      if (memberRequiresByVarName.has(text)) return memberRequiresByVarName.get(text);
       if (requiresByVarName.get(text)) return { requirePath: requiresByVarName.get(text), exportName: null };
       return destructuredRequiresByVarName.get(text) || null;
     }

@@ -919,4 +919,72 @@ describe('collectExpressRoutes', () => {
       expect(collect(files)).toEqual(expected);
     });
   });
+
+  describe('a local bound to one member of an inline relative require (2026-11-11 review of 6a5f76a)', () => {
+    const collect = (files) => {
+      const readFile = (filePath) => {
+        if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+        return files[filePath];
+      };
+      return collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile });
+    };
+    const router = "const router = express.Router();\nrouter.get('/', list);\nmodule.exports = router;";
+    const factory = "module.exports = (db) => {\n  const router = express.Router();\n  router.get('/', list(db));\n  return router;\n};";
+    const expected = { routes: [{ method: 'GET', path: '/api/tasks' }], unparsedRoutes: [] };
+
+    it('follows the member through a barrel instead of reading the barrel itself', () => {
+      const files = {
+        '/repo/src/app.js': "const tasksRouter = require('./routes').tasks;\napp.use('/api/tasks', tasksRouter);",
+        '/repo/src/routes/index.js': "module.exports = { tasks: require('./tasks.routes') };",
+        '/repo/src/routes/tasks.routes.js': router,
+      };
+      expect(collect(files)).toEqual(expected);
+    });
+
+    it('follows the member when the bound name is called inline or into a second local', () => {
+      for (const appSource of [
+        "const makeTasks = require('./routes').tasks;\napp.use('/api/tasks', makeTasks(db));",
+        "const makeTasks = require('./routes').tasks;\nconst tasksRouter = makeTasks(db);\napp.use('/api/tasks', tasksRouter);",
+      ]) {
+        const files = {
+          '/repo/src/app.js': appSource,
+          '/repo/src/routes/index.js': "module.exports = { tasks: require('./tasks.routes') };",
+          '/repo/src/routes/tasks.routes.js': factory,
+        };
+        expect(collect(files)).toEqual(expected);
+      }
+    });
+
+    it('follows a barrel that exports such a local by name', () => {
+      const files = {
+        '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api/tasks', routes.tasks);",
+        '/repo/src/routes/index.js': "const tasks = require('./all').tasks;\nmodule.exports = { tasks };",
+        '/repo/src/routes/all.js': "module.exports = { tasks: require('./tasks.routes') };",
+        '/repo/src/routes/tasks.routes.js': router,
+      };
+      expect(collect(files)).toEqual(expected);
+    });
+
+    it('still reads the required file itself when it defines the member in place', () => {
+      const files = {
+        '/repo/src/app.js': "const tasksRouter = require('./tasks.routes').router;\napp.use('/api/tasks', tasksRouter);",
+        '/repo/src/tasks.routes.js': "const router = express.Router();\nrouter.get('/', list);\nmodule.exports = { router };",
+      };
+      expect(collect(files)).toEqual(expected);
+    });
+
+    it('lets a later whole-module binding of the same name win, as before', () => {
+      const files = {
+        '/repo/src/app.js': [
+          "function a() { const r = require('./routes').tasks; return r; }",
+          "const r = require('./other.routes');",
+          "app.use('/api/other', r);",
+        ].join('\n'),
+        '/repo/src/routes/index.js': "module.exports = { tasks: require('./tasks.routes') };",
+        '/repo/src/routes/tasks.routes.js': router,
+        '/repo/src/other.routes.js': router,
+      };
+      expect(collect(files)).toEqual({ routes: [{ method: 'GET', path: '/api/other' }], unparsedRoutes: [] });
+    });
+  });
 });

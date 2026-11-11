@@ -471,8 +471,9 @@ function findExportedRequire(source, exportName) {
 // UNPARSED_MOUNT_PATTERN. That pattern cannot see a chained .use(, so there
 // the same first argument warns here instead. A call whose last argument is
 // not a require-bound identifier, a member of or a name destructured from a
-// relative require, or an inline require (express.json(), an unbound name)
-// has no router to mount.
+// relative require, an inline require, or one call of a relative one of
+// those (a router factory -- see resolveRouter) has no router to mount
+// (express.json(), an unbound name).
 function analyzeUseCalls(commentMasked, masked) {
   const constStringsByVarName = new Map();
   for (const match of commentMasked.matchAll(CONST_STRING_PATTERN)) {
@@ -481,7 +482,39 @@ function analyzeUseCalls(commentMasked, masked) {
   const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
 
   // The file (and named export) the router argument comes from, or null.
-  const resolveRouter = buildRequireResolver(commentMasked, masked);
+  // `[start, end)` is the argument's range in the source. Besides the forms
+  // buildRequireResolver reads, the argument may be one call of such a form --
+  // a router factory: makeTasksRouter(db), routes.tasks(db), a destructured
+  // name called, require('./x')(db), require('./x').member(db) -- which
+  // resolves to the same file, since the factory's router.<verb> calls are
+  // written there. The callee is the text before the paren that the
+  // argument's closing paren matches, found by depth on `masked` so nothing
+  // inside the call's own arguments (parens, commas, quotes, comments) is
+  // read. A call is relative-only in every form, prefixed or not:
+  // express.json(), helmet(), swaggerUi.setup(doc) and rateLimit({...}) are
+  // never router files in this repo. Only one call is unwrapped --
+  // make(db)(x) and wrap(make(db)) are not resolved.
+  const resolveRequire = buildRequireResolver(commentMasked, masked);
+  function resolveRouter([start, end]) {
+    const raw = commentMasked.slice(start, end);
+    const text = raw.trim();
+    const direct = resolveRequire(text);
+    if (direct || !text.endsWith(')')) return direct;
+    const textStart = start + raw.indexOf(text);
+    let depth = 0;
+    let open = textStart + text.length - 1;
+    for (; open >= textStart; open -= 1) {
+      const ch = masked[open];
+      if (ch === ')' || ch === ']' || ch === '}') depth += 1;
+      else if (ch === '(' || ch === '[' || ch === '{') {
+        depth -= 1;
+        if (depth === 0) break;
+      }
+    }
+    if (open < textStart || masked[open] !== '(') return null;
+    const callee = resolveRequire(commentMasked.slice(textStart, open).trim());
+    return callee && callee.requirePath.startsWith('.') ? callee : null;
+  }
 
   // 'skip' (reported elsewhere), 'warn', or { prefix } with prefix null when
   // the first argument is middleware rather than a prefix.
@@ -505,7 +538,7 @@ function analyzeUseCalls(commentMasked, masked) {
     // A trailing comma -- app.use(a || b,) -- is not another argument.
     if (argText(args[args.length - 1]) === '') args.pop();
     if (args.length > 0) {
-      const router = resolveRouter(argText(args[args.length - 1]));
+      const router = resolveRouter(args[args.length - 1]);
       const requirePath = router && router.requirePath;
       // exportName is only set when the router is one named export of the
       // required file, so a whole-module mount stays { prefix, requirePath }.

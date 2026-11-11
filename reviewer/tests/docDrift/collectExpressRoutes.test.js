@@ -524,4 +524,74 @@ describe('collectExpressRoutes', () => {
       unparsedRoutes: [],
     });
   });
+
+  describe('a router built by a factory exported from a relative require (task 44)', () => {
+    const collect = (files) => {
+      const readFile = (filePath) => {
+        if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+        return files[filePath];
+      };
+      return collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile });
+    };
+    const factory = [
+      'module.exports = (db) => {',
+      '  const router = express.Router();',
+      "  router.get('/', list(db));",
+      "  router.post('/', create(db));",
+      '  return router;',
+      '};',
+    ].join('\n');
+    const expected = {
+      routes: [
+        { method: 'GET', path: '/api/tasks' },
+        { method: 'POST', path: '/api/tasks' },
+      ],
+      unparsedRoutes: [],
+    };
+
+    it('lists the routes of a factory called through a require binding', () => {
+      const files = {
+        '/repo/src/app.js': "const makeTasksRouter = require('./tasks.routes');\napp.use('/api/tasks', makeTasksRouter(db));",
+        '/repo/src/tasks.routes.js': factory,
+      };
+      expect(collect(files)).toEqual(expected);
+    });
+
+    it('lists the routes of a factory called on an inline require', () => {
+      const files = {
+        '/repo/src/app.js': "app.use('/api/tasks', require('./tasks.routes')(db));",
+        '/repo/src/tasks.routes.js': factory,
+      };
+      expect(collect(files)).toEqual(expected);
+    });
+
+    it('follows a factory called as a member of, or destructured from, a barrel', () => {
+      for (const appSource of [
+        "const routes = require('./routes');\napp.use('/api/tasks', auth(), routes.tasks(db));",
+        "const { tasks: makeTasks } = require('./routes');\napp.use('/api/tasks', makeTasks(db));",
+      ]) {
+        const files = {
+          '/repo/src/app.js': appSource,
+          '/repo/src/routes/index.js': "module.exports = { tasks: require('./tasks.routes') };",
+          '/repo/src/routes/tasks.routes.js': factory,
+        };
+        expect(collect(files)).toEqual(expected);
+      }
+    });
+
+    it('follows a relative middleware factory, which contributes no routes and no error', () => {
+      const files = {
+        '/repo/src/app.js': [
+          "const requireRole = require('./middleware/roles');",
+          "const { audit } = require('./middleware/audit');",
+          "app.use(requireRole('admin'));",
+          'app.use(audit({ level: 1 }));',
+          "app.get('/health', ok);",
+        ].join('\n'),
+        '/repo/src/middleware/roles.js': 'module.exports = (role) => (req, res, next) => next();',
+        '/repo/src/middleware/audit.js': 'exports.audit = (opts) => (req, res, next) => next();',
+      };
+      expect(collect(files)).toEqual({ routes: [{ method: 'GET', path: '/health' }], unparsedRoutes: [] });
+    });
+  });
 });

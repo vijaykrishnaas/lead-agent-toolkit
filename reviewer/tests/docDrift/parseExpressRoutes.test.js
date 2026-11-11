@@ -1126,16 +1126,25 @@ describe('mounts whose router is a member of a require binding or a destructured
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 
-  it('leaves a member of a non-require binding, a deeper member and a member call unchanged', () => {
+  // A member call of a relative-require binding (`routes.build()`) was part of
+  // this fixture until task 44, which resolves it as a router factory call.
+  it('leaves a member of a non-require binding, a deeper member and its call unchanged', () => {
     const source = [
       "const routes = require('./routes');",
       'const local = { tasks: makeRouter() };',
       "app.use('/a', local.tasks);",
       "app.use('/b', routes.v1.tasks);",
-      "app.use('/c', routes.build());",
+      "app.use('/c', routes.v1.build());",
       "app.use('/d', unknown.tasks);",
+      "app.use('/e', local.tasks());",
     ].join('\n');
     expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('mounts a member call of a relative-require binding as a router factory (task 44)', () => {
+    const source = ["const routes = require('./routes');", "app.use('/c', routes.build());"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/c', requirePath: './routes', exportName: 'build' }]);
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 
@@ -1335,5 +1344,147 @@ describe('verb calls chained onto a verb or use() call (task 42)', () => {
       { method: 'POST', path: '/a' },
       { method: 'PUT', path: '/c' },
     ]);
+  });
+});
+
+describe('mounts whose router is built by calling a factory from a relative require (task 44)', () => {
+  const MOUNT_WARNING = {
+    type: 'unparsed-route',
+    method: 'MOUNT',
+    reason: 'mount exists but prefix could not be statically resolved',
+  };
+
+  it('mounts a call of a relative-require binding', () => {
+    const source = ["const makeTasksRouter = require('./tasks.routes');", "app.use('/api/tasks', makeTasksRouter(db));"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api/tasks', requirePath: './tasks.routes' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('mounts a call of an inline relative require, with and without a member', () => {
+    const source = [
+      "app.use('/api/tasks', require('./tasks.routes')(db));",
+      "app.use('/api/users', require(\"./routes\").users(db));",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/api/tasks', requirePath: './tasks.routes' },
+      { prefix: '/api/users', requirePath: './routes', exportName: 'users' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('mounts a call of a member of, or a name destructured from, a relative require', () => {
+    const source = [
+      "const routes = require('./routes');",
+      "const { makeUsers, admin: makeAdmin } = require('./more');",
+      "app.use('/a', routes.tasks(db));",
+      "app.use('/b', makeUsers(db));",
+      "app.use('/c', makeAdmin());",
+      "app.use('/d', routes?.tasks(db));",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/a', requirePath: './routes', exportName: 'tasks' },
+      { prefix: '/b', requirePath: './more', exportName: 'makeUsers' },
+      { prefix: '/c', requirePath: './more', exportName: 'admin' },
+      { prefix: '/d', requirePath: './routes', exportName: 'tasks' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('mounts every callee form without a prefix and behind middle middleware', () => {
+    const source = [
+      "const makeTasksRouter = require('./tasks.routes');",
+      "const routes = require('./routes');",
+      "const { makeUsers } = require('./more');",
+      'app.use(makeTasksRouter(db));',
+      'app.use(routes.tasks(db));',
+      "app.use(require('./x.routes')(db));",
+      "app.use('/a', requireAuth(), (req, res, next) => next(), makeUsers(db));",
+      "app.use('/b', [limiter, audit], makeTasksRouter(db));",
+      'app.use(requireAuth, makeTasksRouter(db));',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '', requirePath: './tasks.routes' },
+      { prefix: '', requirePath: './routes', exportName: 'tasks' },
+      { prefix: '', requirePath: './x.routes' },
+      { prefix: '/a', requirePath: './more', exportName: 'makeUsers' },
+      { prefix: '/b', requirePath: './tasks.routes' },
+      { prefix: '', requirePath: './tasks.routes' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('reads the callee past nested parens, commas, quotes and comments in the call arguments', () => {
+    const source = [
+      "const makeTasksRouter = require('./tasks.routes');",
+      "app.use('/a', makeTasksRouter(db, { name: 'a, (b)', fn: (x, y) => get(x)[0] }, \"it's )\"));",
+      "app.use('/b', makeTasksRouter(",
+      '  db, // the (shared) pool',
+      '  opts(1, 2),',
+      '));',
+      "app.use('/c', makeTasksRouter(db) /* built per app */);",
+      "app.use('/d', makeTasksRouter (db));",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/a', requirePath: './tasks.routes' },
+      { prefix: '/b', requirePath: './tasks.routes' },
+      { prefix: '/c', requirePath: './tasks.routes' },
+      { prefix: '/d', requirePath: './tasks.routes' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('gives no mount and no warning for a bare-package call, prefixed or not', () => {
+    const source = [
+      "const express = require('express');",
+      "const helmet = require('helmet');",
+      "const swaggerUi = require('swagger-ui-express');",
+      "const { rateLimit } = require('express-rate-limit');",
+      'app.use(express.json());',
+      'app.use(helmet());',
+      "app.use('/docs', swaggerUi.serve, swaggerUi.setup(doc));",
+      "app.use('/api', rateLimit({ windowMs: 60 * 1000, max: 100 }));",
+      "app.use('/pkg', require('some-router-package')(db));",
+      "app.use('/static', express.static('public'));",
+      'app.use(unbound(db));',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('does not treat a non-call argument ending in a paren, or a call of a call, as a factory call', () => {
+    const source = [
+      "const makeTasksRouter = require('./tasks.routes');",
+      "app.use('/a', (req, res) => makeTasksRouter(db));",
+      "app.use('/b', (makeTasksRouter));",
+      "app.use('/c', makeTasksRouter(db)(extra));",
+      "app.use('/d', wrap(makeTasksRouter(db)));",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('ignores a factory mount inside a comment or a string', () => {
+    const source = [
+      "const makeTasksRouter = require('./tasks.routes');",
+      "// app.use('/a', makeTasksRouter(db));",
+      "const note = \"app.use('/b', makeTasksRouter(db));\";",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('warns instead of mounting when the prefix in front of a factory call cannot be resolved', () => {
+    const source = [
+      "const makeTasksRouter = require('./tasks.routes');",
+      "app.use(API + '/v1', makeTasksRouter(db));",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([{ ...MOUNT_WARNING, line: 2 }]);
+  });
+
+  it('follows a relative middleware factory as a prefixless mount', () => {
+    const source = ["const requireRole = require('./middleware/roles');", "app.use(requireRole('admin'));"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '', requirePath: './middleware/roles' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });

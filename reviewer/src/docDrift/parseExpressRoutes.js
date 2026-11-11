@@ -62,19 +62,27 @@ const EXPORT_ASSIGNMENT_PATTERN = /(?<![\w$.])(?:module\s*\.\s*)?exports\s*\.\s*
 // `Object.assign(module.exports, ...)` / `Object.assign(exports, ...)` call.
 const WHOLE_MODULE_EXPORT_PATTERN = /(?<![\w$.])module\s*\.\s*exports\s*=(?![=>])/g;
 const OBJECT_ASSIGN_EXPORTS_PATTERN = /\bObject\s*\.\s*assign\(\s*(?:module\s*\.\s*)?exports\s*,/g;
-// Matches router.route('/path') / app.route('/path') so its chained
-// .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
-// the head-call walk (CHAIN_HEAD_PATTERN) can't see them because the verb
-// call isn't preceded by "router."/"app." directly, only by the
-// ").route(...)" chain.
-const ROUTE_CALL_PATTERN = /\.route\(\s*(['"])(.*?)\1\s*\)/g;
+// The opening of a .route(path) call, whose chained .<verb>(...) calls (e.g.
+// .get(fn).post(fn)) are found separately — the head-call walk
+// (CHAIN_HEAD_PATTERN) can't see them because the verb call isn't preceded
+// by "router."/"app." directly, only by the ").route(...)" chain. Matched on
+// the fully masked source, so the call's argument can be split by depth (see
+// classifyRouteCalls). The receiver is deliberately not required to be
+// app|router: `express.Router().route('/a').get(h)` and a router held under
+// any other name (`api.route('/b')`) are read too, and narrowing it would
+// drop them.
+const ROUTE_CALL_START_PATTERN = /\.route\(/g;
+// A .route() path the parser never tried to read: a template literal or an
+// array. Reported once per call with no method (the pre-task-48 shape, kept
+// as it was); every other unreadable path warns once per chained verb.
+const TEMPLATE_OR_ARRAY_ARG_PATTERN = /^[`[]/;
 // `all` is matched too: `.all(mw)` is the per-path middleware hook in a route
 // chain, not an HTTP verb, so it adds no route — but the chain continues past
 // it, and stopping there dropped every real verb chained after it.
 const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION}|all)\\(`);
 
-// Mirror of ROUTE_CALL_PATTERN and the mount prefix, but
-// matching a template-literal-delimited (backtick) path/prefix argument
+// Mirror of the mount prefix, but
+// matching a template-literal-delimited (backtick) prefix argument
 // instead of a quoted one. A template literal can embed an interpolated
 // expression (e.g. `` `/api/${version}/things` ``) whose actual runtime
 // value can't be determined by static text scanning, so none of the
@@ -83,8 +91,8 @@ const CHAINED_VERB_START_PATTERN = new RegExp(`^\\.(${VERB_ALTERNATION}|all)\\(`
 // patterns only need to detect *that* such a call exists and where, not
 // resolve its path, so they stop right after the opening backtick. An array
 // path (`['/a', '/b']`) is the same silent drop, so `[` is matched too.
-// (A verb call's own path is classified by classifyVerbCalls instead.)
-const UNPARSED_ROUTE_CALL_PATTERN = /\.route\(\s*[`[]/g;
+// (A verb call's own path is classified by classifyVerbCalls instead, and a
+// .route() call's by classifyRouteCalls.)
 const UNPARSED_MOUNT_PATTERN = /\b(?:router|app)\s*\.use\(\s*[`[]/g;
 
 // The head of a call chain: any live app|router.<verb>( / .use( / .all( call,
@@ -243,6 +251,46 @@ function classifyVerbCalls(commentMasked, masked) {
   return [...classified.filter((call) => !call.isChained), ...classified.filter((call) => call.isChained)];
 }
 
+// Classifies every live .route(...) call by its single argument, split by
+// depth on the masked source -- the .route() twin of classifyVerbCalls,
+// sharing its const-string lookup and literal pattern. Each entry is
+// { index, verbs, path, warn, isTemplateOrArray }; `index` is the "." of
+// `.route(`, and `verbs` the HTTP verbs directly chained onto the call
+// (collectChainedVerbs: `.all(mw)` adds none and does not end the chain):
+//   - one whole quoted string literal, or a `const` bound once to a single
+//     string literal -> `path` is that value (whatever it starts with: a
+//     .route() call has no settings-getter twin to tell apart);
+//   - no argument at all -> neither;
+//   - anything else -- another identifier or member, a concatenation, a
+//     ternary, a call, a template literal, an array, a regex literal, or more
+//     than one argument -> `warn`: the routes exist but their path cannot be
+//     read statically. Nothing is evaluated.
+function classifyRouteCalls(commentMasked, masked) {
+  const constStringsByVarName = collectConstStrings(commentMasked, masked);
+  const argText = ([start, end]) => commentMasked.slice(start, end).trim();
+  const classified = [];
+  for (const match of masked.matchAll(ROUTE_CALL_START_PATTERN)) {
+    const args = splitTopLevelArgs(masked, match.index + match[0].length);
+    if (!args) continue;
+    const closeIndex = args[args.length - 1][1];
+    // A trailing comma -- router.route(PATH,) -- is not another argument.
+    if (argText(args[args.length - 1]) === '') args.pop();
+    if (args.length === 0) continue;
+    const first = argText(args[0]);
+    const literal = args.length === 1 && PATH_LITERAL_ARG_PATTERN.exec(first);
+    const isConstString = args.length === 1 && IDENTIFIER_ARG_PATTERN.test(first) && constStringsByVarName.has(first);
+    const path = literal ? literal[2] : isConstString ? constStringsByVarName.get(first) : null;
+    classified.push({
+      index: match.index,
+      verbs: collectChainedVerbs(commentMasked, masked, closeIndex + 1),
+      path,
+      warn: path === null,
+      isTemplateOrArray: TEMPLATE_OR_ARRAY_ARG_PATTERN.test(first),
+    });
+  }
+  return classified;
+}
+
 // Extracts { method, path } route entries from a single Express router file's
 // source text (e.g. tasks.routes.js). Only router.<verb>(path, ...) calls,
 // verbs chained onto one (router.get('/a', h).post('/b', h)) or onto a use(),
@@ -250,8 +298,8 @@ function classifyVerbCalls(commentMasked, masked) {
 // (middleware) and similar are ignored because neither pattern matches
 // anything but a recognized HTTP verb.
 //
-// All top-level route-detection regexes (ROUTE_CALL_PATTERN here,
-// REQUIRE_PATTERN/CONST_STRING_PATTERN in analyzeUseCalls) are matched against
+// All top-level route-detection regexes that capture string content
+// (REQUIRE_PATTERN/CONST_STRING_PATTERN in analyzeUseCalls) are matched against
 // `commentMasked`, not raw `source` — a commented-out call like
 // `// router.delete('/:id', remove);` is not real, live code, but a raw
 // regex match can't tell the difference, and would report a dead route as
@@ -275,13 +323,11 @@ function parseRouterSource(source) {
   // calls directly chained onto it (see collectChainedVerbs) — not "whatever
   // appears before the next .route() call," which would misattribute an
   // unrelated router.<verb>(...) statement sitting between two chains.
-  for (const routeMatch of commentMasked.matchAll(ROUTE_CALL_PATTERN)) {
-    if (!matchIsLive(routeMatch, masked)) continue;
-    const path = routeMatch[2];
-    const chainStart = routeMatch.index + routeMatch[0].length;
-    for (const method of collectChainedVerbs(commentMasked, masked, chainStart)) {
-      routes.push({ method, path });
-    }
+  // The path is one whole string literal or a const bound to one (see
+  // classifyRouteCalls); any other path lists nothing and warns instead.
+  for (const call of classifyRouteCalls(commentMasked, masked)) {
+    if (call.path === null) continue;
+    for (const method of call.verbs) routes.push({ method, path: call.path });
   }
 
   return routes;
@@ -781,9 +827,9 @@ function analyzeUseCalls(commentMasked, masked) {
   return calls;
 }
 
-// Finds router/app verb calls whose path is anything but a string literal or
-// a const bound to one, plus .route() calls and app|router.use() mounts
-// whose path/prefix argument is a template literal (or, for a mount, a
+// Finds router/app verb calls and .route() calls whose path is anything but
+// a string literal or a const bound to one, plus app|router.use() mounts
+// whose prefix argument is a template literal (or a
 // variable collectUnresolvablePrefixNames can't resolve or an inline
 // expression such as `API + '/v1'`), in either a router
 // file or an app entry file's source text. Returns explicit warning findings
@@ -809,14 +855,21 @@ function findUnparsedRoutes(source) {
       reason: 'route exists but path could not be statically resolved',
     });
   }
-  for (const match of commentMasked.matchAll(UNPARSED_ROUTE_CALL_PATTERN)) {
-    if (!matchIsLive(match, masked)) continue;
-    findings.push({
-      type: 'unparsed-route',
-      method: null,
-      line: lineNumberAt(commentMasked, match.index),
-      reason: 'route exists but path could not be statically resolved',
-    });
+  // A .route() call whose path is not a string literal or a const bound to
+  // one (see classifyRouteCalls), at the .route( call's own line: one finding
+  // per chained verb (none when no verb is chained -- no route exists yet),
+  // except a template-literal or array path, which keeps its single
+  // method-less finding per call.
+  for (const call of classifyRouteCalls(commentMasked, masked)) {
+    if (!call.warn) continue;
+    for (const method of call.isTemplateOrArray ? [null] : call.verbs) {
+      findings.push({
+        type: 'unparsed-route',
+        method,
+        line: lineNumberAt(commentMasked, call.index),
+        reason: 'route exists but path could not be statically resolved',
+      });
+    }
   }
   for (const match of commentMasked.matchAll(UNPARSED_MOUNT_PATTERN)) {
     if (!matchIsLive(match, masked)) continue;

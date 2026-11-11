@@ -1922,3 +1922,160 @@ describe('a const string name bound more than once in the file (review of task 4
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });
+
+describe('.route(path) calls whose path is not one whole quoted literal (task 48)', () => {
+  const warning = (method, line) => ({
+    type: 'unparsed-route',
+    method,
+    line,
+    reason: 'route exists but path could not be statically resolved',
+  });
+
+  it('lists a .route() chain at a const bound once to a single string literal', () => {
+    const source = "const P = '/a';\nrouter.route(P).get(h).post(h);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/a' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('warns once per chained verb, at the .route( line, for an unbound name, a concatenation and a ternary', () => {
+    const source = [
+      'router.route(P).get(h);',
+      "router.route('/a' + s).get(h).put(h);",
+      "router.route(c ? '/a' : '/b')",
+      '  .delete(h);',
+      "router.route('/real').get(h).post(h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/real' },
+      { method: 'POST', path: '/real' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      warning('GET', 1),
+      warning('GET', 2),
+      warning('PUT', 2),
+      warning('DELETE', 3),
+    ]);
+  });
+
+  it('mixes all four reproductions with a literal chain that is still listed', () => {
+    const source = [
+      "const P = '/a';",
+      'router.route(P).get(h);',
+      'router.route(Q).get(h);',
+      "router.route('/a' + s).get(h);",
+      "router.route(c ? '/a' : '/b').get(h);",
+      "router.route('/real').get(h).post(h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'GET', path: '/real' },
+      { method: 'POST', path: '/real' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 3), warning('GET', 4), warning('GET', 5)]);
+  });
+
+  it('warns for a member, a let/var name, a twice-bound const, a call and a regex literal path', () => {
+    const source = [
+      "let L = '/l';",
+      'router.route(L).get(h);',
+      'router.route(paths.tasks).post(h);',
+      "function a() { const D = '/x'; router.route(D).get(h); }",
+      "function b() { const D = '/y'; router.route(D).put(h); }",
+      'router.route(buildPath()).patch(h);',
+      'router.route(/^\\/re$/).delete(h);',
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      warning('GET', 2),
+      warning('POST', 3),
+      warning('GET', 4),
+      warning('PUT', 5),
+      warning('PATCH', 6),
+      warning('DELETE', 7),
+    ]);
+  });
+
+  it('gives nothing for a .route(...) with no chained verb', () => {
+    const source = [
+      'const r = router.route(P);',
+      "router.route('/a' + s);",
+      'router.route(Q).all(mw);',
+      'navigator.route(destination);',
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('does not count .all(mw) as a route or a warning, and does not let it end the chain', () => {
+    const source = "const P = '/a';\nrouter.route(P).all(mw).get(h);\nrouter.route(Q).all(mw).get(h).all(mw).post(h);";
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/a' }]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 3), warning('POST', 3)]);
+  });
+
+  it('gives nothing for the same text inside a comment or a string', () => {
+    const source = [
+      '// router.route(P).get(h);',
+      "/* router.route('/a' + s).get(h); */",
+      'const doc = "router.route(P).get(h)";',
+      "const doc2 = `router.route(c ? '/a' : '/b').get(h)`;",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('skips a commented-out chained verb without ending the chain', () => {
+    const source = 'router.route(Q)\n  // .get(h)\n  .post(h);';
+    expect(findUnparsedRoutes(source)).toEqual([warning('POST', 1)]);
+  });
+
+  it('keeps the template-literal and array warnings at their line with no method', () => {
+    const source = [
+      'router.route(`/widgets/${id}`).get(h).post(h);',
+      "router.route(['/a', '/b']).get(h);",
+      'router',
+      '  .route(`/x/${y}`)',
+      '  .get(h);',
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([warning(null, 1), warning(null, 2), warning(null, 4)]);
+  });
+
+  it('reads a literal path with a comment, whitespace, a newline or a trailing comma around it', () => {
+    const source = [
+      "router.route( /* list */ '/a' ).get(h);",
+      'router.route(',
+      "  '/b',",
+      ').post(h);',
+      "router.route  ('/c').get(h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/b' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('keeps reading .route( on any receiver, not only app|router', () => {
+    const source = "express.Router().route('/a').get(h);\napi.route('/b').post(h);\napi.route(Q).put(h);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/b' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('PUT', 3)]);
+  });
+
+  it('warns for a .route() call with more than one argument rather than joining them into a path', () => {
+    const source = "router.route('/a', 'x').get(h);";
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 1)]);
+  });
+
+  it('gives nothing for a .route() call with no argument', () => {
+    const source = 'router.route().get(h);';
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+});

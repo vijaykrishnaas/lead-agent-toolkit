@@ -42,6 +42,18 @@ function resolveRequiredFile(fileDir, requirePath, readFile) {
   return resolveRouterPath(path.resolve(fileDir, requirePath), readFile);
 }
 
+// Whether `filePath` can be read; only ENOENT counts as "no", any other
+// read error still surfaces.
+function isReadable(filePath, readFile) {
+  try {
+    readFile(filePath);
+    return true;
+  } catch (err) {
+    if (err && err.code !== 'ENOENT') throw err;
+    return false;
+  }
+}
+
 // Recursively walks a source file's own direct routes and mounts, resolving
 // each mount to its required file and recursing into *that* file too — a
 // router file can itself mount a nested sub-router (router.use(prefix,
@@ -67,14 +79,18 @@ function resolveRequiredFile(fileDir, requirePath, readFile) {
 // exports) is not mistaken for a cycle while a self-referencing export still
 // terminates. When the name is not re-exported that way, the file itself is
 // collected, as before (`module.exports = { router }` with the routes
-// defined in the same file).
+// defined in the same file). The same holds when the re-export's target is
+// not readable as a .js file (`require('../config')` resolving to
+// config.json, a native addon, a .ts file): a barrel member is only a guess
+// at a router, so an unreadable target must not abort the run the way a
+// directly mounted missing router does.
 function collectFromFile(filePath, prefix, readFile, ancestors, exportName) {
   if (exportName) {
     const hopKey = `${filePath}\0${exportName}`;
     if (ancestors.has(hopKey)) return { routes: [], unparsedRoutes: [] };
     const reExport = findExportedRequire(readFile(filePath), exportName);
     const target = reExport && resolveRequiredFile(path.dirname(filePath), reExport.requirePath, readFile);
-    if (target) {
+    if (target && isReadable(target, readFile)) {
       const hopAncestors = new Set(ancestors);
       hopAncestors.add(hopKey);
       return collectFromFile(target, prefix, readFile, hopAncestors, reExport.exportName);

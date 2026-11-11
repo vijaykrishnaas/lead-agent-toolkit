@@ -44,10 +44,10 @@ const DESTRUCTURED_REQUIRE_PATTERN = /\b(?:const|let|var)\s*\{([^{}]*)\}\s*=\s*r
 // One member of a binding as the router: `routes.tasks` (or `routes?.tasks`).
 const MEMBER_ARG_PATTERN = /^([A-Za-z_$][\w$]*)\s*\??\.\s*([A-Za-z_$][\w$]*)$/;
 // A barrel file's exports (see findExportedRequire): the opening of a
-// `module.exports = {` object literal, one `key`, `key: value` or
+// `module.exports = {` (or `module.exports = exports = {`) object literal, one `key`, `key: value` or
 // `'key': value` entry of it, and an `exports.<name> =` /
 // `module.exports.<name> =` property assignment.
-const MODULE_EXPORTS_OBJECT_PATTERN = /\bmodule\s*\.\s*exports\s*=\s*\{/g;
+const MODULE_EXPORTS_OBJECT_PATTERN = /\bmodule\s*\.\s*exports\s*=\s*(?:exports\s*=\s*)?\{/g;
 const EXPORT_ENTRY_PATTERN = /^(?:([A-Za-z_$][\w$]*)|(['"])([^'"\\\n]*)\2)\s*(?::\s*([\s\S]+))?$/;
 const EXPORT_ASSIGNMENT_PATTERN = /(?<![\w$.])(?:module\s*\.\s*)?exports\s*\.\s*([A-Za-z_$][\w$]*)\s*=(?![=>])/g;
 // Matches router.route('/path') / app.route('/path') so its chained

@@ -468,4 +468,60 @@ describe('collectExpressRoutes', () => {
       unparsedRoutes: [],
     });
   });
+
+  it('reads the barrel itself when its re-export points at a file that is not readable as .js', () => {
+    // Regression (task 43 review): the hop resolved `../config` to config.js
+    // and `../build/Release/addon` to addon.js and aborted the whole run with
+    // ENOENT; before task 43 only the barrel was read and the run succeeded.
+    const files = {
+      '/repo/src/app.js': [
+        "const { limiter } = require('./middleware');",
+        "const mw = require('./mw');",
+        "app.use(limiter);",
+        "app.use(mw.auth);",
+        "app.use('/api/tasks', require('./tasks.routes'));",
+      ].join('\n'),
+      '/repo/src/middleware/index.js': "const config = require('../config');\nmodule.exports = { limiter: config.limiter };",
+      '/repo/src/mw.js': "const native = require('../build/Release/addon');\nexports.auth = native.auth;\nrouter.get('/own', h);",
+      '/repo/src/config.json': '{}',
+      '/repo/src/tasks.routes.js': "router.get('/:id', show);",
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    expect(collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile })).toEqual({
+      routes: [{ method: 'GET', path: '/own' }, { method: 'GET', path: '/api/tasks/:id' }],
+      unparsedRoutes: [],
+    });
+  });
+
+  it('still surfaces a read error other than ENOENT from a barrel re-export target', () => {
+    const files = {
+      '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api', routes.tasks);",
+      '/repo/src/routes.js': "module.exports = { tasks: require('./tasks.routes') };",
+    };
+    const readFile = (filePath) => {
+      if (filePath === '/repo/src/tasks.routes.js') throw Object.assign(new Error('EACCES'), { code: 'EACCES' });
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    expect(() => collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile })).toThrow('EACCES');
+  });
+
+  it('follows a barrel written as `module.exports = exports = { ... }`', () => {
+    const files = {
+      '/repo/src/app.js': "const routes = require('./routes');\napp.use('/api/tasks', routes.tasks);",
+      '/repo/src/routes/index.js': "module.exports = exports = { tasks: require('./tasks.routes') };",
+      '/repo/src/routes/tasks.routes.js': "router.get('/:id', show);",
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    expect(collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile })).toEqual({
+      routes: [{ method: 'GET', path: '/api/tasks/:id' }],
+      unparsedRoutes: [],
+    });
+  });
 });

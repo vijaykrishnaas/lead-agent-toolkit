@@ -65,7 +65,10 @@ function isReadable(filePath, readFile) {
 //  - A whole-module re-export is only hopped through when the file has no
 //    route or mount of its own: `const router = require('./make')();
 //    router.get('/', h); module.exports = router;` is a routes file, not a
-//    barrel, and is read itself.
+//    barrel, and is read itself. So is a file whose only route or mount
+//    calls are ones that could not be statically resolved (`router.get(P, h)`
+//    with P unbound, a template-literal path): hopping past it would drop
+//    its unparsed-route warnings along with the file.
 function chooseExportHop(filePath, source, exportName, readFile) {
   const fileDir = path.dirname(filePath);
   const readable = [];
@@ -81,6 +84,7 @@ function chooseExportHop(filePath, source, exportName, readFile) {
   if (chosen.via === 'module') {
     const { directRoutes, mounts } = parseAppEntrySource(source);
     if (directRoutes.length > 0 || mounts.length > 0) return null;
+    if (findUnparsedRoutes(source).length > 0) return null;
   }
   return chosen;
 }

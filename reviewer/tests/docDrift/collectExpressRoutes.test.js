@@ -732,6 +732,58 @@ describe('collectExpressRoutes', () => {
         { method: 'GET', path: '/api/v2/:id' },
       ]);
     });
+
+    // Reviewer 2026-11-11 (review of dc38ea0): a whole-module hop was taken
+    // whenever the file had no *listed* route or mount, so a file whose only
+    // calls were unresolvable ones lost its unparsed-route warnings -- the
+    // file was never read, only the module it got its router from.
+    describe('a file whose own calls are all unresolvable is read itself, not hopped past', () => {
+      const mount = { '/repo/src/app.js': "const r = require('./routes');\napp.use('/api', r);" };
+      const warning = (method, line, what) => ({
+        type: 'unparsed-route',
+        method,
+        line,
+        reason: `${what} could not be statically resolved`,
+        file: '/repo/src/routes/index.js',
+      });
+
+      it('keeps the warning for a template-literal path on a router from a local factory', () => {
+        const files = {
+          ...mount,
+          '/repo/src/routes/index.js': "const router = require('./makeRouter')();\nrouter.get(`/${v}/x`, h);\nmodule.exports = router;",
+          '/repo/src/routes/makeRouter.js': "module.exports = () => require('express').Router();",
+        };
+        expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [warning('GET', 2, 'route exists but path')] });
+      });
+
+      it('keeps the warning for an unresolved-name path on a re-exported router', () => {
+        const files = {
+          ...mount,
+          ...tasksRoutes,
+          '/repo/src/routes/index.js': "const router = require('./tasks.routes');\nrouter.post(P, h);\nmodule.exports = router;",
+        };
+        expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [warning('POST', 2, 'route exists but path')] });
+      });
+
+      it('keeps the warning for a mount with an unresolvable prefix', () => {
+        const files = {
+          ...mount,
+          ...tasksRoutes,
+          '/repo/src/routes/index.js': "const router = require('./tasks.routes');\nconst sub = require('./sub');\nrouter.use(base + '/x', sub);\nmodule.exports = router;",
+          '/repo/src/routes/sub.js': "router.get('/s', h);",
+        };
+        expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [warning('MOUNT', 3, 'mount exists but prefix')] });
+      });
+
+      it('still hops through a barrel whose only call-shaped text is commented out', () => {
+        const files = {
+          ...mount,
+          ...tasksRoutes,
+          '/repo/src/routes/index.js': "// router.get(`/${v}/x`, h);\nmodule.exports = require('./tasks.routes');",
+        };
+        expect(collect(files)).toEqual(listed);
+      });
+    });
   });
 
   describe('a router built by a factory exported from a relative require (task 44)', () => {

@@ -310,4 +310,28 @@ describe('collectExpressRoutes', () => {
       { method: 'GET', path: '/api/tasks/:id' },
     ]);
   });
+
+  it('follows a router reached through a member of, or destructured from, a relative require (task 41)', () => {
+    const files = {
+      '/repo/src/app.js': [
+        "const tasksModule = require('./tasks.routes');",
+        "const { router: usersRouter } = require('./users.routes');",
+        "app.use('/api/tasks', tasksModule.router);",
+        "app.use('/api/users', requireAuth, usersRouter);",
+      ].join('\n'),
+      '/repo/src/tasks.routes.js': "router.get('/:id', show);\nmodule.exports = { router };",
+      '/repo/src/users.routes.js': "router.post('/', create);\nmodule.exports = { router };",
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    expect(collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile })).toEqual({
+      routes: [
+        { method: 'GET', path: '/api/tasks/:id' },
+        { method: 'POST', path: '/api/users' },
+      ],
+      unparsedRoutes: [],
+    });
+  });
 });

@@ -1039,3 +1039,113 @@ describe('chained and receiver-on-its-own-line use()/verb calls', () => {
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });
+
+describe('mounts whose router is a member of a require binding or a destructured require (task 41)', () => {
+  const MOUNT_WARNING = {
+    type: 'unparsed-route',
+    method: 'MOUNT',
+    reason: 'mount exists but prefix could not be statically resolved',
+  };
+
+  it('mounts a member of a relative-require binding, with a prefix', () => {
+    const source = ["const routes = require('./routes');", "app.use('/api', routes.tasks);"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './routes' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('mounts a destructured relative require, with a prefix', () => {
+    const source = ["const { tasks } = require('./routes');", "app.use('/api', tasks);"].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([{ prefix: '/api', requirePath: './routes' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('mounts both shapes without a prefix and behind middle middleware', () => {
+    const source = [
+      "const routes = require('./routes');",
+      "const { users, auth: authRouter } = require('./more');",
+      'app.use(routes.tasks);',
+      'app.use(users);',
+      "app.use('/a', requireAuth(), (req, res, next) => next(), routes.admin);",
+      "app.use('/b', [limiter, audit], authRouter);",
+      'app.use(requireAuth, routes?.tasks);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '', requirePath: './routes' },
+      { prefix: '', requirePath: './more' },
+      { prefix: '/a', requirePath: './routes' },
+      { prefix: '/b', requirePath: './more' },
+      { prefix: '', requirePath: './routes' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('reads a destructure spread over several lines, with defaults, a rest element and comments', () => {
+    const source = [
+      'const {',
+      '  tasks, // the main router',
+      '  users: usersRouter = fallback,',
+      '  ...others',
+      "} = require('./routes');",
+      "app.use('/t', tasks);",
+      "app.use('/u', usersRouter);",
+      "app.use('/o', others);",
+      "app.use('/x', users);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([
+      { prefix: '/t', requirePath: './routes' },
+      { prefix: '/u', requirePath: './routes' },
+      { prefix: '/o', requirePath: './routes' },
+    ]);
+  });
+
+  it('warns instead of dropping the router when the prefix cannot be resolved', () => {
+    const source = [
+      "const routes = require('./routes');",
+      "const { tasks } = require('./routes');",
+      "app.use(API + '/v1', routes.tasks);",
+      'app.use(/^\\/api/, tasks);',
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      { ...MOUNT_WARNING, line: 3 },
+      { ...MOUNT_WARNING, line: 4 },
+    ]);
+  });
+
+  it('gives no mount and no warning for a bare-package destructure or member', () => {
+    const source = [
+      "const express = require('express');",
+      "const { Router, json } = require('express');",
+      "const swaggerUi = require('swagger-ui-express');",
+      "app.use('/api', express.json);",
+      "app.use('/api', json);",
+      'app.use(Router);',
+      "app.use('/docs', swaggerUi.serve);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('leaves a member of a non-require binding, a deeper member and a member call unchanged', () => {
+    const source = [
+      "const routes = require('./routes');",
+      'const local = { tasks: makeRouter() };',
+      "app.use('/a', local.tasks);",
+      "app.use('/b', routes.v1.tasks);",
+      "app.use('/c', routes.build());",
+      "app.use('/d', unknown.tasks);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('ignores a commented-out or quoted destructured require', () => {
+    const source = [
+      "// const { tasks } = require('./routes');",
+      "const text = \"const { users } = require('./routes');\";",
+      "app.use('/t', tasks);",
+      "app.use('/u', users);",
+    ].join('\n');
+    expect(parseAppEntrySource(source).mounts).toEqual([]);
+  });
+});

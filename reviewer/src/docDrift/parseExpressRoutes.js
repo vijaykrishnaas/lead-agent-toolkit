@@ -41,6 +41,11 @@ const BINDING_PATTERN = /\b(const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^\n]*)/g
 // or not), which is how most middleware is built.
 const MIDDLEWARE_INITIALIZER_PATTERN = /^(?:(?:async\s+)?function\b|(?:async\s+)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>|(?:await\s+)?(?:new\s+)?[A-Za-z_$][\w$.]*\s*\()/;
 const REQUIRE_PATTERN = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
+// `const { tasks, users: usersRouter } = require('./routes');` -- names bound
+// by destructuring a require. Only a flat pattern (no nested `{}`) matches.
+const DESTRUCTURED_REQUIRE_PATTERN = /\b(?:const|let|var)\s*\{([^{}]*)\}\s*=\s*require\(\s*(['"])(.*?)\2\s*\)/g;
+// One member of a binding as the router: `routes.tasks` (or `routes?.tasks`).
+const MEMBER_ARG_PATTERN = /^([A-Za-z_$][\w$]*)\s*\??\.\s*[A-Za-z_$][\w$]*$/;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
 // METHOD_CALL_PATTERN can't see them because the verb call isn't preceded
@@ -265,6 +270,18 @@ function hasTopLevelOperator(maskedArg) {
   return false;
 }
 
+// The local names a flat destructuring pattern's body binds: `a`, the alias
+// in `a: b`, either with a default (`a = x`), and a rest element (`...rest`).
+function destructuredNames(patternBody) {
+  const names = [];
+  for (const part of patternBody.split(',')) {
+    const binding = part.split('=')[0];
+    const target = binding.slice(binding.indexOf(':') + 1).replace('...', '').trim();
+    if (IDENTIFIER_ARG_PATTERN.test(target)) names.push(target);
+  }
+  return names;
+}
+
 // Classifies every live app|router.use(...) call in source order, including
 // a .use( chained onto another's closing paren. Each entry is
 // { index, mount, warn }: `mount` is { prefix, requirePath } or null, and
@@ -284,8 +301,9 @@ function hasTopLevelOperator(maskedArg) {
 // written directly on app|router: it is already reported by
 // UNPARSED_MOUNT_PATTERN. That pattern cannot see a chained .use(, so there
 // the same first argument warns here instead. A call whose last argument is
-// not a require-bound identifier or an inline require (express.json(), an
-// unbound name) has no router to mount.
+// not a require-bound identifier, a member of or a name destructured from a
+// relative require, or an inline require (express.json(), an unbound name)
+// has no router to mount.
 function analyzeUseCalls(commentMasked, masked) {
   const requiresByVarName = new Map();
   for (const match of commentMasked.matchAll(REQUIRE_PATTERN)) {
@@ -297,10 +315,30 @@ function analyzeUseCalls(commentMasked, masked) {
   }
   const unresolvablePrefixNames = collectUnresolvablePrefixNames(commentMasked, masked);
 
+  // Names destructured from a relative require, each mapped to that file.
+  const destructuredRequiresByVarName = new Map();
+  for (const match of commentMasked.matchAll(DESTRUCTURED_REQUIRE_PATTERN)) {
+    if (!matchIsLive(match, masked) || !match[3].startsWith('.')) continue;
+    for (const name of destructuredNames(match[1])) destructuredRequiresByVarName.set(name, match[3]);
+  }
+
+  // The file the router argument comes from, or null. A router reached one
+  // step away from a relative require -- `routes.tasks` where `routes` is a
+  // require binding, or a name destructured from the require -- resolves to
+  // the required file, exactly as the inline `require('./x').member` form
+  // does. Both are relative-only: `express.json` / `const { Router } =
+  // require('express')` are never router files in this repo.
   function resolveRouter(argText) {
     const inline = INLINE_REQUIRE_ARG_PATTERN.exec(argText);
     if (inline) return inline[2];
-    if (IDENTIFIER_ARG_PATTERN.test(argText)) return requiresByVarName.get(argText) || null;
+    if (IDENTIFIER_ARG_PATTERN.test(argText)) {
+      return requiresByVarName.get(argText) || destructuredRequiresByVarName.get(argText) || null;
+    }
+    const member = MEMBER_ARG_PATTERN.exec(argText);
+    if (member) {
+      const requirePath = requiresByVarName.get(member[1]);
+      return requirePath && requirePath.startsWith('.') ? requirePath : null;
+    }
     return null;
   }
 

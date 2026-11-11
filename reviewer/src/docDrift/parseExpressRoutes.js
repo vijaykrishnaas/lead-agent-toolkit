@@ -692,6 +692,14 @@ function analyzeExports(source, exportName) {
     const resolved = resolve(joinMemberLines(text).trim());
     return resolved && resolved.requirePath.startsWith('.') ? resolved : null;
   };
+  // Where an export's right-hand side ends, or null when the next line
+  // carries the expression on with an operator or a call paren
+  // (`require('./a')` / `  || fallback;`): that is more than the one value,
+  // exactly as it is when written on one line, so no operand is followed.
+  const oneValueEnd = (valueStart) => {
+    const end = exportValueEnd(masked, valueStart);
+    return INITIALIZER_CONTINUATION_PATTERN.test(masked.slice(end)) ? null : end;
+  };
   let declared = false;
   const spreads = [];
 
@@ -718,16 +726,19 @@ function analyzeExports(source, exportName) {
     if (match[1] !== exportName) continue;
     declared = true;
     const valueStart = match.index + match[0].length;
-    const found = relative(commentMasked.slice(valueStart, exportValueEnd(masked, valueStart)));
+    const valueEnd = oneValueEnd(valueStart);
+    const found = valueEnd === null ? null : relative(commentMasked.slice(valueStart, valueEnd));
     if (found) return { declared, hops: [{ ...found, via: 'named' }] };
   }
   if (declared) return { declared, hops: [] };
 
   const hops = exportName === null ? [] : spreads.reverse();
   const wholeModule = [...masked.matchAll(WHOLE_MODULE_EXPORT_PATTERN)];
-  if (wholeModule.length === 1) {
-    const valueStart = wholeModule[0].index + wholeModule[0][0].length;
-    const valueEnd = exportValueEnd(masked, valueStart);
+  const wholeStart = wholeModule.length === 1 ? wholeModule[0].index + wholeModule[0][0].length : null;
+  const wholeEnd = wholeStart === null ? null : oneValueEnd(wholeStart);
+  if (wholeEnd !== null) {
+    const valueStart = wholeStart;
+    const valueEnd = wholeEnd;
     const found = relative(commentMasked.slice(valueStart, valueEnd));
     // One call of a relative-require form (`module.exports = make(db)`,
     // `require('./make')(db)`): the factory's router.<verb> calls are written

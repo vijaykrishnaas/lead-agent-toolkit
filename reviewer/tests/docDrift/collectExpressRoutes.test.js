@@ -927,6 +927,37 @@ describe('collectExpressRoutes', () => {
         expect(collect({ ...branches, [app]: wholeMount, [index]: source })).toEqual(nothing);
       });
     });
+
+    describe('an operator on the line after the right-hand side makes it more than one value (2026-11-11 review of 34e648f)', () => {
+      const barrelFile = { '/repo/src/a.js': "module.exports = { tasks: require('./t') };" };
+
+      it.each([
+        ['|| after a plain require', "module.exports = require('./t')\n  || fallback;"],
+        ['?? after a plain require', "module.exports = require('./t')\n  ?? fallback;"],
+        ['a ternary after a plain require', "module.exports = require('./t')\n  ? a\n  : b;"],
+        ['|| after a factory call', "module.exports = require('./make')(db)\n  || fallback;"],
+        ['|| after a member carried onto its own line', "module.exports = require('./a')\n  .tasks\n  || fallback;"],
+        ['a call paren on the next line', "module.exports = require('./t')\n  (db);"],
+        ['|| after a comment-only line', "module.exports = require('./t')\n  // or else\n  || fallback;"],
+      ])('does not follow the first operand: %s', (_name, source) => {
+        expect(collect({ ...make, ...tasksRoutes, ...barrelFile, [app]: wholeMount, [index]: source })).toEqual(nothing);
+      });
+
+      it('agrees with the same expression written on one line', () => {
+        expect(collect({ ...tasksRoutes, [app]: wholeMount, [index]: "module.exports = require('./t') || fallback;" })).toEqual(nothing);
+      });
+
+      it('does not follow the first operand of a named exports assignment either', () => {
+        expect(collect({ ...tasksRoutes, [app]: namedMount, [index]: "exports.tasks = require('./t')\n  || fallback;" })).toEqual(nothing);
+      });
+
+      it('still follows a right-hand side whose next line is another statement, a blank line or a comment', () => {
+        expect(collect({ ...tasksRoutes, [app]: wholeMount, [index]: "module.exports = require('./t')\n\nconsole.log(1)" })).toEqual(listed);
+        expect(collect({ ...tasksRoutes, [app]: wholeMount, [index]: "module.exports = require('./t')\n// - note\n/* ? */\n" })).toEqual(listed);
+        expect(collect({ ...tasksRoutes, [app]: wholeMount, [index]: "module.exports = require('./t');\n(function () {})();" })).toEqual(listed);
+        expect(collect({ ...tasksRoutes, [app]: namedMount, [index]: "exports.tasks = require('./t')\nexports.other = 1" })).toEqual(listed);
+      });
+    });
   });
 
   describe('a router built by a factory exported from a relative require (task 44)', () => {

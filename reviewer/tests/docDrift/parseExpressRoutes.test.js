@@ -1488,3 +1488,168 @@ describe('mounts whose router is built by calling a factory from a relative requ
     expect(findUnparsedRoutes(source)).toEqual([]);
   });
 });
+
+describe('verb calls whose path is not one whole string literal (task 45)', () => {
+  const warning = (method, line) => ({
+    type: 'unparsed-route',
+    method,
+    line,
+    reason: 'route exists but path could not be statically resolved',
+  });
+
+  it('does not list a concatenated head path at its first operand, and warns', () => {
+    const source = "router.get('/a' + suffix, h);";
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 1)]);
+  });
+
+  it('does not list a concatenated chained path at its first operand, and warns', () => {
+    const source = "router.get('/z', h).post('/a' + suffix, h);";
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/z' }]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('POST', 1)]);
+  });
+
+  it('resolves a head path held in a const bound to a single string literal', () => {
+    const source = "const PATH = '/a';\nrouter.get(PATH, h);";
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/a' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('resolves a chained path held in a const bound to a single string literal', () => {
+    const source = "const PATH = '/a';\nrouter.get('/z', h).post(PATH, h);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/z' },
+      { method: 'POST', path: '/a' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('warns on a ternary path, head and chained', () => {
+    const source = "router.get(c ? '/a' : '/b', h);\nrouter.get('/z', h)\n  .post(c ? '/a' : '/b', h);";
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/z' }]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 1), warning('POST', 3)]);
+  });
+
+  it('warns on a regex-literal path, head and chained', () => {
+    const source = 'router.get(/^\\/a$/, h);\nrouter.get(\'/z\', h).post(/^\\/a$/, h);';
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/z' }]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 1), warning('POST', 2)]);
+  });
+
+  it('warns on an unbound identifier or a member path', () => {
+    const source = "router.get(PATH, h);\nrouter.post(paths.create, h);\nrouter.get('/z', h).put(config.path, h);";
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/z' }]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 1), warning('POST', 2), warning('PUT', 3)]);
+  });
+
+  it('keeps listing plain literal routes mixed with all five shapes in one file', () => {
+    const source = [
+      "const PATH = '/const';",
+      "router.get('/plain', h);",
+      "router.get('/a' + suffix, h);",
+      'router.post(PATH, h);',
+      "router.put(c ? '/a' : '/b', h);",
+      'router.delete(/^\\/a$/, h);',
+      "router.get('/chain', h).post('/a' + suffix, h).put(PATH, h).patch(c ? '/a' : '/b', h).delete(/^\\/a$/, h);",
+      "router.patch('/last', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/plain' },
+      { method: 'POST', path: '/const' },
+      { method: 'GET', path: '/chain' },
+      { method: 'PATCH', path: '/last' },
+      { method: 'PUT', path: '/const' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([
+      warning('GET', 3),
+      warning('PUT', 5),
+      warning('DELETE', 6),
+      warning('POST', 7),
+      warning('PATCH', 7),
+      warning('DELETE', 7),
+    ]);
+  });
+
+  it('warns instead of resolving a let or reassigned path name', () => {
+    const source = "let PATH = '/a';\nPATH = '/b';\nvar OTHER = '/c';\nrouter.get(PATH, h);\nrouter.get('/z', h).post(OTHER, h);";
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/z' }]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 4), warning('POST', 5)]);
+  });
+
+  it('warns on a const whose initializer is not a single string literal', () => {
+    const source = "const PATH = '/a' + version;\nconst P2 = process.env.P || '/b';\nrouter.get(PATH, h);\nrouter.get(P2, h);";
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 3), warning('GET', 4)]);
+  });
+
+  it('keeps the settings getter silent: fewer than two arguments, or a quoted non-path first argument', () => {
+    const source = [
+      "const KEY = 'env';",
+      "app.get('env');",
+      "app.get('view engine');",
+      'app.get(KEY);',
+      'app.get(name);',
+      'app.get(`env`);',
+      "app.get('title', fallback);",
+      'app.get(KEY, fallback);',
+      'app.get();',
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('still lists a single-argument literal or const path', () => {
+    const source = "const PATH = '/b';\nrouter.get('/a');\nrouter.get(PATH);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'GET', path: '/b' },
+    ]);
+  });
+
+  it('reads the first argument across a comment, a trailing comma and its own line', () => {
+    const source = "router.get(/* list */ '/a', h);\nrouter.post(\n  '/b', // create\n  h,\n);\nrouter.put(PATH, h,);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: '/a' },
+      { method: 'POST', path: '/b' },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('PUT', 6)]);
+  });
+
+  it('keeps a literal path holding an escaped quote or a comma whole', () => {
+    const source = "router.get('/a\\'b', h);\nrouter.get('/x,y', h).post(\"/it's\", h);";
+    expect(parseRouterSource(source)).toEqual([
+      { method: 'GET', path: "/a\\'b" },
+      { method: 'GET', path: '/x,y' },
+      { method: 'POST', path: "/it's" },
+    ]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('gives nothing for the same text inside a comment or a string', () => {
+    const source = [
+      "// router.get('/a' + suffix, h);",
+      '/* router.get(PATH, h); router.get(c ? 1 : 2, h); */',
+      'const msg = "router.get(PATH, h)";',
+      "const other = 'router.get(/^x$/, h).post(PATH, h)';",
+      "// const PATH = '/a';",
+      "router.get('/real', h);",
+    ].join('\n');
+    expect(parseRouterSource(source)).toEqual([{ method: 'GET', path: '/real' }]);
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+
+  it('does not resolve a path name whose const binding is only in a comment', () => {
+    const source = "// const PATH = '/a';\nrouter.get(PATH, h);";
+    expect(parseRouterSource(source)).toEqual([]);
+    expect(findUnparsedRoutes(source)).toEqual([warning('GET', 2)]);
+  });
+
+  it('lists a direct app route with a const path in an app entry file, mounts unchanged', () => {
+    const source = "const HEALTH = '/health';\nconst tasks = require('./tasks.routes');\napp.get(HEALTH, h);\napp.use('/api', tasks);";
+    expect(parseAppEntrySource(source)).toEqual({
+      directRoutes: [{ method: 'GET', path: '/health' }],
+      mounts: [{ prefix: '/api', requirePath: './tasks.routes' }],
+    });
+    expect(findUnparsedRoutes(source)).toEqual([]);
+  });
+});

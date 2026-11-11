@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { parseAppEntrySource, findUnparsedRoutes, findExportedRequire } = require('./parseExpressRoutes');
+const { parseAppEntrySource, findUnparsedRoutes, findExportHops, declaresExport } = require('./parseExpressRoutes');
 
 // Joins a mount prefix (e.g. '/api/tasks') with a route path from inside that
 // router (e.g. '/', '/:id') into one full path, without doubling or dropping
@@ -54,6 +54,37 @@ function isReadable(filePath, readFile) {
   }
 }
 
+// The file to collect instead of `filePath` when `filePath` only hands on
+// `exportName` (null: its whole module) from another file, as { target,
+// exportName }, or null when the file itself should be read. Only hops whose
+// target is a readable router source file count.
+//  - Several spread entries (`{ ...require('./a'), ...require('./b') }`) can
+//    each stand behind a name: the last-written one whose file names the
+//    export itself wins; when none does (each hands it on again), the
+//    last-written one is followed.
+//  - A whole-module re-export is only hopped through when the file has no
+//    route or mount of its own: `const router = require('./make')();
+//    router.get('/', h); module.exports = router;` is a routes file, not a
+//    barrel, and is read itself.
+function chooseExportHop(filePath, source, exportName, readFile) {
+  const fileDir = path.dirname(filePath);
+  const readable = [];
+  for (const hop of findExportHops(source, exportName)) {
+    const target = resolveRequiredFile(fileDir, hop.requirePath, readFile);
+    if (target && isReadable(target, readFile)) readable.push({ ...hop, target });
+  }
+  if (readable.length === 0) return null;
+  let chosen = readable[0];
+  if (chosen.via === 'spread') {
+    chosen = readable.find((hop) => hop.via === 'spread' && declaresExport(readFile(hop.target), exportName)) || chosen;
+  }
+  if (chosen.via === 'module') {
+    const { directRoutes, mounts } = parseAppEntrySource(source);
+    if (directRoutes.length > 0 || mounts.length > 0) return null;
+  }
+  return chosen;
+}
+
 // Recursively walks a source file's own direct routes and mounts, resolving
 // each mount to its required file and recursing into *that* file too — a
 // router file can itself mount a nested sub-router (router.use(prefix,
@@ -73,11 +104,14 @@ function isReadable(filePath, readFile) {
 // `exportName` is set when the mount reached this file through one named
 // export (`routes.tasks`, `const { tasks } = require('./routes')`): if the
 // file only re-exports that name from another file (a barrel -- see
-// findExportedRequire), that file is collected instead, at the same prefix.
+// analyzeExports in parseExpressRoutes), that file is collected instead, at
+// the same prefix. A file that hands on another module wholesale
+// (`module.exports = require('./x')`) is hopped through the same way, for a
+// named and a whole-module mount alike (see chooseExportHop).
 // A barrel hop is tracked in `ancestors` per file *and* export name, so a
 // barrel legitimately passed through twice on one path (for two different
 // exports) is not mistaken for a cycle while a self-referencing export still
-// terminates. When the name is not re-exported that way, the file itself is
+// terminates. When nothing is re-exported that way, the file itself is
 // collected, as before (`module.exports = { router }` with the routes
 // defined in the same file). The same holds when the re-export's target is
 // not readable as a .js file (`require('../config')` resolving to
@@ -85,22 +119,19 @@ function isReadable(filePath, readFile) {
 // at a router, so an unreadable target must not abort the run the way a
 // directly mounted missing router does.
 function collectFromFile(filePath, prefix, readFile, ancestors, exportName) {
-  if (exportName) {
-    const hopKey = `${filePath}\0${exportName}`;
-    if (ancestors.has(hopKey)) return { routes: [], unparsedRoutes: [] };
-    const reExport = findExportedRequire(readFile(filePath), exportName);
-    const target = reExport && resolveRequiredFile(path.dirname(filePath), reExport.requirePath, readFile);
-    if (target && isReadable(target, readFile)) {
-      const hopAncestors = new Set(ancestors);
-      hopAncestors.add(hopKey);
-      return collectFromFile(target, prefix, readFile, hopAncestors, reExport.exportName);
-    }
+  const hopKey = `${filePath}\0${exportName || ''}`;
+  if (ancestors.has(hopKey)) return { routes: [], unparsedRoutes: [] };
+  const source = readFile(filePath);
+  const hop = chooseExportHop(filePath, source, exportName || null, readFile);
+  if (hop) {
+    const hopAncestors = new Set(ancestors);
+    hopAncestors.add(hopKey);
+    return collectFromFile(hop.target, prefix, readFile, hopAncestors, hop.exportName);
   }
   if (ancestors.has(filePath)) return { routes: [], unparsedRoutes: [] };
   const nextAncestors = new Set(ancestors);
   nextAncestors.add(filePath);
 
-  const source = readFile(filePath);
   const { directRoutes, mounts } = parseAppEntrySource(source);
 
   const routes = directRoutes.map((route) => ({ method: route.method, path: joinPath(prefix, route.path) }));

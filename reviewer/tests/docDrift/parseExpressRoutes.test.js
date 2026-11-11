@@ -1,4 +1,4 @@
-const { parseRouterSource, parseAppEntrySource, findUnparsedRoutes, findExportedRequire } = require('../../src/docDrift/parseExpressRoutes');
+const { parseRouterSource, parseAppEntrySource, findUnparsedRoutes, findExportedRequire, findExportHops, declaresExport } = require('../../src/docDrift/parseExpressRoutes');
 
 describe('parseRouterSource', () => {
   it('extracts one route per router.<verb>(path, ...) call', () => {
@@ -1218,6 +1218,56 @@ describe('findExportedRequire: a barrel file\'s named export (task 43)', () => {
     ].join('\n');
     expect(findExportedRequire(source, 'tasks')).toEqual({ requirePath: './tasks.routes', exportName: null });
     expect(findExportedRequire(source, 'users')).toBeNull();
+  });
+});
+
+describe('findExportHops: wholesale barrels (task 46)', () => {
+  it('answers a whole-module re-export for a whole-module and a named lookup', () => {
+    const source = "module.exports = require('./all');";
+    expect(findExportHops(source, null)).toEqual([{ requirePath: './all', exportName: null, via: 'module' }]);
+    expect(findExportHops(source, 'tasks')).toEqual([{ requirePath: './all', exportName: 'tasks', via: 'module' }]);
+  });
+
+  it('answers a member re-export for a whole-module lookup only', () => {
+    const source = "const all = require('./all');\nmodule.exports = all.routers";
+    expect(findExportHops(source, null)).toEqual([{ requirePath: './all', exportName: 'routers', via: 'module' }]);
+    expect(findExportHops(source, 'tasks')).toEqual([]);
+  });
+
+  it('lists spreads last-written first, across module.exports and Object.assign objects', () => {
+    const source = "const b = require('./b');\nmodule.exports = { ...require('./a'), own: 1, ...b, ...require('pkg'), ...other };\nObject.assign(exports, { ...require('./c') });";
+    expect(findExportHops(source, 'tasks').map((hop) => hop.requirePath)).toEqual(['./c', './b', './a']);
+    expect(findExportHops(source, 'tasks').every((hop) => hop.via === 'spread' && hop.exportName === 'tasks')).toBe(true);
+    expect(findExportHops(source, null)).toEqual([]);
+  });
+
+  it('gives no spread or whole-module hop for a name the file declares itself', () => {
+    const source = "module.exports = { ...require('./a'), tasks: router };";
+    expect(findExportHops(source, 'tasks')).toEqual([]);
+    expect(declaresExport(source, 'tasks')).toBe(true);
+    expect(declaresExport(source, 'users')).toBe(false);
+    expect(declaresExport("exports.users = make();", 'users')).toBe(true);
+  });
+
+  it('reads Object.assign object-literal arguments as named exports, and keeps findExportedRequire to named hops', () => {
+    const source = "Object.assign(module.exports, { a: fn(1, 2) }, { tasks: require('./tasks.routes') });";
+    expect(findExportHops(source, 'tasks')).toEqual([{ requirePath: './tasks.routes', exportName: null, via: 'named' }]);
+    expect(findExportedRequire(source, 'tasks')).toEqual({ requirePath: './tasks.routes', exportName: null });
+    expect(findExportedRequire("module.exports = require('./all');", 'tasks')).toBeNull();
+    expect(findExportedRequire("module.exports = { ...require('./all') };", 'tasks')).toBeNull();
+  });
+
+  it('ignores Object.assign onto anything but the exports object, and commented-out or quoted text', () => {
+    const sources = [
+      "Object.assign(target, { tasks: require('./tasks.routes') });",
+      "// Object.assign(module.exports, { tasks: require('./tasks.routes') });",
+      "const s = \"module.exports = require('./all');\";",
+      "/* module.exports = { ...require('./all') }; */",
+    ];
+    for (const source of sources) {
+      expect(findExportHops(source, 'tasks')).toEqual([]);
+      expect(findExportHops(source, null)).toEqual([]);
+    }
   });
 });
 

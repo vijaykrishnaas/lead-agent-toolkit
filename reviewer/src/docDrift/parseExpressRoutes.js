@@ -53,6 +53,12 @@ const MEMBER_ARG_PATTERN = /^([A-Za-z_$][\w$]*)\s*\??\.\s*([A-Za-z_$][\w$]*)$/;
 const MODULE_EXPORTS_OBJECT_PATTERN = /\bmodule\s*\.\s*exports\s*=\s*(?:exports\s*=\s*)?\{/g;
 const EXPORT_ENTRY_PATTERN = /^(?:([A-Za-z_$][\w$]*)|(['"])([^'"\\\n]*)\2)\s*(?::\s*([\s\S]+))?$/;
 const EXPORT_ASSIGNMENT_PATTERN = /(?<![\w$.])(?:module\s*\.\s*)?exports\s*\.\s*([A-Za-z_$][\w$]*)\s*=(?![=>])/g;
+// Barrels that hand on exports wholesale (see analyzeExports): a live
+// `module.exports = <rhs>` statement (any right-hand side; the `{` form is
+// counted too, so "the file's only export statement" can be checked), and an
+// `Object.assign(module.exports, ...)` / `Object.assign(exports, ...)` call.
+const WHOLE_MODULE_EXPORT_PATTERN = /(?<![\w$.])module\s*\.\s*exports\s*=(?![=>])/g;
+const OBJECT_ASSIGN_EXPORTS_PATTERN = /\bObject\s*\.\s*assign\(\s*(?:module\s*\.\s*)?exports\s*,/g;
 // Matches router.route('/path') / app.route('/path') so its chained
 // .<verb>(...) calls (e.g. .get(fn).post(fn)) can be found separately —
 // the head-call walk (CHAIN_HEAD_PATTERN) can't see them because the verb
@@ -458,17 +464,64 @@ function splitObjectEntries(masked, bodyStart) {
   return null;
 }
 
-// Where a file's named export `exportName` comes from when the file only
-// re-exports it from another file (a barrel): { requirePath, exportName } of
-// the relative require behind it, or null. Reads `module.exports = { name:
-// require('./x') }`, `module.exports = { name }` / `{ name: local }` with the
-// local bound by (or destructured from) a relative require, and
-// `exports.name = ...` / `module.exports.name = ...` with the same right-hand
-// sides. null -- the name is not exported that way, e.g. `module.exports =
-// { router }` with the router built in this same file -- tells the collector
-// to read this file itself. Matched on comment-masked source and checked
-// live against the full mask, so a commented-out or quoted export is ignored.
-function findExportedRequire(source, exportName) {
+// The end of a right-hand side starting at `valueStart`: the statement's `;`
+// or its line end at depth 0, counted on `masked`.
+function rightHandSideEnd(masked, valueStart) {
+  let depth = 0;
+  let end = valueStart;
+  for (; end < masked.length; end += 1) {
+    const ch = masked[end];
+    if (ch === '(' || ch === '[' || ch === '{') depth += 1;
+    else if (ch === ')' || ch === ']' || ch === '}') depth -= 1;
+    else if (depth === 0 && (ch === ';' || (ch === '\n' && masked.slice(valueStart, end).trim() !== ''))) break;
+  }
+  return end;
+}
+
+// The body start (index right after the "{") of every object literal that
+// sets this file's exports, in source order: `module.exports = {` (or
+// `module.exports = exports = {`) and each object-literal argument after the
+// first of `Object.assign(module.exports, { ... })` / `Object.assign(exports,
+// { ... })`. Matched on the full mask, so commented-out or quoted text is
+// never read.
+function exportObjectBodies(masked) {
+  const bodies = [];
+  for (const match of masked.matchAll(MODULE_EXPORTS_OBJECT_PATTERN)) bodies.push(match.index + match[0].length);
+  for (const match of masked.matchAll(OBJECT_ASSIGN_EXPORTS_PATTERN)) {
+    const args = splitTopLevelArgs(masked, match.index + match[0].indexOf('(') + 1) || [];
+    for (const [start, end] of args.slice(1)) {
+      const open = start + masked.slice(start, end).search(/\S/);
+      if (masked[open] === '{') bodies.push(open + 1);
+    }
+  }
+  return bodies.sort((a, b) => a - b);
+}
+
+// Reads how a file hands on its exports to other files. Returns { declared,
+// hops }: `hops` is the list of relative requires that may stand behind
+// `exportName` (or behind the whole module when `exportName` is null), in
+// the order the collector should prefer them, each { requirePath,
+// exportName, via }; `declared` is true when the file names `exportName`
+// itself (an own object entry or an `exports.name =` assignment), whatever
+// its value.
+//  - via 'named': `module.exports = { name: require('./x') }`, `{ name }` /
+//    `{ name: local }` with the local bound by (or destructured from) a
+//    relative require, the same entries in an `Object.assign(module.exports,
+//    { ... })` / `Object.assign(exports, { ... })` argument, and
+//    `exports.name = ...` / `module.exports.name = ...` with the same
+//    right-hand sides.
+//  - via 'spread': the name is not an own entry of any exports object, but an
+//    object has `...require('./x')` / `...local` entries; one hop per spread,
+//    the last-written first (later entries win in JavaScript). An own entry
+//    always beats a spread here, wherever it is written.
+//  - via 'module': the file's only `module.exports = ` statement is a
+//    relative require, a local bound by one, or one member of either; the
+//    hop keeps `exportName`. With a member (`module.exports =
+//    require('./x').routers`) only a whole-module lookup is answered -- a
+//    named export of a member would be two levels deep.
+// Matched on comment-masked source and checked live against the full mask,
+// so a commented-out or quoted export is ignored.
+function analyzeExports(source, exportName) {
   const { masked: commentMasked } = maskComments(source);
   const { masked } = maskStringLiterals(source);
   const resolve = buildRequireResolver(commentMasked, masked);
@@ -476,33 +529,68 @@ function findExportedRequire(source, exportName) {
     const resolved = resolve(text.trim());
     return resolved && resolved.requirePath.startsWith('.') ? resolved : null;
   };
+  let declared = false;
+  const spreads = [];
 
-  for (const match of masked.matchAll(MODULE_EXPORTS_OBJECT_PATTERN)) {
-    const entries = splitObjectEntries(masked, match.index + match[0].length) || [];
+  for (const bodyStart of exportObjectBodies(masked)) {
+    const entries = splitObjectEntries(masked, bodyStart) || [];
     for (const [start, end] of entries) {
-      const entry = EXPORT_ENTRY_PATTERN.exec(commentMasked.slice(start, end).trim());
-      if (!entry || (entry[1] || entry[3]) !== exportName) continue;
+      const text = commentMasked.slice(start, end).trim();
+      if (text.startsWith('...')) {
+        const spread = relative(text.slice(3));
+        // Only a whole module can be spread by name; `...require('./x').sub`
+        // would be two levels deep.
+        if (spread && !spread.exportName) spreads.push({ requirePath: spread.requirePath, exportName, via: 'spread' });
+        continue;
+      }
+      const entry = EXPORT_ENTRY_PATTERN.exec(text);
+      if (!entry || exportName === null || (entry[1] || entry[3]) !== exportName) continue;
+      declared = true;
       // Shorthand `{ name }` reads the local of the same name.
       const found = relative(entry[4] === undefined ? exportName : entry[4]);
-      if (found) return found;
+      if (found) return { declared, hops: [{ ...found, via: 'named' }] };
     }
   }
   for (const match of masked.matchAll(EXPORT_ASSIGNMENT_PATTERN)) {
     if (match[1] !== exportName) continue;
-    // The right-hand side runs to the statement's `;` or line end at depth 0.
+    declared = true;
     const valueStart = match.index + match[0].length;
-    let depth = 0;
-    let end = valueStart;
-    for (; end < masked.length; end += 1) {
-      const ch = masked[end];
-      if (ch === '(' || ch === '[' || ch === '{') depth += 1;
-      else if (ch === ')' || ch === ']' || ch === '}') depth -= 1;
-      else if (depth === 0 && (ch === ';' || (ch === '\n' && masked.slice(valueStart, end).trim() !== ''))) break;
-    }
-    const found = relative(commentMasked.slice(valueStart, end));
-    if (found) return found;
+    const found = relative(commentMasked.slice(valueStart, rightHandSideEnd(masked, valueStart)));
+    if (found) return { declared, hops: [{ ...found, via: 'named' }] };
   }
-  return null;
+  if (declared) return { declared, hops: [] };
+
+  const hops = exportName === null ? [] : spreads.reverse();
+  const wholeModule = [...masked.matchAll(WHOLE_MODULE_EXPORT_PATTERN)];
+  if (wholeModule.length === 1) {
+    const valueStart = wholeModule[0].index + wholeModule[0][0].length;
+    const found = relative(commentMasked.slice(valueStart, rightHandSideEnd(masked, valueStart)));
+    if (found && exportName === null) hops.push({ ...found, via: 'module' });
+    else if (found && !found.exportName) hops.push({ requirePath: found.requirePath, exportName, via: 'module' });
+  }
+  return { declared, hops };
+}
+
+// Every relative require that may stand behind a file's export `exportName`
+// (null: behind the module as a whole) -- see analyzeExports.
+function findExportHops(source, exportName) {
+  return analyzeExports(source, exportName).hops;
+}
+
+// Whether a file names the export `exportName` itself -- see analyzeExports.
+function declaresExport(source, exportName) {
+  return analyzeExports(source, exportName).declared;
+}
+
+// Where a file's named export `exportName` comes from when the file
+// re-exports that one name from another file (a barrel): { requirePath,
+// exportName } of the relative require behind it, or null -- the name is not
+// exported that way, e.g. `module.exports = { router }` with the router
+// built in this same file. Spread and whole-module barrels are answered by
+// findExportHops.
+function findExportedRequire(source, exportName) {
+  const named = findExportHops(source, exportName).find((hop) => hop.via === 'named');
+  return named ? { requirePath: named.requirePath, exportName: named.exportName } : null;
 }
 
 // Classifies every live app|router.use(...) call in source order, including
@@ -684,4 +772,4 @@ function findUnparsedRoutes(source) {
   return findings;
 }
 
-module.exports = { parseRouterSource, parseAppEntrySource, findUnparsedRoutes, findExportedRequire };
+module.exports = { parseRouterSource, parseAppEntrySource, findUnparsedRoutes, findExportedRequire, findExportHops, declaresExport };

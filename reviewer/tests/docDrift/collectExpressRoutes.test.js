@@ -525,6 +525,215 @@ describe('collectExpressRoutes', () => {
     });
   });
 
+  describe('a barrel that hands on another module wholesale (task 46)', () => {
+    const collect = (files) => {
+      const readFile = (filePath) => {
+        if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+        return files[filePath];
+      };
+      return collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile });
+    };
+    const tasksRoutes = { '/repo/src/routes/tasks.routes.js': "router.get('/:id', show);\nmodule.exports = router;" };
+    const wholeMount = "const r = require('./routes');\napp.use('/api', r);";
+    const namedMount = "const r = require('./routes');\napp.use('/api', r.tasks);";
+    const all = { '/repo/src/routes/all.js': "module.exports = { tasks: require('./tasks.routes') };" };
+    const listed = { routes: [{ method: 'GET', path: '/api/:id' }], unparsedRoutes: [] };
+
+    it('(a) follows a whole-module mount of a whole-module re-export', () => {
+      const files = { ...tasksRoutes, '/repo/src/app.js': wholeMount, '/repo/src/routes/index.js': "module.exports = require('./tasks.routes');" };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('(a) follows a whole-module re-export of a local bound by a relative require', () => {
+      const files = { ...tasksRoutes, '/repo/src/app.js': wholeMount, '/repo/src/routes/index.js': "const tasks = require('./tasks.routes');\n\nmodule.exports = tasks;" };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('(a) follows a whole-module re-export of one member of a require', () => {
+      const files = {
+        '/repo/src/app.js': wholeMount,
+        '/repo/src/routes/index.js': "module.exports = require('./tasks.routes').router;",
+        '/repo/src/routes/tasks.routes.js': "router.get('/:id', show);\nmodule.exports = { router };",
+      };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('(b) follows a named mount through a whole-module re-export of a barrel', () => {
+      const files = { ...tasksRoutes, ...all, '/repo/src/app.js': namedMount, '/repo/src/routes/index.js': "module.exports = require('./all');" };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('(c) follows a named mount through a spread of a barrel', () => {
+      const files = { ...tasksRoutes, ...all, '/repo/src/app.js': namedMount, '/repo/src/routes/index.js': "module.exports = { ...require('./all') };" };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('(c) follows a spread of a local, next to unrelated own entries', () => {
+      const files = {
+        ...tasksRoutes,
+        ...all,
+        '/repo/src/app.js': namedMount,
+        '/repo/src/routes/index.js': "const more = require('./all');\nmodule.exports = { health: (req, res) => res.end('a,b}'), ...more };",
+      };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('(c) lets the later spread that names the export win', () => {
+      const files = {
+        '/repo/src/app.js': namedMount,
+        '/repo/src/routes/index.js': "module.exports = { ...require('./old'), ...require('./new'), ...require('./other') };",
+        '/repo/src/routes/old.js': "module.exports = { tasks: require('./old.routes') };",
+        '/repo/src/routes/new.js': "module.exports = { tasks: require('./new.routes') };",
+        '/repo/src/routes/other.js': "module.exports = { users: require('./users.routes') };",
+        '/repo/src/routes/old.routes.js': "router.get('/old', h);",
+        '/repo/src/routes/new.routes.js': "router.get('/new', h);",
+        '/repo/src/routes/users.routes.js': "router.get('/users', h);",
+      };
+      expect(collect(files).routes).toEqual([{ method: 'GET', path: '/api/new' }]);
+    });
+
+    it('(c) prefers an own entry over a spread, and reads the file itself when the own entry is local', () => {
+      const own = {
+        ...tasksRoutes,
+        ...all,
+        '/repo/src/app.js': namedMount,
+        '/repo/src/routes/index.js': "module.exports = { ...require('./all'), tasks: require('./mine.routes') };",
+        '/repo/src/routes/mine.routes.js': "router.get('/mine', h);",
+      };
+      expect(collect(own).routes).toEqual([{ method: 'GET', path: '/api/mine' }]);
+      const local = { ...own, '/repo/src/routes/index.js': "router.get('/here', h);\nmodule.exports = { ...require('./all'), tasks: router };" };
+      expect(collect(local).routes).toEqual([{ method: 'GET', path: '/api/here' }]);
+    });
+
+    for (const target of ['module.exports', 'exports']) {
+      it(`(d) follows a named mount through Object.assign(${target}, { ... })`, () => {
+        const files = {
+          ...tasksRoutes,
+          '/repo/src/app.js': namedMount,
+          '/repo/src/routes/index.js': `Object.assign(${target}, { helper: make(1, 2) }, { tasks: require('./tasks.routes') });`,
+        };
+        expect(collect(files)).toEqual(listed);
+      });
+    }
+
+    it('(d) follows a spread inside an Object.assign argument', () => {
+      const files = { ...tasksRoutes, ...all, '/repo/src/app.js': namedMount, '/repo/src/routes/index.js': "Object.assign(module.exports, { ...require('./all') });" };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('follows a whole-module re-export chain of two files', () => {
+      const files = {
+        ...tasksRoutes,
+        '/repo/src/app.js': wholeMount,
+        '/repo/src/routes/index.js': "module.exports = require('./v1');",
+        '/repo/src/routes/v1.js': "module.exports = require('./tasks.routes');",
+      };
+      expect(collect(files)).toEqual(listed);
+    });
+
+    it('terminates on a self-referencing whole-module re-export', () => {
+      for (const appSource of [wholeMount, namedMount]) {
+        const files = { '/repo/src/app.js': appSource, '/repo/src/routes/index.js': "module.exports = require('./index');" };
+        expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [] });
+      }
+    });
+
+    it('terminates on two files re-exporting each other', () => {
+      const files = {
+        '/repo/src/app.js': namedMount,
+        '/repo/src/routes/index.js': "module.exports = { ...require('./all') };",
+        '/repo/src/routes/all.js': "module.exports = require('./index');",
+      };
+      expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [] });
+    });
+
+    it('ignores a commented-out or quoted re-export line', () => {
+      const sources = [
+        "// module.exports = require('./tasks.routes');\nrouter.get('/own', h);\nmodule.exports = router;",
+        "/* module.exports = require('./tasks.routes'); */\nconst note = \"module.exports = require('./tasks.routes');\";\nrouter.get('/own', h);",
+        "// Object.assign(module.exports, { tasks: require('./tasks.routes') });\nconst s = '{ ...require(\"./all\") }';\nrouter.get('/own', h);",
+      ];
+      for (const source of sources) {
+        for (const appSource of [wholeMount, namedMount]) {
+          const files = { ...tasksRoutes, ...all, '/repo/src/app.js': appSource, '/repo/src/routes/index.js': source };
+          expect(collect(files).routes).toEqual([{ method: 'GET', path: '/api/own' }]);
+        }
+      }
+    });
+
+    it('does not follow a re-export pointing at a bare package or a .json file', () => {
+      const sources = [
+        "module.exports = require('express-promise-router');",
+        "module.exports = require('./config.json');",
+        "module.exports = { ...require('lodash'), ...require('./config.json') };",
+        "Object.assign(module.exports, { tasks: require('helmet') });",
+      ];
+      for (const source of sources) {
+        for (const appSource of [wholeMount, namedMount]) {
+          const files = { '/repo/src/app.js': appSource, '/repo/src/routes/index.js': source };
+          expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [] });
+        }
+      }
+    });
+
+    it('reads the file itself when the re-export target is not a readable .js file', () => {
+      const sources = ["module.exports = require('../config');", "module.exports = { ...require('../config') };"];
+      for (const source of sources) {
+        const files = { '/repo/src/app.js': namedMount, '/repo/src/config.json': '{}', '/repo/src/routes/index.js': source };
+        expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [] });
+      }
+    });
+
+    it('reads a file with its own routes or mounts itself, despite a whole-module re-export line', () => {
+      const withRoutes = {
+        '/repo/src/app.js': wholeMount,
+        '/repo/src/routes/index.js': "const router = require('./makeRouter')();\nrouter.get('/own', h);\nmodule.exports = router;",
+        '/repo/src/routes/makeRouter.js': "module.exports = () => express.Router();",
+      };
+      expect(collect(withRoutes).routes).toEqual([{ method: 'GET', path: '/api/own' }]);
+      const withMounts = {
+        ...tasksRoutes,
+        ...withRoutes,
+        '/repo/src/routes/index.js': "const router = require('./makeRouter')();\nrouter.use('/tasks', require('./tasks.routes'));\nmodule.exports = router;",
+      };
+      expect(collect(withMounts).routes).toEqual([{ method: 'GET', path: '/api/tasks/:id' }]);
+    });
+
+    it('does not treat a file with two module.exports statements as a wholesale barrel', () => {
+      const files = {
+        ...tasksRoutes,
+        '/repo/src/app.js': wholeMount,
+        '/repo/src/routes/index.js': "module.exports = require('./tasks.routes');\nif (legacy) module.exports = require('./legacy.routes');",
+        '/repo/src/routes/legacy.routes.js': "router.get('/legacy', h);",
+      };
+      expect(collect(files)).toEqual({ routes: [], unparsedRoutes: [] });
+    });
+
+    it('reports an unparsed route behind a wholesale barrel against the routes file', () => {
+      const files = {
+        '/repo/src/app.js': wholeMount,
+        '/repo/src/routes/index.js': "module.exports = require('./tasks.routes');",
+        '/repo/src/routes/tasks.routes.js': 'router.get(`/${id}`, show);',
+      };
+      expect(collect(files)).toEqual({
+        routes: [],
+        unparsedRoutes: [expect.objectContaining({ type: 'unparsed-route', file: '/repo/src/routes/tasks.routes.js' })],
+      });
+    });
+
+    it('still lists the same router mounted twice through a wholesale barrel', () => {
+      const files = {
+        ...tasksRoutes,
+        '/repo/src/app.js': "const r = require('./routes');\napp.use('/api/v1', r);\napp.use('/api/v2', r);",
+        '/repo/src/routes/index.js': "module.exports = require('./tasks.routes');",
+      };
+      expect(collect(files).routes).toEqual([
+        { method: 'GET', path: '/api/v1/:id' },
+        { method: 'GET', path: '/api/v2/:id' },
+      ]);
+    });
+  });
+
   describe('a router built by a factory exported from a relative require (task 44)', () => {
     const collect = (files) => {
       const readFile = (filePath) => {

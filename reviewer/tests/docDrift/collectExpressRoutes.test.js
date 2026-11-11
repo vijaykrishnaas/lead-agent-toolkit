@@ -334,4 +334,29 @@ describe('collectExpressRoutes', () => {
       unparsedRoutes: [],
     });
   });
+
+  it('does not try to read a relative .json/.node require used as a use() argument as a router file', () => {
+    const files = {
+      '/repo/src/app.js': [
+        "const cfg = require('./config.json');",
+        "const { limiter } = require('./settings.json');",
+        "const native = require('./build/addon.node');",
+        "app.use(cfg.mw);",
+        "app.use('/api', limiter);",
+        "app.use(native);",
+        "app.use('/api/tasks', require('./tasks.routes'));",
+      ].join('\n'),
+      '/repo/src/config.json': '{}',
+      '/repo/src/settings.json': '{}',
+      '/repo/src/tasks.routes.js': "router.get('/:id', show);",
+    };
+    const readFile = (filePath) => {
+      if (!(filePath in files)) throw Object.assign(new Error(`ENOENT ${filePath}`), { code: 'ENOENT' });
+      return files[filePath];
+    };
+    expect(collectExpressRoutes({ appEntryPath: '/repo/src/app.js' }, { readFile })).toEqual({
+      routes: [{ method: 'GET', path: '/api/tasks/:id' }],
+      unparsedRoutes: [],
+    });
+  });
 });

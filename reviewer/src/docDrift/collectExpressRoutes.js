@@ -60,6 +60,11 @@ function collectFromFile(filePath, prefix, readFile, ancestors) {
     // A bare specifier (e.g. 'swagger-ui-express') is an npm package, not a
     // router file in this repo; resolving it as a path would throw ENOENT.
     if (!requirePath.startsWith('.')) continue;
+    // A relative .json/.node require (config data, a native addon) is never
+    // a router source file either; guessing <path>.js for it would throw
+    // ENOENT and abort the whole run over a use() argument such as
+    // `cfg.mw` with `const cfg = require('./config.json')`.
+    if (/\.(?:json|node)$/.test(requirePath)) continue;
     const routerPath = resolveRouterPath(path.resolve(fileDir, requirePath), readFile);
     const nested = collectFromFile(routerPath, joinPath(prefix, mountPrefix), readFile, nextAncestors);
     routes.push(...nested.routes);
